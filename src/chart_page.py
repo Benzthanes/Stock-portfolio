@@ -1,0 +1,2395 @@
+"""
+Standalone Technical Chart & AI Multi-Technical Confluence Decision Page Generator.
+Generates a full-page, non-overlay, high-performance interactive charting dashboard
+saved to reports/stock_chart.html.
+"""
+
+import json
+from pathlib import Path
+from typing import Dict, Any, List, Optional
+from src.chart_data import load_candles_cache
+
+
+def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
+    """
+    Collects rich metadata (name, sector, exchange, cost, price, levels)
+    across portfolio holdings, simulation holdings, and trade records.
+    """
+    meta: Dict[str, Dict[str, Any]] = {}
+    
+    # Well-known fallback names for popular US equities
+    KNOWN_NAMES = {
+        "NVDA": ("NVIDIA Corporation", "Semiconductors", "NASDAQ"),
+        "AAPL": ("Apple Inc.", "Consumer Electronics", "NASDAQ"),
+        "MSFT": ("Microsoft Corporation", "Software Infrastructure", "NASDAQ"),
+        "AMZN": ("Amazon.com, Inc.", "Internet Retail", "NASDAQ"),
+        "GOOGL": ("Alphabet Inc. Class A", "Internet Content & Information", "NASDAQ"),
+        "PLTR": ("Palantir Technologies Inc.", "Software Infrastructure", "NASDAQ"),
+        "LLY": ("Eli Lilly and Company", "Pharmaceuticals", "NYSE"),
+        "ISRG": ("Intuitive Surgical, Inc.", "Medical Instruments", "NASDAQ"),
+        "BMY": ("Bristol-Myers Squibb Company", "Pharmaceuticals", "NYSE"),
+        "JPM": ("JPMorgan Chase & Co.", "Diversified Banking", "NYSE"),
+        "CRWD": ("CrowdStrike Holdings, Inc.", "Cybersecurity Software", "NASDAQ"),
+        "BNY": ("Bank of New York Mellon Corp", "Asset Management", "NYSE"),
+        "SPCX": ("CrossingBridge Pre-Merger SPAC ETF", "Exchange Traded Fund", "NASDAQ"),
+        "QQQI": ("NEOS Nasdaq 100 High Income ETF", "High Yield ETF", "NASDAQ"),
+        "ROST": ("Ross Stores, Inc.", "Apparel Retail", "NASDAQ"),
+        "NOK": ("Nokia Corporation", "Telecom Equipment", "NYSE"),
+        "AMAT": ("Applied Materials, Inc.", "Semiconductor Equipment", "NASDAQ"),
+        "LRCX": ("Lam Research Corporation", "Semiconductor Equipment", "NASDAQ"),
+        "MU": ("Micron Technology, Inc.", "Memory Semiconductors", "NASDAQ"),
+        "ARM": ("Arm Holdings plc", "Semiconductor IP", "NASDAQ"),
+        "JNJ": ("Johnson & Johnson", "Pharmaceuticals & Healthcare", "NYSE"),
+        "VOO": ("Vanguard S&P 500 ETF", "Index ETF", "AMEX"),
+        "MNST": ("Monster Beverage Corp", "Non-Alcoholic Beverages", "NASDAQ"),
+        "INTC": ("Intel Corporation", "Semiconductors", "NASDAQ"),
+        "VRT": ("Vertiv Holdings Co", "Data Center Infrastructure", "NYSE"),
+        "NOW": ("ServiceNow, Inc.", "Enterprise Software", "NYSE"),
+        "C": ("Citigroup Inc.", "Diversified Banking", "NYSE"),
+        "BAC": ("Bank of America Corporation", "Diversified Banking", "NYSE"),
+        "VRTX": ("Vertex Pharmaceuticals Inc.", "Biotechnology", "NASDAQ"),
+        "ABNB": ("Airbnb, Inc.", "Travel Services", "NASDAQ"),
+        "APP": ("AppLovin Corporation", "Application Software", "NASDAQ"),
+        "VST": ("Vistra Corp.", "Independent Power Producers", "NYSE"),
+    }
+
+    # 1. From portfolio.json
+    p_path = Path("data/portfolio.json")
+    if p_path.exists():
+        try:
+            p_data = json.loads(p_path.read_text(encoding="utf-8"))
+            for h in p_data.get("holdings", []):
+                t = h["ticker"]
+                meta[t] = {
+                    "ticker": t,
+                    "name": h.get("name", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[0]),
+                    "sector": h.get("sector", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[1]),
+                    "exchange": h.get("exchange", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[2]),
+                    "cost": h.get("avg_cost_usd", 0.0),
+                    "price": h.get("close_price", 0.0),
+                    "support": h.get("key_support", 0.0),
+                    "resistance": h.get("key_resistance", 0.0),
+                    "sl": h.get("stop_loss", 0.0),
+                    "tp": h.get("take_profit", 0.0),
+                    "target": h.get("price_target_average", 0.0),
+                    "days_to_earnings": None,
+                    "earnings_date": "-",
+                    "is_earnings_near": False,
+                }
+        except Exception:
+            pass
+
+    # 2. From portfolio_dip_sim.json
+    d_path = Path("data/portfolio_dip_sim.json")
+    if d_path.exists():
+        try:
+            d_data = json.loads(d_path.read_text(encoding="utf-8"))
+            for h in d_data.get("holdings", []):
+                t = h["ticker"]
+                if t not in meta:
+                    meta[t] = {
+                        "ticker": t,
+                        "name": h.get("name", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[0]),
+                        "sector": h.get("sector", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[1]),
+                        "exchange": h.get("exchange", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[2]),
+                        "cost": h.get("avg_cost_usd", 0.0),
+                        "price": h.get("close_price", 0.0),
+                        "support": h.get("key_support", 0.0),
+                        "resistance": h.get("key_resistance", 0.0),
+                        "sl": h.get("stop_loss", 0.0),
+                        "tp": h.get("take_profit", 0.0),
+                        "target": h.get("price_target_average", 0.0),
+                        "days_to_earnings": None,
+                        "earnings_date": "-",
+                        "is_earnings_near": False,
+                    }
+        except Exception:
+            pass
+
+    # 3. From trades.json
+    t_path = Path("data/trades.json")
+    if t_path.exists():
+        try:
+            t_data = json.loads(t_path.read_text(encoding="utf-8"))
+            for tr in t_data.get("trades", []):
+                t = tr["ticker"]
+                if t not in meta:
+                    meta[t] = {
+                        "ticker": t,
+                        "name": tr.get("name", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[0]),
+                        "sector": "Closed / Realized Trade",
+                        "exchange": tr.get("exchange", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[2]),
+                        "cost": tr.get("buy_price_usd", 0.0),
+                        "price": tr.get("sell_price_usd", 0.0),
+                        "support": 0.0,
+                        "resistance": 0.0,
+                        "sl": 0.0,
+                        "tp": tr.get("sell_price_usd", 0.0),
+                        "target": 0.0,
+                        "days_to_earnings": None,
+                        "earnings_date": "-",
+                        "is_earnings_near": False,
+                    }
+        except Exception:
+            pass
+
+    # 4. Fill in remaining from KNOWN_NAMES
+    for t, (nm, sec, exch) in KNOWN_NAMES.items():
+        if t not in meta:
+            meta[t] = {
+                "ticker": t,
+                "name": nm,
+                "sector": sec,
+                "exchange": exch,
+                "cost": 0.0,
+                "price": 0.0,
+                "support": 0.0,
+                "resistance": 0.0,
+                "sl": 0.0,
+                "tp": 0.0,
+                "target": 0.0,
+                "days_to_earnings": None,
+                "earnings_date": "-",
+                "is_earnings_near": False,
+            }
+
+    # 5. Enrich with earnings calendar from data/.port_analysis.json
+    pa_path = Path("data/.port_analysis.json")
+    if pa_path.exists():
+        try:
+            pa_data = json.loads(pa_path.read_text(encoding="utf-8"))
+            for p in pa_data.get("positions", []):
+                t = p.get("ticker")
+                if t and t in meta:
+                    meta[t]["days_to_earnings"] = p.get("days_to_earnings")
+                    meta[t]["earnings_date"] = p.get("earnings_date", "-")
+                    meta[t]["is_earnings_near"] = p.get("is_earnings_near", False)
+        except Exception:
+            pass
+
+    return meta
+
+
+def generate_stock_chart_page_html() -> str:
+    """
+    Builds the full HTML document for reports/stock_chart.html.
+    Features:
+    - Standalone full-page view (no overlay, no nested scrolling).
+    - Top Back button that returns to the previous report page.
+    - Quick ticker navigation carousel & search.
+    - All indicator toggles default to OFF (pure candlestick + volume start).
+    - Native mouse-wheel chart zooming enabled.
+    - Full AI Confluence Decision Engine & Classical Pattern Deep-Dive Breakdown.
+    """
+    cache = load_candles_cache()
+    meta = get_all_stocks_metadata()
+
+    # Ensure all cache entries have price and name if missing
+    for t, entry in cache.items():
+        if t in meta:
+            if not meta[t]["price"] and entry.get("candles"):
+                meta[t]["price"] = entry["candles"][-1]["close"]
+        else:
+            last_p = entry["candles"][-1]["close"] if entry.get("candles") else 0.0
+            meta[t] = {
+                "ticker": t,
+                "name": t,
+                "sector": "US Equity",
+                "exchange": "US",
+                "cost": 0.0,
+                "price": last_p,
+                "support": 0.0,
+                "resistance": 0.0,
+                "sl": 0.0,
+                "tp": 0.0,
+                "target": 0.0,
+            }
+
+    chart_data_json = json.dumps(cache, ensure_ascii=False)
+    meta_json = json.dumps(meta, ensure_ascii=False)
+
+    reports_dir = Path(__file__).resolve().parent.parent / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    js_content = f"window.CHARTS_DATA = {chart_data_json};\nwindow.STOCKS_META = {meta_json};\n"
+    (reports_dir / "chart_data.js").write_text(js_content, encoding="utf-8")
+    all_tickers = sorted(list(cache.keys()))
+    # Put portfolio core holdings first
+    priority_order = ["NVDA", "PLTR", "LLY", "ISRG", "MSFT", "AMZN", "GOOGL", "AAPL", "VST", "CRWD", "BMY", "JPM", "VOO", "VRT", "APP", "MNST", "ROST", "MU", "ARM", "NOK", "INTC", "C", "BAC", "VRTX", "ABNB", "NOW", "SPCX", "QQQI", "BNY", "AMAT", "LRCX", "JNJ"]
+    sorted_tickers = [t for t in priority_order if t in all_tickers] + [t for t in all_tickers if t not in priority_order]
+    sorted_tickers_json = json.dumps(sorted_tickers)
+
+    pills_html = []
+    for t in sorted_tickers:
+        m = meta.get(t, {})
+        p = m.get("price", 0.0)
+        p_txt = f"${p:,.2f}" if p > 0 else ""
+        pills_html.append(
+            f'<button class="sp-pill" id="pill_{t}" onclick="selectStock(\'{t}\')" title="{m.get("name", t)}">'
+            f'<span class="sp-pill-t">{t}</span>'
+            f'<span class="sp-pill-p">{p_txt}</span>'
+            f'</button>'
+        )
+    pills_html_str = "\n".join(pills_html)
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Chart & AI Confluence Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- TradingView Lightweight Charts & Technical Widgets -->
+    <script type="text/javascript" src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        :root {{
+            --bg-page: #060810;
+            --bg-card: #0d1222;
+            --bg-surface: #12182b;
+            --border-color: rgba(255, 255, 255, 0.09);
+            --border-glow: rgba(59, 130, 246, 0.35);
+            --blue: #3b82f6;
+            --blue-hover: #60a5fa;
+            --emerald: #10b981;
+            --emerald-bright: #34d399;
+            --rose: #f43f5e;
+            --amber: #f59e0b;
+            --purple: #a855f7;
+            --cyan: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }}
+
+        * {{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }}
+
+        body {{
+            background: var(--bg-page);
+            color: var(--text-primary);
+            font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }}
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {{
+            width: 8px;
+            height: 8px;
+        }}
+        ::-webkit-scrollbar-track {{
+            background: #080c18;
+        }}
+        ::-webkit-scrollbar-thumb {{
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 4px;
+        }}
+        ::-webkit-scrollbar-thumb:hover {{
+            background: rgba(59, 130, 246, 0.5);
+        }}
+
+        /* Container */
+        .chart-page-container {{
+            max-width: 1560px;
+            margin: 0 auto;
+            padding: 18px 24px 60px 24px;
+        }}
+
+        /* Top Nav Bar */
+        .top-nav-bar {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }}
+
+        .nav-back-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.14);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            color: #60a5fa;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 0.90rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Prompt', sans-serif;
+        }}
+        .nav-back-btn:hover {{
+            background: #3b82f6;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+        }}
+
+        .nav-links {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }}
+        .nav-link-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.18s;
+        }}
+        .nav-link-btn:hover {{
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }}
+
+        .hotkey-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+        }}
+        .hotkey-badge kbd {{
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            padding: 1px 6px;
+            color: #f8fafc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }}
+
+        .agg-tf-btn.active {{
+            background: var(--emerald) !important;
+            color: #ffffff !important;
+            border-color: var(--emerald-bright) !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }}
+
+        /* Ticker Switcher Carousel */
+        .ticker-carousel-wrap {{
+            background: #090e1c;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+
+        .search-box {{
+            flex-shrink: 0;
+            width: 170px;
+        }}
+        .search-input {{
+            width: 100%;
+            background: #060914;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 7px 12px;
+            color: #f8fafc;
+            font-size: 0.82rem;
+            font-family: 'Prompt', sans-serif;
+            outline: none;
+            transition: border 0.15s;
+        }}
+        .search-input:focus {{
+            border-color: var(--blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }}
+
+        .pills-scroll {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px 4px 6px 4px;
+            scroll-behavior: smooth;
+        }}
+        .sp-pill {{
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 5px 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+        }}
+        .sp-pill:hover {{
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }}
+        .sp-pill.active {{
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            border-color: #60a5fa;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        }}
+        .sp-pill-t {{
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: #f8fafc;
+        }}
+        .sp-pill-p {{
+            font-size: 0.74rem;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }}
+        .sp-pill.active .sp-pill-p {{
+            color: #dbeafe;
+        }}
+
+        /* Stock Main Card */
+        .stock-main-card {{
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }}
+
+        /* Stock Header */
+        .stock-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #0a0f1e;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 16px;
+        }}
+
+        .stock-title-wrap {{
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }}
+        .stock-ticker-badge {{
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }}
+        .stock-name-box h1 {{
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #f8fafc;
+            line-height: 1.25;
+        }}
+        .stock-name-box p {{
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }}
+
+        .stock-header-actions {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }}
+
+        /* Tab Switcher */
+        .view-tabs {{
+            display: flex;
+            gap: 6px;
+            background: #060914;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }}
+        .v-tab-btn {{
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Prompt', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        .v-tab-btn:hover {{
+            color: #ffffff;
+        }}
+        .v-tab-btn.active {{
+            background: var(--blue);
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+        }}
+
+        .jump-btn {{
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Prompt', sans-serif;
+        }}
+        .jump-btn:hover {{
+            background: rgba(59, 130, 246, 0.25);
+            color: #ffffff;
+            border-color: #60a5fa;
+            transform: translateY(-1px);
+        }}
+
+        .ext-tv-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }}
+        .ext-tv-btn:hover {{
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }}
+
+        /* Telemetry HUD Strip */
+        .hud-strip {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            padding: 10px 24px;
+            background: #080c18;
+            border-bottom: 1px solid var(--border-color);
+            font-family: 'Inter', sans-serif;
+        }}
+        .hud-card {{
+            display: flex;
+            flex-direction: column;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            min-width: 0;
+        }}
+        .hud-label {{
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }}
+        .hud-val {{
+            font-size: 0.90rem;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'JetBrains Mono', monospace;
+        }}
+
+        /* Control & Timeframe Toolbar */
+        .chart-toolbar {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 8px 24px;
+            background: #090e1c;
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+        }}
+        .tf-btn-group {{
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }}
+        .tf-btn {{
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }}
+        .tf-btn:hover {{
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }}
+        .tf-btn.active {{
+            background: var(--blue);
+            color: #ffffff;
+            border-color: #60a5fa;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+        }}
+
+        .ind-btn-group {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }}
+        .ind-pill {{
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            transition: all 0.18s ease;
+            font-family: 'Inter', sans-serif;
+        }}
+        .ind-pill:hover {{
+            background: rgba(255, 255, 255, 0.09);
+            color: #f1f5f9;
+        }}
+        .ind-pill.active {{
+            border-color: currentColor;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 10px currentColor;
+        }}
+
+        .reset-ind-btn {{
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #fda4af;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }}
+        .reset-ind-btn:hover {{
+            background: var(--rose);
+            color: #ffffff;
+        }}
+
+        .zoom-hint {{
+            font-size: 0.74rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+
+        /* Fibonacci Level Chips Bar */
+        .fibo-chips-bar {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            padding: 5px 24px;
+            background: #060912;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.74rem;
+            font-family: 'Inter', sans-serif;
+        }}
+        .fibo-chip {{
+            padding: 2px 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: #cbd5e1;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }}
+        .fibo-chip.golden {{
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            font-weight: 700;
+        }}
+
+        /* Chart Body */
+        .chart-canvas-body {{
+            width: 100%;
+            height: 680px;
+            min-height: 680px;
+            position: relative;
+            background: #0a0e1a;
+        }}
+
+        /* AI Decision Section */
+        .ai-decision-section {{
+            padding: 22px 26px;
+            background: #0c1122;
+            border-top: 1px solid var(--border-color);
+        }}
+        .ai-sec-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }}
+        .ai-sec-title {{
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        .sig-chips-row {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 16px;
+        }}
+        .tv-sig-chip {{
+            padding: 5px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        .tv-sig-chip:hover {{
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }}
+        .tv-sig-chip.active {{
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.25));
+            border-color: #60a5fa;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }}
+
+        /* Decision Card */
+        .decision-card-body {{
+            background: #080c18;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 14px;
+            padding: 18px 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }}
+        .dc-top {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 14px;
+        }}
+        .dc-badge {{
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+        }}
+        .dc-badge.buy {{ background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; }}
+        .dc-badge.dca {{ background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; }}
+        .dc-badge.sell {{ background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.4); color: #fb7185; }}
+        .dc-badge.hold {{ background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; }}
+
+        .dc-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }}
+        .dc-box {{
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }}
+        .dc-box-title {{
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        .dc-checklist {{
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }}
+        .dc-checklist li {{
+            font-size: 0.80rem;
+            color: #cbd5e1;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            line-height: 1.4;
+        }}
+        .dc-checklist li::before {{
+            content: '✔';
+            color: #34d399;
+            font-weight: 800;
+        }}
+
+        /* Pattern Deep Dive */
+        .pattern-deepdive-section {{
+            padding: 22px 26px;
+            background: #080c16;
+            border-top: 1px solid var(--border-color);
+        }}
+        .pdd-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }}
+        .pdd-card {{
+            background: #0e1324;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }}
+        .pdd-card-title {{
+            font-size: 0.80rem;
+            font-weight: 800;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        .pdd-card-body {{
+            font-size: 0.84rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }}
+    </style>
+</head>
+<body>
+    <div class="chart-page-container">
+        <!-- Top Navigation Bar -->
+        <div class="top-nav-bar">
+            <button class="nav-back-btn" onclick="goBackToPortfolio()">
+                <span style="font-size: 1.2rem; font-weight: 800;">←</span> กลับไปหน้ารายงานพอร์ต (Back)
+            </button>
+            <div class="hotkey-badge">
+                ⌨️ <b>คีย์ลัด:</b> <kbd>←</kbd> <kbd>→</kbd> สลับหุ้น • <kbd>/</kbd> ค้นหา • <kbd>F</kbd> Fibo • <kbd>E</kbd> EMA200 • <kbd>S</kbd> Supertrend • <kbd>T</kbd> Live
+            </div>
+            <div class="nav-links">
+                <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-right: 4px;">รายงานทั้งหมด:</span>
+                <a href="portfolio_master.html" class="nav-link-btn">🏛️ Master</a>
+                <a href="portfolio_review.html" class="nav-link-btn">🏥 Health</a>
+                <a href="portfolio_recovery.html" class="nav-link-btn">🩹 Recovery</a>
+                <a href="portfolio_dip_sim.html" class="nav-link-btn">🧪 Dip Sim</a>
+                <a href="trades_ledger.html" class="nav-link-btn">📈 Trades</a>
+            </div>
+        </div>
+
+        <!-- Ticker Quick-Switcher Carousel -->
+        <div class="ticker-carousel-wrap">
+            <div class="search-box">
+                <input type="text" id="ticker_search" class="search-input" placeholder="🔍 ค้นหาหุ้น..." oninput="filterTickerPills(this.value)">
+            </div>
+            <div class="pills-scroll" id="pills_container">
+                {pills_html_str}
+            </div>
+        </div>
+
+        <!-- Stock Main Chart Card -->
+        <div class="stock-main-card">
+            <!-- Header -->
+            <div class="stock-header">
+                <div class="stock-title-wrap">
+                    <span id="st_ticker_pill" class="stock-ticker-badge">NVDA</span>
+                    <div class="stock-name-box">
+                        <h1 id="st_name">NVIDIA Corporation</h1>
+                        <p id="st_sector_exchange">Semiconductors • NASDAQ</p>
+                    </div>
+                </div>
+
+                <div class="stock-header-actions">
+                    <div class="view-tabs">
+                        <button id="btn_mode_tech" class="v-tab-btn active" onclick="switchChartTab('tech')">
+                            📐 All Technicals & AI Decisions
+                        </button>
+                        <button id="btn_mode_tv" class="v-tab-btn" onclick="switchChartTab('tv')">
+                            🌐 TradingView Live Embed
+                        </button>
+                    </div>
+
+                    <button class="jump-btn" id="btn_jump_ai" onclick="document.getElementById('ai_decision_panel').scrollIntoView({{behavior:'smooth'}})">
+                        🤖 จุดซื้อ-ขาย AI
+                    </button>
+                    <button class="jump-btn" id="btn_jump_pat" onclick="document.getElementById('pattern_deepdive_panel').scrollIntoView({{behavior:'smooth'}})">
+                        📐 เจาะลึก Pattern
+                    </button>
+
+                    <a id="st_ext_link" href="#" target="_blank" rel="noopener noreferrer" class="ext-tv-btn">
+                        TradingView ↗
+                    </a>
+                </div>
+            </div>
+
+            <!-- Telemetry Level HUD Strip -->
+            <div class="hud-strip">
+                <div class="hud-card">
+                    <span class="hud-label">🎯 ต้นทุน (Cost)</span>
+                    <span id="hud_cost" class="hud-val">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">⚡ ราคาตลาด (Price)</span>
+                    <span id="hud_price" class="hud-val">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🛡️ แนวรับ (Support)</span>
+                    <span id="hud_support" class="hud-val" style="color: #10b981;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🚀 แนวต้าน (Resistance)</span>
+                    <span id="hud_resistance" class="hud-val" style="color: #f59e0b;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🛑 Stop Loss (1.5 ATR)</span>
+                    <span id="hud_sl" class="hud-val" style="color: #f43f5e;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🎯 Take Profit (R:R)</span>
+                    <span id="hud_tp" class="hud-val" style="color: #10b981;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🏛️ Consensus สถาบัน</span>
+                    <span id="hud_target" class="hud-val" style="color: #60a5fa;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">📅 เข้าตลาดเมื่อ (Inception)</span>
+                    <span id="hud_inception" class="hud-val" style="color: #94a3b8;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🏔️ ALL-TIME RANGE</span>
+                    <span id="hud_ath_atl" class="hud-val" style="color: #cbd5e1;">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🛡️ ATR (14)</span>
+                    <span id="hud_atr" class="hud-val">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🌊 VOLUME SURGE</span>
+                    <span id="hud_vol" class="hud-val">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">⚡ RSI (14)</span>
+                    <span id="hud_rsi" class="hud-val">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">📊 MACD</span>
+                    <span id="hud_macd" class="hud-val">-</span>
+                </div>
+                <div class="hud-card">
+                    <span class="hud-label">🎯 PIVOT POINT</span>
+                    <span id="hud_pivot" class="hud-val" style="color: #38bdf8;">-</span>
+                </div>
+                <div class="hud-card" id="hud_earn_card">
+                    <span class="hud-label">🗓️ งบการเงิน (Earnings)</span>
+                    <span id="hud_earnings" class="hud-val">-</span>
+                </div>
+            </div>
+
+            <!-- Fibonacci Level Chips Strip -->
+            <div class="fibo-chips-bar" id="fibo_strip">
+                <span id="fibo_title_label" style="color: #94a3b8; font-weight: 700;">📐 52W CYCLE FIBO:</span>
+                <span class="fibo-chip" id="chip_f0">0.0%: -</span>
+                <span class="fibo-chip" id="chip_f236">23.6%: -</span>
+                <span class="fibo-chip" id="chip_f382">38.2%: -</span>
+                <span class="fibo-chip" id="chip_f500">50.0%: -</span>
+                <span class="fibo-chip golden" id="chip_f618">⭐ 61.8%: -</span>
+                <span class="fibo-chip" id="chip_f786">78.6%: -</span>
+                <span class="fibo-chip" id="chip_f100">100.0%: -</span>
+                <button class="tf-btn" id="btn_fibo_mode" onclick="toggleFiboCycleMode()" style="margin-left: auto; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.35); color: #38bdf8; font-size: 0.72rem; padding: 2px 10px;">🔄 สลับเป็น: All-Time Macro</button>
+            </div>
+
+            <!-- Control & Timeframe Toolbar -->
+            <div class="chart-toolbar" id="chart_toolbar">
+                <div class="tf-btn-group" style="border-right: 1px solid var(--border-color); padding-right: 8px;">
+                    <span style="font-size: 0.70rem; color: #94a3b8; font-weight: 700; margin-right: 2px;">BAR:</span>
+                    <button class="tf-btn active agg-tf-btn" id="agg_btn_D" onclick="setCandleAggregation('D')">1D</button>
+                    <button class="tf-btn agg-tf-btn" id="agg_btn_W" onclick="setCandleAggregation('W')">1W</button>
+                    <button class="tf-btn agg-tf-btn" id="agg_btn_M" onclick="setCandleAggregation('M')">1M</button>
+                </div>
+
+                <div class="tf-btn-group">
+                    <span style="font-size: 0.70rem; color: #94a3b8; font-weight: 700; margin-right: 2px;">ZOOM:</span>
+                    <button class="tf-btn" id="tf_1m" onclick="setTimeframe('1M')">1M</button>
+                    <button class="tf-btn" id="tf_3m" onclick="setTimeframe('3M')">3M</button>
+                    <button class="tf-btn" id="tf_6m" onclick="setTimeframe('6M')">6M</button>
+                    <button class="tf-btn active" id="tf_1y" onclick="setTimeframe('1Y')">1Y</button>
+                    <button class="tf-btn" id="tf_5y" onclick="setTimeframe('5Y')">5Y</button>
+                    <button class="tf-btn" id="tf_all" onclick="setTimeframe('ALL')">ALL (เข้าตลาด)</button>
+                </div>
+
+                <div class="ind-btn-group">
+                    <span style="font-size: 0.70rem; color: #94a3b8; font-weight: 700; margin-right: 2px;">INDICATORS (คลิกเพื่อเปิด):</span>
+                    <button class="ind-pill" id="tog_fibo" style="color: #38bdf8;" onclick="toggleIndicator('fibo')">📐 Fibo</button>
+                    <button class="ind-pill" id="tog_ema20" style="color: #38bdf8;" onclick="toggleIndicator('ema20')">EMA 20</button>
+                    <button class="ind-pill" id="tog_ema50" style="color: #fb923c;" onclick="toggleIndicator('ema50')">EMA 50</button>
+                    <button class="ind-pill" id="tog_ema200" style="color: #a855f7;" onclick="toggleIndicator('ema200')">EMA 200</button>
+                    <button class="ind-pill" id="tog_vwap" style="color: #eab308;" onclick="toggleIndicator('vwap')">VWAP</button>
+                    <button class="ind-pill" id="tog_st" style="color: #34d399;" onclick="toggleIndicator('st')">Supertrend</button>
+                    <button class="ind-pill" id="tog_sar" style="color: #ec4899;" onclick="toggleIndicator('sar')">SAR</button>
+                    <button class="ind-pill" id="tog_ichi" style="color: #38bdf8;" onclick="toggleIndicator('ichi')">Ichimoku</button>
+                    <button class="ind-pill" id="tog_bb" style="color: #06b6d4;" onclick="toggleIndicator('bb')">Bollinger</button>
+                    <button class="ind-pill" id="tog_pat" style="color: #38bdf8;" onclick="toggleIndicator('pat')">📐 Patterns</button>
+                    <button class="reset-ind-btn" onclick="resetAllIndicators()">ล้างเส้นทั้งหมด</button>
+                </div>
+
+                <div class="zoom-hint">
+                    <span>💡 หมุนลูกกลิ้งเมาส์บนกราฟเพื่อซูมเข้า-ออก • ลากแถบเวลาด้านล่างเพื่อเลื่อนช่วงเวลา</span>
+                </div>
+            </div>
+
+            <!-- Chart Canvas Container -->
+            <div id="chart_container" class="chart-canvas-body"></div>
+
+            <!-- AI Multi-Technical Confluence Decision Section -->
+            <div class="ai-decision-section" id="ai_decision_panel">
+                <div class="ai-sec-header">
+                    <div class="ai-sec-title">
+                        <span>🤖 AI Multi-Technical Confluence Decision Engine</span>
+                        <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(ระบบตัดสินใจซื้อ-ขาย-ทยอยสะสม DCA ด้วยคอนฟลูเอนซ์ 5 มิติ)</span>
+                    </div>
+                    <div style="font-size: 0.74rem; color: #64748b;">
+                        💡 คลิกที่มาร์กเกอร์บนแท่งเทียน หรือเลือกจุดตัดสินใจด้านล่าง
+                    </div>
+                </div>
+
+                <div class="sig-chips-row" id="signal_chips"></div>
+                <div class="decision-card-body" id="decision_card"></div>
+            </div>
+
+            <!-- Classical Chart Pattern Deep-Dive Breakdown Section -->
+            <div class="pattern-deepdive-section" id="pattern_deepdive_panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                        <span>📐 Classical Chart Pattern Deep-Dive</span>
+                        <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(วิเคราะห์โครงสร้างกราฟและจิตวิทยาตลาดเชิงลึก)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="pdd_badge" style="padding: 3px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">🟢 กำลังวิเคราะห์...</span>
+                        <span id="pdd_winrate" style="padding: 3px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(250, 204, 21, 0.3); color: #facc15;">🎯 สถิติความแม่นยำ: -</span>
+                    </div>
+                </div>
+
+                <div class="pdd-grid">
+                    <div class="pdd-card">
+                        <div class="pdd-card-title">🏛️ โครงสร้าง & ระดับราคาสำคัญ</div>
+                        <div class="pdd-card-body" id="pdd_structure">-</div>
+                    </div>
+                    <div class="pdd-card">
+                        <div class="pdd-card-title" style="color: #a855f7;">🧠 จิตวิทยาตลาด (Market Psychology)</div>
+                        <div class="pdd-card-body" id="pdd_psychology">-</div>
+                    </div>
+                    <div class="pdd-card">
+                        <div class="pdd-card-title" style="color: #34d399;">🎯 แผนเข้าทำกำไร (Action Plan)</div>
+                        <div class="pdd-card-body" id="pdd_action_plan">-</div>
+                    </div>
+                    <div class="pdd-card">
+                        <div class="pdd-card-title" style="color: #fb7185;">🛑 จุดตัดขาดทุนเมื่อเสียทรง (Invalidation)</div>
+                        <div class="pdd-card-body" id="pdd_invalidation">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Technical Dataset (Cached) -->
+    <script type="text/javascript" src="chart_data.js"></script>
+    <!-- Core Chart & Technical Engine JavaScript -->
+    <script>
+    const CHARTS_DATA = window.CHARTS_DATA || {{}};
+    const STOCKS_META = window.STOCKS_META || {{}};
+
+    let activeLwChart = null;
+    let activeCandleSeries = null;
+    let currentStockTicker = 'NVDA';
+    let currentStockExchange = 'NASDAQ';
+    let currentCandles = [];
+    let currentChartMode = 'tech';
+
+    // ALL INDICATORS DEFAULT TO FALSE (CLEAN CANDLESTICK START)
+    const indicatorVisibility = {{
+        ema20: false,
+        ema50: false,
+        ema200: false,
+        vwap: false,
+        st: false,
+        sar: false,
+        ichi: false,
+        bb: false,
+        pat: false,
+        fibo: false,
+    }};
+
+    const chartSeriesRegistry = {{
+        ema20: [],
+        ema50: [],
+        ema200: [],
+        vwap: [],
+        st: [],
+        sar: [],
+        ichi: [],
+        bb: [],
+        pat: [],
+        fiboLines: []
+    }};
+
+    const ALL_TICKERS = {sorted_tickers_json};
+    let currentAggTimeframe = 'D';
+    let currentFiboMode = 'cycle';
+
+    function getWeekIdentifier(dateStr) {{
+        const d = new Date(dateStr);
+        const day = d.getUTCDay();
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.setDate(diff));
+        return monday.toISOString().split('T')[0];
+    }}
+
+    function aggregateCandles(candles, tf) {{
+        if (!candles || candles.length === 0 || tf === 'D') return candles;
+        const groups = new Map();
+        for (let i = 0; i < candles.length; i++) {{
+            const c = candles[i];
+            let key = (tf === 'W') ? getWeekIdentifier(c.time) : c.time.substring(0, 7);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(c);
+        }}
+        const aggregated = [];
+        for (const [key, list] of groups.entries()) {{
+            let high = -Infinity;
+            let low = Infinity;
+            let volume = 0;
+            for (let j = 0; j < list.length; j++) {{
+                if (list[j].high > high) high = list[j].high;
+                if (list[j].low < low) low = list[j].low;
+                volume += (list[j].volume || 0);
+            }}
+            aggregated.push({{
+                time: list[list.length - 1].time,
+                open: list[0].open,
+                high: Number(high.toFixed(2)),
+                low: Number(low.toFixed(2)),
+                close: list[list.length - 1].close,
+                volume: volume
+            }});
+        }}
+        return aggregated;
+    }}
+
+    function setCandleAggregation(tf) {{
+        currentAggTimeframe = tf;
+        document.querySelectorAll('.agg-tf-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById('agg_btn_' + tf);
+        if (btn) btn.classList.add('active');
+        renderLightweightChart(currentStockTicker);
+    }}
+
+    function getActiveFibo(tData) {{
+        if (!tData) return {{}};
+        if (currentFiboMode === 'macro' && tData.fibo_macro) {{
+            return tData.fibo_macro;
+        }}
+        return tData.fibo_cycle || tData.fibo || {{}};
+    }}
+
+    function updateFiboChips(ticker) {{
+        const tData = CHARTS_DATA[ticker] || {{}};
+        const fibo = getActiveFibo(tData);
+        const titleLabel = document.getElementById('fibo_title_label');
+        const modeBtn = document.getElementById('btn_fibo_mode');
+
+        if (currentFiboMode === 'cycle') {{
+            if (titleLabel) titleLabel.textContent = '📐 52W CYCLE FIBO:';
+            if (modeBtn) modeBtn.textContent = '🔄 สลับเป็น: All-Time Macro';
+        }} else {{
+            if (titleLabel) titleLabel.textContent = '🏔️ ALL-TIME MACRO FIBO:';
+            if (modeBtn) modeBtn.textContent = '🔄 สลับเป็น: 52W Cycle';
+        }}
+
+        const f = (k) => (fibo && fibo[k]) ? '$' + Number(fibo[k]).toFixed(2) : '-';
+        document.getElementById('chip_f0').textContent = '0.0%: ' + f('0.0');
+        document.getElementById('chip_f236').textContent = '23.6%: ' + f('23.6');
+        document.getElementById('chip_f382').textContent = '38.2%: ' + f('38.2');
+        document.getElementById('chip_f500').textContent = '50.0%: ' + f('50.0');
+        document.getElementById('chip_f618').textContent = '⭐ 61.8%: ' + f('61.8');
+        document.getElementById('chip_f786').textContent = '78.6%: ' + f('78.6');
+        document.getElementById('chip_f100').textContent = '100.0%: ' + f('100.0');
+    }}
+
+    function toggleFiboCycleMode() {{
+        currentFiboMode = (currentFiboMode === 'cycle' ? 'macro' : 'cycle');
+        updateFiboChips(currentStockTicker);
+        const tData = CHARTS_DATA[currentStockTicker] || {{}};
+        if (indicatorVisibility.fibo && activeCandleSeries) {{
+            if (chartSeriesRegistry.fiboLines) {{
+                chartSeriesRegistry.fiboLines.forEach(pl => {{
+                    try {{ activeCandleSeries.removePriceLine(pl); }} catch(e) {{}}
+                }});
+            }}
+            chartSeriesRegistry.fiboLines = drawFiboPriceLines(activeCandleSeries, getActiveFibo(tData));
+        }}
+    }}
+
+    function goBackToPortfolio() {{
+        if (window.history.length > 1 && document.referrer && document.referrer.includes('.html')) {{
+            window.history.back();
+        }} else {{
+            window.location.href = 'portfolio_master.html';
+        }}
+    }}
+
+    function filterTickerPills(val) {{
+        val = (val || '').toUpperCase().trim();
+        const pills = document.querySelectorAll('.sp-pill');
+        pills.forEach(p => {{
+            const t = p.querySelector('.sp-pill-t').textContent.toUpperCase();
+            if (!val || t.includes(val)) p.style.display = 'inline-flex';
+            else p.style.display = 'none';
+        }});
+    }}
+
+    function switchChartTab(mode) {{
+        currentChartMode = mode;
+        const btnTech = document.getElementById('btn_mode_tech');
+        const btnTv = document.getElementById('btn_mode_tv');
+        const tBar = document.getElementById('chart_toolbar');
+        const fStrip = document.getElementById('fibo_strip');
+        const aiSec = document.getElementById('ai_decision_panel');
+        const pddSec = document.getElementById('pattern_deepdive_panel');
+        const jAi = document.getElementById('btn_jump_ai');
+        const jPat = document.getElementById('btn_jump_pat');
+
+        if (mode === 'tech') {{
+            if (btnTech) btnTech.classList.add('active');
+            if (btnTv) btnTv.classList.remove('active');
+            if (tBar) tBar.style.display = 'flex';
+            if (fStrip) fStrip.style.display = 'flex';
+            if (aiSec) aiSec.style.display = 'block';
+            if (pddSec) pddSec.style.display = 'block';
+            if (jAi) jAi.style.display = 'inline-flex';
+            if (jPat) jPat.style.display = 'inline-flex';
+            renderLightweightChart(currentStockTicker);
+        }} else {{
+            if (btnTv) btnTv.classList.add('active');
+            if (btnTech) btnTech.classList.remove('active');
+            if (tBar) tBar.style.display = 'none';
+            if (fStrip) fStrip.style.display = 'none';
+            if (aiSec) aiSec.style.display = 'none';
+            if (pddSec) pddSec.style.display = 'none';
+            if (jAi) jAi.style.display = 'none';
+            if (jPat) jPat.style.display = 'none';
+            renderTradingViewWidget(currentStockTicker, currentStockExchange);
+        }}
+    }}
+
+    function setTimeframe(tf) {{
+        if (!activeLwChart || !currentCandles || currentCandles.length === 0) return;
+        document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+        const btnMap = {{ '1M': 'tf_1m', '3M': 'tf_3m', '6M': 'tf_6m', '1Y': 'tf_1y', '5Y': 'tf_5y', 'ALL': 'tf_all' }};
+        const activeBtn = document.getElementById(btnMap[tf]);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        const lastBar = currentCandles[currentCandles.length - 1];
+        const lastDate = new Date(lastBar.time);
+        let fromDate = new Date(lastDate);
+
+        if (tf === '1M') fromDate.setMonth(fromDate.getMonth() - 1);
+        else if (tf === '3M') fromDate.setMonth(fromDate.getMonth() - 3);
+        else if (tf === '6M') fromDate.setMonth(fromDate.getMonth() - 6);
+        else if (tf === '1Y') fromDate.setFullYear(fromDate.getFullYear() - 1);
+        else if (tf === '5Y') fromDate.setFullYear(fromDate.getFullYear() - 5);
+        else if (tf === 'ALL') {{
+            activeLwChart.timeScale().fitContent();
+            return;
+        }}
+
+        const fromStr = fromDate.toISOString().split('T')[0];
+        try {{
+            activeLwChart.timeScale().setVisibleRange({{ from: fromStr, to: lastBar.time }});
+        }} catch(e) {{
+            activeLwChart.timeScale().fitContent();
+        }}
+    }}
+
+    function drawFiboPriceLines(series, fibo) {{
+        if (!series || !fibo) return [];
+        const lines = [];
+        const colors = {{
+            '0.0': 'rgba(148, 163, 184, 0.65)',
+            '23.6': 'rgba(56, 189, 248, 0.70)',
+            '38.2': 'rgba(96, 165, 250, 0.70)',
+            '50.0': 'rgba(251, 191, 36, 0.85)',
+            '61.8': '#10b981',
+            '78.6': 'rgba(168, 85, 247, 0.70)',
+            '100.0': 'rgba(244, 63, 94, 0.75)'
+        }};
+
+        Object.keys(fibo).forEach(lvl => {{
+            const val = fibo[lvl];
+            if (val && val > 0) {{
+                const isGolden = lvl === '61.8';
+                const pl = series.createPriceLine({{
+                    price: val,
+                    color: colors[lvl] || '#94a3b8',
+                    lineWidth: isGolden ? 2 : 1,
+                    lineStyle: isGolden ? LightweightCharts.LineStyle.Solid : LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: (isGolden ? '⭐ Golden 61.8%' : lvl + '%') + ' $' + val.toFixed(2),
+                }});
+                lines.push(pl);
+            }}
+        }});
+        return lines;
+    }}
+
+    function toggleIndicator(key) {{
+        indicatorVisibility[key] = !indicatorVisibility[key];
+        const btn = document.getElementById('tog_' + key);
+        if (btn) {{
+            if (indicatorVisibility[key]) btn.classList.add('active');
+            else btn.classList.remove('active');
+        }}
+
+        if (key === 'fibo') {{
+            const tData = CHARTS_DATA[currentStockTicker] || {{}};
+            if (indicatorVisibility.fibo) {{
+                if (activeCandleSeries && (!chartSeriesRegistry.fiboLines || chartSeriesRegistry.fiboLines.length === 0)) {{
+                    chartSeriesRegistry.fiboLines = drawFiboPriceLines(activeCandleSeries, getActiveFibo(tData));
+                }}
+            }} else {{
+                if (activeCandleSeries && chartSeriesRegistry.fiboLines) {{
+                    chartSeriesRegistry.fiboLines.forEach(pl => {{
+                        try {{ activeCandleSeries.removePriceLine(pl); }} catch(e) {{}}
+                    }});
+                    chartSeriesRegistry.fiboLines = [];
+                }}
+            }}
+            return;
+        }}
+
+        const seriesList = chartSeriesRegistry[key] || [];
+        seriesList.forEach(s => {{
+            try {{
+                s.applyOptions({{ visible: indicatorVisibility[key] }});
+            }} catch(e) {{}}
+        }});
+    }}
+
+    function resetAllIndicators() {{
+        Object.keys(indicatorVisibility).forEach(k => {{
+            indicatorVisibility[k] = false;
+            const btn = document.getElementById('tog_' + k);
+            if (btn) btn.classList.remove('active');
+        }});
+        if (activeCandleSeries && chartSeriesRegistry.fiboLines) {{
+            chartSeriesRegistry.fiboLines.forEach(pl => {{
+                try {{ activeCandleSeries.removePriceLine(pl); }} catch(e) {{}}
+            }});
+            chartSeriesRegistry.fiboLines = [];
+        }}
+        Object.keys(chartSeriesRegistry).forEach(k => {{
+            if (k !== 'fiboLines') {{
+                (chartSeriesRegistry[k] || []).forEach(s => {{
+                    try {{ s.applyOptions({{ visible: false }}); }} catch(e) {{}}
+                }});
+            }}
+        }});
+    }}
+
+    // Technical Math Utilities
+    function calcEMA(candles, period) {{
+        if (!candles || candles.length < period) return [];
+        const k = 2 / (period + 1);
+        let sum = 0;
+        for (let i = 0; i < period; i++) sum += candles[i].close;
+        let ema = sum / period;
+        const res = [{{ time: candles[period - 1].time, value: Number(ema.toFixed(2)) }}];
+        for (let i = period; i < candles.length; i++) {{
+            ema = candles[i].close * k + ema * (1 - k);
+            res.push({{ time: candles[i].time, value: Number(ema.toFixed(2)) }});
+        }}
+        return res;
+    }}
+
+    function calcVWAP(candles) {{
+        if (!candles || candles.length === 0) return [];
+        let cumV = 0, cumVP = 0;
+        const res = [];
+        for (let i = 0; i < candles.length; i++) {{
+            const c = candles[i];
+            const v = c.volume > 0 ? c.volume : 1;
+            const typ = (c.high + c.low + c.close) / 3;
+            cumVP += typ * v;
+            cumV += v;
+            res.push({{ time: c.time, value: Number((cumVP / cumV).toFixed(2)) }});
+        }}
+        return res;
+    }}
+
+    function calcBollinger(candles, period = 20, mult = 2.0) {{
+        if (!candles || candles.length < period) return {{ upper: [], lower: [], middle: [] }};
+        const upper = [], lower = [], middle = [];
+        for (let i = period - 1; i < candles.length; i++) {{
+            let sum = 0;
+            for (let j = 0; j < period; j++) sum += candles[i - j].close;
+            const mean = sum / period;
+            let sqDiff = 0;
+            for (let j = 0; j < period; j++) sqDiff += Math.pow(candles[i - j].close - mean, 2);
+            const std = Math.sqrt(sqDiff / period);
+            const t = candles[i].time;
+            middle.push({{ time: t, value: Number(mean.toFixed(2)) }});
+            upper.push({{ time: t, value: Number((mean + mult * std).toFixed(2)) }});
+            lower.push({{ time: t, value: Number((mean - mult * std).toFixed(2)) }});
+        }}
+        return {{ upper, lower, middle }};
+    }}
+
+    function calcParabolicSAR(candles, step = 0.02, maxStep = 0.2) {{
+        if (!candles || candles.length < 5) return [];
+        const res = [];
+        let isLong = candles[1].close > candles[0].close;
+        let af = step;
+        let ep = isLong ? candles[0].high : candles[0].low;
+        let sar = isLong ? candles[0].low : candles[0].high;
+
+        for (let i = 1; i < candles.length; i++) {{
+            const c = candles[i];
+            const prev = candles[i - 1];
+            sar = sar + af * (ep - sar);
+            if (isLong) {{
+                if (i >= 2) sar = Math.min(sar, prev.low, candles[i - 2].low);
+                else sar = Math.min(sar, prev.low);
+                if (c.low < sar) {{
+                    isLong = false;
+                    sar = ep;
+                    af = step;
+                    ep = c.low;
+                }} else {{
+                    if (c.high > ep) {{
+                        ep = c.high;
+                        af = Math.min(af + step, maxStep);
+                    }}
+                }}
+            }} else {{
+                if (i >= 2) sar = Math.max(sar, prev.high, candles[i - 2].high);
+                else sar = Math.max(sar, prev.high);
+                if (c.high > sar) {{
+                    isLong = true;
+                    sar = ep;
+                    af = step;
+                    ep = c.high;
+                }} else {{
+                    if (c.low < ep) {{
+                        ep = c.low;
+                        af = Math.min(af + step, maxStep);
+                    }}
+                }}
+            }}
+            res.push({{ time: c.time, value: Number(sar.toFixed(2)) }});
+        }}
+        return res;
+    }}
+
+    function calcIchimoku(candles, convP = 9, baseP = 26) {{
+        if (!candles || candles.length < baseP) return {{ tenkan: [], kijun: [] }};
+        const tenkan = [], kijun = [];
+        for (let i = 0; i < candles.length; i++) {{
+            const t = candles[i].time;
+            if (i >= convP - 1) {{
+                let h9 = -Infinity, l9 = Infinity;
+                for (let j = 0; j < convP; j++) {{
+                    h9 = Math.max(h9, candles[i - j].high);
+                    l9 = Math.min(l9, candles[i - j].low);
+                }}
+                tenkan.push({{ time: t, value: Number(((h9 + l9) / 2).toFixed(2)) }});
+            }}
+            if (i >= baseP - 1) {{
+                let h26 = -Infinity, l26 = Infinity;
+                for (let j = 0; j < baseP; j++) {{
+                    h26 = Math.max(h26, candles[i - j].high);
+                    l26 = Math.min(l26, candles[i - j].low);
+                }}
+                kijun.push({{ time: t, value: Number(((h26 + l26) / 2).toFixed(2)) }});
+            }}
+        }}
+        return {{ tenkan, kijun }};
+    }}
+
+    function renderLightweightChart(ticker) {{
+        const container = document.getElementById('chart_container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const tData = CHARTS_DATA[ticker];
+        if (!tData || !tData.candles || tData.candles.length === 0) {{
+            container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:1rem;">ไม่มีข้อมูลแท่งเทียนสำหรับหุ้น ' + ticker + '</div>';
+            return;
+        }}
+
+        if (typeof LightweightCharts === 'undefined') {{
+            container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">กำลังโหลดไลบรารีกราฟ...</div>';
+            return;
+        }}
+
+        if (activeLwChart) {{
+            try {{ activeLwChart.remove(); }} catch(e) {{}}
+            activeLwChart = null;
+        }}
+
+        currentCandles = aggregateCandles(tData.candles, currentAggTimeframe);
+
+        // Native mouse wheel zoom fully enabled!
+        const chart = LightweightCharts.createChart(container, {{
+            width: container.clientWidth || 1400,
+            height: 680,
+            layout: {{
+                background: {{ type: 'solid', color: '#0a0e1a' }},
+                textColor: '#94a3b8',
+                fontFamily: "'Inter', sans-serif",
+            }},
+            grid: {{
+                vertLines: {{ color: 'rgba(255, 255, 255, 0.04)' }},
+                horzLines: {{ color: 'rgba(255, 255, 255, 0.04)' }},
+            }},
+            crosshair: {{
+                mode: LightweightCharts.CrosshairMode.Normal,
+            }},
+            rightPriceScale: {{
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                scaleMargins: {{ top: 0.10, bottom: 0.22 }},
+                autoScale: true,
+                alignLabels: true,
+            }},
+            timeScale: {{
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                timeVisible: true,
+                secondsVisible: false,
+            }},
+            handleScroll: {{
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: false,
+            }},
+            handleScale: {{
+                mouseWheel: true,
+                pinch: true,
+                axisPressedMouseMove: true,
+                axisDoubleClickReset: true,
+            }},
+        }});
+        activeLwChart = chart;
+
+        // 1. Candlestick Series (Full inception data)
+        const candleSeries = chart.addCandlestickSeries({{
+            upColor: '#10b981',
+            downColor: '#f43f5e',
+            borderVisible: false,
+            wickUpColor: '#10b981',
+            wickDownColor: '#f43f5e',
+        }});
+        candleSeries.setData(currentCandles);
+        activeCandleSeries = candleSeries;
+
+        // 2. Volume Histogram
+        const volData = currentCandles.map(c => ({{
+            time: c.time,
+            value: c.volume,
+            color: c.close >= c.open ? 'rgba(16, 185, 129, 0.45)' : 'rgba(244, 63, 94, 0.45)'
+        }}));
+        const volumeSeries = chart.addHistogramSeries({{
+            priceFormat: {{ type: 'volume' }},
+            priceScaleId: '',
+        }});
+        volumeSeries.priceScale().applyOptions({{
+            scaleMargins: {{ top: 0.82, bottom: 0 }},
+        }});
+        volumeSeries.setData(volData);
+
+        // 3. Technical Moving Averages (ALL DEFAULT OFF)
+        const ema200Data = calcEMA(currentCandles, 200);
+        chartSeriesRegistry.ema200 = [];
+        if (ema200Data.length > 0) {{
+            const s = chart.addLineSeries({{
+                color: '#a855f7',
+                lineWidth: 2,
+                title: 'EMA 200',
+                visible: indicatorVisibility.ema200,
+            }});
+            s.setData(ema200Data);
+            chartSeriesRegistry.ema200 = [s];
+        }}
+
+        const ema50Data = calcEMA(currentCandles, 50);
+        chartSeriesRegistry.ema50 = [];
+        if (ema50Data.length > 0) {{
+            const s = chart.addLineSeries({{
+                color: '#fb923c',
+                lineWidth: 1.5,
+                title: 'EMA 50',
+                visible: indicatorVisibility.ema50,
+            }});
+            s.setData(ema50Data);
+            chartSeriesRegistry.ema50 = [s];
+        }}
+
+        const ema20Data = calcEMA(currentCandles, 20);
+        chartSeriesRegistry.ema20 = [];
+        if (ema20Data.length > 0) {{
+            const s = chart.addLineSeries({{
+                color: '#38bdf8',
+                lineWidth: 1.5,
+                title: 'EMA 20',
+                visible: indicatorVisibility.ema20,
+            }});
+            s.setData(ema20Data);
+            chartSeriesRegistry.ema20 = [s];
+        }}
+
+        // 4. VWAP
+        const vwapData = calcVWAP(currentCandles);
+        chartSeriesRegistry.vwap = [];
+        if (vwapData.length > 0) {{
+            const s = chart.addLineSeries({{
+                color: '#eab308',
+                lineWidth: 1.5,
+                title: 'Inception VWAP',
+                visible: indicatorVisibility.vwap,
+            }});
+            s.setData(vwapData);
+            chartSeriesRegistry.vwap = [s];
+        }}
+
+        // 5. Bollinger Bands
+        const bb = calcBollinger(currentCandles, 20, 2.0);
+        chartSeriesRegistry.bb = [];
+        if (bb.upper.length > 0) {{
+            const u = chart.addLineSeries({{
+                color: 'rgba(6, 182, 212, 0.7)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: 'BB Upper',
+                visible: indicatorVisibility.bb,
+            }});
+            u.setData(bb.upper);
+            const m = chart.addLineSeries({{
+                color: 'rgba(6, 182, 212, 0.4)',
+                lineWidth: 1,
+                title: 'BB Mid',
+                visible: indicatorVisibility.bb,
+            }});
+            m.setData(bb.middle);
+            const l = chart.addLineSeries({{
+                color: 'rgba(6, 182, 212, 0.7)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: 'BB Lower',
+                visible: indicatorVisibility.bb,
+            }});
+            l.setData(bb.lower);
+            chartSeriesRegistry.bb = [u, m, l];
+        }}
+
+        // 6. Supertrend (10, 3)
+        chartSeriesRegistry.st = [];
+        if (tData.supertrend && tData.supertrend.last_value) {{
+            const isBull = tData.supertrend.trend === 'BULLISH';
+            const stColor = isBull ? '#10b981' : '#f43f5e';
+            const stLineData = currentCandles.slice(-80).map(c => ({{
+                time: c.time,
+                value: tData.supertrend.last_value
+            }}));
+            const stSeries = chart.addLineSeries({{
+                color: stColor,
+                lineWidth: 2,
+                title: 'Supertrend ' + (isBull ? 'Bull' : 'Bear'),
+                visible: indicatorVisibility.st,
+            }});
+            stSeries.setData(stLineData);
+            chartSeriesRegistry.st = [stSeries];
+        }}
+
+        // 7. Parabolic SAR
+        const sarData = calcParabolicSAR(currentCandles);
+        chartSeriesRegistry.sar = [];
+        if (sarData.length > 0) {{
+            const sarSeries = chart.addLineSeries({{
+                color: '#ec4899',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+                title: 'Parabolic SAR',
+                visible: indicatorVisibility.sar,
+            }});
+            sarSeries.setData(sarData);
+            chartSeriesRegistry.sar = [sarSeries];
+        }}
+
+        // 8. Ichimoku
+        const ichiRes = calcIchimoku(currentCandles, 9, 26);
+        chartSeriesRegistry.ichi = [];
+        if (ichiRes.tenkan.length > 0) {{
+            const tenkanSeries = chart.addLineSeries({{
+                color: '#38bdf8',
+                lineWidth: 1,
+                title: 'Tenkan-sen (9)',
+                visible: indicatorVisibility.ichi,
+            }});
+            tenkanSeries.setData(ichiRes.tenkan);
+            chartSeriesRegistry.ichi.push(tenkanSeries);
+        }}
+        if (ichiRes.kijun.length > 0) {{
+            const kijunSeries = chart.addLineSeries({{
+                color: '#f43f5e',
+                lineWidth: 1.5,
+                title: 'Kijun-sen (26)',
+                visible: indicatorVisibility.ichi,
+            }});
+            kijunSeries.setData(ichiRes.kijun);
+            chartSeriesRegistry.ichi.push(kijunSeries);
+        }}
+
+        // 9. Classical Chart Pattern Overlays
+        chartSeriesRegistry.pat = [];
+        if (tData.pattern && tData.pattern.lines) {{
+            tData.pattern.lines.forEach(pl => {{
+                const lineStyle = pl.style === 2 ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Solid;
+                const ps = chart.addLineSeries({{
+                    color: pl.color || '#38bdf8',
+                    lineWidth: 2,
+                    lineStyle: lineStyle,
+                    title: pl.name,
+                    visible: indicatorVisibility.pat,
+                }});
+                ps.setData(pl.points);
+                chartSeriesRegistry.pat.push(ps);
+            }});
+        }}
+
+        // 10. Markers (Swing Points + AI Decisions)
+        const markers = [];
+        if (tData.swing_high && tData.swing_high.time) {{
+            markers.push({{
+                time: tData.swing_high.time,
+                position: 'aboveBar',
+                color: '#f43f5e',
+                shape: 'arrowDown',
+                text: 'High $' + tData.swing_high.price,
+            }});
+        }}
+        if (tData.swing_low && tData.swing_low.time) {{
+            markers.push({{
+                time: tData.swing_low.time,
+                position: 'belowBar',
+                color: '#10b981',
+                shape: 'arrowUp',
+                text: 'Low $' + tData.swing_low.price,
+            }});
+        }}
+
+        // AI Multi-Technical Confluence Decision Markers
+        const aiSignals = tData.ai_signals || [];
+        aiSignals.forEach(sig => {{
+            const isBuy = sig.action === 'BUY';
+            const isDca = sig.action === 'DCA';
+            const isSell = sig.action === 'SELL';
+            markers.push({{
+                time: sig.time,
+                position: (isBuy || isDca) ? 'belowBar' : 'aboveBar',
+                color: sig.marker_color || (isBuy ? '#10b981' : (isDca ? '#38bdf8' : '#f43f5e')),
+                shape: sig.marker_shape || (isBuy ? 'arrowUp' : (isDca ? 'circle' : 'arrowDown')),
+                text: (isBuy ? '🤖 BUY ' : (isDca ? '🤖 DCA ' : (isSell ? '🤖 TP ' : '🤖 '))) + sig.score + '/5',
+                id: 'sig_' + sig.time,
+            }});
+        }});
+
+        // Earnings Shock Guard Marker
+        const mInfo = STOCKS_META[ticker] || {{}};
+        const dEarn = mInfo.days_to_earnings;
+        if (dEarn !== null && dEarn !== undefined && dEarn >= 0 && dEarn <= 30 && currentCandles.length > 0) {{
+            const lastBar = currentCandles[currentCandles.length - 1];
+            markers.push({{
+                time: lastBar.time,
+                position: 'aboveBar',
+                color: dEarn <= 14 ? '#f43f5e' : '#f59e0b',
+                shape: 'circle',
+                text: '🗓️ งบ ' + dEarn + 'd (' + (mInfo.earnings_date || '') + ')',
+            }});
+        }}
+
+        markers.sort((a, b) => new Date(a.time) - new Date(b.time));
+        if (markers.length > 0) {{
+            candleSeries.setMarkers(markers);
+        }}
+
+        // 11. Fibonacci Lines (If toggled on)
+        chartSeriesRegistry.fiboLines = [];
+        if (indicatorVisibility.fibo) {{
+            chartSeriesRegistry.fiboLines = drawFiboPriceLines(candleSeries, getActiveFibo(tData));
+        }}
+
+        // 12. Volume Profile POC & 52-Week Lines
+        if (tData.volume_profile && tData.volume_profile.poc) {{
+            candleSeries.createPriceLine({{
+                price: tData.volume_profile.poc,
+                color: 'rgba(245, 158, 11, 0.85)',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                axisLabelVisible: true,
+                title: '📍 POC',
+            }});
+        }}
+
+        // 13. Position levels (Cost, SL, TP)
+        const m = STOCKS_META[ticker] || {{}};
+        if (m.cost && m.cost > 0) {{
+            candleSeries.createPriceLine({{
+                price: m.cost,
+                color: '#ec4899',
+                lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                axisLabelVisible: true,
+                title: '🎯 ทุน $' + m.cost.toFixed(2),
+            }});
+        }}
+        if (m.sl && m.sl > 0) {{
+            candleSeries.createPriceLine({{
+                price: m.sl,
+                color: '#ef4444',
+                lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                axisLabelVisible: true,
+                title: '🛑 SL $' + m.sl.toFixed(2),
+            }});
+        }}
+        if (m.tp && m.tp > 0) {{
+            candleSeries.createPriceLine({{
+                price: m.tp,
+                color: '#10b981',
+                lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                axisLabelVisible: true,
+                title: '🎯 TP $' + m.tp.toFixed(2),
+            }});
+        }}
+
+        // Interactive Marker Click Listener
+        chart.subscribeClick((param) => {{
+            if (!param || !param.time) return;
+            let tStr = param.time;
+            if (typeof tStr === 'object') {{
+                tStr = `${{tStr.year}}-${{String(tStr.month).padStart(2, '0')}}-${{String(tStr.day).padStart(2, '0')}}`;
+            }}
+            selectAiSignalByTime(tStr, true);
+        }});
+
+        // Responsive resize
+        window.addEventListener('resize', () => {{
+            if (activeLwChart && container) {{
+                activeLwChart.applyOptions({{ width: container.clientWidth }});
+            }}
+        }});
+
+        // Default zoom to 1Y
+        setTimeframe('1Y');
+    }}
+
+    function renderTradingViewWidget(ticker, exchange) {{
+        const container = document.getElementById('chart_container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (activeLwChart) {{
+            try {{ activeLwChart.remove(); }} catch(e) {{}}
+            activeLwChart = null;
+        }}
+
+        const sym = (exchange && exchange !== 'US') ? (exchange + ':' + ticker) : ticker;
+        if (typeof TradingView !== 'undefined') {{
+            new TradingView.widget({{
+                "autosize": true,
+                "symbol": sym,
+                "interval": "D",
+                "timezone": "Asia/Bangkok",
+                "theme": "dark",
+                "style": "1",
+                "locale": "th_TH",
+                "toolbar_bg": "#0c101d",
+                "enable_publishing": false,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "save_image": false,
+                "container_id": "chart_container",
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "studies": [
+                    "MASimple@tv-basicstudies",
+                    "RSI@tv-basicstudies",
+                    "BollingerBands@tv-basicstudies"
+                ]
+            }});
+        }} else {{
+            container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">กำลังโหลดกราฟ TradingView...</div>';
+        }}
+    }}
+
+    function renderAiDecisionCard(sig) {{
+        const card = document.getElementById('decision_card');
+        if (!card) return;
+        if (!sig) {{
+            card.innerHTML = '<div style="color:#94a3b8;">ไม่พบข้อมูลสัญญาณ</div>';
+            return;
+        }}
+
+        const isBuy = sig.action === 'BUY';
+        const isDca = sig.action === 'DCA';
+        const isSell = sig.action === 'SELL';
+        const badgeClass = isBuy ? 'buy' : (isDca ? 'dca' : (isSell ? 'sell' : 'hold'));
+        const badgeText = sig.badge || (isBuy ? '🚀 STRONG BUY' : (isDca ? '💎 VALUE DCA BUY' : (isSell ? '🎯 TAKE PROFIT' : '⚖️ HOLD & MONITOR')));
+
+        const reasonsHtml = (sig.reasons || []).map(r => `<li>${{r}}</li>`).join('');
+        const slText = sig.stop_loss ? `$${{Number(sig.stop_loss).toFixed(2)}}` : 'N/A';
+        const targetText = sig.target ? `$${{Number(sig.target).toFixed(2)}}` : 'N/A';
+        const rrText = sig.rr || '1:2.0';
+        const timeBadge = sig.is_latest ? '⚡ ปัจจุบัน (Latest)' : `📅 ${{sig.time}}`;
+
+        card.innerHTML = `
+            <div class="dc-top">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="dc-badge ${{badgeClass}}">${{badgeText}}</span>
+                    <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc;">ความแม่นยำ AI: ${{sig.score || 4}}/5 ⭐</span>
+                    <span style="font-size: 0.80rem; color: #94a3b8; font-family: 'JetBrains Mono';">${{timeBadge}}</span>
+                </div>
+                <div style="font-size: 0.84rem; color: #cbd5e1;">
+                    ราคาแท่งเทียน: <b style="color: #38bdf8;">$${{Number(sig.price).toFixed(2)}}</b>
+                </div>
+            </div>
+
+            <div style="font-size: 0.88rem; color: #f1f5f9; line-height: 1.5; margin-bottom: 12px;">
+                💡 <b>คำแนะนำกลยุทธ์:</b> ${{sig.summary || 'สัญญาณทางเทคนิคอลสอดคล้องกันหลายมิติ'}}
+            </div>
+
+            <div class="dc-grid">
+                <div class="dc-box">
+                    <div class="dc-box-title">✅ ปัจจัยเทคนิคอลที่ผ่านเกณฑ์ (Confluence Checklist)</div>
+                    <ul class="dc-checklist">${{reasonsHtml}}</ul>
+                </div>
+                <div class="dc-box">
+                    <div class="dc-box-title" style="color: #34d399;">🎯 แผนบริหารความเสี่ยงและจุดออก (Execution Plan)</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #94a3b8;">🛑 จุดตัดขาดทุน (Stop Loss - 1.5 ATR):</span>
+                            <b style="color: #f43f5e;">${{slText}}</b>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #94a3b8;">🎯 เป้าหมายทำกำไร (Target):</span>
+                            <b style="color: #34d399;">${{targetText}}</b>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #94a3b8;">⚖️ Risk-to-Reward Ratio (R:R):</span>
+                            <b style="color: #38bdf8;">${{rrText}}</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }}
+
+    function selectAiSignalByTime(timeStr, scrollIntoView = false) {{
+        const tData = CHARTS_DATA[currentStockTicker] || {{}};
+        const signals = tData.ai_signals || [];
+        const matched = signals.find(s => s.time === timeStr);
+        if (matched) {{
+            renderAiDecisionCard(matched);
+            document.querySelectorAll('.tv-sig-chip').forEach(c => {{
+                if (c.getAttribute('data-time') === matched.time) c.classList.add('active');
+                else c.classList.remove('active');
+            }});
+            if (scrollIntoView) {{
+                const panel = document.getElementById('ai_decision_panel');
+                if (panel) panel.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+            }}
+        }}
+    }}
+
+    function populateAiSignals(ticker) {{
+        const tData = CHARTS_DATA[ticker] || {{}};
+        const signals = tData.ai_signals || [];
+        const chipsContainer = document.getElementById('signal_chips');
+        if (!chipsContainer) return;
+        chipsContainer.innerHTML = '';
+
+        if (signals.length === 0) {{
+            chipsContainer.innerHTML = '<span style="color:#94a3b8; font-size:0.78rem;">ไม่มีสัญญาณ Confluence ในช่วงเวลานี้</span>';
+            renderAiDecisionCard({{
+                time: '-',
+                price: 0,
+                action: 'HOLD',
+                badge: '⚖️ HOLD & MONITOR',
+                score: 3,
+                summary: 'ราคากำลังทรงตัวในกรอบสะสมพลัง ติดตามแนวรับแนวต้านสำคัญ',
+                reasons: ['สัญญาณทางเทคนิคอลอยู่ในระดับปกติ'],
+                stop_loss: 0,
+                target: 0,
+                rr: '1:2.0',
+                is_latest: true
+            }});
+            return;
+        }}
+
+        signals.forEach((sig, idx) => {{
+            const chip = document.createElement('div');
+            chip.className = 'tv-sig-chip' + (idx === signals.length - 1 ? ' active' : '');
+            chip.setAttribute('data-time', sig.time);
+            const icon = sig.action === 'BUY' ? '🚀' : (sig.action === 'DCA' ? '💎' : (sig.action === 'SELL' ? '🎯' : '⚖️'));
+            const label = sig.is_latest ? '⚡ ปัจจุบัน' : sig.time;
+            chip.innerHTML = `${{icon}} ${{sig.type}} (${{sig.score}}/5) • ${{label}}`;
+            chip.onclick = () => {{
+                document.querySelectorAll('.tv-sig-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                renderAiDecisionCard(sig);
+            }};
+            chipsContainer.appendChild(chip);
+        }});
+
+        renderAiDecisionCard(signals[signals.length - 1]);
+    }}
+
+    function renderPatternDeepDive(pat) {{
+        const pddBadge = document.getElementById('pdd_badge');
+        const pddWinrate = document.getElementById('pdd_winrate');
+        const pddStructure = document.getElementById('pdd_structure');
+        const pddPsychology = document.getElementById('pdd_psychology');
+        const pddActionPlan = document.getElementById('pdd_action_plan');
+        const pddInvalidation = document.getElementById('pdd_invalidation');
+
+        if (!pat) {{
+            if (pddBadge) pddBadge.textContent = '📦 พักตัวในกรอบ';
+            if (pddWinrate) pddWinrate.textContent = '🎯 สถิติความแม่นยำ: 60%';
+            if (pddStructure) pddStructure.textContent = 'ราคากำลังแกว่งตัวสะสมพลังในกรอบไซด์เวย์ รอการเลือกทิศทางเบรกเอาท์';
+            if (pddPsychology) pddPsychology.textContent = 'ผู้ซื้อและผู้ขายกำลังดูดซับแรงซื้อขายซึ่งกันและกัน อุปสงค์และอุปทานอยู่ในจุดสมดุล';
+            if (pddActionPlan) pddActionPlan.textContent = 'เน้นตั้งรับใกล้ขอบล่าง หรือรอเคาะซื้อเมื่อแท่งเทียนทะลุขอบบนพร้อม Volume';
+            if (pddInvalidation) pddInvalidation.textContent = 'Stop Loss หากราคาปิดหลุดขอบล่างของกรอบสะสมพลัง';
+            return;
+        }}
+
+        if (pddBadge) {{
+            pddBadge.textContent = pat.badge;
+            pddBadge.style.color = pat.type && pat.type.toLowerCase().includes('bear') ? '#fb7185' : '#34d399';
+        }}
+        if (pddWinrate) pddWinrate.textContent = '🎯 สถิติความแม่นยำ: ' + (pat.win_rate || '70%');
+        if (pddStructure) {{
+            pddStructure.innerHTML = `
+                <div><b>โครงสร้าง:</b> ${{pat.structure || pat.summary}}</div>
+                <div style="margin-top: 5px; color: #38bdf8;"><b>Neckline / จุดต้าน:</b> $${{Number(pat.neckline).toFixed(2)}}</div>
+                <div style="margin-top: 3px; color: #34d399;"><b>เป้าหมาย Target:</b> $${{Number(pat.target).toFixed(2)}} ${{pat.upside_pct !== undefined ? `(+${{pat.upside_pct}}%)` : ''}}</div>
+                <div style="margin-top: 3px; font-size: 0.74rem; color: #94a3b8;"><b>การวัดเป้าหมาย:</b> ${{pat.target_calc || 'Measured Move Rule'}}</div>
+            `;
+        }}
+        if (pddPsychology) pddPsychology.textContent = pat.psychology || pat.summary;
+        if (pddActionPlan) pddActionPlan.textContent = pat.action_plan || 'เข้าซื้อเมื่อราคาทะลุ Neckline หรือย่อทดสอบแนวรับ';
+        if (pddInvalidation) pddInvalidation.textContent = pat.invalidation || 'รูปแบบจะเสียทรงหากราคาหลุดแนวรับสำคัญ';
+    }}
+
+    function selectStock(ticker) {{
+        currentStockTicker = ticker;
+        const m = STOCKS_META[ticker] || {{}};
+        const tData = CHARTS_DATA[ticker] || {{}};
+
+        currentStockExchange = m.exchange || 'NASDAQ';
+
+        // Update active pill
+        document.querySelectorAll('.sp-pill').forEach(p => p.classList.remove('active'));
+        const activePill = document.getElementById('pill_' + ticker);
+        if (activePill) {{
+            activePill.classList.add('active');
+            activePill.scrollIntoView({{ behavior: 'smooth', inline: 'center', block: 'nearest' }});
+        }}
+
+        // Update Page Title & URL hash without reloading
+        document.title = `${{ticker}} • Technical Chart & AI Decisions`;
+        history.replaceState(null, '', `stock_chart.html?ticker=${{ticker}}#${{ticker}}`);
+
+        // Update Header
+        document.getElementById('st_ticker_pill').textContent = ticker;
+        document.getElementById('st_name').textContent = m.name || ticker;
+        document.getElementById('st_sector_exchange').textContent = (m.sector ? m.sector + ' • ' : '') + currentStockExchange;
+
+        const sym = (currentStockExchange && currentStockExchange !== 'US') ? (currentStockExchange + ':' + ticker) : ticker;
+        document.getElementById('st_ext_link').href = 'https://www.tradingview.com/chart/?symbol=' + sym;
+
+        // Update HUD
+        const fmt = (v) => (v && v > 0) ? '$' + Number(v).toFixed(2) : '-';
+        document.getElementById('hud_cost').textContent = fmt(m.cost);
+        document.getElementById('hud_price').textContent = fmt(m.price || (tData.candles ? tData.candles[tData.candles.length - 1].close : 0));
+        document.getElementById('hud_support').textContent = fmt(m.support);
+        document.getElementById('hud_resistance').textContent = fmt(m.resistance);
+        document.getElementById('hud_sl').textContent = fmt(m.sl);
+        document.getElementById('hud_tp').textContent = fmt(m.tp);
+        document.getElementById('hud_target').textContent = fmt(m.target);
+
+        document.getElementById('hud_inception').textContent = tData.inception_date || '-';
+        if (tData.ath && tData.atl) {{
+            document.getElementById('hud_ath_atl').textContent = '$' + Number(tData.atl.price).toFixed(1) + ' - $' + Number(tData.ath.price).toFixed(1);
+        }} else {{
+            document.getElementById('hud_ath_atl').textContent = '-';
+        }}
+
+        if (tData.atr14) {{
+            document.getElementById('hud_atr').textContent = '$' + Number(tData.atr14.value).toFixed(2) + ' (' + Number(tData.atr14.pct).toFixed(1) + '%)';
+        }} else {{
+            document.getElementById('hud_atr').textContent = '-';
+        }}
+
+        if (tData.vol_surge) {{
+            const r = tData.vol_surge.ratio;
+            document.getElementById('hud_vol').textContent = r.toFixed(2) + 'x ' + (r >= 1.5 ? '🔥' : (r <= 0.7 ? '💤' : '⚖️'));
+            document.getElementById('hud_vol').style.color = r >= 1.5 ? '#34d399' : (r <= 0.7 ? '#94a3b8' : '#f8fafc');
+        }} else {{
+            document.getElementById('hud_vol').textContent = '-';
+        }}
+
+        if (tData.latest_rsi !== null && tData.latest_rsi !== undefined) {{
+            const rVal = Number(tData.latest_rsi);
+            let rBadge = rVal <= 30 ? ' 🟢' : (rVal >= 70 ? ' 🔴' : ' ⚖️');
+            document.getElementById('hud_rsi').textContent = rVal.toFixed(1) + rBadge;
+            document.getElementById('hud_rsi').style.color = rVal <= 30 ? '#34d399' : (rVal >= 70 ? '#fb7185' : '#f8fafc');
+        }} else {{
+            document.getElementById('hud_rsi').textContent = '-';
+        }}
+
+        if (tData.macd) {{
+            document.getElementById('hud_macd').textContent = (tData.macd.hist >= 0 ? '🟢 ' : '🔴 ') + '(' + (tData.macd.hist >= 0 ? '+' : '') + Number(tData.macd.hist).toFixed(2) + ')';
+            document.getElementById('hud_macd').style.color = tData.macd.hist >= 0 ? '#34d399' : '#fb7185';
+        }} else {{
+            document.getElementById('hud_macd').textContent = '-';
+        }}
+
+        if (tData.pivots) {{
+            document.getElementById('hud_pivot').textContent = '$' + Number(tData.pivots.pivot).toFixed(2);
+        }} else {{
+            document.getElementById('hud_pivot').textContent = '-';
+        }}
+
+        // Update Earnings HUD
+        const earnCard = document.getElementById('hud_earn_card');
+        const earnVal = document.getElementById('hud_earnings');
+        const dEarn = m.days_to_earnings;
+        const dDate = m.earnings_date || '-';
+
+        if (earnVal) {{
+            if (dEarn !== null && dEarn !== undefined && dEarn >= 0) {{
+                if (dEarn <= 14) {{
+                    earnVal.innerHTML = `<b style="color: #f43f5e;">⚠️ ใน ${{dEarn}} วัน</b> <span style="font-size:0.75rem; color:#cbd5e1;">(${{dDate}})</span>`;
+                    if (earnCard) {{
+                        earnCard.style.borderColor = 'rgba(244, 63, 94, 0.45)';
+                        earnCard.style.background = 'rgba(244, 63, 94, 0.12)';
+                    }}
+                }} else if (dEarn <= 30) {{
+                    earnVal.innerHTML = `<b style="color: #f59e0b;">🟡 ใน ${{dEarn}} วัน</b> <span style="font-size:0.75rem; color:#cbd5e1;">(${{dDate}})</span>`;
+                    if (earnCard) {{
+                        earnCard.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+                        earnCard.style.background = 'rgba(245, 158, 11, 0.08)';
+                    }}
+                }} else {{
+                    earnVal.innerHTML = `<span style="color: #cbd5e1;">ใน ${{dEarn}} วัน</span> <span style="font-size:0.75rem; color:#94a3b8;">(${{dDate}})</span>`;
+                    if (earnCard) {{
+                        earnCard.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                        earnCard.style.background = 'rgba(255, 255, 255, 0.02)';
+                    }}
+                }}
+            }} else {{
+                earnVal.textContent = dDate;
+                if (earnCard) {{
+                    earnCard.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                    earnCard.style.background = 'rgba(255, 255, 255, 0.02)';
+                }}
+            }}
+        }}
+
+        // Update Fibo Chips
+        updateFiboChips(ticker);
+
+        // Populate AI and Pattern
+        populateAiSignals(ticker);
+        renderPatternDeepDive(tData.pattern);
+
+        // Reset toggles for clean start
+        resetAllIndicators();
+
+        // Render Chart
+        if (currentChartMode === 'tech') {{
+            renderLightweightChart(ticker);
+        }} else {{
+            renderTradingViewWidget(ticker, currentStockExchange);
+        }}
+    }}
+
+    // Global Keyboard Hotkeys
+    window.addEventListener('keydown', (e) => {{
+        const activeEl = document.activeElement;
+        const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+        if (e.key === '/') {{
+            if (!isInput) {{
+                e.preventDefault();
+                const sInput = document.getElementById('ticker_search');
+                if (sInput) {{
+                    sInput.focus();
+                    sInput.select();
+                }}
+            }}
+            return;
+        }}
+
+        if (isInput) {{
+            if (e.key === 'Escape') {{
+                activeEl.blur();
+            }} else if (e.key === 'Enter') {{
+                const visiblePill = document.querySelector('.sp-pill[style*="display: inline-flex"], .sp-pill:not([style*="display: none"])');
+                if (visiblePill) {{
+                    const t = visiblePill.querySelector('.sp-pill-t').textContent;
+                    selectStock(t);
+                    activeEl.blur();
+                }}
+            }}
+            return;
+        }}
+
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {{
+            e.preventDefault();
+            const curIdx = ALL_TICKERS.indexOf(currentStockTicker);
+            const nextIdx = (curIdx + 1) % ALL_TICKERS.length;
+            selectStock(ALL_TICKERS[nextIdx]);
+            return;
+        }}
+
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {{
+            e.preventDefault();
+            const curIdx = ALL_TICKERS.indexOf(currentStockTicker);
+            const prevIdx = (curIdx - 1 + ALL_TICKERS.length) % ALL_TICKERS.length;
+            selectStock(ALL_TICKERS[prevIdx]);
+            return;
+        }}
+
+        const key = e.key.toLowerCase();
+        if (key === 'f') {{
+            toggleIndicator('fibo');
+        }} else if (key === 'e') {{
+            toggleIndicator('ema200');
+        }} else if (key === 's') {{
+            toggleIndicator('st');
+        }} else if (key === 'v') {{
+            toggleIndicator('vwap');
+        }} else if (key === 'b') {{
+            toggleIndicator('bb');
+        }} else if (key === 'p') {{
+            toggleIndicator('pat');
+        }} else if (key === 't') {{
+            switchChartTab(currentChartMode === 'tech' ? 'tv' : 'tech');
+        }}
+    }});
+
+    // Initializer
+    window.addEventListener('DOMContentLoaded', () => {{
+        const urlParams = new URLSearchParams(window.location.search);
+        let targetTicker = urlParams.get('ticker');
+        if (!targetTicker && window.location.hash) {{
+            targetTicker = window.location.hash.replace('#', '');
+        }}
+        if (!targetTicker || !CHARTS_DATA[targetTicker]) {{
+            targetTicker = '{sorted_tickers[0] if sorted_tickers else "NVDA"}';
+        }}
+        selectStock(targetTicker);
+    }});
+    </script>
+</body>
+</html>
+"""
+    return html_content

@@ -1,0 +1,97 @@
+{
+  "portfolio_name": "พอร์ตหุ้นไทย (SET / Streaming)",
+  "broker": "InnovestX",
+  "account_no": "4729933 (E)",
+  "base_currency": "THB",
+  "fx_rate_usd_thb": 33.62,
+  "market": "SET",
+  "cash_balance_thb": 916.01,
+  "line_available_thb": 916.01,
+  "source_screenshot": "data/set-screenshot/IMG_5603.PNG",
+  "holdings": [
+    {
+      "ticker": "BAM",
+      "exchange": "SET",
+      "name": "Bangkok Commercial Asset Management PCL",
+      "shares": 2200,
+      "avg_cost_thb": 14.92,
+      "total_cost_thb": 32824.0,
+      "market_price_thb": 6.40,
+      "market_value_thb": 14080.0,
+      "unrealized_pl_thb": -18744.0,
+      "unrealized_pl_pct": -57.09
+    },
+    {
+      "ticker": "BLAND",
+      "exchange": "SET",
+      "name": "Bangkok Land PCL",
+      "shares": 970000,
+      "avg_cost_thb": 1.01,
+      "total_cost_thb": 979700.0,
+      "market_price_thb": 0.55,
+      "market_value_thb": 533500.0,
+      "unrealized_pl_thb": -446200.0,
+      "unrealized_pl_pct": -45.75
+    },
+    {
+      "ticker": "KCM",
+      "exchange": "SET",
+      "name": "K.C. Metal Sheet PCL",
+      "shares": 600000,
+      "avg_cost_thb": 0.74,
+      "total_cost_thb": 444000.0,
+      "market_price_thb": 0.28,
+      "market_value_thb": 168000.0,
+      "unrealized_pl_thb": -276000.0,
+      "unrealized_pl_pct": -62.02
+    },
+    {
+      "ticker": "KTC",
+      "exchange": "SET",
+      "name": "Krungthai Card PCL",
+      "shares": 8300,
+      "avg_cost_thb": 47.45,
+      "total_cost_thb": 393835.0,
+      "market_price_thb": 35.00,
+      "market_value_thb": 290500.0,
+      "unrealized_pl_thb": -103335.0,
+      "unrealized_pl_pct": -26.24
+    },
+    {
+      "ticker": "NOBLE",
+      "exchange": "SET",
+      "name": "Noble Development PCL",
+      "shares": 40000,
+      "avg_cost_thb": 6.76,
+      "total_cost_thb": 270400.0,
+      "market_price_thb": 1.46,
+      "market_value_thb": 58400.0,
+      "unrealized_pl_thb": -212000.0,
+      "unrealized_pl_pct": -78.42
+    },
+    {
+      "ticker": "SCB",
+      "exchange": "SET",
+      "name": "SCB X PCL",
+      "shares": 1800,
+      "avg_cost_thb": 85.80,
+      "total_cost_thb": 154440.0,
+      "market_price_thb": 144.00,
+      "market_value_thb": 259200.0,
+      "unrealized_pl_thb": 104760.0,
+      "unrealized_pl_pct": 67.84
+    },
+    {
+      "ticker": "SEAFCO",
+      "exchange": "SET",
+      "name": "Seafco PCL",
+      "shares": 77000,
+      "avg_cost_thb": 3.56,
+      "total_cost_thb": 274120.0,
+      "market_price_thb": 2.90,
+      "market_value_thb": 223300.0,
+      "unrealized_pl_thb": -50820.0,
+      "unrealized_pl_pct": -18.59
+    }
+  ]
+}

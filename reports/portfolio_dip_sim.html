@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>พอร์ตจำลองช้อนซื้อหุ้น Dip (Paper Trading) (ตัวละ ฿10,000)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #070b14;
+            --bg-card: #0d1527;
+            --bg-card-subtle: #111c34;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --blue: #3b82f6;
+            --amber: #f59e0b;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Prompt', 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1440px; margin: 0 auto; }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav-links {
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .nav-pill {
+            padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.88rem;
+            text-decoration: none; color: var(--text-secondary); background: var(--bg-card);
+            border: 1px solid var(--border-color); transition: all 0.2s;
+        }
+        .nav-pill:hover {
+            color: var(--text-main); border-color: var(--blue);
+        }
+        .nav-pill.active {
+            background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: var(--blue); font-weight: 600;
+        }
+        .meta-pill {
+            background: var(--bg-card); padding: 8px 16px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-secondary);
+        }
+        .grid-4-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; margin-bottom: 24px; }
+        .grid-3-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 24px; }
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 22px;
+        }
+        .kpi-label { font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 1.95rem; font-weight: 700; font-family: 'Inter', sans-serif; }
+        .kpi-subtext { font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; }
+        .section-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.90rem;
+        }
+        th {
+            background: rgba(255, 255, 255, 0.03); color: var(--text-secondary);
+            padding: 12px 14px; text-align: left; font-weight: 600;
+            border-bottom: 1px solid var(--border-color); font-size: 0.82rem; text-transform: uppercase;
+        }
+        td {
+            padding: 14px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle;
+        }
+        tr:hover td { background: rgba(255, 255, 255, 0.015); }
+        .ticker-link {
+            color: #60a5fa; font-weight: 700; text-decoration: none; font-family: 'Inter', sans-serif;
+        }
+        .ticker-link:hover { text-decoration: underline; }
+        .ticker-badge {
+            background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 4px 10px;
+            border-radius: 6px; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 0.90rem;
+        }
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 6px;
+            font-size: 0.78rem; font-weight: 600; text-align: center; white-space: nowrap;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-danger { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-info { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.08); border-radius: 6px; height: 8px; width: 100%; overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #f43f5e, #f59e0b, #10b981); height: 100%; border-radius: 6px;
+        }
+        .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .metric-box {
+            background: rgba(255, 255, 255, 0.02); padding: 10px; border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+        .metric-lbl { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2px; }
+        .metric-val { font-size: 1.05rem; font-weight: 700; font-family: 'Inter', sans-serif; }
+        .card-item {
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .card-item:hover {
+            transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.15);
+        }
+        .text-muted { color: var(--text-muted); }
+        .small { font-size: 0.80rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h1 style="font-size: 1.75rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
+                    <span>🧪</span> พอร์ตจำลองช้อนซื้อหุ้น Dip (Paper Trading)
+                </h1>
+                <div style="color: var(--text-secondary); margin-top: 4px; font-size: 0.92rem;">
+                    พอร์ตทดลองกลยุทธ์ Super Pullback in Uptrend ทุนจำลองตัวละ 10,000 บาท | เงินลงทุนจำลองคงที่ตัวละ <strong>฿10,000.00 THB</strong>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                <div class="nav-links">
+                    <a href="portfolio_master.html" class="nav-pill">🏛️ พอร์ตหลักความมั่งคั่ง</a>
+                    <a href="portfolio_review.html" class="nav-pill">🏥 ตรวจสุขภาพพอร์ต</a>
+                    <a href="portfolio_dip_sim.html" class="nav-pill active">🧪 พอร์ตจำลองช้อนซื้อ Dip</a>
+                </div>
+                <div class="meta-pill">
+                    อัปเดตราคาล่าสุด: <strong style="color: var(--text-main);">2026-10-15 01:23:43</strong> | FX: 33.62 THB/USD
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI SUMMARY CARDS -->
+        <div class="grid-4-cols">
+            <div class="card" style="border-left: 4px solid var(--blue);">
+                <div class="kpi-label">เงินทุนจำลองรวม (Total Capital)</div>
+                <div class="kpi-value">฿110,000.00</div>
+                <div class="kpi-subtext">~$3,271.84 USD (11 หุ้น x ฿10,000)</div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--cyan);">
+                <div class="kpi-label">มูลค่าพอร์ตจำลองปัจจุบัน (Simulated NAV)</div>
+                <div class="kpi-value">฿108,988.57</div>
+                <div class="kpi-subtext">~$3,241.78 USD</div>
+            </div>
+            <div class="card" style="border-left: 4px solid #f43f5e;">
+                <div class="kpi-label">กำไร/ขาดทุนจำลองรวม (Simulated P/L)</div>
+                <div class="kpi-value" style="color: #f43f5e;">฿-1,011.43</div>
+                <div class="kpi-subtext" style="color: #f43f5e; font-weight: 700;">-0.92% ($-30.06 USD)</div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--purple);">
+                <div class="kpi-label">สถานะการเทรดจำลอง (Trade Progress)</div>
+                <div class="kpi-value" style="font-size: 1.55rem; color: #a855f7;">4/11 แดนบวก</div>
+                <div class="kpi-subtext">ชน TP: 0 | ชน SL: 0</div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: SIMULATION HOLDINGS TABLE -->
+        <div style="margin-bottom: 32px;">
+            <div class="section-title">
+                <span>📊</span> 1. ตารางจำลองการถือครองหุ้น Dip รายตัว (ราคาตลาดสดจาก TradingView)
+                <span class="badge badge-info">11 หุ้น</span>
+            </div>
+            <div class="card" style="padding: 0; overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>บริษัท & ลักษณะธุรกิจ</th>
+                            <th style="text-align: center;">วันที่จำลองซื้อ</th>
+                            <th style="text-align: right;">ต้นทุนเข้าซื้อ ($)</th>
+                            <th style="text-align: right;">ราคาตลาดสด ($)</th>
+                            <th style="text-align: right;">เงินลงทุน (฿ / $)</th>
+                            <th style="text-align: right;">มูลค่าปัจจุบัน (฿ / $)</th>
+                            <th style="text-align: right;">กำไร/ขาดทุนจำลอง</th>
+                            <th style="min-width: 170px;">แถบวัดเป้าหมาย (SL ↔ TP)</th>
+                            <th style="text-align: center;">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('BMY', 'NYSE', 'Bristol-Myers Squibb Company', 'บริษัทยาชีวเวชภัณฑ์ระดับโลก เชี่ยวชาญยารักษาโรคมะเร็งและหลอดเลือดหัวใจ', 59.76, 58.9272, 59.58, 64.3, 57.6, 64.3, 65.52)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BMY 📈</span>
+                <div class="text-muted small">NYSE</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Bristol-Myers Squibb Company</div>
+                <div class="text-muted small">บริษัทยาชีวเวชภัณฑ์ระดับโลก เชี่ยวชาญยารักษาโรคมะเร็งและหลอดเลือดหัวใจ</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-07</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$59.76</div>
+                <div class="text-muted small">4.9772 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$58.93</div>
+                <div style="color: #10b981; font-size: 0.80rem;">+3.98%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,860</div>
+                <div class="text-muted small">$293.29</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-1.39%</div>
+                <div style="font-size: 0.82rem;">฿-139.51 ($-4.15)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $57.60</span>
+                    <span style="color: #10b981;">TP: $64.30</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 19.8%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +9.1% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('ROST', 'NASDAQ', 'Ross Stores, Inc.', 'เครือข่ายร้านค้าปลีกสินค้าราคาประหยัดชั้นนำของสหรัฐฯ', 224.68, 228.28, 219.62, 236.61, 217.17, 236.61, 275.47)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">ROST 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Ross Stores, Inc.</div>
+                <div class="text-muted small">เครือข่ายร้านค้าปลีกสินค้าราคาประหยัดชั้นนำของสหรัฐฯ</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-07</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$224.68</div>
+                <div class="text-muted small">1.3238 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$228.28</div>
+                <div style="color: #10b981; font-size: 0.80rem;">+1.15%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿10,160</div>
+                <div class="text-muted small">$302.20</div>
+            </td>
+            <td style="text-align: right; color: #10b981; font-weight: 700;">
+                <div>+1.60%</div>
+                <div style="font-size: 0.82rem;">+฿159.87 (+$4.76)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $217.17</span>
+                    <span style="color: #10b981;">TP: $236.61</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 57.2%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +3.6% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('C', 'NYSE', 'Citigroup Inc.', 'สถาบันการเงินและธนาคารพาณิชย์ระดับโลกที่มีเครือข่ายธุรกรรมระหว่างประเทศ', 126.49, 122.59, 126.33, 133.65, 121.93, 133.65, 152.48)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">C 📈</span>
+                <div class="text-muted small">NYSE</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Citigroup Inc.</div>
+                <div class="text-muted small">สถาบันการเงินและธนาคารพาณิชย์ระดับโลกที่มีเครือข่ายธุรกรรมระหว่างประเทศ</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-08</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$126.49</div>
+                <div class="text-muted small">2.3515 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$122.59</div>
+                <div style="color: #f43f5e; font-size: 0.80rem;">-1.56%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,692</div>
+                <div class="text-muted small">$288.27</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-3.08%</div>
+                <div style="font-size: 0.82rem;">฿-308.35 ($-9.17)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $121.93</span>
+                    <span style="color: #10b981;">TP: $133.65</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 5.6%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +9.0% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('MU', 'NASDAQ', 'Micron Technology, Inc.', 'ผู้ผลิตชิปหน่วยความจำ DRAM และแฟลชเมมโมรี NAND ระดับโลก', 942.54, 924.2546, 711.77, 982.98, 874.49, 982.98, 1612.83)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">MU 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Micron Technology, Inc.</div>
+                <div class="text-muted small">ผู้ผลิตชิปหน่วยความจำ DRAM และแฟลชเมมโมรี NAND ระดับโลก</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$942.54</div>
+                <div class="text-muted small">0.3156 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$924.25</div>
+                <div style="color: #f43f5e; font-size: 0.80rem;">-3.04%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,807</div>
+                <div class="text-muted small">$291.69</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-1.93%</div>
+                <div style="font-size: 0.82rem;">฿-193.22 ($-5.75)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $874.49</span>
+                    <span style="color: #10b981;">TP: $982.98</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 45.9%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +6.4% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('VRTX', 'NASDAQ', 'Vertex Pharmaceuticals Incorporated', 'บริษัทยาชีวภาพชั้นนำ เชี่ยวชาญการพัฒนายารักษาโรคทางพันธุกรรมรักษายาก', 493.56, 497.72, 475.42, 521.65, 475.36, 521.65, 575.93)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">VRTX 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Vertex Pharmaceuticals Incorporated</div>
+                <div class="text-muted small">บริษัทยาชีวภาพชั้นนำ เชี่ยวชาญการพัฒนายารักษาโรคทางพันธุกรรมรักษายาก</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$493.56</div>
+                <div class="text-muted small">0.6026 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$497.72</div>
+                <div style="color: #10b981; font-size: 0.80rem;">+2.58%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿10,084</div>
+                <div class="text-muted small">$299.93</div>
+            </td>
+            <td style="text-align: right; color: #10b981; font-weight: 700;">
+                <div>+0.84%</div>
+                <div style="font-size: 0.82rem;">+฿83.51 (+$2.49)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $475.36</span>
+                    <span style="color: #10b981;">TP: $521.65</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 48.3%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +4.8% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('ARM', 'NASDAQ', 'ARM Holdings PLC Sponsored ADR', 'ผู้ออกแบบสถาปัตยกรรมชิปประมวลผลที่ใช้ในสมาร์ทโฟนและอุปกรณ์อัจฉริยะทั่วโลก', 243.83, 239.485, 222.19, 269.77, 218.4, 269.77, 300.48)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">ARM 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">ARM Holdings PLC Sponsored ADR</div>
+                <div class="text-muted small">ผู้ออกแบบสถาปัตยกรรมชิปประมวลผลที่ใช้ในสมาร์ทโฟนและอุปกรณ์อัจฉริยะทั่วโลก</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$243.83</div>
+                <div class="text-muted small">1.2199 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$239.49</div>
+                <div style="color: #f43f5e; font-size: 0.80rem;">-6.23%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,822</div>
+                <div class="text-muted small">$292.15</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-1.78%</div>
+                <div style="font-size: 0.82rem;">฿-177.99 ($-5.29)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $218.40</span>
+                    <span style="color: #10b981;">TP: $269.77</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 41.0%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +12.6% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('JNJ', 'NYSE', 'Johnson & Johnson', 'ผู้นำระดับโลกด้านเวชภัณฑ์ยา เครื่องมือแพทย์ และนวัตกรรมดูแลสุขภาพ', 251.44, 253.28, 243.64, 265.3, 242.55, 265.3, 282.48)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">JNJ 📈</span>
+                <div class="text-muted small">NYSE</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Johnson & Johnson</div>
+                <div class="text-muted small">ผู้นำระดับโลกด้านเวชภัณฑ์ยา เครื่องมือแพทย์ และนวัตกรรมดูแลสุขภาพ</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$251.44</div>
+                <div class="text-muted small">1.1829 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$253.28</div>
+                <div style="color: #10b981; font-size: 0.80rem;">+1.88%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿10,073</div>
+                <div class="text-muted small">$299.60</div>
+            </td>
+            <td style="text-align: right; color: #10b981; font-weight: 700;">
+                <div>+0.73%</div>
+                <div style="font-size: 0.82rem;">+฿72.72 (+$2.16)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $242.55</span>
+                    <span style="color: #10b981;">TP: $265.30</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 47.2%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +4.7% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('LRCX', 'NASDAQ', 'Lam Research Corporation', 'กลุ่มอุตสาหกรรม Lam Research Corporation', 292.99, 286.13, 280.99, 310.66, 272.64, 310.66, 386.3)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LRCX 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Lam Research Corporation</div>
+                <div class="text-muted small">กลุ่มอุตสาหกรรม Lam Research Corporation</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$292.99</div>
+                <div class="text-muted small">1.0152 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$286.13</div>
+                <div style="color: #f43f5e; font-size: 0.80rem;">-4.97%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,766</div>
+                <div class="text-muted small">$290.48</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-2.34%</div>
+                <div style="font-size: 0.82rem;">฿-234.09 ($-6.96)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $272.64</span>
+                    <span style="color: #10b981;">TP: $310.66</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 35.5%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +8.6% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('JPM', 'NYSE', 'JPMorgan Chase & Co.', 'ธนาคารพาณิชย์และวาณิชธนกิจอันดับหนึ่งของสหรัฐฯ ให้บริการครบวงจร', 331.27, 333.17, 322.22, 348.85, 321.94, 348.85, 374.79)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">JPM 📈</span>
+                <div class="text-muted small">NYSE</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">JPMorgan Chase & Co.</div>
+                <div class="text-muted small">ธนาคารพาณิชย์และวาณิชธนกิจอันดับหนึ่งของสหรัฐฯ ให้บริการครบวงจร</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$331.27</div>
+                <div class="text-muted small">0.8979 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$333.17</div>
+                <div style="color: #10b981; font-size: 0.80rem;">+0.52%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿10,058</div>
+                <div class="text-muted small">$299.15</div>
+            </td>
+            <td style="text-align: right; color: #10b981; font-weight: 700;">
+                <div>+0.58%</div>
+                <div style="font-size: 0.82rem;">+฿57.54 (+$1.71)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $321.94</span>
+                    <span style="color: #10b981;">TP: $348.85</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 41.7%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +4.7% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('AMAT', 'NASDAQ', 'Applied Materials, Inc.', 'กลุ่มอุตสาหกรรม Applied Materials, Inc.', 455.14, 448.02, 437.45, 486.83, 425.38, 486.83, 659.82)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">AMAT 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Applied Materials, Inc.</div>
+                <div class="text-muted small">กลุ่มอุตสาหกรรม Applied Materials, Inc.</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$455.14</div>
+                <div class="text-muted small">0.6535 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$448.02</div>
+                <div style="color: #f43f5e; font-size: 0.80rem;">-3.49%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,843</div>
+                <div class="text-muted small">$292.78</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-1.57%</div>
+                <div style="font-size: 0.82rem;">฿-156.70 ($-4.66)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $425.38</span>
+                    <span style="color: #10b981;">TP: $486.83</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 36.8%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +8.7% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <span class="ticker-link clickable-ticker" onclick="openChartModal('INTC', 'NASDAQ', 'Intel Corporation', 'ผู้ผลิตชิปประมวลผล CPU และโครงสร้างพื้นฐานโรงงานผลิตเซมิคอนดักเตอร์', 100.45, 98.69, 84.0, 103.53, 92.18, 103.53, 120.83)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">INTC 📈</span>
+                <div class="text-muted small">NASDAQ</div>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Intel Corporation</div>
+                <div class="text-muted small">ผู้ผลิตชิปประมวลผล CPU และโครงสร้างพื้นฐานโรงงานผลิตเซมิคอนดักเตอร์</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-14</td>
+            <td style="text-align: right; font-weight: 600;">
+                <div>$100.45</div>
+                <div class="text-muted small">2.9611 หุ้น</div>
+            </td>
+            <td style="text-align: right; font-weight: 700;">
+                <div>$98.69</div>
+                <div style="color: #f43f5e; font-size: 0.80rem;">-4.01%</div>
+            </td>
+            <td style="text-align: right;">
+                <div>฿10,000</div>
+                <div class="text-muted small">$297.44</div>
+            </td>
+            <td style="text-align: right;">
+                <div style="font-weight: 600;">฿9,825</div>
+                <div class="text-muted small">$292.23</div>
+            </td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700;">
+                <div>-1.75%</div>
+                <div style="font-size: 0.82rem;">฿-175.20 ($-5.21)</div>
+            </td>
+            <td>
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
+                    <span style="color: #f43f5e;">SL: $92.18</span>
+                    <span style="color: #10b981;">TP: $103.53</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: 57.4%;"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+                    อีก +4.9% ถึงเป้า TP
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+            </td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 1.5: CLOSED TRADES / STOP-LOSS EXECUTIONS -->
+        
+        <div style="margin-bottom: 32px;">
+            <div class="section-title">
+                <span>🛑</span> รายการที่แตะจุดยอมแพ้และขายตัดขาดทุนจำลองแล้ว (Closed Trades: 1 ตัว)
+                <span class="badge badge-danger">ขายตัดขาดทุนตามวินัย Stop-Loss</span>
+            </div>
+            <div class="card" style="padding: 0; overflow-x: auto; border-left: 4px solid var(--rose);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>บริษัท & เหตุผลการขาย</th>
+                            <th style="text-align: center;">วันที่ซื้อ</th>
+                            <th style="text-align: center;">วันที่ขาย</th>
+                            <th style="text-align: right;">ราคาซื้อ ($)</th>
+                            <th style="text-align: right;">ราคาขาย ($)</th>
+                            <th style="text-align: right;">ทุน (฿)</th>
+                            <th style="text-align: right;">ยอดรับสุทธิ (฿)</th>
+                            <th style="text-align: right;">ผลขาดทุนจริง</th>
+                            <th style="text-align: right;">% ผลขาดทุน</th>
+                            <th style="text-align: center;">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td style="font-weight: 700; color: #fff; font-family: 'Inter', sans-serif;">
+                <span class="clickable-ticker" onclick="openChartModal('BNY', 'NYSE', 'Bank of New York Mellon Corp', 'Closed Position', 142.08, 136.55, 0, 0, 136.55, 0, 0)" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">BNY 📈</span>
+            </td>
+            <td>
+                <div style="font-weight: 600;">Bank of New York Mellon Corp</div>
+                <div class="text-muted small">🛑 แตะจุดยอมแพ้ Stop-Loss ($137.97) - ขายตัดขาดทุนอัตโนมัติตามวินัย</div>
+            </td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">2026-10-08</td>
+            <td style="text-align: center; color: var(--rose); font-size: 0.85rem; font-weight: 600;">2026-10-14 (6 วัน)</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$142.08</td>
+            <td style="text-align: right; font-weight: 600; color: var(--rose); font-family: 'Inter', sans-serif;">$136.55</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">฿10,000</td>
+            <td style="text-align: right; font-weight: 600; font-family: 'Inter', sans-serif;">฿9,611</td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700; font-family: 'Inter', sans-serif;">฿-388.98 ($-11.57)</td>
+            <td style="text-align: right; color: #f43f5e; font-weight: 700; font-family: 'Inter', sans-serif;">-3.89%</td>
+            <td style="text-align: center;"><span class="badge badge-danger">ตัดขาดทุนตาม SL</span></td>
+        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+
+        <!-- SECTION 2: TRADE STRATEGY CARDS -->
+        <div style="margin-bottom: 32px;">
+            <div class="section-title">
+                <span>🎯</span> 2. รายละเอียดกลยุทธ์และเหตุผลการช้อนซื้อของแต่ละตัว
+            </div>
+            <div class="grid-3-cols">
+                
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('BMY', 'NYSE', 'Bristol-Myers Squibb Company', 'บริษัทยาชีวเวชภัณฑ์ระดับโลก เชี่ยวชาญยารักษาโรคมะเร็งและหลอดเลือดหัวใจ', 59.76, 58.9272, 59.58, 64.3, 57.6, 64.3, 65.52)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BMY 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Bristol-Myers Squibb Company</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('BMY', 'NYSE', 'Bristol-Myers Squibb Company', 'บริษัทยาชีวเวชภัณฑ์ระดับโลก เชี่ยวชาญยารักษาโรคมะเร็งและหลอดเลือดหัวใจ', 59.76, 58.9272, 59.58, 64.3, 57.6, 64.3, 65.52)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                บริษัทยาชีวเวชภัณฑ์ระดับโลก เชี่ยวชาญยารักษาโรคมะเร็งและหลอดเลือดหัวใจ
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$59.76</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$58.93</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-1.39% (฿-139.5)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต BMY ในกลุ่ม Health Technology (Pharmaceuticals: Major)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Strong Dip Buy
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Value Zone + PEG 0.20 💎 + RSI Hook Up (35.9) + R:R 2.1x
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$57.60</strong> | 🎯 จุดทำกำไร TP: <strong>$64.30</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('ROST', 'NASDAQ', 'Ross Stores, Inc.', 'เครือข่ายร้านค้าปลีกสินค้าราคาประหยัดชั้นนำของสหรัฐฯ', 224.68, 228.28, 219.62, 236.61, 217.17, 236.61, 275.47)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">ROST 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Ross Stores, Inc.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+                    <button onclick="openChartModal('ROST', 'NASDAQ', 'Ross Stores, Inc.', 'เครือข่ายร้านค้าปลีกสินค้าราคาประหยัดชั้นนำของสหรัฐฯ', 224.68, 228.28, 219.62, 236.61, 217.17, 236.61, 275.47)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                เครือข่ายร้านค้าปลีกสินค้าราคาประหยัดชั้นนำของสหรัฐฯ
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$224.68</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$228.28</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #10b981;">+1.60% (+฿159.9)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต ROST ในกลุ่ม Retail Trade (Apparel/Footwear Retail)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐ Good Setup
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Pullback SMA200 + Rev YoY +14% 🚀 + PEG 0.90 + R:R 1.6x
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$217.17</strong> | 🎯 จุดทำกำไร TP: <strong>$236.61</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('C', 'NYSE', 'Citigroup Inc.', 'สถาบันการเงินและธนาคารพาณิชย์ระดับโลกที่มีเครือข่ายธุรกรรมระหว่างประเทศ', 126.49, 122.59, 126.33, 133.65, 121.93, 133.65, 152.48)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">C 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Citigroup Inc.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('C', 'NYSE', 'Citigroup Inc.', 'สถาบันการเงินและธนาคารพาณิชย์ระดับโลกที่มีเครือข่ายธุรกรรมระหว่างประเทศ', 126.49, 122.59, 126.33, 133.65, 121.93, 133.65, 152.48)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                สถาบันการเงินและธนาคารพาณิชย์ระดับโลกที่มีเครือข่ายธุรกรรมระหว่างประเทศ
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$126.49</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$122.59</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-3.08% (฿-308.3)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต C ในกลุ่ม Finance (Major Banks)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 35.2 + ซื้อที่ราคาตลาด $126.49
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$121.93</strong> | 🎯 จุดทำกำไร TP: <strong>$133.65</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('MU', 'NASDAQ', 'Micron Technology, Inc.', 'ผู้ผลิตชิปหน่วยความจำ DRAM และแฟลชเมมโมรี NAND ระดับโลก', 942.54, 924.2546, 711.77, 982.98, 874.49, 982.98, 1612.83)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">MU 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Micron Technology, Inc.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('MU', 'NASDAQ', 'Micron Technology, Inc.', 'ผู้ผลิตชิปหน่วยความจำ DRAM และแฟลชเมมโมรี NAND ระดับโลก', 942.54, 924.2546, 711.77, 982.98, 874.49, 982.98, 1612.83)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                ผู้ผลิตชิปหน่วยความจำ DRAM และแฟลชเมมโมรี NAND ระดับโลก
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$942.54</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$924.25</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-1.93% (฿-193.2)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต MU ในกลุ่ม Electronic Technology (Semiconductors)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 39.1 + ซื้อที่ราคาตลาด $942.54
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$874.49</strong> | 🎯 จุดทำกำไร TP: <strong>$982.98</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('VRTX', 'NASDAQ', 'Vertex Pharmaceuticals Incorporated', 'บริษัทยาชีวภาพชั้นนำ เชี่ยวชาญการพัฒนายารักษาโรคทางพันธุกรรมรักษายาก', 493.56, 497.72, 475.42, 521.65, 475.36, 521.65, 575.93)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">VRTX 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Vertex Pharmaceuticals Incorporated</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+                    <button onclick="openChartModal('VRTX', 'NASDAQ', 'Vertex Pharmaceuticals Incorporated', 'บริษัทยาชีวภาพชั้นนำ เชี่ยวชาญการพัฒนายารักษาโรคทางพันธุกรรมรักษายาก', 493.56, 497.72, 475.42, 521.65, 475.36, 521.65, 575.93)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                บริษัทยาชีวภาพชั้นนำ เชี่ยวชาญการพัฒนายารักษาโรคทางพันธุกรรมรักษายาก
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$493.56</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$497.72</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #10b981;">+0.84% (+฿83.5)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต VRTX ในกลุ่ม Health Technology (Pharmaceuticals: Major)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 38.6 + ซื้อที่ราคาตลาด $493.56
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$475.36</strong> | 🎯 จุดทำกำไร TP: <strong>$521.65</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('ARM', 'NASDAQ', 'ARM Holdings PLC Sponsored ADR', 'ผู้ออกแบบสถาปัตยกรรมชิปประมวลผลที่ใช้ในสมาร์ทโฟนและอุปกรณ์อัจฉริยะทั่วโลก', 243.83, 239.485, 222.19, 269.77, 218.4, 269.77, 300.48)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">ARM 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">ARM Holdings PLC Sponsored ADR</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('ARM', 'NASDAQ', 'ARM Holdings PLC Sponsored ADR', 'ผู้ออกแบบสถาปัตยกรรมชิปประมวลผลที่ใช้ในสมาร์ทโฟนและอุปกรณ์อัจฉริยะทั่วโลก', 243.83, 239.485, 222.19, 269.77, 218.4, 269.77, 300.48)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                ผู้ออกแบบสถาปัตยกรรมชิปประมวลผลที่ใช้ในสมาร์ทโฟนและอุปกรณ์อัจฉริยะทั่วโลก
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$243.83</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$239.49</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-1.78% (฿-178.0)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต ARM ในกลุ่ม Electronic Technology (Semiconductors)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 37.3 + ซื้อที่ราคาตลาด $243.83
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$218.40</strong> | 🎯 จุดทำกำไร TP: <strong>$269.77</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('JNJ', 'NYSE', 'Johnson & Johnson', 'ผู้นำระดับโลกด้านเวชภัณฑ์ยา เครื่องมือแพทย์ และนวัตกรรมดูแลสุขภาพ', 251.44, 253.28, 243.64, 265.3, 242.55, 265.3, 282.48)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">JNJ 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Johnson & Johnson</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+                    <button onclick="openChartModal('JNJ', 'NYSE', 'Johnson & Johnson', 'ผู้นำระดับโลกด้านเวชภัณฑ์ยา เครื่องมือแพทย์ และนวัตกรรมดูแลสุขภาพ', 251.44, 253.28, 243.64, 265.3, 242.55, 265.3, 282.48)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                ผู้นำระดับโลกด้านเวชภัณฑ์ยา เครื่องมือแพทย์ และนวัตกรรมดูแลสุขภาพ
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$251.44</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$253.28</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #10b981;">+0.73% (+฿72.7)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต JNJ ในกลุ่ม Health Technology (Pharmaceuticals: Major)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 38.3 + ซื้อที่ราคาตลาด $251.44
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$242.55</strong> | 🎯 จุดทำกำไร TP: <strong>$265.30</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('LRCX', 'NASDAQ', 'Lam Research Corporation', 'กลุ่มอุตสาหกรรม Lam Research Corporation', 292.99, 286.13, 280.99, 310.66, 272.64, 310.66, 386.3)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LRCX 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Lam Research Corporation</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('LRCX', 'NASDAQ', 'Lam Research Corporation', 'กลุ่มอุตสาหกรรม Lam Research Corporation', 292.99, 286.13, 280.99, 310.66, 272.64, 310.66, 386.3)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                กลุ่มอุตสาหกรรม Lam Research Corporation
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$292.99</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$286.13</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-2.34% (฿-234.1)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต LRCX ในกลุ่ม Producer Manufacturing (Industrial Machinery)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 39.5 + ซื้อที่ราคาตลาด $292.99
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$272.64</strong> | 🎯 จุดทำกำไร TP: <strong>$310.66</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('JPM', 'NYSE', 'JPMorgan Chase & Co.', 'ธนาคารพาณิชย์และวาณิชธนกิจอันดับหนึ่งของสหรัฐฯ ให้บริการครบวงจร', 331.27, 333.17, 322.22, 348.85, 321.94, 348.85, 374.79)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">JPM 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">JPMorgan Chase & Co.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-info">🟢 วิ่งในแดนบวก (In Profit)</span>
+                    <button onclick="openChartModal('JPM', 'NYSE', 'JPMorgan Chase & Co.', 'ธนาคารพาณิชย์และวาณิชธนกิจอันดับหนึ่งของสหรัฐฯ ให้บริการครบวงจร', 331.27, 333.17, 322.22, 348.85, 321.94, 348.85, 374.79)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                ธนาคารพาณิชย์และวาณิชธนกิจอันดับหนึ่งของสหรัฐฯ ให้บริการครบวงจร
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$331.27</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$333.17</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #10b981;">+0.58% (+฿57.5)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต JPM ในกลุ่ม Finance (Major Banks)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 37.1 + ซื้อที่ราคาตลาด $331.27
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$321.94</strong> | 🎯 จุดทำกำไร TP: <strong>$348.85</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('AMAT', 'NASDAQ', 'Applied Materials, Inc.', 'กลุ่มอุตสาหกรรม Applied Materials, Inc.', 455.14, 448.02, 437.45, 486.83, 425.38, 486.83, 659.82)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">AMAT 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Applied Materials, Inc.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('AMAT', 'NASDAQ', 'Applied Materials, Inc.', 'กลุ่มอุตสาหกรรม Applied Materials, Inc.', 455.14, 448.02, 437.45, 486.83, 425.38, 486.83, 659.82)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                กลุ่มอุตสาหกรรม Applied Materials, Inc.
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$455.14</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$448.02</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-1.57% (฿-156.7)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต AMAT ในกลุ่ม Producer Manufacturing (Industrial Machinery)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 38.3 + ซื้อที่ราคาตลาด $455.14
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$425.38</strong> | 🎯 จุดทำกำไร TP: <strong>$486.83</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <span class="ticker-badge clickable-ticker" onclick="openChartModal('INTC', 'NASDAQ', 'Intel Corporation', 'ผู้ผลิตชิปประมวลผล CPU และโครงสร้างพื้นฐานโรงงานผลิตเซมิคอนดักเตอร์', 100.45, 98.69, 84.0, 103.53, 92.18, 103.53, 120.83)" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">INTC 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">Intel Corporation</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-warning">🟡 พักตัวรอดีด (Pullback)</span>
+                    <button onclick="openChartModal('INTC', 'NASDAQ', 'Intel Corporation', 'ผู้ผลิตชิปประมวลผล CPU และโครงสร้างพื้นฐานโรงงานผลิตเซมิคอนดักเตอร์', 100.45, 98.69, 84.0, 103.53, 92.18, 103.53, 120.83)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด</button>
+                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
+                ผู้ผลิตชิปประมวลผล CPU และโครงสร้างพื้นฐานโรงงานผลิตเซมิคอนดักเตอร์
+            </div>
+            <div class="metric-grid">
+                <div class="metric-box">
+                    <div class="metric-lbl">ทุนจำลอง (THB)</div>
+                    <div class="metric-val">฿10,000</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
+                    <div class="metric-val">$100.45</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">ราคาตลาดสด</div>
+                    <div class="metric-val">$98.69</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-lbl">กำไร/ขาดทุน</div>
+                    <div class="metric-val" style="color: #f43f5e;">-1.75% (฿-175.2)</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต (🟡 Market Leader):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต INTC ในกลุ่ม Electronic Technology (Semiconductors)</div>
+            </div>
+            <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
+                    🎯 กลยุทธ์ช้อนซื้อ: ⭐⭐⭐ Manual Dip Pick
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> Daily RSI 39.9 + ซื้อที่ราคาตลาด $100.45
+                </div>
+                <div style="font-size: 0.80rem; color: var(--text-muted);">
+                    🛡️ จุดตัดขาดทุน SL: <strong>$92.18</strong> | 🎯 จุดทำกำไร TP: <strong>$103.53</strong>
+                </div>
+            </div>
+        </div>
+        
+            </div>
+        </div>
+
+        <!-- SECTION 3: RULES & PHILOSOPHY -->
+        <div class="card" style="background: rgba(13, 21, 39, 0.6); border: 1px dashed var(--border-color); margin-bottom: 32px;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 12px; color: var(--amber);">
+                💡 วัตถุประสงค์และกติกาของพอร์ตจำลอง Dip นี้ (Paper Trading Rules)
+            </h3>
+            <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.90rem; line-height: 1.8;">
+                <li><strong>เงินทุนเท่ากันทุกตัว:</strong> กำหนดเงินลงทุนจำลองคงที่ตัวละ ฿10,000 เพื่อวัดผลตอบแทนอย่างเที่ยงตรงโดยไม่ให้น้ำหนักตัวใดตัวหนึ่งเบี่ยงเบน.</li>
+                <li><strong>แยกขาดจากพอร์ตจริง:</strong> ตัวเลขในหน้านี้เป็นข้อมูลทดลองเชิงสถิติ จะไม่ถูกนำไปนับรวมในพอร์ตหลัก Dime! ของคุณ.</li>
+                <li><strong>ทดสอบวินัย Take-Profit และ Stop-Loss:</strong> บันทึกจุด Stop Loss ที่ 1.5 ATR และเป้าทำกำไรที่เส้น 50 วัน เพื่อพิสูจน์ว่าในระยะยาวอัตรา Win Rate และ Risk-to-Reward จะเป็นบวกจริงตามหลักคณิตศาสตร์.</li>
+                <li><strong>สามารถกลับมาเปิดดูเพื่อประเมินผลได้ตลอดเวลา:</strong> ระบบจะเชื่อมโยงราคาตลาดสดจาก TradingView API เสมอ.</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 20px 0; border-top: 1px solid var(--border-subtle);">
+            Simulated Dip Paper Trading Engine | Developed with TradingView Screener live scanner API | All data is purely for educational simulation.
+        </div>
+    </div>
+    
+<!-- Stock Chart Dedicated Navigation Handler -->
+<script>
+function openChartModal(ticker, exchange, name, sector, cost, price, support, resistance, sl, tp, targetAvg) {
+    const params = new URLSearchParams();
+    if (ticker) params.set('ticker', ticker);
+    if (exchange) params.set('exchange', exchange);
+    if (name) params.set('name', name);
+    if (sector) params.set('sector', sector);
+    if (cost) params.set('cost', cost);
+    if (price) params.set('price', price);
+    if (support) params.set('support', support);
+    if (resistance) params.set('resistance', resistance);
+    if (sl) params.set('sl', sl);
+    if (tp) params.set('tp', tp);
+    if (targetAvg) params.set('target', targetAvg);
+    window.location.href = 'stock_chart.html?' + params.toString() + '#' + encodeURIComponent(ticker || '');
+}
+</script>
+
+</body>
+</html>

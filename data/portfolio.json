@@ -1,0 +1,89 @@
+{
+  "portfolio_name": "ไม่รวยก็ซวยอ่ะค้าบ",
+  "broker": "Dime! (KKP Securities)",
+  "base_currency": "USD",
+  "fx_rate_usd_thb": 33.62,
+  "holdings": [
+    {
+      "ticker": "LLY",
+      "exchange": "NYSE",
+      "name": "Eli Lilly and Company",
+      "shares": 27.6477631,
+      "avg_cost_usd": 1021.1077,
+      "total_cost_usd": 28231.34,
+      "cost_thb": 949137.8
+    },
+    {
+      "ticker": "GOOGL",
+      "exchange": "NASDAQ",
+      "name": "Alphabet Inc. Class A",
+      "shares": 11.1897032,
+      "avg_cost_usd": 341.7162,
+      "total_cost_usd": 3823.7,
+      "cost_thb": 128552.88
+    },
+    {
+      "ticker": "ABNB",
+      "exchange": "NASDAQ",
+      "name": "Airbnb, Inc.",
+      "shares": 9.8248563,
+      "avg_cost_usd": 151.7895,
+      "total_cost_usd": 1491.31,
+      "cost_thb": 50137.84
+    },
+    {
+      "ticker": "NOK",
+      "exchange": "NYSE",
+      "name": "Nokia Oyj",
+      "shares": 137.7332496,
+      "avg_cost_usd": 11.8125,
+      "total_cost_usd": 1626.97,
+      "cost_thb": 54698.73
+    },
+    {
+      "ticker": "BAC",
+      "exchange": "NYSE",
+      "name": "Bank of America Corp",
+      "shares": 27.3711243,
+      "avg_cost_usd": 54.3123,
+      "total_cost_usd": 1486.59,
+      "cost_thb": 49979.16
+    },
+    {
+      "ticker": "MNST",
+      "exchange": "NASDAQ",
+      "name": "Monster Beverage Corp",
+      "shares": 17.3443578,
+      "avg_cost_usd": 42.935,
+      "total_cost_usd": 744.68,
+      "cost_thb": 25036.14
+    },
+    {
+      "ticker": "APP",
+      "exchange": "NASDAQ",
+      "name": "AppLovin Corp",
+      "shares": 2.9770995,
+      "avg_cost_usd": 285.3213,
+      "total_cost_usd": 849.43,
+      "cost_thb": 28557.84
+    },
+    {
+      "ticker": "VRT",
+      "exchange": "NYSE",
+      "name": "Vertiv Holdings Co.",
+      "shares": 2.7077294,
+      "avg_cost_usd": 237.8007,
+      "total_cost_usd": 643.9,
+      "cost_thb": 21647.92
+    },
+    {
+      "ticker": "VOO",
+      "exchange": "AMEX",
+      "name": "Vanguard S&P 500 ETF",
+      "shares": 0.4951753,
+      "avg_cost_usd": 640.46,
+      "total_cost_usd": 317.14,
+      "cost_thb": 10662.25
+    }
+  ]
+}

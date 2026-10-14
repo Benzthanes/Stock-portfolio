@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realized Trade Ledger - ไม่รวยก็ซวยอ่ะค้าบ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #080d1a;
+            --bg-card: #0f172a;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --blue: #3b82f6;
+            --amber: #f59e0b;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Prompt', 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .meta-pill {
+            background: var(--bg-card); padding: 6px 14px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-secondary);
+        }
+        .grid-4-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 24px; }
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 22px;
+        }
+        .kpi-label { font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; }
+        .kpi-value { font-size: 1.85rem; font-weight: 700; font-family: 'Inter', sans-serif; }
+        .kpi-subtext { font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.92rem;
+        }
+        th {
+            background: rgba(255, 255, 255, 0.03); color: var(--text-secondary);
+            padding: 12px 14px; text-align: left; font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        td {
+            padding: 14px; border-bottom: 1px solid var(--border-subtle);
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 style="font-size: 1.85rem; font-weight: 700;">📈 บัญชีกำไรขาดทุนจากการซื้อขาย (Realized Trade Ledger)</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px;">
+                    พอร์ต: <strong>ไม่รวยก็ซวยอ่ะค้าบ</strong> | โบรกเกอร์: Dime! (KKP Securities)
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>
+                </button>
+                <span class="meta-pill">🕒 ข้อมูล ณ: 2026-10-15 01:23:43</span>
+            </div>
+        </div>
+
+        <div class="grid-4-cols">
+            <div class="card">
+                <div class="kpi-label">กำไรขาดทุนสะสม (Net Realized P&L)</div>
+                <div class="kpi-value" style="color: #10b981;">+$812.15</div>
+                <div class="kpi-subtext" style="color: #10b981; font-weight: 600;">+฿27,304.47</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">อัตราเทรดชนะ (Win Rate)</div>
+                <div class="kpi-value">100.0%</div>
+                <div class="kpi-subtext">7 ชนะ / 0 แพ้ (รวม 7 ไม้)</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">ผลตอบแทนเฉลี่ย (Overall ROI)</div>
+                <div class="kpi-value" style="color: #10b981;">+20.13%</div>
+                <div class="kpi-subtext">Profit Factor: 99.00</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">เงินรับรวมสุทธิ (Net Proceeds)</div>
+                <div class="kpi-value">$4,846.89</div>
+                <div class="kpi-subtext">จากต้นทุนปิดสัญญา $4,034.74</div>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 0; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>วันที่ซื้อ (Buy Date)</th>
+                        <th style="text-align: center;">วันที่ขาย</th>
+                        <th style="text-align: center;">ระยะถือ</th>
+                        <th>หุ้น</th>
+                        <th>ชื่อบริษัท / ไม้สะสม</th>
+                        <th style="text-align: right;">จำนวนหุ้น</th>
+                        <th style="text-align: right;">ราคาซื้อเฉลี่ย</th>
+                        <th style="text-align: right;">ราคาขายจริง</th>
+                        <th style="text-align: right;">ต้นทุนรวม ($)</th>
+                        <th style="text-align: right;">เงินรับสุทธิ ($)</th>
+                        <th style="text-align: right;">กำไร ($)</th>
+                        <th style="text-align: right;">กำไร (฿)</th>
+                        <th style="text-align: right;">% ผลตอบแทน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">30 ก.ย. 69 - 22:08 น.</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">6 ต.ค. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">6 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('VST', 'NYSE', 'Vistra Corp', 'Closed Trade', 137.61, 161.24, 0, 0, 0, 161.24, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">VST 📈</span>
+            </td>
+            <td>
+                <div>Vistra Corp</div>
+                <div style="margin-top: 4px;"><span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">2.1570</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$137.61</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$161.24</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$296.82</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$347.22</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$50.40</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿1,694.45</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+16.98%</td>
+        </tr>
+        
+            <tr id="details-TRD_20261006_VST" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ VST (ทั้งหมด 1 ไม้ | ต้นทุนเฉลี่ย $137.61):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">30 ก.ย. 69 - 22:08 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">2.1570 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$137.61</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$296.82</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">฿9,999.87</td>
+                    <td style="color: var(--text-secondary);">ไม้ Dip ทำกำไรสำเร็จใน 6 วัน (+16.98%)</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5579.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">4 มี.ค. - 29 มิ.ย. 69</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">28 ก.ค. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">146 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('PLTR', 'NASDAQ', 'Palantir Technologies Inc.', 'Closed Trade', 130.88, 169.23, 0, 0, 0, 169.23, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">PLTR 📈</span>
+            </td>
+            <td>
+                <div>Palantir Technologies Inc.</div>
+                <div style="margin-top: 4px;"><button onclick="toggleTranche('TRD_20260728_PLTR')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม 7 ไม้ <span id="icon-TRD_20260728_PLTR">▼</span></button></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">9.2983</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$130.88</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$169.23</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$1,216.97</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$1,573.51</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$356.54</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿11,986.87</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+29.30%</td>
+        </tr>
+        
+            <tr id="details-TRD_20260728_PLTR" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ PLTR (ทั้งหมด 7 ไม้ | ต้นทุนเฉลี่ย $130.88):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">4 มี.ค. 69 - 22:14 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">0.6568 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$152.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$100.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 1 ไม้เปิดสถานะแรก</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5532.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 2</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">14 มี.ค. 69 - 00:50 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">0.6634 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$150.49</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$100.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 2 สะสมรอบสอง</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5533.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 3</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">10 เม.ย. 69 - 21:02 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">2.5059 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$124.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$311.23</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">฿9,999.82</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 3 ช้อนหนัก Dip แรก</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5540.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 4</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">6 พ.ค. 69 - 21:55 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">2.3112 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$134.24</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$310.75</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 4 สะสมต่อเนื่อง</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5541.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 5</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">27 พ.ค. 69 - 22:34 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.1428 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$133.79</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$152.90</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">฿4,999.83</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 5 สะสมรอบห้า</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5544.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 6</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">23 มิ.ย. 69 - 00:14 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.2552 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$120.95</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$152.07</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 6 ถัวฐานล่างรอบหก</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5555.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 7</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">29 มิ.ย. 69 - 20:55 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">0.7630 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$118.18</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$90.31</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 7 ไม้สุดท้ายก่อนปิดรอบกำไร 29.3%</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5557.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">1 มิ.ย. - 15 ก.ค. 69</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">28 ก.ค. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">57 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('NOW', 'NYSE', 'ServiceNow, Inc.', 'Closed Trade', 108.59, 109.82, 0, 0, 0, 109.82, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">NOW 📈</span>
+            </td>
+            <td>
+                <div>ServiceNow, Inc.</div>
+                <div style="margin-top: 4px;"><button onclick="toggleTranche('TRD_20260728_NOW')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม 4 ไม้ <span id="icon-TRD_20260728_NOW">▼</span></button></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">7.0236</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$108.59</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$109.82</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$762.68</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$770.09</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$7.41</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿249.12</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+0.97%</td>
+        </tr>
+        
+            <tr id="details-TRD_20260728_NOW" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ NOW (ทั้งหมด 4 ไม้ | ต้นทุนเฉลี่ย $108.59):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">1 มิ.ย. 69 - 22:34 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.1297 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$137.29</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$155.10</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 1 เปิดสถานะ</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5547.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 2</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">15 มิ.ย. 69 - 20:59 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">2.8952 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$105.74</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$306.65</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">฿9,999.86</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 2 ช้อนย่อไม้ใหญ่</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5549.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 3</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">22 มิ.ย. 69 - 20:42 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.6054 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$94.62</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$152.16</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 3 ถัวโซนต่ำ</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5553.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 4</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">15 ก.ค. 69 - 21:00 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.3932 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$106.95</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$149.25</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 4 สะสมก่อนปิดรอบทำกำไร</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5563.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">16 - 17 มี.ค. 69</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">28 ก.ค. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">133 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('MNST', 'NASDAQ', 'Monster Beverage Corp (รอบที่ 1)', 'Closed Trade', 77.54, 98.4, 0, 0, 0, 98.4, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">MNST 📈</span>
+            </td>
+            <td>
+                <div>Monster Beverage Corp (รอบที่ 1)</div>
+                <div style="margin-top: 4px;"><button onclick="toggleTranche('TRD_20260728_MNST')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม 2 ไม้ <span id="icon-TRD_20260728_MNST">▼</span></button></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">2.5750</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$77.54</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$98.40</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$199.68</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$252.96</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$53.28</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿1,791.27</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+26.68%</td>
+        </tr>
+        
+            <tr id="details-TRD_20260728_MNST" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ MNST (ทั้งหมด 2 ไม้ | ต้นทุนเฉลี่ย $77.54):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">16 มี.ค. 69 - 22:51 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.2817 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$77.89</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$100.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 1 เข้าซื้อโซนเปิด</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5534.PNG</td>
+                </tr>
+                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 2</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">17 มี.ค. 69 - 02:36 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">1.2933 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$77.19</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$100.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้ที่ 2 ถัวเพิ่มวันถัดมา</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5535.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">10 ก.ค. 69 - 22:34 น.</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">10 ก.ค. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">0 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('SKHYV', 'NASDAQ', 'SK hynix Inc. (ADS / ปัจจุบันคือ SKHY)', 'Closed Trade', 170.0, 171.3, 0, 0, 0, 171.3, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">SKHYV 📈</span>
+            </td>
+            <td>
+                <div>SK hynix Inc. (ADS / ปัจจุบันคือ SKHY)</div>
+                <div style="margin-top: 4px;"><span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">2.0000</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$170.00</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$171.30</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$340.00</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$342.03</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$2.03</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿68.25</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+0.60%</td>
+        </tr>
+        
+            <tr id="details-TRD_20260710_SKHYV" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ SKHYV (ทั้งหมด 1 ไม้ | ต้นทุนเฉลี่ย $170.00):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">10 ก.ค. 69 - 22:34 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">2.0000 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$170.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$340.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">Day trade ซื้อขายจบในวันเดียวกัน</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5559.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">3 ก.พ. 69 - 21:30 น.</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">25 มิ.ย. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">142 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('QQQI', 'NASDAQ', 'NEOS Nasdaq-100 High Income ETF', 'Closed Trade', 54.34, 55.2, 0, 0, 0, 55.2, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">QQQI 📈</span>
+            </td>
+            <td>
+                <div>NEOS Nasdaq-100 High Income ETF</div>
+                <div style="margin-top: 4px;"><span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">5.8362</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$54.34</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$55.20</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$317.15</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$321.65</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$4.50</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿151.29</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+1.42%</td>
+        </tr>
+        
+            <tr id="details-TRD_20260625_QQQI" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ QQQI (ทั้งหมด 1 ไม้ | ต้นทุนเฉลี่ย $54.34):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">3 ก.พ. 69 - 21:30 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">5.8362 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$54.34</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$317.15</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ไม้แรกวันเปิดตลาดหลังเปิดบัญชี</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5528.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">12 มิ.ย. 69 - 22:46 น.</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">17 มิ.ย. 69</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">5 วัน</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">
+                <span class="clickable-ticker" onclick="openChartModal('SPCX', 'NASDAQ', 'Space Exploration Technologies Corp. (SpaceX)', 'Closed Trade', 150.24, 206.91, 0, 0, 0, 206.91, 0)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">SPCX 📈</span>
+            </td>
+            <td>
+                <div>Space Exploration Technologies Corp. (SpaceX)</div>
+                <div style="margin-top: 4px;"><span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span></div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">6.0000</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$150.24</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$206.91</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$901.44</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$1,239.43</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+$337.99</td>
+            <td style="text-align: right; font-weight: 600; color: #10b981; font-family: 'Inter', sans-serif;">+฿11,363.22</td>
+            <td style="text-align: right; font-weight: 700; color: #10b981; font-family: 'Inter', sans-serif;">+37.49%</td>
+        </tr>
+        
+            <tr id="details-TRD_20260617_SPCX" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="13" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ SPCX (ทั้งหมด 1 ไม้ | ต้นทุนเฉลี่ย $150.24):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ 1</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">12 มิ.ย. 69 - 22:46 น.</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">6.0000 หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">$150.00</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$901.44</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+                    <td style="color: var(--text-secondary);">ซื้อรอบแรก 6 หุ้น</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">IMG_5548.PNG</td>
+                </tr>
+                
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+    function toggleTranche(id) {
+        var row = document.getElementById('details-' + id);
+        var icon = document.getElementById('icon-' + id);
+        if (!row) return;
+        if (row.style.display === 'none' || row.style.display === '') {
+            row.style.display = 'table-row';
+            if (icon) icon.innerHTML = '▲';
+        } else {
+            row.style.display = 'none';
+            if (icon) icon.innerHTML = '▼';
+        }
+    }
+
+    var allExpanded = false;
+    function toggleAllTranches() {
+        var rows = document.querySelectorAll('.tranche-detail-row');
+        var btnText = document.getElementById('toggleAllBtnText');
+        allExpanded = !allExpanded;
+        rows.forEach(function(row) {
+            row.style.display = allExpanded ? 'table-row' : 'none';
+            var id = row.id.replace('details-', '');
+            var icon = document.getElementById('icon-' + id);
+            if (icon) icon.innerHTML = allExpanded ? '▲' : '▼';
+        });
+        if (btnText) {
+            btnText.innerText = allExpanded ? 'หุบรายละเอียดทุกไม้ (Collapse All)' : 'คลี่ดูรายละเอียดทุกไม้ (Expand All)';
+        }
+    }
+    </script>
+    
+<!-- Stock Chart Dedicated Navigation Handler -->
+<script>
+function openChartModal(ticker, exchange, name, sector, cost, price, support, resistance, sl, tp, targetAvg) {
+    const params = new URLSearchParams();
+    if (ticker) params.set('ticker', ticker);
+    if (exchange) params.set('exchange', exchange);
+    if (name) params.set('name', name);
+    if (sector) params.set('sector', sector);
+    if (cost) params.set('cost', cost);
+    if (price) params.set('price', price);
+    if (support) params.set('support', support);
+    if (resistance) params.set('resistance', resistance);
+    if (sl) params.set('sl', sl);
+    if (tp) params.set('tp', tp);
+    if (targetAvg) params.set('target', targetAvg);
+    window.location.href = 'stock_chart.html?' + params.toString() + '#' + encodeURIComponent(ticker || '');
+}
+</script>
+
+</body>
+</html>

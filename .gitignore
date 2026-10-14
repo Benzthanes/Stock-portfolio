@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cpython & IDEs
+.DS_Store
+.idea/
+.vscode/
+.claude/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Temporary analysis cache
+data/.port_analysis.json
