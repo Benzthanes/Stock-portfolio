@@ -515,6 +515,11 @@ def generate_trades_markdown(trades_data: Dict[str, Any]) -> str:
 
 
 def generate_trades_html(trades_data: Dict[str, Any]) -> str:
+    try:
+        from scripts.generate_master_report import generate_master_dashboard_data, generate_master_ledger_html
+        return generate_master_ledger_html(generate_master_dashboard_data())
+    except Exception:
+        pass
     summary = calculate_trades_summary(trades_data)
     trades = trades_data.get("trades", [])
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

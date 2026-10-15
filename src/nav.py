@@ -8,7 +8,7 @@ PAGES = (
     ("review", "portfolio_review.html", "สุขภาพพอร์ต"),
     ("recovery", "portfolio_recovery.html", "แก้ดอย"),
     ("dip_sim", "portfolio_dip_sim.html", "Dip จำลอง"),
-    ("ledger", "trades_ledger.html", "ประวัติขาย"),
+    ("ledger", "trades_ledger.html", "รายการซื้อขายทั้งหมด"),
     ("chart", "stock_chart.html", "กราฟ"),
 )
 

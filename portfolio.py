@@ -70,9 +70,9 @@ def run_all_reports():
     dip_html = generate_dip_html(sim_summary)
     (reports_dir / "portfolio_dip_sim.html").write_text(dip_html, encoding="utf-8")
 
-    print("📈 [5/6] กำลังอัปเดต Realized Trades Ledger (ประวัติปิดออเดอร์)...", flush=True)
-    trades_data = load_trades()
-    trades_html = generate_trades_html(trades_data)
+    print("📈 [5/6] กำลังอัปเดต Complete Trading Ledger (รายการซื้อขายทั้งหมด)...", flush=True)
+    from scripts.generate_master_report import generate_master_ledger_html
+    trades_html = generate_master_ledger_html(master_data)
     (reports_dir / "trades_ledger.html").write_text(trades_html, encoding="utf-8")
 
     print("🚀 [6/6] กำลังสร้าง Dedicated Stock Chart Page (หน้าวิเคราะห์กราฟ & AI เต็มจอ)...", flush=True)
@@ -93,7 +93,7 @@ def run_all_reports():
     print(f"2. ตรวจสุขภาพพอร์ต       : reports/portfolio_review.html")
     print(f"3. กลยุทธ์ฟื้นฟู/แก้ดอย : reports/portfolio_recovery.html")
     print(f"4. จำลองช้อนซื้อหุ้น Dip : reports/portfolio_dip_sim.html")
-    print(f"5. บัญชีกำไรขายแล้ว      : reports/trades_ledger.html")
+    print(f"5. รายการซื้อขายทั้งหมด   : reports/trades_ledger.html")
     print(f"6. หน้ากราฟ & AI เต็มจอ  : reports/stock_chart.html")
     print("=" * 74)
 

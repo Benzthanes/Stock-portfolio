@@ -422,165 +422,7 @@ def generate_master_dashboard_html(data):
         </div>
         """
 
-    # 2. Buy Orders Rows (55 orders)
-    buy_rows = ""
-    for idx, b in enumerate(data["buy_orders"]):
-        acc_badge = '<span class="badge badge-success">Dime! Save (THB)</span>' if "Save" in b["account"] else '<span class="badge badge-info">Dime! USD</span>'
-        type_badge = f'<span class="badge badge-purple">{b["order_type"]}</span>' if b["order_type"] == "Limit" else '<span class="badge badge-neutral">Market</span>'
-        fx_str = f"฿{b['fx_rate']:.2f}" if b['fx_rate'] > 0 else "-"
-        thb_str = f"฿{b['amt_thb']:,.2f}" if b['amt_thb'] > 0 else "-"
-        buy_rows += f"""
-        <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
-            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">{b['date']}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">{b['ticker']}</td>
-            <td style="text-align: center;">{type_badge}</td>
-            <td style="text-align: center;">{acc_badge}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">{b['shares']:.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${b['price_usd']:,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${b['amt_usd']:,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{thb_str}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{fx_str}</td>
-            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{b['fn']}</td>
-        </tr>
-        """
 
-    # 3. Closed Trades Rows (7 sells with Buy Dates & Multi-Tranche Details)
-    closed_rows = ""
-    for idx, t in enumerate(data["closed_trades"]):
-        c = "#10b981" if t.get("realized_pl_usd", 0) >= 0 else "#f43f5e"
-        s = "+" if t.get("realized_pl_usd", 0) >= 0 else ""
-        tranches = t.get("buy_tranches", [])
-        tranche_count = len(tranches)
-        trade_id = t.get("id", f"trade_{idx}").replace("-", "_")
-
-        buy_date_str = re.sub(r"\s*\(\d+\s*ไม้\)", "", str(t.get("buy_date", "-")))
-        days = t.get("holding_days", "-")
-        days_str = f"{days} วัน" if isinstance(days, (int, float)) else str(days)
-
-        if tranche_count > 1:
-            tranche_btn = f'<button onclick="toggleTranche(\'{trade_id}\')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม {tranche_count} ไม้ <span id="icon-{trade_id}">▼</span></button>'
-        else:
-            tranche_btn = '<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span>'
-
-        closed_rows += f"""
-        <tr style="border-bottom: 1px solid var(--border-subtle);">
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
-            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">{buy_date_str}</td>
-            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">{t.get('date', '-')}</td>
-            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">{days_str}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">{t.get('ticker')}</td>
-            <td>
-                <div>{t.get('name', '-')}</div>
-                <div style="margin-top: 4px;">{tranche_btn}</div>
-            </td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{t.get('shares', 0):.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('buy_price_usd', 0):.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${t.get('sell_price_usd', 0):.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('total_cost_usd', 0):,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${t.get('net_revenue_usd', 0):,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}${t.get('realized_pl_usd', 0):,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{s}฿{t.get('realized_pl_thb', 0):,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}{t.get('realized_pl_pct', 0):.2f}%</td>
-        </tr>
-        """
-
-        # Detailed tranche subrow
-        if tranches:
-            tranche_subrows = ""
-            for tr in tranches:
-                t_thb_str = f"฿{tr.get('amt_thb', 0):,.2f}" if tr.get('amt_thb', 0) > 0 else "-"
-                tranche_subrows += f"""
-                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
-                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ {tr.get('tranche')}</td>
-                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">{tr.get('date')}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif;">{tr.get('shares'):.4f} หุ้น</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif;">${tr.get('price_usd'):.2f}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${tr.get('amt_usd'):,.2f}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{t_thb_str}</td>
-                    <td style="color: var(--text-secondary);">{tr.get('note', '-')}</td>
-                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">{tr.get('file', '-')}</td>
-                </tr>
-                """
-
-            closed_rows += f"""
-            <tr id="details-{trade_id}" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
-                <td colspan="14" style="padding: 12px 18px;">
-                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
-                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ {t.get('ticker')} (ทั้งหมด {tranche_count} ไม้ | ต้นทุนเฉลี่ย ${t.get('buy_price_usd', 0):.2f}):
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
-                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
-                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
-                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
-                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
-                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
-                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
-                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
-                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tranche_subrows}
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            """
-
-
-    # 4. Dividend Rows (13 items)
-    div_rows = ""
-    for d in data["dividends_list"]:
-        div_rows += f"""
-        <tr>
-            <td style="text-align: center; color: var(--text-secondary);">{d['date']}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif;">{d['ticker']}</td>
-            <td>{d['rate']}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+${d['amount_usd']:.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿{d['amount_usd'] * data['fx_rate']:,.2f}</td>
-        </tr>
-        """
-
-    # 5. Complete Cash Movements Rows (54 items from KKP Statement + recent)
-    cash_rows = ""
-    for idx, c in enumerate(data["cash_movements"]):
-        if "ฝากเงิน" in c["type"]:
-            badge = '<span class="badge badge-success">ฝากเงินเข้าพอร์ต</span>'
-            amt_color = "#10b981"
-            sign = "+"
-        elif "ดอกเบี้ย" in c["type"]:
-            badge = '<span class="badge badge-info">ดอกเบี้ยรับเงินฝาก</span>'
-            amt_color = "#60a5fa"
-            sign = "+"
-        elif "โอนเงินออก" in c["type"]:
-            badge = '<span class="badge badge-rose">โอนเงินออกไปต่างธนาคาร</span>'
-            amt_color = "#f43f5e"
-            sign = ""
-        else:
-            badge = '<span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span>'
-            amt_color = "#f43f5e"
-            sign = ""
-
-        bal_str = f"฿{c['balance_thb']:,.2f}" if "balance_thb" in c else "-"
-        ch_str = c.get("channel", "Dime! Save")
-        ref_str = c.get("ref", "-")
-
-        cash_rows += f"""
-        <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
-            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">{c['date_str']}</td>
-            <td>{badge}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: {amt_color};">{sign}฿{c['amount_thb']:,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">{bal_str}</td>
-            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">{ch_str}</td>
-            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{ref_str}</td>
-        </tr>
-        """
 
     html = f"""<!DOCTYPE html>
 <html lang="th">
@@ -821,26 +663,10 @@ def generate_master_dashboard_html(data):
             </div>
         </div>
 
-        <!-- MASTER TABS -->
-        <div class="master-tab-bar">
-            <button id="btn-tab-holdings" class="master-tab-btn active" onclick="switchMasterTab('holdings')">
-                <span style="font-size: 1.15rem;">📊</span>
-                <span>ภาพรวม & หุ้นที่ถือครอง</span>
-                <span class="tab-badge">{len(data['positions'])} หุ้น</span>
-            </button>
-            <button id="btn-tab-ledger" class="master-tab-btn" onclick="switchMasterTab('ledger')">
-                <span style="font-size: 1.15rem;">📑</span>
-                <span>รายการซื้อขายและเติมเงิน</span>
-                <span class="tab-badge">{len(data['buy_orders']) + len(data['closed_trades']) + len(data['dividends_list']) + len(data['cash_movements'])} รายการ</span>
-            </button>
-        </div>
-
-        <!-- TAB 1: ACTIVE HOLDINGS & OUTLOOK -->
-        <div id="tab-holdings" class="master-tab-content">
         <!-- SECTION 1: ACTIVE HOLDINGS TABLE -->
         <div style="margin-bottom: 36px;">
             <div class="section-title">
-                <span>📈</span> 1. รายการหุ้นที่กำลังถือครองในพอร์ต (Active Holdings: {len(data['positions'])} ตัว)
+                <span>📈</span> 1. รายการหุ้นที่กำลังถือครองในพอร์ต (Active Holdings: {len(data.get('positions', []))} ตัว)
                 <span class="badge badge-info">ราคาตลาดสดจาก TradingView API</span>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
@@ -870,29 +696,404 @@ def generate_master_dashboard_html(data):
             <div style="margin-top: 24px;">
                 <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
                     <span>🔭</span> วิสัยทัศน์ & ตัวเร่งราคาในอนาคตรายตัว (Forward Intelligence & Catalysts)
-                    <span class="badge badge-purple">{len(data['positions'])} หุ้นในพอร์ต</span>
+                    <span class="badge badge-purple">{len(data.get('positions', []))} หุ้นในพอร์ต</span>
                 </div>
                 <div class="grid-3-cols">
                     {outlook_cards_master}
                 </div>
             </div>
         </div>
+
+        <!-- LINK TO COMPLETE TRADES LEDGER -->
+        <div class="card" style="margin-top: 24px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%); border: 1px solid rgba(139, 92, 246, 0.3); padding: 24px; text-align: center;">
+            <div style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 8px;">
+                📑 รายการซื้อขาย เงินปันผล และประวัติเดินบัญชีทั้งหมด
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 16px;">
+                ตรวจสอบประวัติคำสั่งซื้อหุ้น {len(data.get('buy_orders', []))} ไม้ | ปิดขายทำกำไร {len(data.get('closed_trades', []))} ไม้ | ปันผลรับ {len(data.get('dividends_list', []))} ครั้ง | เดินบัญชี {len(data.get('cash_movements', []))} รายการ
+            </p>
+            <a href="trades_ledger.html" style="display: inline-flex; align-items: center; gap: 8px; background: #3b82f6; color: #fff; padding: 10px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; transition: background 0.2s;">
+                <span>ดูรายการซื้อขายทั้งหมด</span> <span>→</span>
+            </a>
         </div>
 
-        <!-- TAB 2: TRANSACTIONS & CASH MOVEMENTS -->
-        <div id="tab-ledger" class="master-tab-content" style="display: none;">
-            <div class="sub-tab-bar">
-                <button id="btn-sub-all" class="sub-tab-btn active" onclick="switchSubTab('all')">ทั้งหมด ({len(data['buy_orders']) + len(data['closed_trades']) + len(data['dividends_list']) + len(data['cash_movements'])})</button>
-                <button id="btn-sub-buys" class="sub-tab-btn" onclick="switchSubTab('buys')">🛒 คำสั่งซื้อหุ้น ({len(data['buy_orders'])})</button>
-                <button id="btn-sub-sells" class="sub-tab-btn" onclick="switchSubTab('sells')">🏆 ปิดขายทำกำไร ({len(data['closed_trades'])})</button>
-                <button id="btn-sub-divs" class="sub-tab-btn" onclick="switchSubTab('divs')">💵 เงินปันผล ({len(data['dividends_list'])})</button>
-                <button id="btn-sub-cash" class="sub-tab-btn" onclick="switchSubTab('cash')">🏦 เติมเงิน & เดินบัญชี ({len(data['cash_movements'])})</button>
-            </div>
+    </div>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {{
+        var hash = (window.location.hash || '').replace('#', '');
+        if (['ledger', 'transactions', 'trades', 'buys', 'sells', 'divs', 'cash'].indexOf(hash) !== -1) {{
+            window.location.replace('trades_ledger.html' + window.location.hash);
+        }}
+    }});
+    </script>
+    {get_chart_modal_component()}
+</body>
+</html>
+"""
+    return html
 
-            <!-- SECTION 2: COMPLETE BUY ORDERS HISTORY (55 BUYS) -->
-            <div id="section-buys" class="sub-section" style="margin-bottom: 36px;">
+
+def generate_master_ledger_html(data):
+    buy_orders = data.get("buy_orders", [])
+    closed_trades = data.get("closed_trades", [])
+    dividends_list = data.get("dividends_list", [])
+    cash_movements = data.get("cash_movements", [])
+    trades_summary = data.get("trades_summary", {})
+    fx_rate = data.get("fx_rate", 33.62)
+
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    rz_sign = "+" if trades_summary.get("total_realized_pl_thb", 0) >= 0 else ""
+    rz_color = "#10b981" if trades_summary.get("total_realized_pl_thb", 0) >= 0 else "#f43f5e"
+
+    total_buys_usd = sum(b.get("amt_usd", 0.0) for b in buy_orders)
+    total_buys_thb = sum(b.get("amt_thb", 0.0) for b in buy_orders)
+
+    # 1. Buy Orders Rows
+    buy_rows = ""
+    for idx, b in enumerate(buy_orders):
+        acc_badge = '<span class="badge badge-success">Dime! Save (THB)</span>' if "Save" in b.get("account", "") else '<span class="badge badge-info">Dime! USD</span>'
+        type_badge = f'<span class="badge badge-purple">{b.get("order_type", "Market")}</span>' if b.get("order_type") == "Limit" else '<span class="badge badge-neutral">Market</span>'
+        fx_val = b.get("fx_rate", 0)
+        fx_str = f"฿{fx_val:.2f}" if fx_val > 0 else "-"
+        amt_thb_val = b.get("amt_thb", 0)
+        thb_str = f"฿{amt_thb_val:,.2f}" if amt_thb_val > 0 else "-"
+        buy_rows += f"""
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">{b.get('date', '-')}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">{b.get('ticker', '-')}</td>
+            <td style="text-align: center;">{type_badge}</td>
+            <td style="text-align: center;">{acc_badge}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">{b.get('shares', 0):.4f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">${b.get('price_usd', 0):,.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${b.get('amt_usd', 0):,.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{thb_str}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{fx_str}</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{b.get('fn', '-')}</td>
+        </tr>
+        """
+
+    # 2. Closed Trades Rows (Multi-tranche expand)
+    closed_rows = ""
+    for idx, t in enumerate(closed_trades):
+        c = "#10b981" if t.get("realized_pl_usd", 0) >= 0 else "#f43f5e"
+        s = "+" if t.get("realized_pl_usd", 0) >= 0 else ""
+        tranches = t.get("buy_tranches", [])
+        tranche_count = len(tranches)
+        trade_id = t.get("id", f"trade_{idx}").replace("-", "_")
+
+        buy_date_str = re.sub(r"\s*\(\d+\s*ไม้\)", "", str(t.get("buy_date", "-")))
+        days = t.get("holding_days", "-")
+        days_str = f"{days} วัน" if isinstance(days, (int, float)) else str(days)
+
+        if tranche_count > 1:
+            tranche_btn = f'<button onclick="toggleTranche(\'{trade_id}\')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม {tranche_count} ไม้ <span id="icon-{trade_id}">▼</span></button>'
+        else:
+            tranche_btn = '<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span>'
+
+        closed_rows += f"""
+        <tr style="border-bottom: 1px solid var(--border-subtle);">
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">{buy_date_str}</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">{t.get('date', '-')}</td>
+            <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">{days_str}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">{t.get('ticker')}</td>
+            <td>
+                <div>{t.get('name', '-')}</div>
+                <div style="margin-top: 4px;">{tranche_btn}</div>
+            </td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{t.get('shares', 0):.4f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('buy_price_usd', 0):.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${t.get('sell_price_usd', 0):.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('total_cost_usd', 0):,.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${t.get('net_revenue_usd', 0):,.2f}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}${t.get('realized_pl_usd', 0):,.2f}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{s}฿{t.get('realized_pl_thb', 0):,.2f}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}{t.get('realized_pl_pct', 0):.2f}%</td>
+        </tr>
+        """
+
+        if tranches:
+            tranche_subrows = ""
+            for tr in tranches:
+                t_thb_str = f"฿{tr.get('amt_thb', 0):,.2f}" if tr.get('amt_thb', 0) > 0 else "-"
+                tranche_subrows += f"""
+                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
+                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ {tr.get('tranche')}</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">{tr.get('date')}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">{tr.get('shares', 0):.4f} หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">${tr.get('price_usd', 0):.2f}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${tr.get('amt_usd', 0):,.2f}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{t_thb_str}</td>
+                    <td style="color: var(--text-secondary);">{tr.get('note', '-')}</td>
+                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">{tr.get('file', '-')}</td>
+                </tr>
+                """
+
+            closed_rows += f"""
+            <tr id="details-{trade_id}" class="tranche-detail-row" style="display: none; background: rgba(139, 92, 246, 0.05);">
+                <td colspan="14" style="padding: 12px 18px;">
+                    <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ {t.get('ticker')} (ทั้งหมด {tranche_count} ไม้ | ต้นทุนเฉลี่ย ${t.get('buy_price_usd', 0):.2f}):
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.78rem; color: var(--text-secondary);">
+                                    <th style="text-align: center; width: 65px; background: transparent;">ไม้ที่</th>
+                                    <th style="background: transparent;">วัน-เวลาที่เข้าซื้อ (Buy Date & Time)</th>
+                                    <th style="text-align: right; background: transparent;">จำนวนหุ้น</th>
+                                    <th style="text-align: right; background: transparent;">ราคาที่ซื้อ ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดลงทุน ($)</th>
+                                    <th style="text-align: right; background: transparent;">ยอดเงินบาท (THB)</th>
+                                    <th style="background: transparent;">หมายเหตุ / กลยุทธ์</th>
+                                    <th style="text-align: center; background: transparent;">สลิปอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tranche_subrows}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            """
+
+    # 3. Dividend Rows
+    div_rows = ""
+    for d in dividends_list:
+        div_amt_usd = d.get('amount_usd', 0)
+        div_rows += f"""
+        <tr>
+            <td style="text-align: center; color: var(--text-secondary);">{d.get('date', '-')}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif;">{d.get('ticker', '-')}</td>
+            <td>{d.get('rate', '-')}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+${div_amt_usd:.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿{div_amt_usd * fx_rate:,.2f}</td>
+        </tr>
+        """
+
+    # 4. Cash Movements Rows
+    cash_rows = ""
+    for idx, c in enumerate(cash_movements):
+        c_type = c.get("type", "")
+        if "ฝากเงิน" in c_type:
+            badge = '<span class="badge badge-success">ฝากเงินเข้าพอร์ต</span>'
+            amt_color = "#10b981"
+            sign = "+"
+        elif "ดอกเบี้ย" in c_type:
+            badge = '<span class="badge badge-info">ดอกเบี้ยรับเงินฝาก</span>'
+            amt_color = "#60a5fa"
+            sign = "+"
+        elif "โอนเงินออก" in c_type:
+            badge = '<span class="badge badge-rose">โอนเงินออกไปต่างธนาคาร</span>'
+            amt_color = "#f43f5e"
+            sign = ""
+        else:
+            badge = '<span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span>'
+            amt_color = "#f43f5e"
+            sign = ""
+
+        bal_str = f"฿{c['balance_thb']:,.2f}" if "balance_thb" in c else "-"
+        ch_str = c.get("channel", "Dime! Save")
+        ref_str = c.get("ref", "-")
+
+        cash_rows += f"""
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
+            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">{c.get('date_str', '-')}</td>
+            <td>{badge}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: {amt_color};">{sign}฿{c.get('amount_thb', 0):,.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">{bal_str}</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">{ch_str}</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{ref_str}</td>
+        </tr>
+        """
+
+    total_records = len(buy_orders) + len(closed_trades) + len(dividends_list) + len(cash_movements)
+    gross_deposits = data.get('gross_deposits_thb', data.get('gross_promptpay_deposits_thb', 0.0))
+    transfer_out = data.get('transfer_out_thb', 0.0)
+    dime_save_cash = data.get('dime_save_cash_thb', 0.0)
+
+    html = f"""<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายการซื้อขายและเดินบัญชีทั้งหมด - {data.get('portfolio_name', 'Portfolio')}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {{
+            --bg-body: #070b14;
+            --bg-card: #0d1527;
+            --bg-card-subtle: #111c34;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --blue: #3b82f6;
+            --amber: #f59e0b;
+            --purple: #8b5cf6;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+        }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{
+            font-family: 'Prompt', 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+            min-height: 100vh;
+        }}
+        .container {{ max-width: 1480px; margin: 0 auto; }}
+        .header {{
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }}
+        .meta-pill {{
+            background: var(--bg-card); padding: 8px 16px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-secondary);
+        }}
+        .grid-4-cols {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 24px; }}
+        .card {{
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); padding: 24px;
+        }}
+        .kpi-label {{ font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }}
+        .kpi-value {{ font-size: 1.95rem; font-weight: 700; font-family: 'Inter', sans-serif; }}
+        .kpi-subtext {{ font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; }}
+        .section-title {{
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }}
+        .table-container {{
+            max-height: 520px;
+            overflow-y: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }}
+        table {{
+            width: 100%; border-collapse: collapse; font-size: 0.90rem;
+        }}
+        th {{
+            background: #0f192e; color: var(--text-secondary);
+            padding: 12px 14px; text-align: left; font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 10;
+        }}
+        td {{
+            padding: 12px 14px; border-bottom: 1px solid var(--border-subtle);
+        }}
+        tr:hover td {{
+            background: rgba(255, 255, 255, 0.02);
+        }}
+        .badge {{
+            padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-block;
+        }}
+        .badge-success {{ background: rgba(16, 185, 129, 0.15); color: var(--emerald); }}
+        .badge-rose {{ background: rgba(244, 63, 94, 0.15); color: var(--rose); }}
+        .badge-info {{ background: rgba(59, 130, 246, 0.15); color: var(--blue); }}
+        .badge-purple {{ background: rgba(139, 92, 246, 0.15); color: var(--purple); }}
+        .badge-neutral {{ background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }}
+        .sub-tab-bar {{
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }}
+        .sub-tab-btn {{
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }}
+        .sub-tab-btn:hover {{
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }}
+        .sub-tab-btn.active {{
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            color: #c084fc;
+            font-weight: 600;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        {nav_bar_html('ledger')}
+
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <h1 style="font-size: 2.1rem; font-weight: 800; letter-spacing: -0.5px;">
+                    📑 รายการซื้อขายและเดินบัญชีทั้งหมด
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px;">
+                    พอร์ต: <strong style="color: #fff;">{data.get('portfolio_name', 'ไม่รวยก็ซวยอ่ะค้าบ')}</strong> | บันทึกประวัติคำสั่งซื้อ ปิดขายทำกำไร เงินปันผล และการเดินบัญชีครบวงจร
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>
+                </button>
+                <span class="meta-pill">🕒 ข้อมูล ณ: {now_str}</span>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS KPI OVERVIEW (4-COLS) -->
+        <div class="grid-4-cols">
+            <div class="card">
+                <div class="kpi-label">เงินต้นฝากสะสมสุทธิ (Net Capital)</div>
+                <div class="kpi-value" style="color: #60a5fa;">฿{data.get('net_injected_capital_thb', 0):,.2f}</div>
+                <div class="kpi-subtext">ฝากรวม ฿{gross_deposits:,.2f} (โอนออก -฿{transfer_out:,.2f})</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">ยอดคำสั่งซื้อหุ้นรวม (Total Buys)</div>
+                <div class="kpi-value" style="color: #38bdf8;">฿{total_buys_thb:,.2f}</div>
+                <div class="kpi-subtext">${total_buys_usd:,.2f} USD ({len(buy_orders)} คำสั่งซื้อ)</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">กำไรปิดรอบที่ขายแล้ว (Realized P&L)</div>
+                <div class="kpi-value" style="color: {rz_color};">{rz_sign}฿{trades_summary.get('total_realized_pl_thb', 0):,.2f}</div>
+                <div class="kpi-subtext">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% ({trades_summary.get('winning_trades', 0)} ชนะ / {trades_summary.get('losing_trades', 0)} แพ้)</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
+                <div class="kpi-value" style="color: #10b981;">+฿{data.get('total_dividends_thb', 0):,.2f}</div>
+                <div class="kpi-subtext">+${data.get('total_dividends_usd', 0):,.2f} USD ({len(dividends_list)} ครั้ง)</div>
+            </div>
+        </div>
+
+        <!-- SUB-TAB BAR -->
+        <div class="sub-tab-bar">
+            <button id="btn-sub-all" class="sub-tab-btn active" onclick="switchSubTab('all')">ทั้งหมด ({total_records})</button>
+            <button id="btn-sub-buys" class="sub-tab-btn" onclick="switchSubTab('buys')">🛒 คำสั่งซื้อหุ้น ({len(buy_orders)})</button>
+            <button id="btn-sub-sells" class="sub-tab-btn" onclick="switchSubTab('sells')">🏆 ปิดขายทำกำไร ({len(closed_trades)})</button>
+            <button id="btn-sub-divs" class="sub-tab-btn" onclick="switchSubTab('divs')">💵 เงินปันผล ({len(dividends_list)})</button>
+            <button id="btn-sub-cash" class="sub-tab-btn" onclick="switchSubTab('cash')">🏦 เติมเงิน & เดินบัญชี ({len(cash_movements)})</button>
+        </div>
+
+        <!-- SECTION 1: COMPLETE BUY ORDERS HISTORY -->
+        <div id="section-buys" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
-                <span>🛒</span> 2. ประวัติคำสั่งซื้อหุ้นทั้งหมดอย่างละเอียด (Complete Buy Orders History: {len(data['buy_orders'])} ไม้)
+                <span>🛒</span> 1. ประวัติคำสั่งซื้อหุ้นทั้งหมดอย่างละเอียด (Complete Buy Orders History: {len(buy_orders)} ไม้)
                 <span class="badge badge-info">สกัดจากสลิปคำสั่งซื้อ Dime! 100% เรียงตามวันเวลาสำเร็จจริง</span>
             </div>
             <div class="table-container">
@@ -918,18 +1119,14 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
-        </div>
 
-        <!-- SECTION 3: CLOSED TRADES TABLE (7 SELLS) -->
+        <!-- SECTION 2: CLOSED TRADES TABLE -->
         <div id="section-sells" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
-                    <span>🏆</span> 3. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: {len(data['closed_trades'])} ไม้)
-                    <span class="badge badge-success">Win Rate {data['trades_summary']['win_rate_pct']:.1f}% (กำไรสะสม {rz_sign}฿{data['trades_summary']['total_realized_pl_thb']:,.2f})</span>
+                    <span>🏆</span> 2. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: {len(closed_trades)} ไม้)
+                    <span class="badge badge-success">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% (กำไรสะสม {rz_sign}฿{trades_summary.get('total_realized_pl_thb', 0):,.2f})</span>
                 </div>
-                <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                    <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>
-                </button>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
                 <table>
@@ -957,13 +1154,12 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
-        </div>
 
-        <!-- SECTION 4: DIVIDEND STREAM -->
+        <!-- SECTION 3: DIVIDEND STREAM -->
         <div id="section-divs" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
-                <span>💵</span> 4. ประวัติเงินปันผลรับสะสม (Dividends Received: {len(data['dividends_list'])} ครั้ง)
-                <span class="badge badge-success">รวม +${data['total_dividends_usd']:.2f} (~฿{data['total_dividends_thb']:,.2f})</span>
+                <span>💵</span> 3. ประวัติเงินปันผลรับสะสม (Dividends Received: {len(dividends_list)} ครั้ง)
+                <span class="badge badge-success">รวม +${data.get('total_dividends_usd', 0):.2f} (~฿{data.get('total_dividends_thb', 0):,.2f})</span>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
                 <table>
@@ -982,12 +1178,11 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
-        </div>
 
-        <!-- SECTION 5: CAPITAL & CASH MOVEMENTS STATEMENT -->
+        <!-- SECTION 4: CAPITAL & CASH MOVEMENTS STATEMENT -->
         <div id="section-cash" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
-                <span>🏦</span> 5. ข้อมูลการเติมเงินและการเคลื่อนไหวเงินสดในบัญชี (Complete Cash Flow & Deposit Ledger: {len(data['cash_movements'])} รายการ)
+                <span>🏦</span> 4. ข้อมูลการเติมเงินและการเคลื่อนไหวเงินสดในบัญชี (Complete Cash Flow & Deposit Ledger: {len(cash_movements)} รายการ)
                 <span class="badge badge-info">KKP Official Statement & สลิป Dime! Save ตั้งแต่วันเปิดบัญชี 2 ก.พ. 69</span>
             </div>
             <!-- STATEMENT OVERVIEW CARDS -->
@@ -995,22 +1190,22 @@ def generate_master_dashboard_html(data):
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 0.95rem;">
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดโอนเข้าจากต่างธนาคารรวม (PromptPay):</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">฿{data['gross_deposits_thb']:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">฿{gross_deposits:,.2f}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(19 รายการ: Statement 18 ครั้ง + 14 ต.ค. 1 ครั้ง)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดโอนเงินกลับออกไปต่างธนาคาร:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--rose);">-฿{data['transfer_out_thb']:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--rose);">-฿{transfer_out:,.2f}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(เมื่อวันที่ 03/02/2026 ผ่านช่องทาง DIME)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดเงินต้นสุทธิที่คงอยู่ใน Dime!:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #60a5fa;">฿{data['net_injected_capital_thb']:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #60a5fa;">฿{data.get('net_injected_capital_thb', 0):,.2f}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(ใช้เป็นฐานคำนวณผลตอบแทนรวมจริง 100%)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">เงินสดคงเหลือในบัญชี Dime! Save:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--emerald);">฿{data['dime_save_cash_thb']:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--emerald);">฿{dime_save_cash:,.2f}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(หักซื้อหุ้นชุดล่าสุด 4 ไม้ ฿35,001.63 เมื่อ 13-14 ต.ค. 69)</div>
                     </div>
                 </div>
@@ -1035,8 +1230,6 @@ def generate_master_dashboard_html(data):
                     </tbody>
                 </table>
             </div>
-        </div>
-        </div>
         </div>
 
     </div>
@@ -1070,18 +1263,6 @@ def generate_master_dashboard_html(data):
         }}
     }}
 
-    function switchMasterTab(tabName) {{
-        document.querySelectorAll('.master-tab-btn').forEach(function(b) {{ b.classList.remove('active'); }});
-        document.querySelectorAll('.master-tab-content').forEach(function(c) {{ c.style.display = 'none'; }});
-        var btn = document.getElementById('btn-tab-' + tabName);
-        var content = document.getElementById('tab-' + tabName);
-        if (btn) btn.classList.add('active');
-        if (content) content.style.display = 'block';
-        if (window.history && window.history.replaceState) {{
-            window.history.replaceState(null, null, '#' + tabName);
-        }}
-    }}
-
     function switchSubTab(subName) {{
         document.querySelectorAll('.sub-tab-btn').forEach(function(b) {{ b.classList.remove('active'); }});
         var btn = document.getElementById('btn-sub-' + subName);
@@ -1093,14 +1274,14 @@ def generate_master_dashboard_html(data):
                 el.style.display = (subName === 'all' || subName === s) ? 'block' : 'none';
             }}
         }});
+        if (window.history && window.history.replaceState) {{
+            window.history.replaceState(null, null, '#' + subName);
+        }}
     }}
 
     window.addEventListener('DOMContentLoaded', function() {{
         var hash = (window.location.hash || '').replace('#', '');
-        if (hash === 'ledger' || hash === 'transactions' || hash === 'trades') {{
-            switchMasterTab('ledger');
-        }} else if (hash === 'buys' || hash === 'sells' || hash === 'divs' || hash === 'cash') {{
-            switchMasterTab('ledger');
+        if (['buys', 'sells', 'divs', 'cash', 'all'].indexOf(hash) !== -1) {{
             switchSubTab(hash);
         }}
     }});
@@ -1113,7 +1294,7 @@ def generate_master_dashboard_html(data):
 
 
 def main():
-    print("Generating Unified Master Dashboard...", file=sys.stderr)
+    print("Generating Unified Master Dashboard & Complete Ledger...", file=sys.stderr)
     data = generate_master_dashboard_data()
 
     # Save to reports/portfolio_master.html
@@ -1121,6 +1302,12 @@ def main():
     out_path.parent.mkdir(parents=True, exist_ok=True)
     html_content = generate_master_dashboard_html(data)
     out_path.write_text(html_content, encoding="utf-8")
+
+    # Save to reports/trades_ledger.html (Complete Trading & Cash Ledger)
+    trades_path = Path("reports/trades_ledger.html")
+    trades_path.parent.mkdir(parents=True, exist_ok=True)
+    trades_content = generate_master_ledger_html(data)
+    trades_path.write_text(trades_content, encoding="utf-8")
 
     # Save JSON summary
     json_path = Path("data/account_summary.json")
