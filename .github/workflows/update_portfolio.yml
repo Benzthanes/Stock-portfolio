@@ -11,6 +11,9 @@ on:
 permissions:
   contents: write
 
+env:
+  TZ: 'Asia/Bangkok'
+
 jobs:
   update-portfolio:
     name: Refresh Portfolio Reports
