@@ -358,7 +358,7 @@ def get_live_refresh_script(data):
             try {{
                 const fxRes = await fetch('https://scanner.tradingview.com/forex/scan', {{
                     method: 'POST',
-                    headers: {{ 'Content-Type': 'text/plain' }},
+                    mode: 'cors',
                     body: JSON.stringify({{
                         symbols: {{ tickers: ['FX_IDC:USDTHB'] }},
                         columns: ['close']
@@ -389,10 +389,10 @@ def get_live_refresh_script(data):
                 throw new Error('ไม่พบรายชื่อหุ้นในตาราง');
             }}
 
-            // 3. Fetch stock quotes from TradingView Scanner API (using text/plain to avoid CORS preflight check)
+            // 3. Fetch stock quotes from TradingView Scanner API (simple request without custom headers)
             const stockRes = await fetch('https://scanner.tradingview.com/america/scan', {{
                 method: 'POST',
-                headers: {{ 'Content-Type': 'text/plain' }},
+                mode: 'cors',
                 body: JSON.stringify({{
                     symbols: {{ tickers: tickers }},
                     columns: ['close', 'change']
@@ -400,7 +400,7 @@ def get_live_refresh_script(data):
             }});
 
             if (!stockRes.ok) {{
-                throw new Error('TradingView API responded with status ' + stockRes.status);
+                throw new Error('TradingView ตอบกลับด้วยรหัส ' + stockRes.status);
             }}
 
             const stockData = await stockRes.json();
@@ -544,7 +544,7 @@ def get_live_refresh_script(data):
 
         }} catch (err) {{
             console.error('Failed to refresh quotes:', err);
-            alert('เกิดข้อผิดพลาดในการดึงราคา: ' + err.message);
+            alert('เกิดข้อผิดพลาดในการดึงราคา (' + err.message + ')\n\nหากเปิดบนมือถือ iPhone/Safari:\n1. กรุณาลองเปิดผ่านแท็บส่วนตัว (Private Tab)\n2. หรือตรวจสอบว่าเปิด Content Blocker / AdBlocker บล็อกไว้หรือไม่');
         }} finally {{
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -664,6 +664,9 @@ def generate_master_dashboard_html(data):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Master Portfolio & Wealth Summary - {data['portfolio_name']}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -845,6 +848,7 @@ def generate_master_dashboard_html(data):
                     <button id="btn-refresh-live" onclick="refreshLiveQuotes()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
                         <span id="refresh-icon" style="display: inline-block; transition: transform 0.6s ease;">🔄</span>
                         <span id="refresh-text">รีเฟรชราคาเรียลไทม์</span>
+                        <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; margin-left: 2px;">v2.1</span>
                     </button>
                 </div>
                 <span id="refresh-timestamp" style="font-size: 0.78rem; color: var(--text-muted);"></span>
