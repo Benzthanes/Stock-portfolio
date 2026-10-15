@@ -543,8 +543,109 @@ def get_live_refresh_script(data):
             if (ts) ts.innerHTML = '🟢 ราคาเรียลไทม์ล่าสุด: <strong style="color: #60a5fa;">' + timeStr + ' น.</strong>';
 
         }} catch (err) {{
-            console.error('Failed to refresh quotes:', err);
-            alert('เกิดข้อผิดพลาดในการดึงราคา (' + err.message + ')\n\nหากเปิดบนมือถือ iPhone/Safari:\n1. กรุณาลองเปิดผ่านแท็บส่วนตัว (Private Tab)\n2. หรือตรวจสอบว่าเปิด Content Blocker / AdBlocker บล็อกไว้หรือไม่');
+            console.warn('Direct TradingView fetch blocked (common on mobile iOS/WebKit ITP), syncing from Cloud data:', err);
+            try {{
+                const cloudRes = await fetch('../data/account_summary.json?t=' + Date.now());
+                if (cloudRes.ok) {{
+                    const cData = await cloudRes.json();
+                    const cPositions = cData.positions || [];
+                    const cMap = {{}};
+                    cPositions.forEach(p => {{ cMap[p.ticker] = p; }});
+
+                    const rows = document.querySelectorAll('tr.holding-row');
+                    rows.forEach(r => {{
+                        const ticker = r.dataset.ticker;
+                        const p = cMap[ticker];
+                        if (p) {{
+                            const close = p.close_price;
+                            const valUsd = p.current_val_usd;
+                            const valThb = p.current_val_thb;
+                            const plUsd = p.unrealized_pl_usd;
+                            const plThb = p.unrealized_pl_thb;
+                            const plPct = p.unrealized_pl_pct;
+                            const weightPct = p.weight_pct;
+
+                            const priceCell = r.querySelector('.cell-price');
+                            const valUsdCell = r.querySelector('.cell-val-usd');
+                            const valThbCell = r.querySelector('.cell-val-thb');
+                            const plUsdCell = r.querySelector('.cell-pl-usd');
+                            const plThbCell = r.querySelector('.cell-pl-thb');
+                            const plPctCell = r.querySelector('.cell-pl-pct');
+                            const weightCell = r.querySelector('.cell-weight');
+
+                            const color = plUsd >= 0 ? '#10b981' : '#f43f5e';
+                            const sign = plUsd >= 0 ? '+' : '';
+
+                            if (priceCell) priceCell.textContent = '$' + close.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                            if (valUsdCell) valUsdCell.textContent = '$' + valUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                            if (valThbCell) valThbCell.textContent = '฿' + valThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                            if (plUsdCell) {{
+                                plUsdCell.textContent = sign + '$' + plUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                                plUsdCell.style.color = color;
+                            }}
+                            if (plThbCell) {{
+                                plThbCell.textContent = sign + '฿' + plThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                                plThbCell.style.color = color;
+                            }}
+                            if (plPctCell) {{
+                                plPctCell.textContent = sign + plPct.toFixed(2) + '%';
+                                plPctCell.style.color = color;
+                            }}
+                            if (weightCell) weightCell.textContent = weightPct.toFixed(1) + '%';
+
+                            r.style.transition = 'background-color 0.4s ease';
+                            r.style.backgroundColor = 'rgba(16, 185, 129, 0.12)';
+                            setTimeout(() => {{ r.style.backgroundColor = ''; }}, 600);
+                        }}
+                    }});
+
+                    const kpiNetWorthThb = document.getElementById('kpi-net-worth-thb');
+                    const kpiNetWorthUsdSub = document.getElementById('kpi-net-worth-usd-sub');
+                    const kpiAllTimeProfitThb = document.getElementById('kpi-all-time-profit-thb');
+                    const kpiAllTimeRoiSub = document.getElementById('kpi-all-time-roi-sub');
+                    const kpiStockValUsd = document.getElementById('kpi-stock-market-val-usd');
+                    const kpiStockValThb = document.getElementById('kpi-stock-market-val-thb');
+                    const kpiStockUnrealizedPl = document.getElementById('kpi-stock-unrealized-pl');
+                    const kpiFxPill = document.getElementById('kpi-fx-pill');
+                    const kpiTotalCashThb = document.getElementById('kpi-total-cash-thb');
+
+                    if (kpiNetWorthThb) kpiNetWorthThb.textContent = '฿' + (cData.total_net_worth_thb || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                    if (kpiNetWorthUsdSub) kpiNetWorthUsdSub.textContent = '~$' + (cData.total_net_worth_usd || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' USD (หุ้น + เงินสด)';
+
+                    const atProfit = cData.all_time_profit_thb || 0;
+                    const atRoi = cData.all_time_roi_pct || 0;
+                    const atColor = atProfit >= 0 ? '#10b981' : '#f43f5e';
+                    const atSign = atProfit >= 0 ? '+' : '';
+                    if (kpiAllTimeProfitThb) {{
+                        kpiAllTimeProfitThb.textContent = atSign + '฿' + atProfit.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                        kpiAllTimeProfitThb.style.color = atColor;
+                    }}
+                    if (kpiAllTimeRoiSub) {{
+                        kpiAllTimeRoiSub.textContent = atSign + atRoi.toFixed(2) + '% All-Time ROI';
+                        kpiAllTimeRoiSub.style.color = atColor;
+                    }}
+
+                    if (kpiStockValUsd) kpiStockValUsd.textContent = '$' + (cData.stock_market_val_usd || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                    if (kpiStockValThb) kpiStockValThb.textContent = '฿' + (cData.stock_market_val_thb || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+
+                    const unPlUsd = cData.stock_unrealized_pl_usd || 0;
+                    const unPlPct = cData.stock_unrealized_pl_pct || 0;
+                    const unColor = unPlUsd >= 0 ? '#10b981' : '#f43f5e';
+                    const unSign = unPlUsd >= 0 ? '+' : '';
+                    if (kpiStockUnrealizedPl) {{
+                        kpiStockUnrealizedPl.textContent = unSign + '$' + unPlUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' (' + unSign + unPlPct.toFixed(2) + '%)';
+                        kpiStockUnrealizedPl.style.color = unColor;
+                    }}
+
+                    if (kpiTotalCashThb) kpiTotalCashThb.textContent = '฿' + (cData.total_cash_thb || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                    if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + (cData.fx_rate || 33.62).toFixed(2) + ' THB';
+
+                    if (ts) ts.innerHTML = '☁️ ซิงค์ข้อมูลล่าสุดจาก Cloud: <strong style="color: #60a5fa;">' + (cData.updated_at || '') + ' น.</strong>';
+                }}
+            }} catch (fallbackErr) {{
+                console.error('Cloud sync fallback error:', fallbackErr);
+                if (ts) ts.innerHTML = '⚠️ ซิงค์ขัดข้อง กรุณาลองใหม่อีกครั้ง';
+            }}
         }} finally {{
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -847,9 +948,12 @@ def generate_master_dashboard_html(data):
                     <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
                     <button id="btn-refresh-live" onclick="refreshLiveQuotes()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
                         <span id="refresh-icon" style="display: inline-block; transition: transform 0.6s ease;">🔄</span>
-                        <span id="refresh-text">รีเฟรชราคาเรียลไทม์</span>
-                        <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; margin-left: 2px;">v2.1</span>
+                        <span id="refresh-text">รีเฟรชราคา</span>
+                        <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; margin-left: 2px;">v2.2</span>
                     </button>
+                    <a href="https://github.com/Benzthanes/Stock-portfolio/actions/workflows/update_portfolio.yml" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399; padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; font-family: inherit;">
+                        <span>⚡ สั่งคำนวณสดบน Cloud ↗</span>
+                    </a>
                 </div>
                 <span id="refresh-timestamp" style="font-size: 0.78rem; color: var(--text-muted);"></span>
             </div>
