@@ -18,6 +18,297 @@ DEFAULT_LEDGER_PATH = Path("data/ledger.json")
 THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
 
 
+def resolve_slip_relative_path(filename: Optional[str], from_reports_dir: bool = True) -> str:
+    if not filename or filename in ("-", "CLI"):
+        return ""
+    fn = filename.strip()
+    prefix = "../" if from_reports_dir else ""
+    for folder in ["data/screenshots", "data/set-screenshot", "src/port"]:
+        if (Path(folder) / fn).exists():
+            return f"{prefix}{folder}/{fn}"
+    return f"{prefix}data/screenshots/{fn}"
+
+
+def get_slip_modal_component() -> str:
+    return """
+<!-- Order Slip Viewer Modal Component -->
+<div id="slipModal" class="slip-modal" onclick="onSlipModalBackdrop(event)" style="display: none;">
+    <div class="slip-modal-dialog">
+        <div class="slip-modal-header">
+            <div class="slip-modal-title-wrap">
+                <span style="font-size: 1.3rem;">🧾</span>
+                <div>
+                    <h3 id="slipModalTitle" class="slip-modal-title">สลิปคำสั่งซื้อ</h3>
+                    <div id="slipModalSub" class="slip-modal-sub">รายละเอียดคำสั่งซื้อ</div>
+                </div>
+            </div>
+            <div class="slip-modal-actions">
+                <a id="slipModalExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="slip-modal-btn slip-modal-btn-ext" title="เปิดดูภาพขนาดเต็มในแท็บใหม่">
+                    ↗️ เปิดแท็บใหม่
+                </a>
+                <button type="button" class="slip-modal-btn slip-modal-btn-close" onclick="closeSlipModal()" title="ปิด (Esc)">
+                    ✕ ปิด
+                </button>
+            </div>
+        </div>
+        <div class="slip-modal-body">
+            <div id="slipModalLoading" class="slip-modal-loading" style="display: none;">กำลังโหลดรูปภาพสลิป...</div>
+            <img id="slipModalImg" src="" alt="สลิปคำสั่งซื้อ" class="slip-modal-img" onload="onSlipImageLoaded()" onerror="onSlipImageError()">
+            <div id="slipModalError" class="slip-modal-error" style="display: none;">
+                ⚠️ ไม่พบไฟล์สลิปหรือโหลดรูปภาพไม่สำเร็จ
+            </div>
+        </div>
+        <div class="slip-modal-footer">
+            <span id="slipModalFilename" class="slip-modal-fn">filename.webp</span>
+            <span style="color: var(--text-muted); font-size: 0.78rem;">กด Esc หรือคลิกพื้นหลังเพื่อปิด</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.slip-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(3, 7, 18, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.slip-modal.show {
+    opacity: 1;
+}
+.slip-modal-dialog {
+    background: #0b1120;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+    overflow: hidden;
+    transform: scale(0.96);
+    transition: transform 0.2s ease;
+}
+.slip-modal.show .slip-modal-dialog {
+    transform: scale(1);
+}
+.slip-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.slip-modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.slip-modal-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0;
+}
+.slip-modal-sub {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+.slip-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.slip-modal-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+.slip-modal-btn-ext {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+}
+.slip-modal-btn-ext:hover {
+    background: rgba(56, 189, 248, 0.25);
+    color: #fff;
+}
+.slip-modal-btn-close {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #94a3b8;
+}
+.slip-modal-btn-close:hover {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: rgba(244, 63, 94, 0.4);
+    color: #f43f5e;
+}
+.slip-modal-body {
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 280px;
+    max-height: calc(92vh - 120px);
+    overflow: auto;
+    background: #060913;
+    position: relative;
+}
+.slip-modal-img {
+    max-width: 100%;
+    max-height: calc(88vh - 130px);
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+.slip-modal-loading {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+.slip-modal-error {
+    color: #f43f5e;
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+.slip-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.slip-modal-fn {
+    font-family: 'Inter', monospace;
+    font-size: 0.78rem;
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.slip-badge-btn {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.78rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+.slip-badge-btn:hover {
+    background: rgba(56, 189, 248, 0.25);
+    border-color: #38bdf8;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+}
+</style>
+
+<script>
+function openSlipModal(imagePath, filename, ticker, dateStr, extraInfo) {
+    const modal = document.getElementById('slipModal');
+    const title = document.getElementById('slipModalTitle');
+    const sub = document.getElementById('slipModalSub');
+    const fnEl = document.getElementById('slipModalFilename');
+    const img = document.getElementById('slipModalImg');
+    const extLink = document.getElementById('slipModalExternalLink');
+    const loading = document.getElementById('slipModalLoading');
+    const errorEl = document.getElementById('slipModalError');
+
+    if (!modal || !img) return;
+
+    title.innerText = ticker ? ('สลิปคำสั่งซื้อ: ' + ticker) : 'สลิปคำสั่งซื้อ';
+    sub.innerText = (dateStr || '') + (extraInfo ? (' • ' + extraInfo) : '');
+    fnEl.innerText = filename || 'slip.webp';
+    extLink.href = imagePath;
+
+    img.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'none';
+    if (loading) loading.style.display = 'block';
+
+    img.src = imagePath;
+
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSlipModal() {
+    const modal = document.getElementById('slipModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        const img = document.getElementById('slipModalImg');
+        if (img) img.src = '';
+    }, 200);
+    document.body.style.overflow = '';
+}
+
+function onSlipImageLoaded() {
+    const img = document.getElementById('slipModalImg');
+    const loading = document.getElementById('slipModalLoading');
+    const errorEl = document.getElementById('slipModalError');
+    if (loading) loading.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'none';
+    if (img) img.style.display = 'block';
+}
+
+function onSlipImageError() {
+    const img = document.getElementById('slipModalImg');
+    const loading = document.getElementById('slipModalLoading');
+    const errorEl = document.getElementById('slipModalError');
+    if (loading) loading.style.display = 'none';
+    if (img) img.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'block';
+}
+
+function onSlipModalBackdrop(event) {
+    if (event.target && event.target.id === 'slipModal') {
+        closeSlipModal();
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' || event.key === 'Esc') {
+        closeSlipModal();
+    }
+});
+</script>
+"""
+
+
 def load_trades(filepath: Optional[str] = None) -> Dict[str, Any]:
     path = Path(filepath) if filepath else DEFAULT_TRADES_PATH
     if not path.exists():
@@ -546,7 +837,16 @@ def generate_trades_html(trades_data: Dict[str, Any]) -> str:
         if tranche_count > 1:
             tranche_btn = f'<button onclick="toggleTranche(\'{trade_id}\')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม {tranche_count} ไม้ <span id="icon-{trade_id}">▼</span></button>'
         else:
-            tranche_btn = '<span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span>'
+            single_fn = tranches[0].get('file') if tranches else None
+            single_path = resolve_slip_relative_path(single_fn) if single_fn else ""
+            if single_path:
+                t_tk = t.get("ticker", "")
+                t_sh = t.get("shares", 0.0)
+                t_pr = t.get("buy_price_usd", 0.0)
+                t_info = f"{t_sh:.4f} หุ้น @ ${t_pr:.2f}"
+                tranche_btn = f'<span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span> <button type="button" onclick="openSlipModal(\'{single_path}\', \'{single_fn}\', \'{t_tk}\', \'{buy_date_str}\', \'{t_info}\')" class="slip-badge-btn" style="padding: 2px 7px; font-size: 0.74rem;" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 สลิป</button>'
+            else:
+                tranche_btn = '<span style="background: rgba(255, 255, 255, 0.08); color: #94a3b8; padding: 2px 8px; border-radius: 6px; font-size: 0.76rem;">1 ไม้</span>'
 
         t_ticker = t.get('ticker', '')
         t_name = (t.get('name') or t_ticker).replace("'", "\\'")
@@ -579,6 +879,19 @@ def generate_trades_html(trades_data: Dict[str, Any]) -> str:
             tranche_subrows = ""
             for tr in tranches:
                 t_thb_str = f"฿{tr.get('amt_thb', 0):,.2f}" if tr.get('amt_thb', 0) > 0 else "-"
+                tr_fn = tr.get('file', '')
+                tr_path = resolve_slip_relative_path(tr_fn)
+                if tr_path:
+                    tr_tk = t.get("ticker", "")
+                    tr_dt = tr.get("date", "-")
+                    tr_num = tr.get("tranche", 1)
+                    tr_sh = tr.get("shares", 0.0)
+                    tr_pr = tr.get("price_usd", 0.0)
+                    tr_info = f"ไม้ที่ {tr_num} • {tr_sh:.4f} หุ้น @ ${tr_pr:.2f}"
+                    slip_col = f'<button type="button" onclick="openSlipModal(\'{tr_path}\', \'{tr_fn}\', \'{tr_tk}\', \'{tr_dt}\', \'{tr_info}\')" class="slip-badge-btn" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 {tr_fn}</button>'
+                else:
+                    slip_col = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{tr_fn or "-"}</span>'
+
                 tranche_subrows += f"""
                 <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
                     <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ {tr.get('tranche')}</td>
@@ -588,7 +901,7 @@ def generate_trades_html(trades_data: Dict[str, Any]) -> str:
                     <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${tr.get('amt_usd'):,.2f}</td>
                     <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{t_thb_str}</td>
                     <td style="color: var(--text-secondary);">{tr.get('note', '-')}</td>
-                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">{tr.get('file', '-')}</td>
+                    <td style="text-align: center;">{slip_col}</td>
                 </tr>
                 """
 
@@ -789,6 +1102,7 @@ def generate_trades_html(trades_data: Dict[str, Any]) -> str:
     }}
     </script>
     {get_chart_modal_component()}
+    {get_slip_modal_component()}
 </body>
 </html>
 """

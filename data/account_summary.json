@@ -3,7 +3,7 @@
   "broker": "Dime! (KKP Securities)",
   "account_no": "2081682995",
   "fx_rate": 33.62,
-  "updated_at": "2026-10-15 12:06:17",
+  "updated_at": "2026-10-15 12:29:53",
   "net_injected_capital_thb": 1245000.0,
   "gross_deposits_thb": 1295000.0,
   "transfer_out_thb": 50000.0,
@@ -1082,7 +1082,7 @@
         "RSI Hook Up ⤴",
         "MACD Hist Tick 📈"
       ],
-      "days_to_earnings": 21.7,
+      "days_to_earnings": 21.6,
       "earnings_date": "05 Nov 2026",
       "is_earnings_near": false,
       "key_support": 151.66,
@@ -1235,7 +1235,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (21.7 วัน)",
+            "period": "ปฏิทินงบ (21.6 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -1713,7 +1713,7 @@
         "Attractive PEG 0.2 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 20.7,
+      "days_to_earnings": 20.6,
       "earnings_date": "04 Nov 2026",
       "is_earnings_near": false,
       "key_support": 252.42,
@@ -1867,7 +1867,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะประชิด (20.7 วัน)",
+            "period": "ระยะประชิด (20.6 วัน)",
             "event": "รายงานงบการเงิน Q3: จับตาการเติบโตของรายได้จากลูกค้า Web Advertising และการเติบโตของซอฟต์แวร์ AXON 2.0"
           },
           {
@@ -2519,7 +2519,7 @@
   ],
   "buy_orders": [
     {
-      "fn": "IMG_5682.PNG",
+      "fn": "IMG_5682.webp",
       "ticker": "APP",
       "shares": 1.1139568,
       "price_usd": 265.11,
@@ -2531,7 +2531,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5680.PNG",
+      "fn": "IMG_5680.webp",
       "ticker": "BAC",
       "shares": 5.9040724,
       "price_usd": 50.13,
@@ -2543,7 +2543,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5679.PNG",
+      "fn": "IMG_5679.webp",
       "ticker": "VRT",
       "shares": 1.2778999,
       "price_usd": 231.99,
@@ -2555,7 +2555,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5678.PNG",
+      "fn": "IMG_5678.webp",
       "ticker": "BAC",
       "shares": 2.7493738,
       "price_usd": 53.9,
@@ -2567,7 +2567,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5611.PNG",
+      "fn": "IMG_5611.webp",
       "ticker": "NOK",
       "shares": 14.5972798,
       "price_usd": 10.11,
@@ -2579,7 +2579,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5600.PNG",
+      "fn": "IMG_5600.webp",
       "ticker": "VRT",
       "shares": 1.4298295,
       "price_usd": 242.99,
@@ -2591,7 +2591,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5601.PNG",
+      "fn": "IMG_5601.webp",
       "ticker": "BAC",
       "shares": 2.7667196,
       "price_usd": 53.45,
@@ -2603,7 +2603,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5580.PNG",
+      "fn": "IMG_5580.webp",
       "ticker": "APP",
       "shares": 0.5464124,
       "price_usd": 271.24,
@@ -2615,7 +2615,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5579.PNG",
+      "fn": "IMG_5579.webp",
       "ticker": "VST",
       "shares": 2.1569586,
       "price_usd": 137.61,
@@ -2627,7 +2627,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5578.PNG",
+      "fn": "IMG_5578.webp",
       "ticker": "NOK",
       "shares": 28.8590179,
       "price_usd": 10.28,
@@ -2639,7 +2639,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5577.PNG",
+      "fn": "IMG_5577.webp",
       "ticker": "ABNB",
       "shares": 4.9364058,
       "price_usd": 150.8,
@@ -2651,7 +2651,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5576.PNG",
+      "fn": "IMG_5576.webp",
       "ticker": "BAC",
       "shares": 15.9509585,
       "price_usd": 56.07,
@@ -2663,7 +2663,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5575.PNG",
+      "fn": "IMG_5575.webp",
       "ticker": "MNST",
       "shares": 17.3443577,
       "price_usd": 42.93,
@@ -2675,7 +2675,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5574.PNG",
+      "fn": "IMG_5574.webp",
       "ticker": "ABNB",
       "shares": 1.9724764,
       "price_usd": 150.99,
@@ -2687,7 +2687,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5572.PNG",
+      "fn": "IMG_5572.webp",
       "ticker": "ABNB",
       "shares": 2.915974,
       "price_usd": 154.0,
@@ -2699,7 +2699,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5573.PNG",
+      "fn": "IMG_5573.webp",
       "ticker": "APP",
       "shares": 1.3167302,
       "price_usd": 308.25,
@@ -2711,7 +2711,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5571.PNG",
+      "fn": "IMG_5571.webp",
       "ticker": "GOOGL",
       "shares": 2.3167173,
       "price_usd": 329.0,
@@ -2723,7 +2723,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5569.PNG",
+      "fn": "IMG_5569.webp",
       "ticker": "LLY",
       "shares": 0.9215843,
       "price_usd": 1119.93,
@@ -2735,7 +2735,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5566.PNG",
+      "fn": "IMG_5566.webp",
       "ticker": "GOOGL",
       "shares": 3.6899537,
       "price_usd": 319.26,
@@ -2747,7 +2747,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5565.PNG",
+      "fn": "IMG_5565.webp",
       "ticker": "NOK",
       "shares": 14.3381364,
       "price_usd": 10.41,
@@ -2759,7 +2759,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5564.PNG",
+      "fn": "IMG_5564.webp",
       "ticker": "NOK",
       "shares": 29.1285714,
       "price_usd": 11.2,
@@ -2771,7 +2771,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5563.PNG",
+      "fn": "IMG_5563.webp",
       "ticker": "NOW",
       "shares": 1.3932157,
       "price_usd": 106.95,
@@ -2783,7 +2783,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5559.PNG",
+      "fn": "IMG_5559.webp",
       "ticker": "SKHY",
       "shares": 2.0,
       "price_usd": 170.0,
@@ -2795,7 +2795,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5558.PNG",
+      "fn": "IMG_5558.webp",
       "ticker": "GOOGL",
       "shares": 0.4323712,
       "price_usd": 347.45,
@@ -2807,7 +2807,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5557.PNG",
+      "fn": "IMG_5557.webp",
       "ticker": "PLTR",
       "shares": 0.7629757,
       "price_usd": 118.18,
@@ -2819,7 +2819,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5556.PNG",
+      "fn": "IMG_5556.webp",
       "ticker": "NOK",
       "shares": 7.1591901,
       "price_usd": 12.59,
@@ -2831,7 +2831,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5555.PNG",
+      "fn": "IMG_5555.webp",
       "ticker": "PLTR",
       "shares": 1.2552498,
       "price_usd": 120.95,
@@ -2843,7 +2843,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5554.PNG",
+      "fn": "IMG_5554.webp",
       "ticker": "GOOGL",
       "shares": 0.4387313,
       "price_usd": 346.06,
@@ -2855,7 +2855,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5553.PNG",
+      "fn": "IMG_5553.webp",
       "ticker": "NOW",
       "shares": 1.6054444,
       "price_usd": 94.62,
@@ -2867,7 +2867,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5552.PNG",
+      "fn": "IMG_5552.webp",
       "ticker": "GOOGL",
       "shares": 0.8558941,
       "price_usd": 355.55,
@@ -2879,7 +2879,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5551.PNG",
+      "fn": "IMG_5551.webp",
       "ticker": "GOOGL",
       "shares": 0.1393463,
       "price_usd": 370.37,
@@ -2891,7 +2891,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5550.PNG",
+      "fn": "IMG_5550.webp",
       "ticker": "GOOGL",
       "shares": 3.316689,
       "price_usd": 369.47,
@@ -2903,7 +2903,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5549.PNG",
+      "fn": "IMG_5549.webp",
       "ticker": "NOW",
       "shares": 2.8951837,
       "price_usd": 105.74,
@@ -2915,7 +2915,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5548.PNG",
+      "fn": "IMG_5548.webp",
       "ticker": "SPCX",
       "shares": 6.0,
       "price_usd": 150.0,
@@ -2927,7 +2927,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5547.PNG",
+      "fn": "IMG_5547.webp",
       "ticker": "NOW",
       "shares": 1.1297253,
       "price_usd": 137.29,
@@ -2939,7 +2939,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5546.PNG",
+      "fn": "IMG_5546.webp",
       "ticker": "NOK",
       "shares": 10.4042187,
       "price_usd": 14.77,
@@ -2951,7 +2951,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5545.PNG",
+      "fn": "IMG_5545.webp",
       "ticker": "NOK",
       "shares": 9.7288114,
       "price_usd": 15.71,
@@ -2963,7 +2963,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5544.PNG",
+      "fn": "IMG_5544.webp",
       "ticker": "PLTR",
       "shares": 1.1428016,
       "price_usd": 133.79,
@@ -2975,7 +2975,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5543.PNG",
+      "fn": "IMG_5543.webp",
       "ticker": "LLY",
       "shares": 2.4556303,
       "price_usd": 993.94,
@@ -2987,7 +2987,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5542.PNG",
+      "fn": "IMG_5542.webp",
       "ticker": "NOK",
       "shares": 23.5180236,
       "price_usd": 13.18,
@@ -2999,7 +2999,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5541.PNG",
+      "fn": "IMG_5541.webp",
       "ticker": "PLTR",
       "shares": 2.3111591,
       "price_usd": 134.24,
@@ -3011,7 +3011,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5540.PNG",
+      "fn": "IMG_5540.webp",
       "ticker": "PLTR",
       "shares": 2.505887,
       "price_usd": 124.0,
@@ -3023,7 +3023,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5539.PNG",
+      "fn": "IMG_5539.webp",
       "ticker": "LLY",
       "shares": 0.0989608,
       "price_usd": 969.27,
@@ -3035,7 +3035,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5538.PNG",
+      "fn": "IMG_5538.webp",
       "ticker": "LLY",
       "shares": 0.0989608,
       "price_usd": 969.27,
@@ -3047,7 +3047,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5537.PNG",
+      "fn": "IMG_5537.webp",
       "ticker": "LLY",
       "shares": 8.6871652,
       "price_usd": 967.87,
@@ -3059,7 +3059,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5536.PNG",
+      "fn": "IMG_5536.webp",
       "ticker": "LLY",
       "shares": 2.9234024,
       "price_usd": 940.5,
@@ -3071,7 +3071,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5535.PNG",
+      "fn": "IMG_5535.webp",
       "ticker": "MNST",
       "shares": 1.2932977,
       "price_usd": 77.19,
@@ -3083,7 +3083,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5534.PNG",
+      "fn": "IMG_5534.webp",
       "ticker": "MNST",
       "shares": 1.281676,
       "price_usd": 77.89,
@@ -3095,7 +3095,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5533.PNG",
+      "fn": "IMG_5533.webp",
       "ticker": "PLTR",
       "shares": 0.6634063,
       "price_usd": 150.49,
@@ -3107,7 +3107,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5532.PNG",
+      "fn": "IMG_5532.webp",
       "ticker": "PLTR",
       "shares": 0.6568421,
       "price_usd": 152.0,
@@ -3119,7 +3119,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5530.PNG",
+      "fn": "IMG_5530.webp",
       "ticker": "LLY",
       "shares": 11.9637081,
       "price_usd": 1076.0,
@@ -3131,7 +3131,7 @@
       "account": "Dime! Save (THB)"
     },
     {
-      "fn": "IMG_5529.PNG",
+      "fn": "IMG_5529.webp",
       "ticker": "LLY",
       "shares": 0.2917426,
       "price_usd": 1079.89,
@@ -3143,7 +3143,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5528.PNG",
+      "fn": "IMG_5528.webp",
       "ticker": "QQQI",
       "shares": 5.8362164,
       "price_usd": 54.34,
@@ -3155,7 +3155,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5527.PNG",
+      "fn": "IMG_5527.webp",
       "ticker": "VOO",
       "shares": 0.4951753,
       "price_usd": 640.46,
@@ -3167,7 +3167,7 @@
       "account": "Dime! USD"
     },
     {
-      "fn": "IMG_5526.PNG",
+      "fn": "IMG_5526.webp",
       "ticker": "LLY",
       "shares": 0.3055689,
       "price_usd": 1037.54,

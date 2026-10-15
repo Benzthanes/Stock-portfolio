@@ -20,7 +20,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.portfolio import load_portfolio, analyze_portfolio
-from src.trades import load_trades, calculate_trades_summary, load_ledger
+from src.trades import (
+    load_trades, calculate_trades_summary, load_ledger,
+    resolve_slip_relative_path, get_slip_modal_component
+)
 from src.html_report import get_chart_modal_component, _make_chart_onclick
 from src.nav import nav_bar_html
 from scripts.sync_skill_numbers import sync_skill_numbers
@@ -758,6 +761,18 @@ def generate_master_ledger_html(data):
         fx_str = f"฿{fx_val:.2f}" if fx_val > 0 else "-"
         amt_thb_val = b.get("amt_thb", 0)
         thb_str = f"฿{amt_thb_val:,.2f}" if amt_thb_val > 0 else "-"
+        fn_val = b.get("fn", "")
+        slip_path = resolve_slip_relative_path(fn_val)
+        if slip_path:
+            b_tick = b.get("ticker", "-")
+            b_dt = b.get("date", "-")
+            b_sh = b.get("shares", 0.0)
+            b_pr = b.get("price_usd", 0.0)
+            b_info = f"{b_sh:.4f} หุ้น @ ${b_pr:.2f}"
+            slip_html = f'<button type="button" onclick="openSlipModal(\'{slip_path}\', \'{fn_val}\', \'{b_tick}\', \'{b_dt}\', \'{b_info}\')" class="slip-badge-btn" title="คลิกเพื่อดูสลิปคำสั่งซื้อ">🧾 {fn_val}</button>'
+        else:
+            slip_html = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{fn_val or "-"}</span>'
+
         buy_rows += f"""
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
@@ -770,7 +785,7 @@ def generate_master_ledger_html(data):
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${b.get('amt_usd', 0):,.2f}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{thb_str}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{fx_str}</td>
-            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{b.get('fn', '-')}</td>
+            <td style="text-align: center;">{slip_html}</td>
         </tr>
         """
 
@@ -790,7 +805,16 @@ def generate_master_ledger_html(data):
         if tranche_count > 1:
             tranche_btn = f'<button onclick="toggleTranche(\'{trade_id}\')" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 6px; padding: 2px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">สะสม {tranche_count} ไม้ <span id="icon-{trade_id}">▼</span></button>'
         else:
-            tranche_btn = '<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span>'
+            single_fn = tranches[0].get('file') if tranches else None
+            single_path = resolve_slip_relative_path(single_fn) if single_fn else ""
+            if single_path:
+                t_tk = t.get("ticker", "")
+                t_sh = t.get("shares", 0.0)
+                t_pr = t.get("buy_price_usd", 0.0)
+                t_info = f"{t_sh:.4f} หุ้น @ ${t_pr:.2f}"
+                tranche_btn = f'<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span> <button type="button" onclick="openSlipModal(\'{single_path}\', \'{single_fn}\', \'{t_tk}\', \'{buy_date_str}\', \'{t_info}\')" class="slip-badge-btn" style="padding: 2px 7px; font-size: 0.74rem;" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 สลิป</button>'
+            else:
+                tranche_btn = '<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span>'
 
         closed_rows += f"""
         <tr style="border-bottom: 1px solid var(--border-subtle);">
@@ -818,6 +842,19 @@ def generate_master_ledger_html(data):
             tranche_subrows = ""
             for tr in tranches:
                 t_thb_str = f"฿{tr.get('amt_thb', 0):,.2f}" if tr.get('amt_thb', 0) > 0 else "-"
+                tr_fn = tr.get('file', '')
+                tr_path = resolve_slip_relative_path(tr_fn)
+                if tr_path:
+                    tr_tk = t.get("ticker", "")
+                    tr_dt = tr.get("date", "-")
+                    tr_num = tr.get("tranche", 1)
+                    tr_sh = tr.get("shares", 0.0)
+                    tr_pr = tr.get("price_usd", 0.0)
+                    tr_info = f"ไม้ที่ {tr_num} • {tr_sh:.4f} หุ้น @ ${tr_pr:.2f}"
+                    slip_col = f'<button type="button" onclick="openSlipModal(\'{tr_path}\', \'{tr_fn}\', \'{tr_tk}\', \'{tr_dt}\', \'{tr_info}\')" class="slip-badge-btn" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 {tr_fn}</button>'
+                else:
+                    slip_col = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{tr_fn or "-"}</span>'
+
                 tranche_subrows += f"""
                 <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
                     <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ {tr.get('tranche')}</td>
@@ -827,7 +864,7 @@ def generate_master_ledger_html(data):
                     <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${tr.get('amt_usd', 0):,.2f}</td>
                     <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{t_thb_str}</td>
                     <td style="color: var(--text-secondary);">{tr.get('note', '-')}</td>
-                    <td style="text-align: center; color: var(--text-muted); font-size: 0.78rem;">{tr.get('file', '-')}</td>
+                    <td style="text-align: center;">{slip_col}</td>
                 </tr>
                 """
 
@@ -1287,6 +1324,7 @@ def generate_master_ledger_html(data):
     }});
     </script>
     {get_chart_modal_component()}
+    {get_slip_modal_component()}
 </body>
 </html>
 """

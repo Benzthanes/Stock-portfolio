@@ -147,5 +147,55 @@ class SyncSkillTest(LedgerCase):
         self.assertEqual(err.getvalue(), "")
 
 
+from src.trades import resolve_slip_relative_path, get_slip_modal_component
+from scripts.generate_master_report import generate_master_ledger_html
+
+
+class SlipViewerTest(unittest.TestCase):
+    def test_resolve_slip_relative_path_existing(self):
+        rel = resolve_slip_relative_path("IMG_5526.webp", from_reports_dir=True)
+        self.assertEqual(rel, "../data/screenshots/IMG_5526.webp")
+
+    def test_resolve_slip_relative_path_empty_and_special(self):
+        self.assertEqual(resolve_slip_relative_path(None), "")
+        self.assertEqual(resolve_slip_relative_path(""), "")
+        self.assertEqual(resolve_slip_relative_path("-"), "")
+        self.assertEqual(resolve_slip_relative_path("CLI"), "")
+
+    def test_slip_modal_component_markup(self):
+        modal_html = get_slip_modal_component()
+        self.assertIn('id="slipModal"', modal_html)
+        self.assertIn('function openSlipModal(', modal_html)
+        self.assertIn('function closeSlipModal(', modal_html)
+        self.assertIn('.slip-badge-btn', modal_html)
+
+    def test_ledger_html_includes_slip_modal_and_buttons(self):
+        sample_data = {
+            "portfolio_name": "Test Port",
+            "buy_orders": [{
+                "fn": "IMG_5526.webp", "ticker": "SPCX", "shares": 6.0, "price_usd": 150.0,
+                "amt_usd": 900.0, "amt_thb": 30000.0, "fx_rate": 33.62, "date": "12 มิ.ย. 69 - 22:46 น.",
+                "order_type": "Market", "account": "Dime! USD"
+            }],
+            "closed_trades": [{
+                "id": "TRD-1", "ticker": "SPCX", "shares": 6.0, "buy_price_usd": 150.0, "sell_price_usd": 200.0,
+                "total_cost_usd": 900.0, "net_revenue_usd": 1200.0, "realized_pl_usd": 300.0,
+                "realized_pl_thb": 10000.0, "realized_pl_pct": 33.33, "buy_date": "12 มิ.ย. 69",
+                "date": "17 มิ.ย. 69", "buy_tranches": [{
+                    "tranche": 1, "date": "12 มิ.ย. 69", "shares": 6.0, "price_usd": 150.0,
+                    "amt_usd": 900.0, "amt_thb": 0.0, "file": "IMG_5526.webp", "note": "buy"
+                }]
+            }],
+            "dividends_list": [],
+            "cash_movements": [],
+            "trades_summary": {"total_trades": 1, "winning_trades": 1, "win_rate_pct": 100.0, "total_realized_pl_thb": 10000.0},
+            "fx_rate": 33.62
+        }
+        html = generate_master_ledger_html(sample_data)
+        self.assertIn('id="slipModal"', html)
+        self.assertIn("openSlipModal('../data/screenshots/IMG_5526.webp'", html)
+
+
 if __name__ == "__main__":
     unittest.main()
+
