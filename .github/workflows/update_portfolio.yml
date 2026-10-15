@@ -1,0 +1,42 @@
+name: Automated Portfolio Update
+
+on:
+  schedule:
+    # 20:35 ICT (จันทร์ - ศุกร์ หลังเปิดตลาด) = 13:35 UTC (Mon-Fri)
+    - cron: '35 13 * * 1-5'
+    # 04:05 ICT (อังคาร - เสาร์ เช้าหลังปิดตลาดสหรัฐฯ) = 21:05 UTC (Mon-Fri)
+    - cron: '5 21 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-portfolio:
+    name: Refresh Portfolio Reports
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run all portfolio reports
+        run: |
+          python3 portfolio.py --all
+
+      - name: Commit and push updated reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/ data/
+          if git diff --staged --quiet; then
+            echo "No changes detected. Skipping commit."
+          else
+            git commit -m "chore: automated portfolio update [skip ci]"
+            git push
+          fi
