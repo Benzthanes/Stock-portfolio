@@ -275,15 +275,11 @@ def generate_master_dashboard_data():
     total_net_worth_usd = round(total_net_worth_thb / fx_rate, 2)
 
     all_time_profit_thb = round(total_net_worth_thb - net_injected_capital_thb, 2)
-    all_time_roi_pct = round((all_time_profit_thb / net_injected_capital_thb * 100.0), 2)
+    all_time_roi_pct = round((all_time_profit_thb / net_injected_capital_thb * 100.0), 2) if net_injected_capital_thb else 0.0
 
     # 6. Realized & Dividend Streams
     total_realized_pl_usd = trades_summary["total_realized_pl_usd"]
     total_realized_pl_thb = trades_summary["total_realized_pl_thb"]
-    total_dividends_usd = 141.74
-    total_dividends_thb = round(total_dividends_usd * fx_rate, 2)
-    total_realized_and_div_thb = round(total_realized_pl_thb + total_dividends_thb + dime_save_interest_thb, 2)
-
     # Dividend details list
     dividends_list = [
         {"date": "1 ต.ค. 69", "ticker": "VOO", "amount_usd": 0.90, "rate": "1.8226/หุ้น"},
@@ -300,6 +296,9 @@ def generate_master_dashboard_data():
         {"date": "10 มี.ค. 69", "ticker": "LLY", "amount_usd": 21.73, "rate": "1.73/หุ้น"},
         {"date": "21 ก.พ. 69", "ticker": "QQQI", "amount_usd": 3.58, "rate": "0.6140/หุ้น"},
     ]
+    total_dividends_usd = round(sum(d["amount_usd"] for d in dividends_list), 2)
+    total_dividends_thb = round(total_dividends_usd * fx_rate, 2)
+    total_realized_and_div_thb = round(total_realized_pl_thb + total_dividends_thb + dime_save_interest_thb, 2)
 
     # 7. Detailed Buy Orders (55 orders from OCR) & Cash Flow (54 transactions from KKP Statement)
     buy_orders = load_ocr_buy_orders()
@@ -348,6 +347,10 @@ def generate_master_dashboard_html(data):
 
     un_sign = "+" if data["stock_unrealized_pl_thb"] >= 0 else ""
     un_color = "#10b981" if data["stock_unrealized_pl_thb"] >= 0 else "#f43f5e"
+    rz_sign = "+" if data["trades_summary"]["total_realized_pl_thb"] >= 0 else ""
+    rz_color = "#10b981" if data["trades_summary"]["total_realized_pl_thb"] >= 0 else "#f43f5e"
+    rd_sign = "+" if data["total_realized_and_div_thb"] >= 0 else ""
+    rd_color = "#10b981" if data["total_realized_and_div_thb"] >= 0 else "#f43f5e"
 
     # 1. Active Holdings Rows
     holdings_rows = ""
@@ -755,9 +758,9 @@ def generate_master_dashboard_html(data):
             </div>
             <div class="card">
                 <div class="kpi-label">กำไรที่ขายทำกำไรจริง (Realized P&L)</div>
-                <div style="font-size: 1.45rem; font-weight: 700; color: #10b981;">+${data['trades_summary']['total_realized_pl_usd']:,.2f}</div>
+                <div style="font-size: 1.45rem; font-weight: 700; color: {rz_color};">{rz_sign}${data['trades_summary']['total_realized_pl_usd']:,.2f}</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    คิดเป็นเงินไทย: <strong style="color: #10b981;">+฿{data['trades_summary']['total_realized_pl_thb']:,.2f}</strong><br>
+                    คิดเป็นเงินไทย: <strong style="color: {rz_color};">{rz_sign}฿{data['trades_summary']['total_realized_pl_thb']:,.2f}</strong><br>
                     Win Rate: <strong style="color: #10b981;">{data['trades_summary']['win_rate_pct']:.1f}%</strong> (ปิด {data['trades_summary']['total_trades']} ชนะ {data['trades_summary']['winning_trades']} ไม้)
                 </div>
             </div>
@@ -766,7 +769,7 @@ def generate_master_dashboard_html(data):
                 <div style="font-size: 1.45rem; font-weight: 700; color: #10b981;">+${data['total_dividends_usd']:,.2f}</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
                     คิดเป็นเงินไทย: <strong style="color: #10b981;">+฿{data['total_dividends_thb']:,.2f}</strong> (รับรวม {len(data['dividends_list'])} ครั้ง)<br>
-                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: #10b981;">+฿{data['total_realized_and_div_thb']:,.2f}</strong>
+                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: {rd_color};">{rd_sign}฿{data['total_realized_and_div_thb']:,.2f}</strong>
                 </div>
             </div>
         </div>
@@ -847,7 +850,7 @@ def generate_master_dashboard_html(data):
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <span>🏆</span> 3. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: {len(data['closed_trades'])} ไม้)
-                    <span class="badge badge-success">Win Rate 100.0% (กำไรสะสม +฿{data['trades_summary']['total_realized_pl_thb']:,.2f})</span>
+                    <span class="badge badge-success">Win Rate {data['trades_summary']['win_rate_pct']:.1f}% (กำไรสะสม {rz_sign}฿{data['trades_summary']['total_realized_pl_thb']:,.2f})</span>
                 </div>
                 <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>

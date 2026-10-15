@@ -230,8 +230,8 @@ def main():
         require_strong_buy=args.strong_buy
     )
 
-    effective_rsi_max = args.rsi_max
-    if not filtered_results and args.auto_fallback and args.rsi_max <= 35.0:
+    effective_rsi_max = effective_rsi
+    if not filtered_results and args.auto_fallback and effective_rsi_max <= 35.0:
         fallback_rsi = 40.0
         print(f"No stocks found at RSI <= {args.rsi_max}. Auto-fallback active: expanding scan to RSI <= {fallback_rsi}...", file=sys.stderr)
         filtered_results = filter_stocks(

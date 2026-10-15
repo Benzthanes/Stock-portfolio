@@ -85,7 +85,6 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
     portfolio = load_portfolio(portfolio_path)
     holdings = portfolio.get("holdings", [])
     base_currency = str(portfolio.get("base_currency", "USD")).upper()
-    fx_rate = float(portfolio.get("fx_rate_usd_thb", 33.62))
     curr_sym = "฿" if base_currency == "THB" else "$"
     
     pos = next((h for h in holdings if h["ticker"].upper() == ticker.upper()), None)
@@ -97,6 +96,8 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
 
     shares = custom_shares if custom_shares is not None else (pos.get("shares", 1.0) if pos else 1.0)
     avg_cost = custom_cost if custom_cost is not None else (float(pos.get("avg_cost_thb") or pos.get("avg_cost_usd", 0.0)) if pos else 0.0)
+    if shares <= 0:
+        raise ValueError(f"Shares must be greater than 0 (got {shares}).")
     
     from src.universe import get_universe
     all_univ = get_universe("all")
@@ -117,6 +118,8 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
 
     data = market_data_list[0]
     close = data.get("close") or 0.0
+    if close <= 0:
+        raise ValueError(f"No valid close price for {symbol_tv} from TradingView.")
     atr = data.get("ATR") or (close * 0.03)
     sma20 = data.get("SMA20") or 0.0
     sma50 = data.get("SMA50") or 0.0
@@ -338,6 +341,9 @@ def analyze_all_underwater(portfolio_path: Optional[str] = None) -> Dict[str, An
         d = market_map.get(t, {})
         close = d.get("close") or 0.0
         shares = float(h.get("shares", 0.0))
+        if close <= 0 or shares <= 0:
+            print(f"Warning: skipping {t} (missing quote or zero shares).", file=sys.stderr)
+            continue
         avg_cost = float(h.get("avg_cost_thb") or h.get("avg_cost_usd", 0.0))
         total_cost = float(h.get("total_cost_thb") or h.get("total_cost_usd", shares * avg_cost))
         current_val = shares * close
@@ -459,7 +465,7 @@ def generate_single_report(res: Dict[str, Any]) -> str:
             f"- **ต้นทุนเฉลี่ยของคุณ:** **{curr_sym}{avg:.2f} {curr_code}**.",
             f"- **ราคาตลาดปัจจุบัน:** **{curr_sym}{c:.2f} {curr_code}** (ต้องการดีดกลับ **{be_str}** เพื่อคืนทุน).",
             f"- **ราคาเป้าหมายเฉลี่ยที่สถาบันให้:** **{curr_sym}{res['price_target_average']:,.2f} {curr_code}** (โอกาสเติบโต Upside **{res['target_upside_pct']:+.1f}%** จากราคาปัจจุบัน).",
-            f"- **กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน:** **{curr_sym}{res['price_target_low']:,.2f} - {curr_sym}{res['price_target_high']:,.2f} {curr_code}**.",
+            (f"- **กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน:** **{curr_sym}{res['price_target_low']:,.2f} - {curr_sym}{res['price_target_high']:,.2f} {curr_code}**." if res.get('price_target_low') is not None and res.get('price_target_high') is not None else "- **กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน:** -"),
             f"- **ฉันทามตินักวิเคราะห์:** **{b_cnt} สถาบันแนะนำซื้อ**, **{h_cnt} สถาบันแนะนำถือ**, **{s_cnt} สถาบันแนะนำขาย**.",
             f"- **บทสรุปเปรียบเทียบกับทุนของคุณ:** {comp_txt}",
         ])
@@ -614,9 +620,10 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
                 f"- ราคาเฉลี่ยที่สถาบันให้: **{curr_sym}{p['price_target_average']:,.2f}** "
                 f"(โอกาสทำกำไร Upside: **{p['target_upside_pct']:+.1f}%** จากราคาตลาด {curr_sym}{p['close']:.2f})."
             )
-            lines.append(
-                f"- กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน: **{curr_sym}{p['price_target_low']:,.2f} - {curr_sym}{p['price_target_high']:,.2f}**."
-            )
+            if p.get('price_target_low') is not None and p.get('price_target_high') is not None:
+                lines.append(
+                    f"- กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน: **{curr_sym}{p['price_target_low']:,.2f} - {curr_sym}{p['price_target_high']:,.2f}**."
+                )
             lines.append(
                 f"- มตินักวิเคราะห์: **{b_cnt} สถาบันแนะนำซื้อ**, **{h_cnt} สถาบันแนะนำถือ**, **{s_cnt} สถาบันแนะนำขาย**."
             )
@@ -658,7 +665,13 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
             recommended_choice = f"ทางเลือกที่ 2 (Smart DCA) ซื้อเพิ่มที่แนวรับเพื่อดึงทุนลงเหลือ {curr_sym}{p['dca_half']['new_avg_cost']:.2f}"
         else:
             triage_badge = "🟢 ดอยชั่วคราว (รอราคาเด้งกลับ)"
-            recommended_choice = "ทางเลือกที่ 1 (ถือรอเฉยๆ) ราคาเป้าหมายสถาบันอยู่สูงกว่าต้นทุนเดิมของคุณ"
+            tvc = p.get("target_vs_cost_pct")
+            if tvc is None:
+                recommended_choice = "ทางเลือกที่ 1 (ถือรอเฉยๆ) ยังไม่มีข้อมูลราคาเป้าหมายสถาบันเทียบต้นทุนของคุณ"
+            elif tvc >= 0:
+                recommended_choice = "ทางเลือกที่ 1 (ถือรอเฉยๆ) ราคาเป้าหมายสถาบันอยู่สูงกว่าต้นทุนเดิมของคุณ"
+            else:
+                recommended_choice = "ทางเลือกที่ 1 (ถือรอเฉยๆ) แต่ราคาเป้าหมายสถาบันยังต่ำกว่าต้นทุนเดิมของคุณ"
 
         target_info = f" สถาบันให้เป้าหมายเฉลี่ย {curr_sym}{p['price_target_average']:,.2f} (Upside {p['target_upside_pct']:+.1f}%, เทียบทุนคุณ {p['target_vs_cost_pct']:+.1f}%)." if p.get('price_target_average') else " ไม่มีข้อมูลเป้าหมาย."
 
@@ -736,14 +749,18 @@ def main():
     parser.add_argument("--shares", type=float, default=None, help="Custom share quantity")
     parser.add_argument("--cost", type=float, default=None, help="Custom average cost")
     parser.add_argument("--json", action="store_true", help="Output JSON format")
-    parser.add_argument("--save-report", type=str, nargs="?", const="reports/portfolio_recovery.html", default="reports/portfolio_recovery.html", help="Save report to HTML or Markdown file (default: reports/portfolio_recovery.html)")
+    parser.add_argument("--save-report", type=str, nargs="?", const="", default="", help="Save report to HTML or Markdown file (default: reports/portfolio_recovery.html, or reports/recovery_<TICKER>.md for a single ticker)")
 
     args = parser.parse_args()
 
     # Automatically set Thai recovery report name if Thai portfolio is specified
-    if args.file and ("set" in Path(args.file).name.lower() or "thai" in Path(args.file).name.lower()):
-        if args.save_report == "reports/portfolio_recovery.html":
+    if not args.save_report:
+        if args.ticker and not args.all:
+            args.save_report = f"reports/recovery_{args.ticker.upper()}.md"
+        elif args.file and ("set" in Path(args.file).name.lower() or "thai" in Path(args.file).name.lower()):
             args.save_report = "reports/portfolio_set_recovery.html"
+        else:
+            args.save_report = "reports/portfolio_recovery.html"
 
     if args.ticker and not args.all:
         try:

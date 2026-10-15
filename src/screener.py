@@ -12,6 +12,16 @@ from typing import Any, Dict, List, Optional
 from src.news import fetch_batch_news, fetch_batch_catalysts
 from src.profiles import get_business_summary
 
+FALLBACK_SL_RATIO = 0.95
+MIN_SL_RATIO = 0.5
+
+
+def atr_stop_loss(close: float, atr: Optional[float]) -> float:
+    """1.5 ATR stop, floored at half the price so a huge ATR cannot push the stop to zero or below."""
+    if atr and atr > 0:
+        return round(max(close - 1.5 * atr, close * MIN_SL_RATIO), 2)
+    return round(close * FALLBACK_SL_RATIO, 2)
+
 
 def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -92,11 +102,8 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     weekly_bullish = (rsi_weekly >= 45.0) if rsi_weekly is not None else False
     
     # Trade Setup: ATR Stop Loss & Target calculation
-    if atr and atr > 0:
-        stop_loss = round(close - (1.5 * atr), 2)
-    else:
-        stop_loss = round(close * 0.95, 2)
-        
+    stop_loss = atr_stop_loss(close, atr)
+
     target_ma = sma50 or ema50
     if target_ma and target_ma > close:
         take_profit = round(target_ma, 2)
@@ -249,7 +256,7 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "ticker": ticker,
         "exchange": exchange,
-        "name": data.get("description", ticker),
+        "name": data.get("description") or ticker,
         "sector": sector,
         "industry": industry,
         "business_summary": business_summary,
@@ -374,7 +381,7 @@ def filter_stocks(
             stock_sector = (stock.get("sector") or "").lower()
             match = False
             for ts in target_sectors:
-                if ts.lower() in stock_sector or stock_sector in ts.lower():
+                if stock_sector and (ts.lower() in stock_sector or stock_sector in ts.lower()):
                     match = True
                     break
             if not match:
@@ -390,11 +397,10 @@ def filter_stocks(
         if require_ema200 and not stock["is_above_ema200"]:
             continue
 
-        if weekly_rsi_min is not None and stock.get("rsi_weekly") is not None:
-            if stock["rsi_weekly"] < weekly_rsi_min:
-                continue
+        if weekly_rsi_min is not None and (stock.get("rsi_weekly") is None or stock["rsi_weekly"] < weekly_rsi_min):
+            continue
 
-        if require_stoch_cross and not stock["stoch_cross_up"]:
+        if require_stoch_cross and not stock["fresh_stoch_cross"]:
             continue
 
         if exclude_falling_knife and stock.get("adx_falling_knife"):

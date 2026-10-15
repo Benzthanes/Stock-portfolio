@@ -35,26 +35,28 @@ TICKER_SEARCH_MAP = {
 
 BEARISH_KEYWORDS = {
     "downgrade", "downgrades", "downgraded", "drop", "drops", "dropped", "fall", "falls",
-    "fell", "slide", "slides", "losing", "streak", "dispute", "lawsuit", "probe",
+    "fell", "slide", "slides", "losing", "dispute", "lawsuit", "probe",
     "investigation", "miss", "misses", "missed", "warning", "caution", "weak", "weakness",
     "sell", "debt", "tariff", "antitrust", "slashes", "slashed", "loss", "losses", "delay",
     "delays", "delayed", "tumble", "tumbles", "tumbled", "plunge", "plunges", "plunged",
     "sink", "sinks", "sank", "headwind", "struggle", "struggles", "struggling", "underperform",
-    "penalty", "low", "dip", "pullback", "narrow range", "selloff"
+    "penalty", "record low", "record lows", "52-week low", "dip", "pullback", "narrow range", "selloff",
+    "reject", "rejects", "rejected", "rejection", "declines to approve"
 }
 
 BULLISH_KEYWORDS = {
     "upgrade", "upgrades", "upgraded", "record", "beat", "beats", "beating", "soar",
     "soars", "soared", "gain", "gains", "gained", "rise", "rises", "invest", "investment",
-    "expansion", "profit", "profits", "profitable", "approval", "fda", "partner",
+    "expansion", "profit", "profits", "profitable", "approval", "approves", "approved", "partner",
     "partnership", "surge", "surges", "surged", "growth", "growing", "dividend", "boost",
     "boosts", "outperform", "opportunity", "moat", "rebound", "rebounds", "bull", "bullish",
-    "rally", "rallies", "grew", "cheaper", "edge", "buy", "picks", "picks ahead"
+    "rally", "rallies", "grew", "cheaper", "edge", "buy", "picks", "picks ahead", "winning streak"
 }
 
 _BEAR_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BEARISH_KEYWORDS) + r')\b', re.IGNORECASE)
-_BULL_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BULLISH_KEYWORDS) + r')\b', re.IGNORECASE)
+_BULL_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BULLISH_KEYWORDS) + r')\b(?!\s+lows?\b)', re.IGNORECASE)
 _AI_REGEX = re.compile(r'\b(ai|artificial intelligence)\b', re.IGNORECASE)
+_NEUTRAL_PHRASE_REGEX = re.compile(r'\bweight[- ]loss\b', re.IGNORECASE)
 
 
 def _load_cache() -> Dict[str, Any]:
@@ -76,19 +78,24 @@ def _save_cache(cache: Dict[str, Any]) -> None:
         pass
 
 
-def _get_from_cache(ticker: str) -> Optional[List[Dict[str, str]]]:
+def _get_from_cache(ticker: str, max_items: int) -> Optional[List[Dict[str, str]]]:
     with _CACHE_LOCK:
         cache = _load_cache()
-        if ticker in cache:
-            return cache[ticker].get("articles", [])
-        return None
+        entry = cache.get(ticker)
+        if entry is None:
+            return None
+        articles = entry.get("articles", [])
+        if entry.get("max_items", len(articles)) < max_items:
+            return None
+        return articles
 
 
-def _update_cache(ticker: str, articles: List[Dict[str, str]]) -> None:
+def _update_cache(ticker: str, articles: List[Dict[str, str]], max_items: int) -> None:
     with _CACHE_LOCK:
         cache = _load_cache()
         cache[ticker] = {
             "cached_at": time.time(),
+            "max_items": max_items,
             "articles": articles
         }
         _save_cache(cache)
@@ -116,6 +123,7 @@ def classify_sentiment(title: str) -> str:
     """
     Classify a headline as 'bullish', 'bearish', or 'neutral' using whole-word regex matching.
     """
+    title = _NEUTRAL_PHRASE_REGEX.sub(" ", title)
     is_bear = bool(_BEAR_REGEX.search(title))
     is_bull = bool(_BULL_REGEX.search(title) or _AI_REGEX.search(title))
 
@@ -133,7 +141,7 @@ def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[
     Fetch the latest market news and catalysts for a specific stock ticker with sentiment tags.
     """
     clean_ticker = ticker.strip().upper()
-    cached = _get_from_cache(clean_ticker)
+    cached = _get_from_cache(clean_ticker, max_items)
     if cached is not None:
         return cached[:max_items]
 
@@ -178,7 +186,7 @@ def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[
                     "sentiment": sentiment
                 })
 
-        _update_cache(clean_ticker, articles)
+        _update_cache(clean_ticker, articles, max_items)
 
     except Exception:
         return []

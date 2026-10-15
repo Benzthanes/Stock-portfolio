@@ -138,10 +138,14 @@ def record_sell(
     current_shares = float(holding_match.get("shares", 0.0))
     avg_cost = float(holding_match.get("avg_cost_usd", 0.0))
 
-    if shares is None or shares <= 0:
+    if shares is None:
         sell_shares = current_shares
+    elif shares <= 0:
+        raise ValueError(f"Shares to sell must be greater than 0 (got {shares}).")
+    elif shares > current_shares:
+        raise ValueError(f"Cannot sell {shares} shares of {target_ticker}: only {current_shares} held.")
     else:
-        sell_shares = min(float(shares), current_shares)
+        sell_shares = float(shares)
 
     current_fx = fx_rate if fx_rate is not None else float(portfolio_data.get("fx_rate_usd_thb", 33.62))
     exec_date = trade_date or datetime.now().strftime("%Y-%m-%d")
@@ -184,6 +188,14 @@ def record_sell(
         "remaining_shares": round(current_shares - sell_shares, 7),
     }
 
+    buy_date = holding_match.get("buy_date")
+    if buy_date:
+        trade_entry["buy_date"] = buy_date
+        try:
+            trade_entry["holding_days"] = (datetime.strptime(exec_date, "%Y-%m-%d") - datetime.strptime(buy_date, "%Y-%m-%d")).days
+        except ValueError:
+            pass
+
     # Update holdings
     remaining_shares = current_shares - sell_shares
     if remaining_shares <= 0.000001:
@@ -192,7 +204,11 @@ def record_sell(
             holdings.pop(holding_idx)
     else:
         new_total_cost = round(remaining_shares * avg_cost, 2)
-        new_cost_thb = round(new_total_cost * current_fx, 2)
+        old_cost_thb = holding_match.get("cost_thb")
+        if old_cost_thb is None:
+            new_cost_thb = round(new_total_cost * current_fx, 2)
+        else:
+            new_cost_thb = round(float(old_cost_thb) * remaining_shares / current_shares, 2)
         status_action = f"Partial sell: {sell_shares} sold, {remaining_shares:.4f} remaining."
         if not dry_run:
             holding_match["shares"] = round(remaining_shares, 7)

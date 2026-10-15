@@ -3,8 +3,10 @@ HTML Report Generator for Filter-Stock.
 Generates a modern, luxury dark-mode, responsive financial dashboard HTML report.
 """
 
-from typing import Dict, Any
+import json
 from datetime import datetime
+from html import escape
+from typing import Any, Dict, List, Optional
 
 
 def _fmt_curr(val: float, sym: str = "$") -> str:
@@ -14,21 +16,34 @@ def _fmt_curr(val: float, sym: str = "$") -> str:
 
 def _make_chart_onclick(p: Dict[str, Any], is_thb: bool = False) -> str:
     ticker = p.get("ticker", "")
-    exchange = p.get("exchange", "NASDAQ")
-    name = (p.get("name") or ticker).replace("'", "\\'")
-    sector = (p.get("sector") or "").replace("'", "\\'")
-    cost = p.get("avg_cost_thb" if is_thb else "avg_cost_usd", p.get("avg_cost_usd", 0.0))
-    price = p.get("close_price", 0.0)
-    supp = p.get("key_support", 0.0)
-    res = p.get("key_resistance", 0.0)
-    sl = p.get("stop_loss", 0.0)
-    tp = p.get("take_profit", 0.0)
-    target = p.get("price_target_average", 0.0)
-    return f"openChartModal('{ticker}', '{exchange}', '{name}', '{sector}', {cost}, {price}, {supp}, {res}, {sl}, {tp}, {target})"
+    args = [
+        ticker,
+        p.get("exchange", "NASDAQ"),
+        p.get("name") or ticker,
+        p.get("sector") or "",
+        p.get("avg_cost_thb" if is_thb else "avg_cost_usd", p.get("avg_cost_usd", 0.0)),
+        p.get("close_price", 0.0),
+        p.get("key_support", 0.0),
+        p.get("key_resistance", 0.0),
+        p.get("stop_loss", 0.0),
+        p.get("take_profit", 0.0),
+        p.get("price_target_average", 0.0),
+    ]
+    return escape(f"openChartModal({', '.join(json.dumps(a, ensure_ascii=False) for a in args)})", quote=True)
 
 
-import json
-from typing import Dict, Any, List, Optional
+def _news_items_html(items: List[Dict[str, Any]], empty_msg: str) -> str:
+    if not items:
+        return f"<li><span class='text-muted'>{empty_msg}</span></li>"
+    rows = []
+    for b in items:
+        title = escape(b.get("title", ""), quote=True)
+        link = b.get("link") or ""
+        if link.lower().startswith(("http://", "https://")):
+            title = f"<a href='{escape(link, quote=True)}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{title} ↗</a>"
+        published = f" <span class='text-muted small'>({escape(b['published'], quote=True)})</span>" if b.get("published") else ""
+        rows.append(f"<li><strong class='source-tag'>[{escape(b.get('source', ''), quote=True)}]</strong> {title}{published}</li>")
+    return "".join(rows)
 
 
 def get_chart_modal_component(tickers: Optional[List[str]] = None) -> str:
@@ -123,7 +138,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         )
         sector_rows_html += f"""
         <tr>
-            <td style="font-weight: 600;">{sec_name}</td>
+            <td style="font-weight: 600;">{escape(str(sec_name))}</td>
             <td style="width: 45%;">
                 <div class="progress-wrap">
                     <div class="progress-bar" style="width: {bar_width}%; background: {bar_color};"></div>
@@ -138,8 +153,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     holdings_rows_html = ""
     for p in positions:
         t = p["ticker"]
-        name = p["name"]
-        biz = p.get("business_summary", "")
+        name = escape(p["name"])
+        biz = escape(p.get("business_summary") or "")
         r = p.get("rating", {})
         stars = r.get("stars_str", "⭐")
         weight = p["weight_pct"]
@@ -235,7 +250,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     fund_rows_html = ""
     for p in positions:
         t = p["ticker"]
-        name = p["name"]
+        name = escape(p["name"])
         fh = p.get("financial_health", {})
         h_badge = fh.get("health_badge", "-")
         peg_verdict = fh.get("peg_verdict", "-")
@@ -303,14 +318,14 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         medal_title = medals[idx] if idx < len(medals) else f"อันดับ {idx+1}"
         m_color = medal_colors[idx] if idx < len(medal_colors) else "var(--blue)"
         t = pick["ticker"]
-        name = pick["name"]
+        name = escape(pick["name"])
         stars = pick.get("rating", {}).get("stars_str", "⭐")
         w = pick["weight_pct"]
         c = pick["close_price"]
         sl = pick.get("stop_loss") or (c * 0.95)
         buy_low = c * 0.98
         buy_high = c * 1.01
-        biz = pick.get("business_summary", "")
+        biz = escape(pick.get("business_summary") or "")
 
         target_upside = pick.get("target_upside_pct")
         if t in ("VOO", "SPY", "QQQ"):
@@ -357,7 +372,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         forbidden_html += f"""
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ {fb['ticker']}</span>
-            <div><strong>{fb['name']}:</strong> {fb['reason']}</div>
+            <div><strong>{escape(fb['name'])}:</strong> {fb['reason']}</div>
         </div>
         """
 
@@ -365,8 +380,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     catalysts_html = ""
     for p in positions:
         t = p["ticker"]
-        name = p["name"]
-        biz = p.get("business_summary", "")
+        name = escape(p["name"])
+        biz = escape(p.get("business_summary") or "")
         cat = p.get("catalysts", {})
         bullish = cat.get("bullish", [])
         bearish = cat.get("bearish", [])
@@ -396,21 +411,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         ]) if timeline else "<div class='text-muted small'>ไม่มีกำหนดการตัวเร่งราคาเฉพาะในระยะสั้น</div>"
 
         # Bullish / Bearish items
-        bull_items = "".join([
-            f"<li><strong class='source-tag'>[{b['source']}]</strong> " +
-            (f"<a href='{b['link']}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{b['title']} ↗</a>" if b.get('link') else b['title']) +
-            (f" <span class='text-muted small'>({b['published']})</span>" if b.get('published') else "") +
-            "</li>"
-            for b in bullish
-        ]) if bullish else "<li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li>"
-
-        bear_items = "".join([
-            f"<li><strong class='source-tag'>[{b['source']}]</strong> " +
-            (f"<a href='{b['link']}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{b['title']} ↗</a>" if b.get('link') else b['title']) +
-            (f" <span class='text-muted small'>({b['published']})</span>" if b.get('published') else "") +
-            "</li>"
-            for b in bearish
-        ]) if bearish else "<li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li>"
+        bull_items = _news_items_html(bullish, "ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.")
+        bear_items = _news_items_html(bearish, "ไม่มีข่าวร้ายรุนแรงในระยะสั้น.")
 
         # Targets & Consensus
         t_low_str = f"{curr_sym}{t_low:,.2f}" if t_low else "-"
@@ -439,7 +441,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="{onclick_js}" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span>
                     <strong style="font-size: 1.25rem;">{name}</strong>
-                    <span class="badge badge-neutral" style="font-size: 0.8rem;">{p.get('sector', '')} • {p.get('industry', '')}</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">{escape(p.get('sector') or '')} • {escape(p.get('industry') or '')}</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">{quality_badge}</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -1134,10 +1136,10 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             <p style="color: var(--text-secondary); margin-bottom: 12px;">{grade_desc}</p>
             <div class="grid-2-cols" style="margin-bottom: 12px; gap: 12px;">
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> {f"[{best_pos['ticker']}] {best_pos['name']} (+{best_pos['unrealized_pl_pct']:.1f}%)" if best_pos else "-"}
+                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> {f"[{best_pos['ticker']}] {escape(best_pos['name'])} (+{best_pos['unrealized_pl_pct']:.1f}%)" if best_pos else "-"}
                 </div>
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🔻 <strong>ตัวฉุดดอยหนัก:</strong> {f"[{worst_pos['ticker']}] {worst_pos['name']} ({worst_pos['unrealized_pl_pct']:.1f}%)" if worst_pos else "-"}
+                    🔻 <strong>ตัวฉุดดอยหนัก:</strong> {f"[{worst_pos['ticker']}] {escape(worst_pos['name'])} ({worst_pos['unrealized_pl_pct']:.1f}%)" if worst_pos else "-"}
                 </div>
             </div>
             <ul class="layman-checklist">
@@ -1283,8 +1285,8 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
     deep_dive_cards = ""
     for p in positions:
         t = p["ticker"]
-        name = p["name"]
-        biz = p.get("business_summary", "")
+        name = escape(p["name"])
+        biz = escape(p.get("business_summary") or "")
         avg = p["avg_cost"]
         c = p["close"]
         loss_pct = p["unrealized_pl_pct"]
@@ -1352,21 +1354,8 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         ]) if timeline else "<div class='text-muted small'>ไม่มีกำหนดการตัวเร่งราคาเฉพาะในระยะสั้น</div>"
 
         # News Headlines & Catalysts
-        bull_items = "".join([
-            f"<li><strong class='source-tag'>[{b['source']}]</strong> " +
-            (f"<a href='{b['link']}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{b['title']} ↗</a>" if b.get('link') else b['title']) +
-            (f" <span class='text-muted small'>({b['published']})</span>" if b.get('published') else "") +
-            "</li>"
-            for b in cat.get("bullish", [])
-        ]) if cat.get("bullish") else "<li><span class='text-muted'>ไม่มีข่าวเชิงบวกเด่นชัดในสัปดาห์นี้.</span></li>"
-
-        bear_items = "".join([
-            f"<li><strong class='source-tag'>[{b['source']}]</strong> " +
-            (f"<a href='{b['link']}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{b['title']} ↗</a>" if b.get('link') else b['title']) +
-            (f" <span class='text-muted small'>({b['published']})</span>" if b.get('published') else "") +
-            "</li>"
-            for b in cat.get("bearish", [])
-        ]) if cat.get("bearish") else "<li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li>"
+        bull_items = _news_items_html(cat.get("bullish", []), "ไม่มีข่าวเชิงบวกเด่นชัดในสัปดาห์นี้.")
+        bear_items = _news_items_html(cat.get("bearish", []), "ไม่มีข่าวร้ายรุนแรงในระยะสั้น.")
 
         # Wall Street Consensus Targets
         t_low = p.get("price_target_low")
@@ -1391,7 +1380,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="{onclick_js}" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span>
                     <strong style="font-size: 1.25rem;">{name}</strong>
-                    <span class="badge badge-neutral" style="font-size: 0.8rem;">{p.get('sector', '')} • {p.get('industry', '')}</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">{escape(p.get('sector') or '')} • {escape(p.get('industry') or '')}</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">{quality_badge}</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">

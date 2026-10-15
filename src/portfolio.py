@@ -1110,9 +1110,10 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
                 f"- ราคาเฉลี่ยที่สถาบันให้: **${p['price_target_average']:,.2f}** "
                 f"(โอกาสทำกำไร Upside: **{p['target_upside_pct']:+.1f}%** จากราคาตลาด ${p['close_price']:,.2f})."
             )
-            lines.append(
-                f"- กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน: **${p['price_target_low']:,.2f} - ${p['price_target_high']:,.2f}**."
-            )
+            if p.get('price_target_low') is not None and p.get('price_target_high') is not None:
+                lines.append(
+                    f"- กรอบราคาต่ำสุด ถึง สูงสุดที่สถาบันประเมิน: **${p['price_target_low']:,.2f} - ${p['price_target_high']:,.2f}**."
+                )
             lines.append(
                 f"- มตินักวิเคราะห์จากสถาบัน: **{b_cnt} สถาบันแนะนำซื้อ**, **{h_cnt} สถาบันแนะนำถือ**, **{s_cnt} สถาบันแนะนำขาย**."
             )

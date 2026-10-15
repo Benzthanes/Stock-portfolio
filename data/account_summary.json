@@ -3,7 +3,7 @@
   "broker": "Dime! (KKP Securities)",
   "account_no": "2081682995",
   "fx_rate": 33.62,
-  "updated_at": "2026-10-15 01:23:39",
+  "updated_at": "2026-10-15 09:43:37",
   "net_injected_capital_thb": 1245000.0,
   "gross_deposits_thb": 1295000.0,
   "transfer_out_thb": 50000.0,
@@ -11,17 +11,17 @@
   "dime_usd_cash": 140.96,
   "dime_usd_cash_thb": 4739.08,
   "total_cash_thb": 4739.09,
-  "stock_market_val_usd": 44281.91140884633,
-  "stock_market_val_thb": 1488757.8615654132,
+  "stock_market_val_usd": 44152.779131939,
+  "stock_market_val_thb": 1484416.434415789,
   "stock_cost_usd": 39215.06,
   "stock_cost_thb": 1318410.56,
-  "stock_unrealized_pl_usd": 5066.851408846334,
-  "stock_unrealized_pl_thb": 170347.30156541313,
-  "stock_unrealized_pl_pct": 12.920677435776803,
-  "total_net_worth_thb": 1493496.95,
-  "total_net_worth_usd": 44422.87,
-  "all_time_profit_thb": 248496.95,
-  "all_time_roi_pct": 19.96,
+  "stock_unrealized_pl_usd": 4937.719131939004,
+  "stock_unrealized_pl_thb": 166005.87441578903,
+  "stock_unrealized_pl_pct": 12.591384870860848,
+  "total_net_worth_thb": 1489155.52,
+  "total_net_worth_usd": 44293.74,
+  "all_time_profit_thb": 244155.52,
+  "all_time_roi_pct": 19.61,
   "trades_summary": {
     "total_trades": 7,
     "winning_trades": 7,
@@ -628,58 +628,59 @@
       "avg_cost_thb": 34329.640874,
       "total_cost_usd": 28231.34,
       "cost_thb": 949137.8,
-      "close_price": 1214.69,
-      "change_pct": 4.130268921826651,
-      "current_val_usd": 33583.461359939,
-      "current_val_thb": 1129075.970921149,
-      "unrealized_pl_usd": 5352.121359938999,
-      "unrealized_pl_thb": 179938.32012114915,
-      "unrealized_pl_pct": 18.958084738234174,
-      "daily_diff_usd": 1332.069226157997,
-      "daily_diff_thb": 44784.16738343186,
-      "rsi": 61.54,
-      "rsi_weekly": 58.97,
+      "close_price": 1208.74,
+      "change_pct": 3.620200426914473,
+      "current_val_usd": 33418.957169494,
+      "current_val_thb": 1123545.3400383883,
+      "unrealized_pl_usd": 5187.617169494002,
+      "unrealized_pl_thb": 174407.68923838835,
+      "unrealized_pl_pct": 18.375384128043525,
+      "daily_diff_usd": 1167.5650357129998,
+      "daily_diff_thb": 39253.53650067105,
+      "rsi": 60.41,
+      "rsi_weekly": 58.49,
       "stoch_k": 76.7,
       "stoch_d": 72.67,
-      "mfi": 50.9,
-      "sma200": 1078.19,
-      "ema200": 1082.64,
-      "dist_sma200_pct": 12.66,
-      "dist_ema200_pct": 12.2,
+      "mfi": 53.4,
+      "sma200": 1078.16,
+      "ema200": 1082.58,
+      "dist_sma200_pct": 12.11,
+      "dist_ema200_pct": 11.65,
       "in_value_zone": false,
-      "score": 4.5,
+      "score": 5.0,
       "tier": "⭐⭐⭐ Strong Dip Buy",
       "signal_tags": [
         "Above SMA200",
         "Weekly Bullish (RSI≥45)",
         "RSI Hook Up ⤴",
         "MACD Hist Tick 📈",
+        "High Vol (1.4x)",
         "Rev Growth +50% 🚀",
         "Attractive PEG 0.4 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 14.7,
+      "days_to_earnings": 14.3,
       "earnings_date": "29 Oct 2026",
       "is_earnings_near": false,
-      "key_support": 1132.81,
+      "key_support": 1133.96,
       "support_desc": "ขอบล่าง Bollinger Band",
       "key_resistance": 1364.39,
       "resistance_desc": "ราคาเป้าหมายเฉลี่ยสถาบัน",
-      "stop_loss": 1163.05,
-      "take_profit": 1311.87,
+      "stop_loss": 1157.1,
+      "take_profit": 1305.44,
       "rr_ratio": 1.9,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NYSE:LLY",
       "rev_growth_yoy": 49.58,
       "net_inc_growth_yoy": 93.55,
       "peg": 0.42,
-      "pe": 41.28,
-      "rec_mark": 1.25,
+      "pe": 41.07,
+      "rec_mark": 1.24,
       "fcf": 18190100000,
       "price_target_average": 1364.39,
       "price_target_high": 1680,
       "price_target_low": 930,
-      "target_upside_pct": 12.3,
-      "rec_buy": 24,
+      "target_upside_pct": 12.9,
+      "rec_buy": 25,
       "rec_hold": 3,
       "rec_sell": 1,
       "sector": "Health Technology",
@@ -688,10 +689,18 @@
         "ticker": "LLY",
         "bullish": [
           {
+            "title": "Lilly, Merck, AbbVie Stocks Surge. Why Healthcare Is Rallying Today.",
+            "source": "Barron's",
+            "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQanl3UmdlVjVnVTd2dVk3T1VwXzVoMHlBMGVtQnlEejh4dVBfQ1ZJR3FkcWE3eVIzalZkNGwtTkxSOHM5TUI2dlBkaTF5aUR4ODhaOFFnamFRdkpfNnpIWGgteDdaRHNqdlhDM0VOaHlzdlg4SmhEdVc5LTZna2VsQkp3VDRHdFZaRWc?oc=5",
+            "published": "5h ago",
+            "raw_date": "Wed, 14 Oct 2026 20:49:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
             "title": "What Is Eli Lilly Stock’s Biggest Opportunity?",
             "source": "Trefis",
             "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNdlZ6UHowOXBmYlhmUlRWSEhLX21Hc0dDcWNXSWtDbEJXZExkdWhJcDBndy05Sl95MWJUVlp5WWFwUmpVeFB0M2ZOTTg1YXdjUGNKNFZjYWl0eHJYQ2VxR29qemtpLXJTNnpCbEw3cHhtMHBoVVQzX0k5VFB0RGp3Q1NKNEQ0cXlhVk1hLTZlV3FlYnoxVm9JXzhmNzg5UThMTVlTaXZpTQ?oc=5",
-            "published": "22h ago",
+            "published": "1d ago",
             "raw_date": "Tue, 13 Oct 2026 19:24:01 GMT",
             "sentiment": "bullish"
           }
@@ -699,28 +708,52 @@
         "bearish": [],
         "neutral": [
           {
+            "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
+            "published": "5h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "Why is Eli Lilly stock rallying today?",
             "source": "Investing.com",
             "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
-            "published": "2h ago",
+            "published": "11h ago",
             "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
+            "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
+            "published": "5h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "Why is Eli Lilly stock rallying today?",
             "source": "Investing.com",
             "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
-            "published": "2h ago",
+            "published": "11h ago",
             "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
             "sentiment": "neutral"
+          },
+          {
+            "title": "Lilly, Merck, AbbVie Stocks Surge. Why Healthcare Is Rallying Today.",
+            "source": "Barron's",
+            "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQanl3UmdlVjVnVTd2dVk3T1VwXzVoMHlBMGVtQnlEejh4dVBfQ1ZJR3FkcWE3eVIzalZkNGwtTkxSOHM5TUI2dlBkaTF5aUR4ODhaOFFnamFRdkpfNnpIWGgteDdaRHNqdlhDM0VOaHlzdlg4SmhEdVc5LTZna2VsQkp3VDRHdFZaRWc?oc=5",
+            "published": "5h ago",
+            "raw_date": "Wed, 14 Oct 2026 20:49:00 GMT",
+            "sentiment": "bullish"
           },
           {
             "title": "What Is Eli Lilly Stock’s Biggest Opportunity?",
             "source": "Trefis",
             "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNdlZ6UHowOXBmYlhmUlRWSEhLX21Hc0dDcWNXSWtDbEJXZExkdWhJcDBndy05Sl95MWJUVlp5WWFwUmpVeFB0M2ZOTTg1YXdjUGNKNFZjYWl0eHJYQ2VxR29qemtpLXJTNnpCbEw3cHhtMHBoVVQzX0k5VFB0RGp3Q1NKNEQ0cXlhVk1hLTZlV3FlYnoxVm9JXzhmNzg5UThMTVlTaXZpTQ?oc=5",
-            "published": "22h ago",
+            "published": "1d ago",
             "raw_date": "Tue, 13 Oct 2026 19:24:01 GMT",
             "sentiment": "bullish"
           }
@@ -728,33 +761,33 @@
       },
       "news": [
         {
-          "title": "Why is Eli Lilly stock rallying today?",
-          "source": "Investing.com",
-          "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
-          "published": "2h ago",
-          "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
+          "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
+          "source": "Yahoo Finance",
+          "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
+          "published": "5h ago",
+          "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
           "sentiment": "neutral"
         },
         {
-          "title": "What Is Eli Lilly Stock’s Biggest Opportunity?",
-          "source": "Trefis",
-          "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNdlZ6UHowOXBmYlhmUlRWSEhLX21Hc0dDcWNXSWtDbEJXZExkdWhJcDBndy05Sl95MWJUVlp5WWFwUmpVeFB0M2ZOTTg1YXdjUGNKNFZjYWl0eHJYQ2VxR29qemtpLXJTNnpCbEw3cHhtMHBoVVQzX0k5VFB0RGp3Q1NKNEQ0cXlhVk1hLTZlV3FlYnoxVm9JXzhmNzg5UThMTVlTaXZpTQ?oc=5",
-          "published": "22h ago",
-          "raw_date": "Tue, 13 Oct 2026 19:24:01 GMT",
-          "sentiment": "bullish"
+          "title": "Why is Eli Lilly stock rallying today?",
+          "source": "Investing.com",
+          "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
+          "published": "11h ago",
+          "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
+          "sentiment": "neutral"
         }
       ],
-      "weight_pct": 75.84013492522801,
+      "weight_pct": 75.68936276837799,
       "alerts": [
-        "🚨 Extreme Concentration (75.8%)"
+        "🚨 Extreme Concentration (75.7%)"
       ],
       "rating": {
         "stars_count": 4,
         "stars_str": "⭐⭐⭐⭐",
         "grade": "เกรด A (สุขภาพดี แข็งแกร่ง)",
-        "summary": "สถานะ กำไร +19.0%, กราฟ ยืนเหนือเส้น 200 วัน +12.7%.",
-        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+12.7%), โมเมนตัมขาขึ้นแข็งแกร่ง (RSI 61.5), กำไรเติบโตเด่น YoY +93.5%, ฉันทามติตลาด Strong Buy",
-        "risk": "สัดส่วนกระจุกตัวสูง (75.8%)",
+        "summary": "สถานะ กำไร +18.4%, กราฟ ยืนเหนือเส้น 200 วัน +12.1%.",
+        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+12.1%), โมเมนตัมขาขึ้นแข็งแกร่ง (RSI 60.4), กำไรเติบโตเด่น YoY +93.5%, ฉันทามติตลาด Strong Buy",
+        "risk": "สัดส่วนกระจุกตัวสูง (75.7%)",
         "action": "สถานะแข็งแกร่ง ถือต่อตามแผนเทรดได้อย่างมั่นใจ."
       },
       "financial_health": {
@@ -770,7 +803,7 @@
         "quality_badge": "🟡 Market Leader",
         "future_growth_drivers": [
           "การขยายตัวของรายได้ระดับ +49.6% YoY และความสามารถในการทำกำไรสุทธิ +93.5% YoY",
-          "อัตราการประเมินมูลค่า P/E 41.3x และค่า PEG 0.42 เท่า สะท้อนระดับราคาต่อการเติบโต",
+          "อัตราการประเมินมูลค่า P/E 41.1x และค่า PEG 0.42 เท่า สะท้อนระดับราคาต่อการเติบโต",
           "ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Pharmaceuticals: Major",
           "การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ"
         ],
@@ -781,7 +814,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (14.7 วัน)",
+            "period": "ปฏิทินงบ (14.3 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -793,7 +826,7 @@
             "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"
           }
         ],
-        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $1364.39 (Upside +12.3%)",
+        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $1364.39 (Upside +12.9%)",
         "tailored_roadmap": "ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
         "invalidation_risk": "การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%"
       }
@@ -809,24 +842,24 @@
       "avg_cost_thb": 11488.498644,
       "total_cost_usd": 3823.7,
       "cost_thb": 128552.88,
-      "close_price": 347.77,
-      "change_pct": -1.698795861835036,
-      "current_val_usd": 3891.443081864,
-      "current_val_thb": 130830.31641226767,
-      "unrealized_pl_usd": 67.74308186400003,
-      "unrealized_pl_thb": 2277.522412267681,
-      "unrealized_pl_pct": 1.771663097627953,
-      "daily_diff_usd": -67.25011623199998,
-      "daily_diff_thb": -2260.948907719839,
-      "rsi": 51.37,
-      "rsi_weekly": 52.09,
-      "stoch_k": 82.27,
-      "stoch_d": 89.78,
-      "mfi": 72.5,
+      "close_price": 347.64,
+      "change_pct": -1.7355418621742287,
+      "current_val_usd": 3889.988420448,
+      "current_val_thb": 130781.41069546175,
+      "unrealized_pl_usd": 66.28842044800012,
+      "unrealized_pl_thb": 2228.616695461764,
+      "unrealized_pl_pct": 1.7336198040641297,
+      "daily_diff_usd": -68.70477764799989,
+      "daily_diff_thb": -2309.854624525756,
+      "rsi": 51.24,
+      "rsi_weekly": 52.04,
+      "stoch_k": 81.93,
+      "stoch_d": 89.66,
+      "mfi": 69.7,
       "sma200": 340.59,
       "ema200": 330.69,
-      "dist_sma200_pct": 2.11,
-      "dist_ema200_pct": 5.17,
+      "dist_sma200_pct": 2.07,
+      "dist_ema200_pct": 5.13,
       "in_value_zone": true,
       "score": 4.5,
       "tier": "⭐⭐⭐ Strong Dip Buy",
@@ -839,27 +872,27 @@
         "Attractive PEG 0.2 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 12.7,
+      "days_to_earnings": 12.4,
       "earnings_date": "27 Oct 2026",
       "is_earnings_near": true,
       "key_support": 340.59,
       "support_desc": "เส้น 200 วัน (SMA 200)",
-      "key_resistance": 356.47,
+      "key_resistance": 356.46,
       "resistance_desc": "ขอบบน Bollinger Band",
-      "stop_loss": 335.16,
-      "take_profit": 375.59,
+      "stop_loss": 334.92,
+      "take_profit": 375.45,
       "rr_ratio": 2.2,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NASDAQ:GOOGL",
       "rev_growth_yoy": 20.23,
       "net_inc_growth_yoy": 111.3,
       "peg": 0.16,
-      "pe": 17.47,
+      "pe": 17.46,
       "rec_mark": 1.12,
       "fcf": 53273000000,
       "price_target_average": 427.56,
       "price_target_high": 515,
       "price_target_low": 340,
-      "target_upside_pct": 22.9,
+      "target_upside_pct": 23.0,
       "rec_buy": 60,
       "rec_hold": 6,
       "rec_sell": 0,
@@ -868,6 +901,30 @@
       "catalysts": {
         "ticker": "GOOGL",
         "bullish": [
+          {
+            "title": "Prediction: Alphabet Stock Is Going to Soar After Oct. 28",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaFlsSXh3Z2NyZnQ4LWgxckpldGMxR05EaVNHYVJ5OXV0cXoxa0RGdGxqam9PSkt2QW1fVTU4eVgxOVpfV2tBQXpnelAwQlBsT2EtWnZYcDR2OHhaMnMxSXpfUDh5OVJMdUZ1YjRJTDFWY1NXSXNQRW92ekdLaVRvcnFPTW14TkhqQVd6d1hqVmRweExNR2xZ?oc=5",
+            "published": "14h ago",
+            "raw_date": "Wed, 14 Oct 2026 12:09:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Warren Buffett Bought This Magnificent Artificial Intelligence (AI) Stock a Year Ago. Here's Why It's Still a Buy Today.",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQdlpRZ2kyazdNYi1HNzVmMWRabFlRVUNHb28yOEphakthbjdmdXctZjRVVG40TEZuN2lOMUgtRUdCY0pfeGhKVjAxNjIyQWZTbWZnOUdGd2p2OWhQUVdWQ3R3QUlnTXF4OThxdmU5S3JMQ3MwTDFYRkt4c2hnRVdaTkVPVkpBNDhMeF9ZNWk4UFlHSTFMRDd1MnU3N0pYcTFjMkV6SEZEcjEtRkk0?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 18:20:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Alphabet’s Gemini Success: Fueling Growth And Investor Returns (NASDAQ:GOOGL)",
+            "source": "Seeking Alpha",
+            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQTkJYSDhiY3dwaFlBOFc1VG9NTXRVUXNuNkQwWGllQi1vbzZRaTNJN0RORDB6UkNCZXlhcDZUVWJ6Y1h0T09wd0dibnhuQWVTTHBmOGNNc2VPc0M1UmpxT0xsdkhTelZibnZtTXlBbkEybTlVSDFqYzhDdGtYeGJvTU5KaUg4UlJOVzZ6VUpYRUlBdlE1Q3BCTGk4ZnozcHgyZFE?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 21:43:14 GMT",
+            "sentiment": "bullish"
+          },
           {
             "title": "Buy these stocks as plays on Google’s big spending, analyst says",
             "source": "MarketWatch",
@@ -878,24 +935,31 @@
           }
         ],
         "bearish": [],
-        "neutral": [
-          {
-            "title": "$10,000 Invested Equally in Alphabet and Nvidia Could Be Worth This Much by 2030",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPZ1gxMzZrenN5NnFsUFl5alJkSHJjM05MQUl1TTNwcDNwVzRzV2xDRV9WVkxJQ0Zsckt5YTlwdmVTRTNOTTE0dkx6bkFjQTV4X2JoeXp0YXEyU2I4aTN2bjk5LVRicF9DdUFETUhSVHhGVU5GdVZDMHlfc053V0FvbFV0Rm9YVjR1WGhxX3JOS2hHeWphYURz?oc=5",
-            "published": "1d ago",
-            "raw_date": "Mon, 12 Oct 2026 22:30:00 GMT",
-            "sentiment": "neutral"
-          }
-        ],
+        "neutral": [],
         "all": [
           {
-            "title": "$10,000 Invested Equally in Alphabet and Nvidia Could Be Worth This Much by 2030",
+            "title": "Prediction: Alphabet Stock Is Going to Soar After Oct. 28",
             "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPZ1gxMzZrenN5NnFsUFl5alJkSHJjM05MQUl1TTNwcDNwVzRzV2xDRV9WVkxJQ0Zsckt5YTlwdmVTRTNOTTE0dkx6bkFjQTV4X2JoeXp0YXEyU2I4aTN2bjk5LVRicF9DdUFETUhSVHhGVU5GdVZDMHlfc053V0FvbFV0Rm9YVjR1WGhxX3JOS2hHeWphYURz?oc=5",
-            "published": "1d ago",
-            "raw_date": "Mon, 12 Oct 2026 22:30:00 GMT",
-            "sentiment": "neutral"
+            "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaFlsSXh3Z2NyZnQ4LWgxckpldGMxR05EaVNHYVJ5OXV0cXoxa0RGdGxqam9PSkt2QW1fVTU4eVgxOVpfV2tBQXpnelAwQlBsT2EtWnZYcDR2OHhaMnMxSXpfUDh5OVJMdUZ1YjRJTDFWY1NXSXNQRW92ekdLaVRvcnFPTW14TkhqQVd6d1hqVmRweExNR2xZ?oc=5",
+            "published": "14h ago",
+            "raw_date": "Wed, 14 Oct 2026 12:09:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Warren Buffett Bought This Magnificent Artificial Intelligence (AI) Stock a Year Ago. Here's Why It's Still a Buy Today.",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQdlpRZ2kyazdNYi1HNzVmMWRabFlRVUNHb28yOEphakthbjdmdXctZjRVVG40TEZuN2lOMUgtRUdCY0pfeGhKVjAxNjIyQWZTbWZnOUdGd2p2OWhQUVdWQ3R3QUlnTXF4OThxdmU5S3JMQ3MwTDFYRkt4c2hnRVdaTkVPVkpBNDhMeF9ZNWk4UFlHSTFMRDd1MnU3N0pYcTFjMkV6SEZEcjEtRkk0?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 18:20:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Alphabet’s Gemini Success: Fueling Growth And Investor Returns (NASDAQ:GOOGL)",
+            "source": "Seeking Alpha",
+            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQTkJYSDhiY3dwaFlBOFc1VG9NTXRVUXNuNkQwWGllQi1vbzZRaTNJN0RORDB6UkNCZXlhcDZUVWJ6Y1h0T09wd0dibnhuQWVTTHBmOGNNc2VPc0M1UmpxT0xsdkhTelZibnZtTXlBbkEybTlVSDFqYzhDdGtYeGJvTU5KaUg4UlJOVzZ6VUpYRUlBdlE1Q3BCTGk4ZnozcHgyZFE?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 21:43:14 GMT",
+            "sentiment": "bullish"
           },
           {
             "title": "Buy these stocks as plays on Google’s big spending, analyst says",
@@ -909,33 +973,33 @@
       },
       "news": [
         {
-          "title": "$10,000 Invested Equally in Alphabet and Nvidia Could Be Worth This Much by 2030",
+          "title": "Prediction: Alphabet Stock Is Going to Soar After Oct. 28",
           "source": "The Motley Fool",
-          "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPZ1gxMzZrenN5NnFsUFl5alJkSHJjM05MQUl1TTNwcDNwVzRzV2xDRV9WVkxJQ0Zsckt5YTlwdmVTRTNOTTE0dkx6bkFjQTV4X2JoeXp0YXEyU2I4aTN2bjk5LVRicF9DdUFETUhSVHhGVU5GdVZDMHlfc053V0FvbFV0Rm9YVjR1WGhxX3JOS2hHeWphYURz?oc=5",
-          "published": "1d ago",
-          "raw_date": "Mon, 12 Oct 2026 22:30:00 GMT",
-          "sentiment": "neutral"
+          "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaFlsSXh3Z2NyZnQ4LWgxckpldGMxR05EaVNHYVJ5OXV0cXoxa0RGdGxqam9PSkt2QW1fVTU4eVgxOVpfV2tBQXpnelAwQlBsT2EtWnZYcDR2OHhaMnMxSXpfUDh5OVJMdUZ1YjRJTDFWY1NXSXNQRW92ekdLaVRvcnFPTW14TkhqQVd6d1hqVmRweExNR2xZ?oc=5",
+          "published": "14h ago",
+          "raw_date": "Wed, 14 Oct 2026 12:09:00 GMT",
+          "sentiment": "bullish"
         },
         {
-          "title": "Buy these stocks as plays on Google’s big spending, analyst says",
-          "source": "MarketWatch",
-          "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQN2hXMWcyeWZUMEpXVGoxNVFhOVotRFkzeEpBSloydko5aE82OHVOak5BOGIxTk10VTU0LV81cEZJV3YzVjdwTzVVeDZENlBkU0hfWDVwWDQ5ZVd4ekZydzBKLWtqZGNoNFdnTk5mWG1vZzRFSzI0M1JoLTBzX0lBSzVRek1IN05hM3gtamlGX2ZVdkxlYzl6dVVZNjY5MWdHc1h1R3h2WXU?oc=5",
+          "title": "Warren Buffett Bought This Magnificent Artificial Intelligence (AI) Stock a Year Ago. Here's Why It's Still a Buy Today.",
+          "source": "Yahoo Finance",
+          "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQdlpRZ2kyazdNYi1HNzVmMWRabFlRVUNHb28yOEphakthbjdmdXctZjRVVG40TEZuN2lOMUgtRUdCY0pfeGhKVjAxNjIyQWZTbWZnOUdGd2p2OWhQUVdWQ3R3QUlnTXF4OThxdmU5S3JMQ3MwTDFYRkt4c2hnRVdaTkVPVkpBNDhMeF9ZNWk4UFlHSTFMRDd1MnU3N0pYcTFjMkV6SEZEcjEtRkk0?oc=5",
           "published": "2d ago",
-          "raw_date": "Mon, 12 Oct 2026 16:31:00 GMT",
+          "raw_date": "Mon, 12 Oct 2026 18:20:00 GMT",
           "sentiment": "bullish"
         }
       ],
-      "weight_pct": 8.787884167724961,
+      "weight_pct": 8.810291213660165,
       "alerts": [
-        "⚠️ Earnings in 12.7d"
+        "⚠️ Earnings in 12.4d"
       ],
       "rating": {
         "stars_count": 5,
         "stars_str": "⭐⭐⭐⭐⭐",
         "grade": "เกรด A+ (ยอดเยี่ยม ปลอดภัยสูง)",
-        "summary": "สถานะ กำไร +1.8%, กราฟ ยืนเหนือเส้น 200 วัน +2.1%.",
+        "summary": "สถานะ กำไร +1.7%, กราฟ ยืนเหนือเส้น 200 วัน +2.1%.",
         "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+2.1%), อยู่ใน Institutional Value Zone 💎, กำไรเติบโตเด่น YoY +111.3%, ฉันทามติตลาด Strong Buy",
-        "risk": "วันประกาศงบใกล้เข้ามา (12.7 วัน)",
+        "risk": "วันประกาศงบใกล้เข้ามา (12.4 วัน)",
         "action": "ถือรันเทรนด์ต่อ หรือสะสมเพิ่มตามแนวรับเส้น 200 วัน."
       },
       "financial_health": {
@@ -962,7 +1026,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (12.7 วัน)",
+            "period": "ปฏิทินงบ (12.4 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -974,7 +1038,7 @@
             "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"
           }
         ],
-        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $427.56 (Upside +22.9%)",
+        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $427.56 (Upside +23.0%)",
         "tailored_roadmap": "ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
         "invalidation_risk": "การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%"
       }
@@ -990,24 +1054,24 @@
       "avg_cost_thb": 5103.16299,
       "total_cost_usd": 1491.31,
       "cost_thb": 50137.84,
-      "close_price": 165.61,
-      "change_pct": 0.01811813020896312,
-      "current_val_usd": 1627.0944518430001,
-      "current_val_thb": 54702.91547096166,
-      "unrealized_pl_usd": 135.78445184300017,
-      "unrealized_pl_thb": 4565.073270961665,
-      "unrealized_pl_pct": 9.105045352274187,
-      "daily_diff_usd": 0.29474568899991027,
-      "daily_diff_thb": 9.909350064176982,
-      "rsi": 51.5,
-      "rsi_weekly": 56.43,
-      "stoch_k": 94.29,
-      "stoch_d": 94.89,
-      "mfi": 71.4,
-      "sma200": 144.62,
-      "ema200": 149.43,
-      "dist_sma200_pct": 14.51,
-      "dist_ema200_pct": 10.83,
+      "close_price": 167.06,
+      "change_pct": 0.893827756975474,
+      "current_val_usd": 1641.340493478,
+      "current_val_thb": 55181.86739073036,
+      "unrealized_pl_usd": 150.03049347800015,
+      "unrealized_pl_thb": 5044.025190730365,
+      "unrealized_pl_pct": 10.060315660593718,
+      "daily_diff_usd": 14.54078732400012,
+      "daily_diff_thb": 488.86126983288403,
+      "rsi": 53.49,
+      "rsi_weekly": 57.31,
+      "stoch_k": 95.06,
+      "stoch_d": 95.15,
+      "mfi": 72.5,
+      "sma200": 144.63,
+      "ema200": 149.44,
+      "dist_sma200_pct": 15.51,
+      "dist_ema200_pct": 11.79,
       "in_value_zone": false,
       "score": 3.0,
       "tier": "⭐⭐ Good Setup",
@@ -1017,27 +1081,27 @@
         "RSI Hook Up ⤴",
         "MACD Hist Tick 📈"
       ],
-      "days_to_earnings": 22.1,
+      "days_to_earnings": 21.8,
       "earnings_date": "05 Nov 2026",
       "is_earnings_near": false,
-      "key_support": 151.74,
+      "key_support": 151.66,
       "support_desc": "ขอบล่าง Bollinger Band",
-      "key_resistance": 171.89,
+      "key_resistance": 171.92,
       "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 158.49,
-      "take_profit": 171.89,
-      "rr_ratio": 0.9,
+      "stop_loss": 159.94,
+      "take_profit": 171.92,
+      "rr_ratio": 0.7,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NASDAQ:ABNB",
       "rev_growth_yoy": 14.2,
       "net_inc_growth_yoy": 2.51,
       "peg": 6.12,
-      "pe": 37.64,
+      "pe": 37.97,
       "rec_mark": 1.53,
       "fcf": 4858000000,
       "price_target_average": 184.45,
       "price_target_high": 220,
       "price_target_low": 135,
-      "target_upside_pct": 11.4,
+      "target_upside_pct": 10.4,
       "rec_buy": 21,
       "rec_hold": 17,
       "rec_sell": 1,
@@ -1050,35 +1114,68 @@
             "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
-            "published": "1h ago",
+            "published": "9h ago",
             "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "ABNB Stock Soars 11% After-Hours — Airbnb Raises 2026 Outlook Again On Strong Travel Demand",
+            "source": "Stocktwits",
+            "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ19BU043SnhnVGNIQndNbDJ1WVFUVVNtd19NZFAwY1dKeFdJMndyUE4zRHhqbjdNSVJBeVhPZHBSSndhVUdlQWtKX0FvVGtKSW0xWVlPcE45ZWlqYUcya3BpeGdsZXVvdDhtY0xOR1JWNThkT0NvdjVqUkVXMzB5c2MtS005OWt3WmdOQkdhLVRCa1RVUk1PM0hmYkt1cWNwdUhzSEZ2bkdtVDJUS3V3Q2RiZTVzZGJiNk1NcQ?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 10:39:12 GMT",
             "sentiment": "bullish"
           },
           {
             "title": "How Investors Are Reacting To Airbnb (ABNB) AI Search Rollout",
             "source": "Simply Wall Street",
             "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPakI2N2Vwb055Yk5iSlR6dGhQc3hzT05ILTZkVHVsYmRxMmRlSTE3MHNmb2RwWWZlUWdaQnZ6SDFxRThFeGIyZUhpdE1sNFA3c0RGTHhPdnV0LUpLSzQ1R1pNWUw2X0NCOUlHT0RoLTcybWlTMlpBTzhSZ3NFa0RneElyNnRvelFpSTExdDZSNjZEQXEwVjlxZ2xDc3d2eHVWS2lXbHFkRFJPb0J4aTh4NGhUZFZuMzJTZ2hyajBpemtVUEFaLUVwNzQzRWxOQdIB0wFBVV95cUxQN1BVSWF6aHhCZ3dFM2RYNGdDWDJCOG9YY21jQlJERFBWVFE2VG1oZ2VYeE9zZEpGM1pNd3FOVTNpcG5tR2l4bERLa3FxbFhpbUh5N3U4bjBrVks2a1ViaEM5V2NZNlVvX0VuY2xyb083TFk2Q2FGOHhPTGNXZFFDeU1NZzJsS3QxSHFBSVYyWkRaenhva1B1eVhfaW45VFUyNEpOOHJpcEVneXFnR3QzQ2Y1VFZJNGFSZjJUWS1mM0E2MHhBdjNrYTlNQ0RwNzhNU2pJ?oc=5",
-            "published": "1h ago",
+            "published": "10h ago",
             "raw_date": "Wed, 14 Oct 2026 16:08:01 GMT",
             "sentiment": "bullish"
           }
         ],
         "bearish": [],
-        "neutral": [],
+        "neutral": [
+          {
+            "title": "Insider Selling: Airbnb (NASDAQ:ABNB) Insider Sells $2,248,925.70 in Stock",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOYXFYV1I3empkUUd6U1ptWlpPX2pyXzdpVnlUSmMyRGl3ZDI4VnllQ1Mxd2R5SGJwTzdZTW5UQ0VTQ2ZtcFJ2VWt0Q044RlFGa095Q1ZZdXpURXJhRHl3X0tkZ3cxZ0pvcWVRVlVDR0RQQUtMUjhPeGpYaWhLTDIxMGpHR1EtLWZ1cjFtal9oSEw5cS1RYmctNmJXVXNRSUxjMGdFMHE2QnRGajJ5VDY3MGlDc1F3UWVScVVnVDliaXdSWm9OVXFmTg?oc=5",
+            "published": "4h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:33:16 GMT",
+            "sentiment": "neutral"
+          }
+        ],
         "all": [
           {
             "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
-            "published": "1h ago",
+            "published": "9h ago",
             "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Insider Selling: Airbnb (NASDAQ:ABNB) Insider Sells $2,248,925.70 in Stock",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOYXFYV1I3empkUUd6U1ptWlpPX2pyXzdpVnlUSmMyRGl3ZDI4VnllQ1Mxd2R5SGJwTzdZTW5UQ0VTQ2ZtcFJ2VWt0Q044RlFGa095Q1ZZdXpURXJhRHl3X0tkZ3cxZ0pvcWVRVlVDR0RQQUtMUjhPeGpYaWhLTDIxMGpHR1EtLWZ1cjFtal9oSEw5cS1RYmctNmJXVXNRSUxjMGdFMHE2QnRGajJ5VDY3MGlDc1F3UWVScVVnVDliaXdSWm9OVXFmTg?oc=5",
+            "published": "4h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:33:16 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "ABNB Stock Soars 11% After-Hours — Airbnb Raises 2026 Outlook Again On Strong Travel Demand",
+            "source": "Stocktwits",
+            "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ19BU043SnhnVGNIQndNbDJ1WVFUVVNtd19NZFAwY1dKeFdJMndyUE4zRHhqbjdNSVJBeVhPZHBSSndhVUdlQWtKX0FvVGtKSW0xWVlPcE45ZWlqYUcya3BpeGdsZXVvdDhtY0xOR1JWNThkT0NvdjVqUkVXMzB5c2MtS005OWt3WmdOQkdhLVRCa1RVUk1PM0hmYkt1cWNwdUhzSEZ2bkdtVDJUS3V3Q2RiZTVzZGJiNk1NcQ?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 10:39:12 GMT",
             "sentiment": "bullish"
           },
           {
             "title": "How Investors Are Reacting To Airbnb (ABNB) AI Search Rollout",
             "source": "Simply Wall Street",
             "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPakI2N2Vwb055Yk5iSlR6dGhQc3hzT05ILTZkVHVsYmRxMmRlSTE3MHNmb2RwWWZlUWdaQnZ6SDFxRThFeGIyZUhpdE1sNFA3c0RGTHhPdnV0LUpLSzQ1R1pNWUw2X0NCOUlHT0RoLTcybWlTMlpBTzhSZ3NFa0RneElyNnRvelFpSTExdDZSNjZEQXEwVjlxZ2xDc3d2eHVWS2lXbHFkRFJPb0J4aTh4NGhUZFZuMzJTZ2hyajBpemtVUEFaLUVwNzQzRWxOQdIB0wFBVV95cUxQN1BVSWF6aHhCZ3dFM2RYNGdDWDJCOG9YY21jQlJERFBWVFE2VG1oZ2VYeE9zZEpGM1pNd3FOVTNpcG5tR2l4bERLa3FxbFhpbUh5N3U4bjBrVks2a1ViaEM5V2NZNlVvX0VuY2xyb083TFk2Q2FGOHhPTGNXZFFDeU1NZzJsS3QxSHFBSVYyWkRaenhva1B1eVhfaW45VFUyNEpOOHJpcEVneXFnR3QzQ2Y1VFZJNGFSZjJUWS1mM0E2MHhBdjNrYTlNQ0RwNzhNU2pJ?oc=5",
-            "published": "1h ago",
+            "published": "10h ago",
             "raw_date": "Wed, 14 Oct 2026 16:08:01 GMT",
             "sentiment": "bullish"
           }
@@ -1089,27 +1186,27 @@
           "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
           "source": "Yahoo Finance",
           "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
-          "published": "1h ago",
+          "published": "9h ago",
           "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
           "sentiment": "bullish"
         },
         {
-          "title": "How Investors Are Reacting To Airbnb (ABNB) AI Search Rollout",
-          "source": "Simply Wall Street",
-          "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPakI2N2Vwb055Yk5iSlR6dGhQc3hzT05ILTZkVHVsYmRxMmRlSTE3MHNmb2RwWWZlUWdaQnZ6SDFxRThFeGIyZUhpdE1sNFA3c0RGTHhPdnV0LUpLSzQ1R1pNWUw2X0NCOUlHT0RoLTcybWlTMlpBTzhSZ3NFa0RneElyNnRvelFpSTExdDZSNjZEQXEwVjlxZ2xDc3d2eHVWS2lXbHFkRFJPb0J4aTh4NGhUZFZuMzJTZ2hyajBpemtVUEFaLUVwNzQzRWxOQdIB0wFBVV95cUxQN1BVSWF6aHhCZ3dFM2RYNGdDWDJCOG9YY21jQlJERFBWVFE2VG1oZ2VYeE9zZEpGM1pNd3FOVTNpcG5tR2l4bERLa3FxbFhpbUh5N3U4bjBrVks2a1ViaEM5V2NZNlVvX0VuY2xyb083TFk2Q2FGOHhPTGNXZFFDeU1NZzJsS3QxSHFBSVYyWkRaenhva1B1eVhfaW45VFUyNEpOOHJpcEVneXFnR3QzQ2Y1VFZJNGFSZjJUWS1mM0E2MHhBdjNrYTlNQ0RwNzhNU2pJ?oc=5",
-          "published": "1h ago",
-          "raw_date": "Wed, 14 Oct 2026 16:08:01 GMT",
-          "sentiment": "bullish"
+          "title": "Insider Selling: Airbnb (NASDAQ:ABNB) Insider Sells $2,248,925.70 in Stock",
+          "source": "MarketBeat",
+          "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOYXFYV1I3empkUUd6U1ptWlpPX2pyXzdpVnlUSmMyRGl3ZDI4VnllQ1Mxd2R5SGJwTzdZTW5UQ0VTQ2ZtcFJ2VWt0Q044RlFGa095Q1ZZdXpURXJhRHl3X0tkZ3cxZ0pvcWVRVlVDR0RQQUtMUjhPeGpYaWhLTDIxMGpHR1EtLWZ1cjFtal9oSEw5cS1RYmctNmJXVXNRSUxjMGdFMHE2QnRGajJ5VDY3MGlDc1F3UWVScVVnVDliaXdSWm9OVXFmTg?oc=5",
+          "published": "4h ago",
+          "raw_date": "Wed, 14 Oct 2026 21:33:16 GMT",
+          "sentiment": "neutral"
         }
       ],
-      "weight_pct": 3.6743997719979866,
+      "weight_pct": 3.717411510096079,
       "alerts": [],
       "rating": {
         "stars_count": 4,
         "stars_str": "⭐⭐⭐⭐",
         "grade": "เกรด A (สุขภาพดี แข็งแกร่ง)",
-        "summary": "สถานะ กำไร +9.1%, กราฟ ยืนเหนือเส้น 200 วัน +14.5%.",
-        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+14.5%)",
+        "summary": "สถานะ กำไร +10.1%, กราฟ ยืนเหนือเส้น 200 วัน +15.5%.",
+        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+15.5%)",
         "risk": "ไม่มีสัญญาณความเสี่ยงผิดปกติ.",
         "action": "สถานะแข็งแกร่ง ถือต่อตามแผนเทรดได้อย่างมั่นใจ."
       },
@@ -1126,7 +1223,7 @@
         "quality_badge": "🟡 Market Leader",
         "future_growth_drivers": [
           "การขยายตัวของรายได้ระดับ +14.2% YoY และความสามารถในการทำกำไรสุทธิ +2.5% YoY",
-          "อัตราการประเมินมูลค่า P/E 37.6x และค่า PEG 6.12 เท่า สะท้อนระดับราคาต่อการเติบโต",
+          "อัตราการประเมินมูลค่า P/E 38.0x และค่า PEG 6.12 เท่า สะท้อนระดับราคาต่อการเติบโต",
           "ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Hotels/Resorts/Cruise lines",
           "การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ"
         ],
@@ -1137,7 +1234,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (22.1 วัน)",
+            "period": "ปฏิทินงบ (21.8 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -1149,7 +1246,7 @@
             "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"
           }
         ],
-        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $184.45 (Upside +11.4%)",
+        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $184.45 (Upside +10.4%)",
         "tailored_roadmap": "ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
         "invalidation_risk": "การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%"
       }
@@ -1165,58 +1262,58 @@
       "avg_cost_thb": 1825.9795259999999,
       "total_cost_usd": 1486.59,
       "cost_thb": 49979.16,
-      "close_price": 50.765,
-      "change_pct": -5.921052631578948,
-      "current_val_usd": 1389.4951250895,
-      "current_val_thb": 46714.82610550899,
-      "unrealized_pl_usd": -97.09487491049981,
-      "unrealized_pl_thb": -3264.3296944910035,
-      "unrealized_pl_pct": -6.531382217726462,
-      "daily_diff_usd": -87.45074213850012,
-      "daily_diff_thb": -2940.0939506963737,
-      "rsi": 21.2,
-      "rsi_weekly": 35.68,
-      "stoch_k": 58.68,
-      "stoch_d": 75.57,
-      "mfi": 32.7,
+      "close_price": 51.39,
+      "change_pct": -4.762787249814679,
+      "current_val_usd": 1406.6020777770002,
+      "current_val_thb": 47289.96185486274,
+      "unrealized_pl_usd": -79.98792222299971,
+      "unrealized_pl_thb": -2689.19394513725,
+      "unrealized_pl_pct": -5.380630989243821,
+      "daily_diff_usd": -70.34378945100002,
+      "daily_diff_thb": -2364.9582013426207,
+      "rsi": 22.64,
+      "rsi_weekly": 36.7,
+      "stoch_k": 60.55,
+      "stoch_d": 76.19,
+      "mfi": 30.7,
       "sma200": 55.23,
       "ema200": 55.72,
-      "dist_sma200_pct": -8.09,
-      "dist_ema200_pct": -8.89,
+      "dist_sma200_pct": -6.96,
+      "dist_ema200_pct": -7.78,
       "in_value_zone": false,
       "score": 1.0,
       "tier": "⭐ Watchlist",
       "signal_tags": [
         "Deep Oversold (RSI≤30)",
         "Touch BB Lower Band",
-        "High R:R (4.3x) 🎯",
-        "High Vol (2.1x)",
+        "High R:R (4.1x) 🎯",
+        "High Vol (2.9x)",
         "⚠️ Neg Rev Growth",
-        "Attractive PEG 0.5 💎",
+        "Attractive PEG 0.9 💎",
         "Wall St Strong Buy 🌟",
         "⚠️ High ADX Falling Knife"
       ],
-      "days_to_earnings": 92.7,
+      "days_to_earnings": 92.4,
       "earnings_date": "15 Jan 2027",
       "is_earnings_near": false,
-      "key_support": 48.76,
-      "support_desc": "แนวรับความผันผวน 1.5 ATR",
-      "key_resistance": 59.51,
+      "key_support": 55.23,
+      "support_desc": "เส้น 200 วัน (SMA 200)",
+      "key_resistance": 59.52,
       "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 48.76,
-      "take_profit": 59.51,
-      "rr_ratio": 4.3,
+      "stop_loss": 49.39,
+      "take_profit": 59.52,
+      "rr_ratio": 4.1,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NYSE:BAC",
-      "rev_growth_yoy": -1.71,
-      "net_inc_growth_yoy": 20.31,
-      "peg": 0.46,
-      "pe": 11.68,
+      "rev_growth_yoy": -1.02,
+      "net_inc_growth_yoy": 8.74,
+      "peg": 0.9,
+      "pe": 12.25,
       "rec_mark": 1.27,
-      "fcf": 82168000000,
-      "price_target_average": 66.13,
+      "fcf": null,
+      "price_target_average": 65.3,
       "price_target_high": 75,
-      "price_target_low": 57,
-      "target_upside_pct": 30.3,
+      "price_target_low": 56,
+      "target_upside_pct": 27.1,
       "rec_buy": 19,
       "rec_hold": 6,
       "rec_sell": 0,
@@ -1224,85 +1321,118 @@
       "industry": "Major Banks",
       "catalysts": {
         "ticker": "BAC",
-        "bullish": [],
+        "bullish": [
+          {
+            "title": "Is Bank of America's Stock a Buy Ahead of Its Q3 Earnings Report on Oct. 14?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOTkxJR1FJVUtiSVVoUmJpZzVxRkFPUlhFQ011M3hCY1NYY3ZPTUZ1SlNVSWdRU0VjNmp4eWlTYjJOMEZobGZUMUNOSUU5dE53TlBVQjU3T0x5ZS04QUZKWndFYnRoSHBWb2pEbEV2d2NSNU1aWUgwbmlDclBEa1lhZ1NHeV9feVFSVWZHOGNIeG9RZ1ZKeHN6eXpXcmplcUhwdmJJeC1mSXVvcG1wS0p4dmtBTGlMd0lD?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 21:30:00 GMT",
+            "sentiment": "bullish"
+          }
+        ],
         "bearish": [
           {
-            "title": "Bank of America shares drop 8% after third-quarter revenue miss and regulatory penalty",
+            "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
             "source": "CNBC",
             "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
-            "published": "7h ago",
+            "published": "16h ago",
             "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
+            "sentiment": "bearish"
+          },
+          {
+            "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+            "published": "13h ago",
+            "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
             "sentiment": "bearish"
           }
         ],
         "neutral": [
           {
-            "title": "Bank of America stock on track for worst day since 2025 as $1.2 billion fine weighs on Q3 earnings",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOU1B5TE41RnQ5X3NmTVYyMGNnUTZQaWUzS014bl9CdzY5Q2RVRkZjVnZwSnNqdTA0NEx5eFE3NlZPd3c5MEhpdC16eDNjWmVLQVhFTHhsRV9QYkxvVElKaDBoX2FwOUVQakpOZEVRRndXNmI5VElmWlFjR2JhQ181S215NTdpeFFPRmxhZVVFRUxja3BneFYyVHdZVi1KcWFBc0JEREc0SE5TUkUzV3d5a2JoYW5mNVBrTG16VzlPSjBhOWpKY1NZQVRRaUNqS1ExMk1fTTdRSDNjLWxfdW05b3pKdElOWUNF?oc=5",
-            "published": "4h ago",
-            "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
+            "title": "The black sheep of bank earnings: Why BofA stock is having its worst day in 18 months",
+            "source": "Business Insider",
+            "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOdk5xcDFadEgyOG1wNzVhNzlfOHJ1c3BLNmdUclR6MDRvTlZRT09YVW5BTHpRc3M0N3VEdDBxcF9CcFZ5aGphMWU4dU1md3duWFVkZGtyNGpoMHdkNlFpVl9CY3BiWURPbWpiMXV3T0pIcFJmQ3lGQ0xWYU1uV0N3UElnMGpXR2tSS0ZiMFkzd0FSZw?oc=5",
+            "published": "6h ago",
+            "raw_date": "Wed, 14 Oct 2026 20:16:00 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
-            "title": "Bank of America stock on track for worst day since 2025 as $1.2 billion fine weighs on Q3 earnings",
+            "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
+            "source": "CNBC",
+            "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
+            "published": "16h ago",
+            "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
+            "sentiment": "bearish"
+          },
+          {
+            "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
             "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOU1B5TE41RnQ5X3NmTVYyMGNnUTZQaWUzS014bl9CdzY5Q2RVRkZjVnZwSnNqdTA0NEx5eFE3NlZPd3c5MEhpdC16eDNjWmVLQVhFTHhsRV9QYkxvVElKaDBoX2FwOUVQakpOZEVRRndXNmI5VElmWlFjR2JhQ181S215NTdpeFFPRmxhZVVFRUxja3BneFYyVHdZVi1KcWFBc0JEREc0SE5TUkUzV3d5a2JoYW5mNVBrTG16VzlPSjBhOWpKY1NZQVRRaUNqS1ExMk1fTTdRSDNjLWxfdW05b3pKdElOWUNF?oc=5",
-            "published": "4h ago",
+            "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+            "published": "13h ago",
             "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
+            "sentiment": "bearish"
+          },
+          {
+            "title": "The black sheep of bank earnings: Why BofA stock is having its worst day in 18 months",
+            "source": "Business Insider",
+            "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOdk5xcDFadEgyOG1wNzVhNzlfOHJ1c3BLNmdUclR6MDRvTlZRT09YVW5BTHpRc3M0N3VEdDBxcF9CcFZ5aGphMWU4dU1md3duWFVkZGtyNGpoMHdkNlFpVl9CY3BiWURPbWpiMXV3T0pIcFJmQ3lGQ0xWYU1uV0N3UElnMGpXR2tSS0ZiMFkzd0FSZw?oc=5",
+            "published": "6h ago",
+            "raw_date": "Wed, 14 Oct 2026 20:16:00 GMT",
             "sentiment": "neutral"
           },
           {
-            "title": "Bank of America shares drop 8% after third-quarter revenue miss and regulatory penalty",
-            "source": "CNBC",
-            "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
-            "published": "7h ago",
-            "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
-            "sentiment": "bearish"
+            "title": "Is Bank of America's Stock a Buy Ahead of Its Q3 Earnings Report on Oct. 14?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOTkxJR1FJVUtiSVVoUmJpZzVxRkFPUlhFQ011M3hCY1NYY3ZPTUZ1SlNVSWdRU0VjNmp4eWlTYjJOMEZobGZUMUNOSUU5dE53TlBVQjU3T0x5ZS04QUZKWndFYnRoSHBWb2pEbEV2d2NSNU1aWUgwbmlDclBEa1lhZ1NHeV9feVFSVWZHOGNIeG9RZ1ZKeHN6eXpXcmplcUhwdmJJeC1mSXVvcG1wS0p4dmtBTGlMd0lD?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 21:30:00 GMT",
+            "sentiment": "bullish"
           }
         ]
       },
       "news": [
         {
-          "title": "Bank of America stock on track for worst day since 2025 as $1.2 billion fine weighs on Q3 earnings",
-          "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOU1B5TE41RnQ5X3NmTVYyMGNnUTZQaWUzS014bl9CdzY5Q2RVRkZjVnZwSnNqdTA0NEx5eFE3NlZPd3c5MEhpdC16eDNjWmVLQVhFTHhsRV9QYkxvVElKaDBoX2FwOUVQakpOZEVRRndXNmI5VElmWlFjR2JhQ181S215NTdpeFFPRmxhZVVFRUxja3BneFYyVHdZVi1KcWFBc0JEREc0SE5TUkUzV3d5a2JoYW5mNVBrTG16VzlPSjBhOWpKY1NZQVRRaUNqS1ExMk1fTTdRSDNjLWxfdW05b3pKdElOWUNF?oc=5",
-          "published": "4h ago",
-          "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
-          "sentiment": "neutral"
-        },
-        {
-          "title": "Bank of America shares drop 8% after third-quarter revenue miss and regulatory penalty",
+          "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
           "source": "CNBC",
           "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
-          "published": "7h ago",
+          "published": "16h ago",
           "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
+          "sentiment": "bearish"
+        },
+        {
+          "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
+          "source": "Yahoo Finance",
+          "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+          "published": "13h ago",
+          "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
           "sentiment": "bearish"
         }
       ],
-      "weight_pct": 3.137839087975584,
+      "weight_pct": 3.1857611353834345,
       "alerts": [],
       "rating": {
-        "stars_count": 4,
-        "stars_str": "⭐⭐⭐⭐",
-        "grade": "เกรด A (สุขภาพดี แข็งแกร่ง)",
-        "summary": "สถานะ ขาดทุน -6.5%, กราฟ ยืนเหนือเส้น 200 วัน -8.1%.",
-        "strength": "RSI Oversold (21.2) ลุ้นเด้งรีบาวด์, กำไรเติบโตเด่น YoY +20.3%, ฉันทามติตลาด Strong Buy",
-        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-8.1%)",
-        "action": "สถานะแข็งแกร่ง ถือต่อตามแผนเทรดได้อย่างมั่นใจ."
+        "stars_count": 3,
+        "stars_str": "⭐⭐⭐",
+        "grade": "เกรด B (ปานกลาง / พักฐาน)",
+        "summary": "สถานะ ขาดทุน -5.4%, กราฟ ยืนเหนือเส้น 200 วัน -7.0%.",
+        "strength": "RSI Oversold (22.6) ลุ้นเด้งรีบาวด์, ฉันทามติตลาด Strong Buy",
+        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-7.0%)",
+        "action": "ติดตามแนวรับสำคัญและรอสัญญาณเบรกแนวต้าน."
       },
       "financial_health": {
         "health_grade": "เกรด B (ปานกลาง 🟡)",
         "health_badge": "🟡 ปานกลาง",
-        "peg_verdict": "ถูกมาก (0.46 💎)",
-        "fcf_str": "$82.2B",
+        "peg_verdict": "คุ้มค่ามาก (0.90 💎)",
+        "fcf_str": "-",
         "summary": "งบการเงินผ่านเกณฑ์ แต่การเติบโตเริ่มทรงตัว หรือราคาเทรดด้วย Valuation ค่อนข้างตึงตัว.",
-        "score": 3
+        "score": 2
       },
       "forward_outlook": {
-        "thesis_title": "สถาบันการเงินยักษ์ใหญ่รับประโยชน์ดอกเบี้ยขาลง — จังหวะย่อตัวรุนแรงในโซน Oversold (RSI 19)",
+        "thesis_title": "สถาบันการเงินยักษ์ใหญ่รับประโยชน์ดอกเบี้ยขาลง จังหวะย่อตัวรุนแรงในโซน Oversold (RSI 23)",
         "quality_badge": "🟢 Resilient Major Bank (Value Deep Dip)",
         "future_growth_drivers": [
           "วัฏจักรดอกเบี้ยขาลงของธนาคารกลางสหรัฐฯ (Fed Rate Cuts): ช่วยลดต้นทุนดอกเบี้ยจ่ายเงินฝาก (Deposit Beta) ทำให้ส่วนต่างดอกเบี้ยรับสุทธิ (NII) แตะจุดต่ำสุดและเริ่มฟื้นตัว",
@@ -1313,12 +1443,12 @@
         "drawdown_root_cause": [
           "ผลการดำเนินงาน Q3 รายได้และกำไรสุทธิปรับลดลงชั่วคราวจากการชะลอตัวของรายได้ค่าธรรมเนียม Fixed Income Trading และดีล M&A",
           "ประเด็นค่าปรับด้านการกำกับดูแล (Regulatory Penalty) ส่งผลให้นักลงทุนเทขายฉับพลันจนราคาดิ่งหลุดกรอบ",
-          "ดัชนี RSI รายวันดิ่งลงสู่ระดับ 19.36 ซึ่งเป็นโซน Extreme Oversold (ขายมากเกินไปอย่างผิดปกติในเชิงสถิติ)"
+          "ดัชนี RSI รายวันอยู่ที่ระดับ 22.64 ซึ่งเป็นโซน Extreme Oversold (ขายมากเกินไปอย่างผิดปกติในเชิงสถิติ)"
         ],
         "catalyst_timeline": [
           {
             "period": "ระยะประชิด (0-14 วัน)",
-            "event": "แรงซื้อดักเด้งทางเทคนิค (Mean Reversion) จากโซน RSI 19 เพื่อกลับไปทดสอบเส้น SMA 20 ที่ $54.95"
+            "event": "แรงซื้อดักเด้งทางเทคนิค (Mean Reversion) เพื่อกลับไปทดสอบเส้น SMA 20 ที่ $55.03"
           },
           {
             "period": "ระยะ 1-3 เดือน",
@@ -1329,9 +1459,9 @@
             "event": "การกลับมาของกิจกรรมซื้อหุ้นคืน (Share Repurchase Program) หลังเงินกองทุน Tier 1 แข็งแกร่งเกินเกณฑ์"
           }
         ],
-        "wall_street_verdict": "สถาบัน 25 แห่งไม่มีคำแนะนำ 'Sell' เลยแม้แต่รายเดียว! เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ $57.00 (สูงกว่าต้นทุนของคุณ $54.31 แล้ว!) เป้าหมายเฉลี่ย $66.13 (Upside +30.3%)",
-        "tailored_roadmap": "ผ่านพ้นวันประกาศงบเรียบร้อยแล้ว ไม่มีความเสี่ยงเรื่องงบตกใจในอีก 92 วันข้างหน้า. เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับ $48.12",
-        "invalidation_risk": "หากราคาปิดหลุดแนวรับ Stop-Loss $48.12 และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง"
+        "wall_street_verdict": "สถาบัน 25 แห่งไม่มีคำแนะนำ 'Sell' เลยแม้แต่รายเดียว! เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ $56.00 (สูงกว่าต้นทุนของคุณ $54.31 แล้ว!) เป้าหมายเฉลี่ย $65.30 (Upside +27.1%)",
+        "tailored_roadmap": "วันงบถัดไปอยู่ห่างอีก 92 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ",
+        "invalidation_risk": "หากราคาปิดหลุดแนวรับ Stop-Loss และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง"
       }
     },
     {
@@ -1358,7 +1488,7 @@
       "rsi_weekly": 43.43,
       "stoch_k": 0.0,
       "stoch_d": 7.29,
-      "mfi": 43.4,
+      "mfi": 42.0,
       "sma200": 10.16,
       "ema200": 9.93,
       "dist_sma200_pct": -7.52,
@@ -1369,14 +1499,14 @@
       "signal_tags": [
         "Touch BB Lower Band"
       ],
-      "days_to_earnings": 7.4,
+      "days_to_earnings": 7.1,
       "earnings_date": "22 Oct 2026",
       "is_earnings_near": true,
-      "key_support": 8.68,
+      "key_support": 8.67,
       "support_desc": "แนวรับความผันผวน 1.5 ATR",
       "key_resistance": 10.24,
       "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 8.68,
+      "stop_loss": 8.67,
       "take_profit": 10.24,
       "rr_ratio": 1.2,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NYSE:NOK",
@@ -1397,7 +1527,24 @@
       "industry": "Telecommunications Equipment",
       "catalysts": {
         "ticker": "NOK",
-        "bullish": [],
+        "bullish": [
+          {
+            "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQUlhqZVlYbzJWRGwtTndlMWNGRnJqekx3Mi0xQ3Ezc2piTG1tLW1RUGk0RC14Y0hibmNFNGdBeWNLNl9qM2U5dzY1aFZSVEFxVHJlMG1vaU1RaWFoQVpSUy1oMTFiZ1dfOXRfVjJ2ZHNkanV1MEU5VTZDSnQ2aWFHZkRmTTM3WmNQVGZZOTBkQ2pyQQ?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 13:20:52 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
+            "source": "24/7 Wall St.",
+            "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQNjZwaVoxeXlJcW93ZlowUmdWTUdDcWF4N1ZURmk2NmRnUmtEUHhxQkdkaHFXSkRkRUZMRUhVVTkzVnBWZmFEWHZGUEVvMHNha2R1T09QLWg1eU9jVUllTmhCc1RKRjBlRk1GU2hPUWVkb0U1OWhLeFNmWW96RTgxMnFwZDZZSldrUUZDUG0xVHZrZWtuYnR1LVZ3WmY0aTBvcThIZE1JU0tMVFlsaGE1SllEYw?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 13:20:00 GMT",
+            "sentiment": "bullish"
+          }
+        ],
         "bearish": [],
         "neutral": [
           {
@@ -1409,11 +1556,11 @@
             "sentiment": "neutral"
           },
           {
-            "title": "NOK Gears Up to Report Q3 Earnings: Buy, Sell or Hold the Stock?",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPbGk1dENEOGhDZE91VEJHNTdiYnAwY2dDVloyMndhTVBqWVo5NG1tdWUwakJhSm1SNmliS0UyUkFZajVUMk5vWXVxQVNQMlliZlVOQ3JLSW1PTGJ1SDduZEZ3V2tMMy05dUZBOWNuUjNRYlFKcEVqTlRQQ2tSakx0eGZGZzJrVF83VWZRc1BjNl9ZYkwzRUgxWg?oc=5",
-            "published": "2d ago",
-            "raw_date": "Mon, 12 Oct 2026 14:58:00 GMT",
+            "title": "Nokia to sell Enterprise Campus Edge business to AURELIUS",
+            "source": "Nokia",
+            "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxObllsMWRyM1Q0MTBMcjZnNjU3TmxFVmZ4dmdESFk5d2lUVFJRd2FZM2JDTXpBZ040X1dKVGdvV0JGbG1xempyZlFzVEJEZE9oRktnOGZBUkJIRFhIRmRxQ28zRUc1bmdvSTNLelVsQmZPNElpbFMySTZGN3NNX3ljNlBMeFppUnc1MzNDVlNuOXNtdE0?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 05:00:33 GMT",
             "sentiment": "mixed"
           }
         ],
@@ -1427,12 +1574,28 @@
             "sentiment": "neutral"
           },
           {
-            "title": "NOK Gears Up to Report Q3 Earnings: Buy, Sell or Hold the Stock?",
+            "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
             "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPbGk1dENEOGhDZE91VEJHNTdiYnAwY2dDVloyMndhTVBqWVo5NG1tdWUwakJhSm1SNmliS0UyUkFZajVUMk5vWXVxQVNQMlliZlVOQ3JLSW1PTGJ1SDduZEZ3V2tMMy05dUZBOWNuUjNRYlFKcEVqTlRQQ2tSakx0eGZGZzJrVF83VWZRc1BjNl9ZYkwzRUgxWg?oc=5",
-            "published": "2d ago",
-            "raw_date": "Mon, 12 Oct 2026 14:58:00 GMT",
+            "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQUlhqZVlYbzJWRGwtTndlMWNGRnJqekx3Mi0xQ3Ezc2piTG1tLW1RUGk0RC14Y0hibmNFNGdBeWNLNl9qM2U5dzY1aFZSVEFxVHJlMG1vaU1RaWFoQVpSUy1oMTFiZ1dfOXRfVjJ2ZHNkanV1MEU5VTZDSnQ2aWFHZkRmTTM3WmNQVGZZOTBkQ2pyQQ?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 13:20:52 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Nokia to sell Enterprise Campus Edge business to AURELIUS",
+            "source": "Nokia",
+            "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxObllsMWRyM1Q0MTBMcjZnNjU3TmxFVmZ4dmdESFk5d2lUVFJRd2FZM2JDTXpBZ040X1dKVGdvV0JGbG1xempyZlFzVEJEZE9oRktnOGZBUkJIRFhIRmRxQ28zRUc1bmdvSTNLelVsQmZPNElpbFMySTZGN3NNX3ljNlBMeFppUnc1MzNDVlNuOXNtdE0?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 05:00:33 GMT",
             "sentiment": "mixed"
+          },
+          {
+            "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
+            "source": "24/7 Wall St.",
+            "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQNjZwaVoxeXlJcW93ZlowUmdWTUdDcWF4N1ZURmk2NmRnUmtEUHhxQkdkaHFXSkRkRUZMRUhVVTkzVnBWZmFEWHZGUEVvMHNha2R1T09QLWg1eU9jVUllTmhCc1RKRjBlRk1GU2hPUWVkb0U1OWhLeFNmWW96RTgxMnFwZDZZSldrUUZDUG0xVHZrZWtuYnR1LVZ3WmY0aTBvcThIZE1JU0tMVFlsaGE1SllEYw?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 13:20:00 GMT",
+            "sentiment": "bullish"
           }
         ]
       },
@@ -1446,18 +1609,18 @@
           "sentiment": "neutral"
         },
         {
-          "title": "NOK Gears Up to Report Q3 Earnings: Buy, Sell or Hold the Stock?",
+          "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
           "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPbGk1dENEOGhDZE91VEJHNTdiYnAwY2dDVloyMndhTVBqWVo5NG1tdWUwakJhSm1SNmliS0UyUkFZajVUMk5vWXVxQVNQMlliZlVOQ3JLSW1PTGJ1SDduZEZ3V2tMMy05dUZBOWNuUjNRYlFKcEVqTlRQQ2tSakx0eGZGZzJrVF83VWZRc1BjNl9ZYkwzRUgxWg?oc=5",
-          "published": "2d ago",
-          "raw_date": "Mon, 12 Oct 2026 14:58:00 GMT",
-          "sentiment": "mixed"
+          "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQUlhqZVlYbzJWRGwtTndlMWNGRnJqekx3Mi0xQ3Ezc2piTG1tLW1RUGk0RC14Y0hibmNFNGdBeWNLNl9qM2U5dzY1aFZSVEFxVHJlMG1vaU1RaWFoQVpSUy1oMTFiZ1dfOXRfVjJ2ZHNkanV1MEU5VTZDSnQ2aWFHZkRmTTM3WmNQVGZZOTBkQ2pyQQ?oc=5",
+          "published": "1d ago",
+          "raw_date": "Tue, 13 Oct 2026 13:20:52 GMT",
+          "sentiment": "bullish"
         }
       ],
-      "weight_pct": 2.923750364536783,
+      "weight_pct": 2.9323013674204987,
       "alerts": [
         "🔻 Drawdown (-20.4%)",
-        "⚠️ Earnings in 7.4d"
+        "⚠️ Earnings in 7.1d"
       ],
       "rating": {
         "stars_count": 2,
@@ -1465,7 +1628,7 @@
         "grade": "เกรด C (เฝ้าระวัง / เสี่ยงสูง)",
         "summary": "สถานะ ขาดทุน -20.4%, กราฟ ยืนเหนือเส้น 200 วัน -7.5%.",
         "strength": "ราคาทรงตัวในกรอบสะสมพลัง.",
-        "risk": "ขาดทุนสะสม (-20.4%), ราคาหลุดต่ำกว่าเส้น 200 วัน (-7.5%), วันประกาศงบใกล้เข้ามา (7.4 วัน), กำไรสุทธิหดตัว YoY -23.0%",
+        "risk": "ขาดทุนสะสม (-20.4%), ราคาหลุดต่ำกว่าเส้น 200 วัน (-7.5%), วันประกาศงบใกล้เข้ามา (7.1 วัน), กำไรสุทธิหดตัว YoY -23.0%",
         "action": "ระมัดระวังการซื้อถัวเฉลี่ย รอแท่งเทียนสร้างฐานชัดเจน."
       },
       "financial_health": {
@@ -1488,11 +1651,11 @@
         "drawdown_root_cause": [
           "ผู้ให้บริการเครือข่ายโทรคมนาคมรายใหญ่ในสหรัฐฯ (AT&T, Verizon) ชะลอการลงทุนขยายเสาสัญญาณ 5G ชั่วคราวหลังจากลงทุนหนักไปในช่วง 2-3 ปีก่อนหน้า",
           "การเสียสัญญา Open RAN ให้แก่ Ericsson ปลายปี 2023 ยังคงเป็นแรงกดดันทางจิตวิทยาต่อรายได้กลุ่ม Mobile Networks ในระยะสั้น",
-          "ราคาหุ้นแกว่งตัวในกรอบแคบรอผลประกอบการไตรมาส 3 สัปดาห์นี้ เพื่อประเมินอัตรากำไรขั้นต้นและการฟื้นตัวของคำสั่งซื้อ"
+          "ราคาหุ้นแกว่งตัวในกรอบแคบรอผลประกอบการไตรมาสถัดไป เพื่อประเมินอัตรากำไรขั้นต้นและการฟื้นตัวของคำสั่งซื้อ"
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะประชิด (7.6 วัน / 22 ต.ค. 69)",
+            "period": "ระยะประชิด (7.1 วัน)",
             "event": "ประกาศผลประกอบการไตรมาส 3: ตัวชี้ขาด Gross Margin และคำสั่งซื้อ Network Infrastructure"
           },
           {
@@ -1505,8 +1668,8 @@
           }
         ],
         "wall_street_verdict": "สถาบัน 27 แห่งให้เป้าหมายเฉลี่ย $13.18 (Upside +40.2%) โดยเป้าหมายต่ำสุดอยู่ที่ $7.39 และสูงสุดที่ $20.41",
-        "tailored_roadmap": "กำไรสุทธิ YoY ยังหดตัว -23.0% และมีวันงบออกในอีก 7.6 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap Down เปิดกระโดดลงได้. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.17) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่เป้าหมายทุน $11.81",
-        "invalidation_risk": "หากงบ Q3 ชะลอตัวลงเกินคาดและราคาหลุดจุดตัดขาดทุน $8.90 (หลุดแนวรับโครงสร้างหลัก) ต้องพิจารณา Cut Loss เพื่อปกป้องเงินต้นส่วนใหญ่"
+        "tailored_roadmap": "กำไรสุทธิ YoY -23.0%. มีวันงบออกในอีก 7.1 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.16) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $11.81",
+        "invalidation_risk": "หากงบ Q3 ชะลอตัวลงเกินคาดและราคาหลุดจุดตัดขาดทุน (หลุดแนวรับโครงสร้างหลัก) ต้องพิจารณา Cut Loss เพื่อปกป้องเงินต้นส่วนใหญ่"
       }
     },
     {
@@ -1520,24 +1683,24 @@
       "avg_cost_thb": 9592.502106,
       "total_cost_usd": 849.43,
       "cost_thb": 28557.84,
-      "close_price": 263.06,
-      "change_pct": -3.3862200675774834,
-      "current_val_usd": 783.15579447,
-      "current_val_thb": 26329.6978100814,
-      "unrealized_pl_usd": -66.2742055299999,
-      "unrealized_pl_thb": -2228.1387899185966,
-      "unrealized_pl_pct": -7.802197418268711,
-      "daily_diff_usd": -27.448857389999944,
-      "daily_diff_thb": -922.830585451798,
-      "rsi": 30.9,
-      "rsi_weekly": 33.19,
-      "stoch_k": 29.02,
-      "stoch_d": 32.25,
-      "mfi": 27.7,
+      "close_price": 262.19,
+      "change_pct": -3.705744086969288,
+      "current_val_usd": 780.565717905,
+      "current_val_thb": 26242.6194359661,
+      "unrealized_pl_usd": -68.86428209499991,
+      "unrealized_pl_thb": -2315.2171640338966,
+      "unrealized_pl_pct": -8.10711678360782,
+      "daily_diff_usd": -30.038933954999948,
+      "daily_diff_thb": -1009.9089595670981,
+      "rsi": 30.62,
+      "rsi_weekly": 33.11,
+      "stoch_k": 28.36,
+      "stoch_d": 32.03,
+      "mfi": 26.8,
       "sma200": 438.97,
-      "ema200": 411.65,
-      "dist_sma200_pct": -40.07,
-      "dist_ema200_pct": -36.1,
+      "ema200": 411.64,
+      "dist_sma200_pct": -40.27,
+      "dist_ema200_pct": -36.31,
       "in_value_zone": false,
       "score": 2.8,
       "tier": "⭐ Watchlist",
@@ -1549,27 +1712,27 @@
         "Attractive PEG 0.2 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 21.1,
+      "days_to_earnings": 20.8,
       "earnings_date": "04 Nov 2026",
       "is_earnings_near": false,
-      "key_support": 252.59,
+      "key_support": 252.42,
       "support_desc": "ขอบล่าง Bollinger Band",
-      "key_resistance": 309.86,
+      "key_resistance": 309.84,
       "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 242.73,
-      "take_profit": 309.86,
+      "stop_loss": 241.68,
+      "take_profit": 309.84,
       "rr_ratio": 2.3,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NASDAQ:APP",
       "rev_growth_yoy": 28.52,
       "net_inc_growth_yoy": 89.86,
       "peg": 0.22,
-      "pe": 20.22,
+      "pe": 20.15,
       "rec_mark": 1.23,
       "fcf": 4527589000,
       "price_target_average": 481.28,
       "price_target_high": 790,
       "price_target_low": 325,
-      "target_upside_pct": 83.0,
+      "target_upside_pct": 83.6,
       "rec_buy": 28,
       "rec_hold": 7,
       "rec_sell": 0,
@@ -1582,13 +1745,30 @@
             "title": "AppLovin (APP) vs. U and TTD: Can AXON’s AI Advantage Outpace Execution Risks?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZnlXTEViaGVUV2MxcXZyUmRmTUpHRmNQbUZxZ3AxajMxVzBvVDAzQkhrVk5vSFdrTVJOa1pkT25leDNQRXIyRkZLLXF1bzlPRGVVRE91R3A0ekpobGJ5SHhDMDdqaXVKQTBaeGhfXzRoZlROalgtek9DUmNkR3IyTE5RaWxRaTk0dHFHaU5MVQ?oc=5",
-            "published": "1h ago",
+            "published": "9h ago",
             "raw_date": "Wed, 14 Oct 2026 16:42:58 GMT",
             "sentiment": "bullish"
           }
         ],
-        "bearish": [],
+        "bearish": [
+          {
+            "title": "AppLovin Corporation (APP) Class Action Lawsuit Seeks Recovery for Investors; November 16, 2026, Deadline - Contact Kessler Topaz Meltzer & Check, LLP",
+            "source": "Morningstar",
+            "link": "https://news.google.com/rss/articles/CBMiqAJBVV95cUxQS1NjUnJvZDJDSDljRkttN1MzT0xqYjU3Z1U3TVdYemR2Y2ZCbnpCMW1xMUZYT0hfbVkyTlhUZTc3U0p4U1RTZ3RBNFBjMF9iX1RQNmp3Sjk2QnhKakdiak8tZFctVDQtYTNhMmN5aUlwcUtidG1ld1JtYnhjckUzbjFmb0x5NXFncy1FRy1mYnhLVmVWR3k3TUpNRzhBaVZEYlJWY0EzVVpvc3hEM2o5bWZlM2R1VnBwN3JSeTVtNTQyYjFyLVFkdXN6TGRYaUltYzd1T0VyN21MeGtnZV9YaVp4YkIyS3RwNkVxRUxvREFaVzZhMmJJQ1htbFUyT0U1RWx4NkJVVUZfSmV3bFQyRHdpdmdzYjN2aEJKNi1OVWV0X240dlh6ZQ?oc=5",
+            "published": "3h ago",
+            "raw_date": "Wed, 14 Oct 2026 22:44:00 GMT",
+            "sentiment": "bearish"
+          }
+        ],
         "neutral": [
+          {
+            "title": "What Does AppLovin Offer That Omnicom Does Not?",
+            "source": "Trefis",
+            "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQSHJmVXRtOE96Q3RTWnVnTGNlVm1rUVZ1cWE1RFNIQm1HSXZOMG5fbDQxRUtVVmx1U0JhMTRlSjNJano4SnA1V3E0VkdsOFRhQXFCdEN5STlhQTBLYmdUMXZOLTJPZjg4SDdPQk9ZaVpQVEI3RmFvcTJOdFdiSGJNUmhtWjhJVDFjUHZycXdLTXpNWVBrc1AydTBKYk9LYlRwbDVKRENUZFM4QQ?oc=5",
+            "published": "3h ago",
+            "raw_date": "Wed, 14 Oct 2026 23:10:41 GMT",
+            "sentiment": "neutral"
+          },
           {
             "title": "AppLovin Corporation",
             "source": "Simply Wall Street",
@@ -1600,10 +1780,18 @@
         ],
         "all": [
           {
+            "title": "What Does AppLovin Offer That Omnicom Does Not?",
+            "source": "Trefis",
+            "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQSHJmVXRtOE96Q3RTWnVnTGNlVm1rUVZ1cWE1RFNIQm1HSXZOMG5fbDQxRUtVVmx1U0JhMTRlSjNJano4SnA1V3E0VkdsOFRhQXFCdEN5STlhQTBLYmdUMXZOLTJPZjg4SDdPQk9ZaVpQVEI3RmFvcTJOdFdiSGJNUmhtWjhJVDFjUHZycXdLTXpNWVBrc1AydTBKYk9LYlRwbDVKRENUZFM4QQ?oc=5",
+            "published": "3h ago",
+            "raw_date": "Wed, 14 Oct 2026 23:10:41 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "AppLovin (APP) vs. U and TTD: Can AXON’s AI Advantage Outpace Execution Risks?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZnlXTEViaGVUV2MxcXZyUmRmTUpHRmNQbUZxZ3AxajMxVzBvVDAzQkhrVk5vSFdrTVJOa1pkT25leDNQRXIyRkZLLXF1bzlPRGVVRE91R3A0ekpobGJ5SHhDMDdqaXVKQTBaeGhfXzRoZlROalgtek9DUmNkR3IyTE5RaWxRaTk0dHFHaU5MVQ?oc=5",
-            "published": "1h ago",
+            "published": "9h ago",
             "raw_date": "Wed, 14 Oct 2026 16:42:58 GMT",
             "sentiment": "bullish"
           },
@@ -1614,36 +1802,44 @@
             "published": "2d ago",
             "raw_date": "Mon, 12 Oct 2026 07:00:00 GMT",
             "sentiment": "neutral"
+          },
+          {
+            "title": "AppLovin Corporation (APP) Class Action Lawsuit Seeks Recovery for Investors; November 16, 2026, Deadline - Contact Kessler Topaz Meltzer & Check, LLP",
+            "source": "Morningstar",
+            "link": "https://news.google.com/rss/articles/CBMiqAJBVV95cUxQS1NjUnJvZDJDSDljRkttN1MzT0xqYjU3Z1U3TVdYemR2Y2ZCbnpCMW1xMUZYT0hfbVkyTlhUZTc3U0p4U1RTZ3RBNFBjMF9iX1RQNmp3Sjk2QnhKakdiak8tZFctVDQtYTNhMmN5aUlwcUtidG1ld1JtYnhjckUzbjFmb0x5NXFncy1FRy1mYnhLVmVWR3k3TUpNRzhBaVZEYlJWY0EzVVpvc3hEM2o5bWZlM2R1VnBwN3JSeTVtNTQyYjFyLVFkdXN6TGRYaUltYzd1T0VyN21MeGtnZV9YaVp4YkIyS3RwNkVxRUxvREFaVzZhMmJJQ1htbFUyT0U1RWx4NkJVVUZfSmV3bFQyRHdpdmdzYjN2aEJKNi1OVWV0X240dlh6ZQ?oc=5",
+            "published": "3h ago",
+            "raw_date": "Wed, 14 Oct 2026 22:44:00 GMT",
+            "sentiment": "bearish"
           }
         ]
       },
       "news": [
         {
+          "title": "What Does AppLovin Offer That Omnicom Does Not?",
+          "source": "Trefis",
+          "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQSHJmVXRtOE96Q3RTWnVnTGNlVm1rUVZ1cWE1RFNIQm1HSXZOMG5fbDQxRUtVVmx1U0JhMTRlSjNJano4SnA1V3E0VkdsOFRhQXFCdEN5STlhQTBLYmdUMXZOLTJPZjg4SDdPQk9ZaVpQVEI3RmFvcTJOdFdiSGJNUmhtWjhJVDFjUHZycXdLTXpNWVBrc1AydTBKYk9LYlRwbDVKRENUZFM4QQ?oc=5",
+          "published": "3h ago",
+          "raw_date": "Wed, 14 Oct 2026 23:10:41 GMT",
+          "sentiment": "neutral"
+        },
+        {
           "title": "AppLovin (APP) vs. U and TTD: Can AXON’s AI Advantage Outpace Execution Risks?",
           "source": "Yahoo Finance",
           "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZnlXTEViaGVUV2MxcXZyUmRmTUpHRmNQbUZxZ3AxajMxVzBvVDAzQkhrVk5vSFdrTVJOa1pkT25leDNQRXIyRkZLLXF1bzlPRGVVRE91R3A0ekpobGJ5SHhDMDdqaXVKQTBaeGhfXzRoZlROalgtek9DUmNkR3IyTE5RaWxRaTk0dHFHaU5MVQ?oc=5",
-          "published": "1h ago",
+          "published": "9h ago",
           "raw_date": "Wed, 14 Oct 2026 16:42:58 GMT",
           "sentiment": "bullish"
-        },
-        {
-          "title": "AppLovin Corporation",
-          "source": "Simply Wall Street",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9vVnJhV25ESUJkWDY0cXpTanZpRFdBSU9INUs5amJYLVRYQ1BCWFdpbUhoY09kWElMZGhCNUZXNnpMVV9oUU9LaHFSRzVWalVFQmQ2cHV4UzVWbTFsdWI3ZFl3Q3Iyd0dL?oc=5",
-          "published": "2d ago",
-          "raw_date": "Mon, 12 Oct 2026 07:00:00 GMT",
-          "sentiment": "neutral"
         }
       ],
-      "weight_pct": 1.768568179542373,
+      "weight_pct": 1.7678744877473829,
       "alerts": [],
       "rating": {
         "stars_count": 3,
         "stars_str": "⭐⭐⭐",
         "grade": "เกรด B (ปานกลาง / พักฐาน)",
-        "summary": "สถานะ ขาดทุน -7.8%, กราฟ ยืนเหนือเส้น 200 วัน -40.1%.",
-        "strength": "RSI Oversold (30.9) ลุ้นเด้งรีบาวด์, กำไรเติบโตเด่น YoY +89.9%, ฉันทามติตลาด Strong Buy",
-        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-40.1%)",
+        "summary": "สถานะ ขาดทุน -8.1%, กราฟ ยืนเหนือเส้น 200 วัน -40.3%.",
+        "strength": "RSI Oversold (30.6) ลุ้นเด้งรีบาวด์, กำไรเติบโตเด่น YoY +89.9%, ฉันทามติตลาด Strong Buy",
+        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-40.3%)",
         "action": "ติดตามแนวรับสำคัญและรอสัญญาณเบรกแนวต้าน."
       },
       "financial_health": {
@@ -1665,12 +1861,12 @@
         ],
         "drawdown_root_cause": [
           "การพักฐานรอบสั้นหลังหุ้นวิ่งขึ้นมาหลายเท่าตัวในรอบปีก่อน เกิดการหมุนเวียนเงินทุน (Tech Sector Rotation) ระยะสั้น",
-          "ราคาพักตัวลงมาทดสอบระดับต่ำสุดรอบ 52 สัปดาห์ที่ ~$265-266 ซึ่งเป็นแนวรับทางจิตวิทยาสำคัญ",
+          "ราคาพักตัวลงมาทดสอบระดับต่ำสุดรอบ 52 สัปดาห์ ซึ่งเป็นแนวรับทางจิตวิทยาสำคัญ",
           "แรงกดดันจากกระแสข่าวการแข่งขันของแพลตฟอร์มโซเชียลมีเดีย แต่พื้นฐานกำไรจริงของบริษัทยังไม่ได้รับผลกระทบ"
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะ 21 วัน (ต้น พ.ย. 69)",
+            "period": "ระยะประชิด (20.8 วัน)",
             "event": "รายงานงบการเงิน Q3: จับตาการเติบโตของรายได้จากลูกค้า Web Advertising และการเติบโตของซอฟต์แวร์ AXON 2.0"
           },
           {
@@ -1682,9 +1878,9 @@
             "event": "การขยายตลาดสู่ผู้ค้าปลีกระดับโลก (Shopify / Global Brands Integration)"
           }
         ],
-        "wall_street_verdict": "โบรกเกอร์ 28 แห่งพร้อมใจแนะนำ 'Buy' (0 Sell)! เป้าหมายเฉลี่ยสูงถึง $481.28 (Upside +83.0%) และเป้าหมายต่ำสุดยังอยู่ที่ $325.00 ซึ่งสูงกว่าต้นทุนของคุณ ($285.32) ถึง $39.68 เหรียญ!",
-        "tailored_roadmap": "หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับ $253.18 แล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่",
-        "invalidation_risk": "จุดยอมจำนนคือการหลุด $245 (เส้น Stop-Loss) หรือหากตัวเลขอัตรากำไร AXON ชะลอตัวลงต่ำกว่า 20% อย่างมีนัยสำคัญ"
+        "wall_street_verdict": "โบรกเกอร์ 28 แห่งพร้อมใจแนะนำ 'Buy' (0 Sell)! เป้าหมายเฉลี่ยสูงถึง $481.28 (Upside +83.6%) และเป้าหมายต่ำสุดยังอยู่ที่ $325.00 ซึ่งสูงกว่าต้นทุนของคุณ ($285.32) ถึง $39.68 เหรียญ!",
+        "tailored_roadmap": "วันงบถัดไปอยู่ห่างอีก 21 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับสำคัญแล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่",
+        "invalidation_risk": "จุดยอมจำนนคือการหลุดเส้น Stop-Loss หรือหากตัวเลขอัตรากำไร AXON ชะลอตัวลงต่ำกว่า 20% อย่างมีนัยสำคัญ"
       }
     },
     {
@@ -1698,24 +1894,24 @@
       "avg_cost_thb": 1443.4747,
       "total_cost_usd": 744.68,
       "cost_thb": 25036.14,
-      "close_price": 44.085,
-      "change_pct": 1.789425075040403,
-      "current_val_usd": 764.626013613,
-      "current_val_thb": 25706.72657766906,
-      "unrealized_pl_usd": 19.946013613000105,
-      "unrealized_pl_thb": 670.5849776690635,
-      "unrealized_pl_pct": 2.6784677462802957,
-      "daily_diff_usd": 13.44187729500004,
-      "daily_diff_thb": 451.91591465790134,
-      "rsi": 52.7,
-      "rsi_weekly": 50.56,
+      "close_price": 44.22,
+      "change_pct": 2.1011313784345336,
+      "current_val_usd": 766.9675019160001,
+      "current_val_thb": 25785.44741441592,
+      "unrealized_pl_usd": 22.28750191600011,
+      "unrealized_pl_thb": 749.3058144159237,
+      "unrealized_pl_pct": 2.992896534887483,
+      "daily_diff_usd": 15.783365597999932,
+      "daily_diff_thb": 530.6367514047577,
+      "rsi": 53.63,
+      "rsi_weekly": 50.98,
       "stoch_k": 93.89,
       "stoch_d": 95.84,
-      "mfi": 54.2,
+      "mfi": 56.6,
       "sma200": 42.61,
       "ema200": 42.36,
-      "dist_sma200_pct": 3.46,
-      "dist_ema200_pct": 4.08,
+      "dist_sma200_pct": 3.78,
+      "dist_ema200_pct": 4.4,
       "in_value_zone": true,
       "score": 4.5,
       "tier": "⭐⭐⭐ Strong Dip Buy",
@@ -1728,27 +1924,27 @@
         "Rev Growth +20% 🚀",
         "Attractive PEG 1.2 💎"
       ],
-      "days_to_earnings": 14.7,
+      "days_to_earnings": 14.4,
       "earnings_date": "29 Oct 2026",
       "is_earnings_near": false,
       "key_support": 42.61,
       "support_desc": "เส้น 200 วัน (SMA 200)",
       "key_resistance": 44.79,
       "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 42.68,
+      "stop_loss": 42.8,
       "take_profit": 44.79,
-      "rr_ratio": 0.5,
+      "rr_ratio": 0.4,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NASDAQ:MNST",
       "rev_growth_yoy": 20.37,
       "net_inc_growth_yoy": 35.23,
       "peg": 1.16,
-      "pe": 40.91,
+      "pe": 41.04,
       "rec_mark": 1.52,
       "fcf": 2097916000.0000002,
       "price_target_average": 50.88,
       "price_target_high": 57,
       "price_target_low": 42,
-      "target_upside_pct": 15.4,
+      "target_upside_pct": 15.1,
       "rec_buy": 14,
       "rec_hold": 13,
       "rec_sell": 0,
@@ -1758,11 +1954,11 @@
         "ticker": "MNST",
         "bullish": [
           {
-            "title": "Monster Beverage (NASDAQ:MNST) Stock Moved Up to \"Strong-Buy\" by Zacks Research",
-            "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNTHdHakxhZV82c2pEc2hUMlN0U0E0TUtKc3IzWFZFMHFLRDViTXIxUW1FdGczUEExYnpDVHR5TWt6Z0NGa3pXTmlBcUFOTEpCZ1FLdDE5Y1hUbTNKOXlJSTd4cUxCanM4OE10UXFNbVhqTU5aN2Z1YlFSdnIxb0J5bG9lcFpFb2NrdllydG5UOXYwcXJ4MkVnbVFJVV81cHZkRzRDVFpEUm4tOUJQUjZXWmFfdUlraFRVb0F4ZUlVRy1LNGwwOU5tOEdpMkpWN3BvdmNv?oc=5",
-            "published": "6h ago",
-            "raw_date": "Wed, 14 Oct 2026 11:19:53 GMT",
+            "title": "e.l.f. Beauty vs. Monster Beverage: Which Consumer Goods Stock Is a Better Buy in 2026?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQa0pCMjFMaDN5QVZRTVE1UHVrYXY4X1M1dnp2VXJTNjRYX0RUUXVnVnVYZUlwaEZJVUpJMkc1ZlhvYV9BYTBlY1dLeEVoR3BxY2FTVFZQS0Q3ZUI1czBORmY1TG9zWnA5UUFueWFuUzlScEVlRW1uNVI2eWVTcm9HaWI3cEhmMXlodnFzOVB6aU5jc19tLUo4bmpWMUV1Si1IZ0NfN29rb0cxTWU4TUE3eVhZVE53V3VHbm9ObS0wYlFsd1I1UW9FUFBWRUxDVWc?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 10:54:00 GMT",
             "sentiment": "bullish"
           }
         ],
@@ -1772,8 +1968,24 @@
             "title": "If You Invested $100 In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
             "source": "Benzinga",
             "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
-            "published": "2h ago",
+            "published": "11h ago",
             "raw_date": "Wed, 14 Oct 2026 15:15:34 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "Western Financial Corp CA Purchases 100,690 Shares of Monster Beverage Corporation $MNST",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcWQ2Z3dZT2JvcHZUN1ZJNFp6ZnFmVEJWRTVrTnJFcUpvQl9fcDJ0TmhGQWl4MGx1bWV0MUtWZEE0MHJwNFVZcHNJcFl3elJwZ0VfMklNc2pFZS1DcUYtLWtwSGtMSVhjb2NHNmN2T3RCangzSVBLWVE4N0dEMEpwLXVXdWFyVGZNTWtHRTR1NVNWeXN6ek5TQzBRWlJORGxwV1pubWJIUWxBQ3drNmhLZ010Z051MHpDV1pqRHhLc014dG1mVEJBM0ozdmJPVERjMllFS3htWGNxUlJsSVVHdg?oc=5",
+            "published": "2h ago",
+            "raw_date": "Wed, 14 Oct 2026 23:47:29 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "Monster Beverage (MNST) Stock Looks Reasonable As Cash Flow Supports The Price",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOZ2hQTlh2NkFwdnRDS3pTd1BHMDE4bjgtM18zY3I1d2tGRnVIR0JxWjNGbm1jcTNnTUZJVGdqUERITE9xSEh1RXotTGFJenRKN0NCQ3NLMWxCMXg1bHFXT1dsMHdsTTE4bXN5ZlNETi1la1BKRFMxVUFYZDVuQ3g1TmRJNTk2X19uMEszNURuZ0t6UF9Ud1FkZEMxejRfaHc?oc=5",
+            "published": "3d ago",
+            "raw_date": "Sun, 11 Oct 2026 12:13:06 GMT",
             "sentiment": "neutral"
           }
         ],
@@ -1782,17 +1994,33 @@
             "title": "If You Invested $100 In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
             "source": "Benzinga",
             "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
-            "published": "2h ago",
+            "published": "11h ago",
             "raw_date": "Wed, 14 Oct 2026 15:15:34 GMT",
             "sentiment": "neutral"
           },
           {
-            "title": "Monster Beverage (NASDAQ:MNST) Stock Moved Up to \"Strong-Buy\" by Zacks Research",
+            "title": "Western Financial Corp CA Purchases 100,690 Shares of Monster Beverage Corporation $MNST",
             "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNTHdHakxhZV82c2pEc2hUMlN0U0E0TUtKc3IzWFZFMHFLRDViTXIxUW1FdGczUEExYnpDVHR5TWt6Z0NGa3pXTmlBcUFOTEpCZ1FLdDE5Y1hUbTNKOXlJSTd4cUxCanM4OE10UXFNbVhqTU5aN2Z1YlFSdnIxb0J5bG9lcFpFb2NrdllydG5UOXYwcXJ4MkVnbVFJVV81cHZkRzRDVFpEUm4tOUJQUjZXWmFfdUlraFRVb0F4ZUlVRy1LNGwwOU5tOEdpMkpWN3BvdmNv?oc=5",
-            "published": "6h ago",
-            "raw_date": "Wed, 14 Oct 2026 11:19:53 GMT",
+            "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcWQ2Z3dZT2JvcHZUN1ZJNFp6ZnFmVEJWRTVrTnJFcUpvQl9fcDJ0TmhGQWl4MGx1bWV0MUtWZEE0MHJwNFVZcHNJcFl3elJwZ0VfMklNc2pFZS1DcUYtLWtwSGtMSVhjb2NHNmN2T3RCangzSVBLWVE4N0dEMEpwLXVXdWFyVGZNTWtHRTR1NVNWeXN6ek5TQzBRWlJORGxwV1pubWJIUWxBQ3drNmhLZ010Z051MHpDV1pqRHhLc014dG1mVEJBM0ozdmJPVERjMllFS3htWGNxUlJsSVVHdg?oc=5",
+            "published": "2h ago",
+            "raw_date": "Wed, 14 Oct 2026 23:47:29 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "e.l.f. Beauty vs. Monster Beverage: Which Consumer Goods Stock Is a Better Buy in 2026?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQa0pCMjFMaDN5QVZRTVE1UHVrYXY4X1M1dnp2VXJTNjRYX0RUUXVnVnVYZUlwaEZJVUpJMkc1ZlhvYV9BYTBlY1dLeEVoR3BxY2FTVFZQS0Q3ZUI1czBORmY1TG9zWnA5UUFueWFuUzlScEVlRW1uNVI2eWVTcm9HaWI3cEhmMXlodnFzOVB6aU5jc19tLUo4bmpWMUV1Si1IZ0NfN29rb0cxTWU4TUE3eVhZVE53V3VHbm9ObS0wYlFsd1I1UW9FUFBWRUxDVWc?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 10:54:00 GMT",
             "sentiment": "bullish"
+          },
+          {
+            "title": "Monster Beverage (MNST) Stock Looks Reasonable As Cash Flow Supports The Price",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOZ2hQTlh2NkFwdnRDS3pTd1BHMDE4bjgtM18zY3I1d2tGRnVIR0JxWjNGbm1jcTNnTUZJVGdqUERITE9xSEh1RXotTGFJenRKN0NCQ3NLMWxCMXg1bHFXT1dsMHdsTTE4bXN5ZlNETi1la1BKRFMxVUFYZDVuQ3g1TmRJNTk2X19uMEszNURuZ0t6UF9Ud1FkZEMxejRfaHc?oc=5",
+            "published": "3d ago",
+            "raw_date": "Sun, 11 Oct 2026 12:13:06 GMT",
+            "sentiment": "neutral"
           }
         ]
       },
@@ -1801,27 +2029,27 @@
           "title": "If You Invested $100 In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
           "source": "Benzinga",
           "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
-          "published": "2h ago",
+          "published": "11h ago",
           "raw_date": "Wed, 14 Oct 2026 15:15:34 GMT",
           "sentiment": "neutral"
         },
         {
-          "title": "Monster Beverage (NASDAQ:MNST) Stock Moved Up to \"Strong-Buy\" by Zacks Research",
+          "title": "Western Financial Corp CA Purchases 100,690 Shares of Monster Beverage Corporation $MNST",
           "source": "MarketBeat",
-          "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNTHdHakxhZV82c2pEc2hUMlN0U0E0TUtKc3IzWFZFMHFLRDViTXIxUW1FdGczUEExYnpDVHR5TWt6Z0NGa3pXTmlBcUFOTEpCZ1FLdDE5Y1hUbTNKOXlJSTd4cUxCanM4OE10UXFNbVhqTU5aN2Z1YlFSdnIxb0J5bG9lcFpFb2NrdllydG5UOXYwcXJ4MkVnbVFJVV81cHZkRzRDVFpEUm4tOUJQUjZXWmFfdUlraFRVb0F4ZUlVRy1LNGwwOU5tOEdpMkpWN3BvdmNv?oc=5",
-          "published": "6h ago",
-          "raw_date": "Wed, 14 Oct 2026 11:19:53 GMT",
-          "sentiment": "bullish"
+          "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcWQ2Z3dZT2JvcHZUN1ZJNFp6ZnFmVEJWRTVrTnJFcUpvQl9fcDJ0TmhGQWl4MGx1bWV0MUtWZEE0MHJwNFVZcHNJcFl3elJwZ0VfMklNc2pFZS1DcUYtLWtwSGtMSVhjb2NHNmN2T3RCangzSVBLWVE4N0dEMEpwLXVXdWFyVGZNTWtHRTR1NVNWeXN6ek5TQzBRWlJORGxwV1pubWJIUWxBQ3drNmhLZ010Z051MHpDV1pqRHhLc014dG1mVEJBM0ozdmJPVERjMllFS3htWGNxUlJsSVVHdg?oc=5",
+          "published": "2h ago",
+          "raw_date": "Wed, 14 Oct 2026 23:47:29 GMT",
+          "sentiment": "neutral"
         }
       ],
-      "weight_pct": 1.7267231456053374,
+      "weight_pct": 1.7370763901953234,
       "alerts": [],
       "rating": {
         "stars_count": 5,
         "stars_str": "⭐⭐⭐⭐⭐",
         "grade": "เกรด A+ (ยอดเยี่ยม ปลอดภัยสูง)",
-        "summary": "สถานะ กำไร +2.7%, กราฟ ยืนเหนือเส้น 200 วัน +3.5%.",
-        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+3.5%), อยู่ใน Institutional Value Zone 💎, กำไรเติบโตเด่น YoY +35.2%",
+        "summary": "สถานะ กำไร +3.0%, กราฟ ยืนเหนือเส้น 200 วัน +3.8%.",
+        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+3.8%), อยู่ใน Institutional Value Zone 💎, กำไรเติบโตเด่น YoY +35.2%",
         "risk": "ไม่มีสัญญาณความเสี่ยงผิดปกติ.",
         "action": "ถือรันเทรนด์ต่อ หรือสะสมเพิ่มตามแนวรับเส้น 200 วัน."
       },
@@ -1838,7 +2066,7 @@
         "quality_badge": "🟡 Market Leader",
         "future_growth_drivers": [
           "การขยายตัวของรายได้ระดับ +20.4% YoY และความสามารถในการทำกำไรสุทธิ +35.2% YoY",
-          "อัตราการประเมินมูลค่า P/E 40.9x และค่า PEG 1.16 เท่า สะท้อนระดับราคาต่อการเติบโต",
+          "อัตราการประเมินมูลค่า P/E 41.0x และค่า PEG 1.16 เท่า สะท้อนระดับราคาต่อการเติบโต",
           "ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Beverages: Non-Alcoholic",
           "การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ"
         ],
@@ -1849,7 +2077,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (14.7 วัน)",
+            "period": "ปฏิทินงบ (14.4 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -1861,7 +2089,7 @@
             "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"
           }
         ],
-        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $50.88 (Upside +15.4%)",
+        "wall_street_verdict": "ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $50.88 (Upside +15.1%)",
         "tailored_roadmap": "ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
         "invalidation_risk": "การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%"
       }
@@ -1877,56 +2105,57 @@
       "avg_cost_thb": 7994.859533999999,
       "total_cost_usd": 643.9,
       "cost_thb": 21647.92,
-      "close_price": 221.0203,
-      "change_pct": -6.85646255636563,
-      "current_val_usd": 598.46316430682,
-      "current_val_thb": 20120.331583995285,
-      "unrealized_pl_usd": -45.43683569318,
-      "unrealized_pl_thb": -1527.5864160047115,
-      "unrealized_pl_pct": -7.0565049997173475,
-      "daily_diff_usd": -44.05394501917999,
-      "daily_diff_thb": -1481.0936315448312,
-      "rsi": 32.71,
-      "rsi_weekly": 39.82,
+      "close_price": 222.83,
+      "change_pct": -6.093809262927211,
+      "current_val_usd": 603.363342202,
+      "current_val_thb": 20285.07556483124,
+      "unrealized_pl_usd": -40.536657797999965,
+      "unrealized_pl_thb": -1362.8424351687588,
+      "unrealized_pl_pct": -6.295489640938029,
+      "daily_diff_usd": -39.153767123999955,
+      "daily_diff_thb": -1316.3496507088785,
+      "rsi": 33.43,
+      "rsi_weekly": 40.14,
       "stoch_k": -0.0,
       "stoch_d": 4.72,
-      "mfi": 42.5,
-      "sma200": 267.84,
-      "ema200": 255.04,
-      "dist_sma200_pct": -17.48,
-      "dist_ema200_pct": -13.34,
+      "mfi": 40.5,
+      "sma200": 267.85,
+      "ema200": 255.06,
+      "dist_sma200_pct": -16.81,
+      "dist_ema200_pct": -12.64,
       "in_value_zone": false,
-      "score": 3.0,
+      "score": 3.5,
       "tier": "⭐⭐ Good Setup",
       "signal_tags": [
         "Oversold (RSI≤35)",
         "Touch BB Lower Band",
-        "High R:R (2.2x) 🎯",
+        "High R:R (2.1x) 🎯",
+        "High Vol (1.4x)",
         "Rev Growth +26% 🚀",
         "Attractive PEG 0.5 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 13.7,
+      "days_to_earnings": 13.4,
       "earnings_date": "28 Oct 2026",
       "is_earnings_near": true,
-      "key_support": 204.24,
+      "key_support": 206.02,
       "support_desc": "แนวรับความผันผวน 1.5 ATR",
-      "key_resistance": 258.06,
+      "key_resistance": 258.1,
       "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 204.24,
-      "take_profit": 258.06,
-      "rr_ratio": 2.2,
+      "stop_loss": 206.02,
+      "take_profit": 258.1,
+      "rr_ratio": 2.1,
       "tv_url": "https://www.tradingview.com/chart/?symbol=NYSE:VRT",
       "rev_growth_yoy": 26.23,
       "net_inc_growth_yoy": 113.22,
       "peg": 0.48,
-      "pe": 50.01,
+      "pe": 50.42,
       "rec_mark": 1.24,
       "fcf": 2929800000,
       "price_target_average": 331.26,
       "price_target_high": 427,
       "price_target_low": 188,
-      "target_upside_pct": 49.9,
+      "target_upside_pct": 48.7,
       "rec_buy": 27,
       "rec_hold": 5,
       "rec_sell": 1,
@@ -1936,32 +2165,58 @@
         "ticker": "VRT",
         "bullish": [
           {
-            "title": "Vertiv vs. Amphenol: Which AI Infrastructure Stock Has an Edge Now?",
-            "source": "TradingView",
-            "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOLVh4SklySXJIcWQ4RWpHb0RzMWx3aWpiOFJOUjFiM3hWd0tYSHpndHlCbmlfOFFuYlJhcTU3aVZWYmFXcFNGOXpnei0xMWJJdF9aMzYxdlBiWWVndHlIM25sUElsaGZnbm9WWWxQNGw1VzNUX2lScDR0ZFNNaXNoaUdhYmx3WGtibkJzb0tSb0NjSE1IYlczakZIcVB4NUZhcUN2d3dQTUtNTTlNWFhzQUxHRmgxYUhBUTUtVA?oc=5",
-            "published": "4h ago",
-            "raw_date": "Wed, 14 Oct 2026 13:42:00 GMT",
-            "sentiment": "bullish"
-          },
-          {
             "title": "Vertiv Stock and 5 More Industrial Picks Ahead Of Earnings",
             "source": "Barron's",
             "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPNzVXQmVHWUxKWEdhQzY2Q0ZvdW5DUGV1NF9FQU5lbWhTdkNreHNpaHNlMnZoeVFEX0lFUUJpZUFpMjdjT2xyR2VObnU3NkpqS2xROHN0NHRtR2libHRDUUt0bC00QTEzMEZDMUZpNGNzamNMSGdpRjBLajU2ajdkRUZjNVcxTUVF?oc=5",
             "published": "2d ago",
             "raw_date": "Mon, 12 Oct 2026 17:44:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Vertiv vs. Amphenol: Which AI Infrastructure Stock Has an Edge Now?",
+            "source": "Zacks Investment Research",
+            "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNbGdSU2kzX2R6aklyMDBxUG5nbkFicW5ycnJjOF9GQ0ptRVRsWHlPcW4zeTk5T1NjLXFXOWcyR0lpa2ZsejZ5Wnc3RHpJSHRjcXV1ajA0WUdqUjFZbkp2Q3U4N1lqY0xEeXM0WjVWb2pvLWtja2FkWWxhbHo4QjFZUndNcGdYVDY2TTFpMkhvUVJGaHVSYnAwSVYtX3FSWEdWQnpsR0RpWUw?oc=5",
+            "published": "12h ago",
+            "raw_date": "Wed, 14 Oct 2026 14:03:31 GMT",
             "sentiment": "bullish"
           }
         ],
-        "bearish": [],
-        "neutral": [],
+        "bearish": [
+          {
+            "title": "Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5",
+            "published": "5h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:06:39 GMT",
+            "sentiment": "bearish"
+          }
+        ],
+        "neutral": [
+          {
+            "title": "Why Should Vertiv Stock Holders Watch This One Number?",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 00:46:00 GMT",
+            "sentiment": "neutral"
+          }
+        ],
         "all": [
           {
-            "title": "Vertiv vs. Amphenol: Which AI Infrastructure Stock Has an Edge Now?",
-            "source": "TradingView",
-            "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOLVh4SklySXJIcWQ4RWpHb0RzMWx3aWpiOFJOUjFiM3hWd0tYSHpndHlCbmlfOFFuYlJhcTU3aVZWYmFXcFNGOXpnei0xMWJJdF9aMzYxdlBiWWVndHlIM25sUElsaGZnbm9WWWxQNGw1VzNUX2lScDR0ZFNNaXNoaUdhYmx3WGtibkJzb0tSb0NjSE1IYlczakZIcVB4NUZhcUN2d3dQTUtNTTlNWFhzQUxHRmgxYUhBUTUtVA?oc=5",
-            "published": "4h ago",
-            "raw_date": "Wed, 14 Oct 2026 13:42:00 GMT",
-            "sentiment": "bullish"
+            "title": "Why Should Vertiv Stock Holders Watch This One Number?",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 00:46:00 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5",
+            "published": "5h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:06:39 GMT",
+            "sentiment": "bearish"
           },
           {
             "title": "Vertiv Stock and 5 More Industrial Picks Ahead Of Earnings",
@@ -1969,39 +2224,47 @@
             "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPNzVXQmVHWUxKWEdhQzY2Q0ZvdW5DUGV1NF9FQU5lbWhTdkNreHNpaHNlMnZoeVFEX0lFUUJpZUFpMjdjT2xyR2VObnU3NkpqS2xROHN0NHRtR2libHRDUUt0bC00QTEzMEZDMUZpNGNzamNMSGdpRjBLajU2ajdkRUZjNVcxTUVF?oc=5",
             "published": "2d ago",
             "raw_date": "Mon, 12 Oct 2026 17:44:00 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Vertiv vs. Amphenol: Which AI Infrastructure Stock Has an Edge Now?",
+            "source": "Zacks Investment Research",
+            "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNbGdSU2kzX2R6aklyMDBxUG5nbkFicW5ycnJjOF9GQ0ptRVRsWHlPcW4zeTk5T1NjLXFXOWcyR0lpa2ZsejZ5Wnc3RHpJSHRjcXV1ajA0WUdqUjFZbkp2Q3U4N1lqY0xEeXM0WjVWb2pvLWtja2FkWWxhbHo4QjFZUndNcGdYVDY2TTFpMkhvUVJGaHVSYnAwSVYtX3FSWEdWQnpsR0RpWUw?oc=5",
+            "published": "12h ago",
+            "raw_date": "Wed, 14 Oct 2026 14:03:31 GMT",
             "sentiment": "bullish"
           }
         ]
       },
       "news": [
         {
-          "title": "Vertiv vs. Amphenol: Which AI Infrastructure Stock Has an Edge Now?",
-          "source": "TradingView",
-          "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOLVh4SklySXJIcWQ4RWpHb0RzMWx3aWpiOFJOUjFiM3hWd0tYSHpndHlCbmlfOFFuYlJhcTU3aVZWYmFXcFNGOXpnei0xMWJJdF9aMzYxdlBiWWVndHlIM25sUElsaGZnbm9WWWxQNGw1VzNUX2lScDR0ZFNNaXNoaUdhYmx3WGtibkJzb0tSb0NjSE1IYlczakZIcVB4NUZhcUN2d3dQTUtNTTlNWFhzQUxHRmgxYUhBUTUtVA?oc=5",
-          "published": "4h ago",
-          "raw_date": "Wed, 14 Oct 2026 13:42:00 GMT",
-          "sentiment": "bullish"
+          "title": "Why Should Vertiv Stock Holders Watch This One Number?",
+          "source": "Yahoo Finance",
+          "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
+          "published": "1h ago",
+          "raw_date": "Thu, 15 Oct 2026 00:46:00 GMT",
+          "sentiment": "neutral"
         },
         {
-          "title": "Vertiv Stock and 5 More Industrial Picks Ahead Of Earnings",
-          "source": "Barron's",
-          "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPNzVXQmVHWUxKWEdhQzY2Q0ZvdW5DUGV1NF9FQU5lbWhTdkNreHNpaHNlMnZoeVFEX0lFUUJpZUFpMjdjT2xyR2VObnU3NkpqS2xROHN0NHRtR2libHRDUUt0bC00QTEzMEZDMUZpNGNzamNMSGdpRjBLajU2ajdkRUZjNVcxTUVF?oc=5",
-          "published": "2d ago",
-          "raw_date": "Mon, 12 Oct 2026 17:44:00 GMT",
-          "sentiment": "bullish"
+          "title": "Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade",
+          "source": "MarketBeat",
+          "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5",
+          "published": "5h ago",
+          "raw_date": "Wed, 14 Oct 2026 21:06:39 GMT",
+          "sentiment": "bearish"
         }
       ],
-      "weight_pct": 1.3514844894144817,
+      "weight_pct": 1.3665353666617606,
       "alerts": [
-        "⚠️ Earnings in 13.7d"
+        "⚠️ Earnings in 13.4d"
       ],
       "rating": {
         "stars_count": 3,
         "stars_str": "⭐⭐⭐",
         "grade": "เกรด B (ปานกลาง / พักฐาน)",
-        "summary": "สถานะ ขาดทุน -7.1%, กราฟ ยืนเหนือเส้น 200 วัน -17.5%.",
-        "strength": "RSI Oversold (32.7) ลุ้นเด้งรีบาวด์, กำไรเติบโตเด่น YoY +113.2%, ฉันทามติตลาด Strong Buy",
-        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-17.5%), วันประกาศงบใกล้เข้ามา (13.7 วัน)",
+        "summary": "สถานะ ขาดทุน -6.3%, กราฟ ยืนเหนือเส้น 200 วัน -16.8%.",
+        "strength": "RSI Oversold (33.4) ลุ้นเด้งรีบาวด์, กำไรเติบโตเด่น YoY +113.2%, ฉันทามติตลาด Strong Buy",
+        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-16.8%), วันประกาศงบใกล้เข้ามา (13.4 วัน)",
         "action": "ติดตามแนวรับสำคัญและรอสัญญาณเบรกแนวต้าน."
       },
       "financial_health": {
@@ -2018,7 +2281,7 @@
         "future_growth_drivers": [
           "NVIDIA GB200 NVL72 Architecture: ชิป Blackwell ระดับ 100kW+ ต่อ Rack ไม่สามารถระบายความร้อนด้วยพัดลมลมธรรมดาได้ ต้องใช้ Liquid Cooling 100% ซึ่ง Vertiv เป็นพันธมิตรวิศวกรรมหลักของ NVIDIA",
           "Backlog คำสั่งซื้อค้างส่งสูงเป็นประวัติการณ์: ดีมานด์การสร้าง AI Factory ของ Microsoft, AWS, Google, Oracle ผลักดันให้อัตราจองคำสั่งซื้อยาวต่อเนื่องข้ามปี",
-          "กำไรสุทธิ YoY เติบโตระเบิด +113.2% และรายได้โต +26.2%: แสดงถึงอำนาจในการกำหนดราคา (Pricing Power) และการขยายตัวของอัตรากำไรขั้นต้น",
+          "กำไรสุทธิ YoY +113.2% และรายได้ YoY +26.2%: สะท้อนอำนาจในการกำหนดราคา (Pricing Power) และการขยายตัวของอัตรากำไรขั้นต้น",
           "ระบบจัดการพลังงานครบวงจร (Switchgear, Busbar, UPS, Thermal): Vertiv เป็นผู้เล่นรายเดียวที่มีโซลูชันครบวงจรตั้งแต่เสาไฟแรงสูงจนถึงหลังชิปประมวลผล"
         ],
         "drawdown_root_cause": [
@@ -2028,7 +2291,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะประชิด (13.8 วัน / 28 ต.ค. 69)",
+            "period": "ระยะประชิด (13.4 วัน)",
             "event": "ประกาศผลประกอบการ Q3: จับตาการเร่งส่งมอบคำสั่งซื้อและ Guidance ปี 2027"
           },
           {
@@ -2040,9 +2303,9 @@
             "event": "การเปิดโรงงานขยายกำลังการผลิต Liquid Cooling เฟสใหม่เพื่อรองรับอุปสงค์ที่ล้นมือ"
           }
         ],
-        "wall_street_verdict": "โบรกเกอร์ 27 แห่งแนะนำ 'Buy' เป้าหมายเฉลี่ย $331.26 (Upside +49.9% จากราคาปัจจุบัน และสูงกว่าต้นทุนของคุณ +39.3%)",
-        "tailored_roadmap": "วันงบออกจะมาถึงในอีก 13.8 วัน จึงต้อง 'Freeze DCA ห้ามเติมเงินก่อนงบออกเด็ดขาด' เพื่อหลีกเลี่ยงความผันผวนของ Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก",
-        "invalidation_risk": "หากประกาศงบแล้วพบว่าปัญหา Supply Chain คอขวดรุนแรงจนยกเลิกออเดอร์ หรือราคาปิดหลุดแนวรับ Stop-Loss $209.26 ให้พิจารณาลดสัดส่วนเพื่อถือเงินสด"
+        "wall_street_verdict": "โบรกเกอร์ 27 แห่งแนะนำ 'Buy' เป้าหมายเฉลี่ย $331.26 (Upside +48.7% จากราคาปัจจุบัน และสูงกว่าต้นทุนของคุณ +39.3%)",
+        "tailored_roadmap": "มีวันงบออกในอีก 13.4 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก",
+        "invalidation_risk": "หากประกาศงบแล้วพบว่าปัญหา Supply Chain คอขวดรุนแรงจนยกเลิกออเดอร์ หรือราคาปิดหลุดแนวรับ Stop-Loss ให้พิจารณาลดสัดส่วนเพื่อถือเงินสด"
       }
     },
     {
@@ -2056,41 +2319,42 @@
       "avg_cost_thb": 21532.265199999998,
       "total_cost_usd": 317.14,
       "cost_thb": 10662.25,
-      "close_price": 705.77,
-      "change_pct": -1.3185123042505682,
-      "current_val_usd": 349.479871481,
-      "current_val_thb": 11749.513279191218,
-      "unrealized_pl_usd": 32.33987148099999,
-      "unrealized_pl_thb": 1087.2664791912196,
-      "unrealized_pl_pct": 10.197348641294063,
-      "daily_diff_usd": -4.669503079000037,
-      "daily_diff_thb": -156.98869351598125,
-      "rsi": 47.74,
-      "rsi_weekly": 59.07,
-      "stoch_k": 55.49,
-      "stoch_d": 70.98,
-      "mfi": 48.6,
-      "sma200": 665.94,
-      "ema200": 669.76,
-      "dist_sma200_pct": 5.98,
-      "dist_ema200_pct": 5.38,
+      "close_price": 707.43,
+      "change_pct": -1.0864093959731675,
+      "current_val_usd": 350.30186247899996,
+      "current_val_thb": 11777.148616543978,
+      "unrealized_pl_usd": 33.16186247899998,
+      "unrealized_pl_thb": 1114.9018165439793,
+      "unrealized_pl_pct": 10.456537327047984,
+      "daily_diff_usd": -3.8475120810000476,
+      "daily_diff_thb": -129.35335616322158,
+      "rsi": 49.37,
+      "rsi_weekly": 59.95,
+      "stoch_k": 59.32,
+      "stoch_d": 72.25,
+      "mfi": 47.4,
+      "sma200": 665.95,
+      "ema200": 669.78,
+      "dist_sma200_pct": 6.23,
+      "dist_ema200_pct": 5.62,
       "in_value_zone": false,
-      "score": 2.0,
+      "score": 2.5,
       "tier": "⭐ Watchlist",
       "signal_tags": [
         "Above SMA200",
-        "Weekly Bullish (RSI≥45)"
+        "Weekly Bullish (RSI≥45)",
+        "High R:R (6.3x) 🎯"
       ],
       "days_to_earnings": null,
       "earnings_date": "-",
       "is_earnings_near": false,
-      "key_support": 665.94,
+      "key_support": 665.95,
       "support_desc": "เส้น 200 วัน (SMA 200)",
-      "key_resistance": 706.65,
-      "resistance_desc": "เส้น 50 วัน (Mean Reversion)",
-      "stop_loss": 696.85,
-      "take_profit": 706.65,
-      "rr_ratio": 0.1,
+      "key_resistance": 719.45,
+      "resistance_desc": "ขอบบน Bollinger Band",
+      "stop_loss": 698.51,
+      "take_profit": 764.02,
+      "rr_ratio": 6.3,
       "tv_url": "https://www.tradingview.com/chart/?symbol=AMEX:VOO",
       "rev_growth_yoy": null,
       "net_inc_growth_yoy": null,
@@ -2119,16 +2383,33 @@
             "sentiment": "bullish"
           },
           {
-            "title": "Prediction: This Is What a $5,000 Investment in the Vanguard S&P 500 ETF (VOO) Will Be Worth by 2040",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQUlpDYzJKTXptSEJUZ3VDSExwaXpUcU9qU2hkdmk0Qi1NbTd6VlFUWEZfcVhqakllV0xPd3I4c2oyYjl4VlBzOW9ETkN2RzFLandNY1VpeW1XZkF3TmlfQVNIZHVJaW95aG5tNEV1WE9TNml1RklSWjhwa1M1QlpGcmMzZ1JJX3p1MGQ0MVdDZjI4Z3c?oc=5",
-            "published": "4d ago",
-            "raw_date": "Sat, 10 Oct 2026 15:35:00 GMT",
+            "title": "If I Could Invest $1,000 in Just 1 Dividend Stock for the Next 5 Years, I'd Pick This Clear Standout Over the Vanguard S&P 500 ETF (VOO)",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPaUZEdElpdWxBdUs0bzFoYVpFdER5SS1pcXEwblVva1FscTZKUGRzS245cDZSSDRZQTMxdnJfQTNxRXB2ZkV5R19XZlp4VTk4ejVDc2UxTWdObGFHblcwRWFTeGlBT2d3MjZYSTNBVEFHTEtRUW9KNHlXVm4wcHRxOWJMS0IxM2NUNVpkTXoybVFfZw?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 11:19:00 GMT",
             "sentiment": "bullish"
           }
         ],
         "bearish": [],
-        "neutral": [],
+        "neutral": [
+          {
+            "title": "Why \"VOO and Chill\" Lost Money for 8 Straight Years: What $100,000 in the S&P 500 Did From 2000 to 2008",
+            "source": "24/7 Wall St.",
+            "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNWTl4aEZ4cm1JMF84NjRod2xwR05ocWx3dXpTNzZnMFI2M3Q4dUsyNlJKNzFtX1c1SnRLMnFGVzV4Q005aDZ6N2NsMmRCbzZNcVNzMnBqUjdqYW5TME56NC02bUVjaXQ4VXZaN3lGNVAtZFFnUUVoMVhTc0hsTHZaWGJhamlxZzFrZmJycnZ4TU5qaUF1blRLRHJJQnhjUklaRTRDWlV0QnA2VWJOMFZhdktmUWZrcDNuLTFHVFRfNWlja01XVzUxUG80dm9aYnlIYnI2Y19Da1hVQXl1MWc?oc=5",
+            "published": "4d ago",
+            "raw_date": "Sat, 10 Oct 2026 08:34:00 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "The Top S&P 500 ETFs for October 2026: IVV, VOO, SPY and SPYM",
+            "source": "NerdWallet",
+            "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFAwOVFpQTBacEtRYlRMTWhJT0Ryb0pNNG9aXzVkLVBGTUF0cVNSRXIzS1lnZ0Y4UFI1cWUtM3JUbl9aT3p2RmYycnY2LTZuQS1XVDBGYzdCakl5b1BqcmNzQUtSN1k?oc=5",
+            "published": "13d ago",
+            "raw_date": "Thu, 01 Oct 2026 07:00:00 GMT",
+            "sentiment": "neutral"
+          }
+        ],
         "all": [
           {
             "title": "Prediction: This Is What a $5,000 Investment in the Vanguard S&P 500 ETF (VOO) Will Be Worth by 2040",
@@ -2139,11 +2420,27 @@
             "sentiment": "bullish"
           },
           {
-            "title": "Prediction: This Is What a $5,000 Investment in the Vanguard S&P 500 ETF (VOO) Will Be Worth by 2040",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQUlpDYzJKTXptSEJUZ3VDSExwaXpUcU9qU2hkdmk0Qi1NbTd6VlFUWEZfcVhqakllV0xPd3I4c2oyYjl4VlBzOW9ETkN2RzFLandNY1VpeW1XZkF3TmlfQVNIZHVJaW95aG5tNEV1WE9TNml1RklSWjhwa1M1QlpGcmMzZ1JJX3p1MGQ0MVdDZjI4Z3c?oc=5",
+            "title": "Why \"VOO and Chill\" Lost Money for 8 Straight Years: What $100,000 in the S&P 500 Did From 2000 to 2008",
+            "source": "24/7 Wall St.",
+            "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNWTl4aEZ4cm1JMF84NjRod2xwR05ocWx3dXpTNzZnMFI2M3Q4dUsyNlJKNzFtX1c1SnRLMnFGVzV4Q005aDZ6N2NsMmRCbzZNcVNzMnBqUjdqYW5TME56NC02bUVjaXQ4VXZaN3lGNVAtZFFnUUVoMVhTc0hsTHZaWGJhamlxZzFrZmJycnZ4TU5qaUF1blRLRHJJQnhjUklaRTRDWlV0QnA2VWJOMFZhdktmUWZrcDNuLTFHVFRfNWlja01XVzUxUG80dm9aYnlIYnI2Y19Da1hVQXl1MWc?oc=5",
             "published": "4d ago",
-            "raw_date": "Sat, 10 Oct 2026 15:35:00 GMT",
+            "raw_date": "Sat, 10 Oct 2026 08:34:00 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "The Top S&P 500 ETFs for October 2026: IVV, VOO, SPY and SPYM",
+            "source": "NerdWallet",
+            "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFAwOVFpQTBacEtRYlRMTWhJT0Ryb0pNNG9aXzVkLVBGTUF0cVNSRXIzS1lnZ0Y4UFI1cWUtM3JUbl9aT3p2RmYycnY2LTZuQS1XVDBGYzdCakl5b1BqcmNzQUtSN1k?oc=5",
+            "published": "13d ago",
+            "raw_date": "Thu, 01 Oct 2026 07:00:00 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "If I Could Invest $1,000 in Just 1 Dividend Stock for the Next 5 Years, I'd Pick This Clear Standout Over the Vanguard S&P 500 ETF (VOO)",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPaUZEdElpdWxBdUs0bzFoYVpFdER5SS1pcXEwblVva1FscTZKUGRzS245cDZSSDRZQTMxdnJfQTNxRXB2ZkV5R19XZlp4VTk4ejVDc2UxTWdObGFHblcwRWFTeGlBT2d3MjZYSTNBVEFHTEtRUW9KNHlXVm4wcHRxOWJMS0IxM2NUNVpkTXoybVFfZw?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 11:19:00 GMT",
             "sentiment": "bullish"
           }
         ]
@@ -2158,22 +2455,22 @@
           "sentiment": "bullish"
         },
         {
-          "title": "Prediction: This Is What a $5,000 Investment in the Vanguard S&P 500 ETF (VOO) Will Be Worth by 2040",
-          "source": "The Motley Fool",
-          "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQUlpDYzJKTXptSEJUZ3VDSExwaXpUcU9qU2hkdmk0Qi1NbTd6VlFUWEZfcVhqakllV0xPd3I4c2oyYjl4VlBzOW9ETkN2RzFLandNY1VpeW1XZkF3TmlfQVNIZHVJaW95aG5tNEV1WE9TNml1RklSWjhwa1M1QlpGcmMzZ1JJX3p1MGQ0MVdDZjI4Z3c?oc=5",
+          "title": "Why \"VOO and Chill\" Lost Money for 8 Straight Years: What $100,000 in the S&P 500 Did From 2000 to 2008",
+          "source": "24/7 Wall St.",
+          "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNWTl4aEZ4cm1JMF84NjRod2xwR05ocWx3dXpTNzZnMFI2M3Q4dUsyNlJKNzFtX1c1SnRLMnFGVzV4Q005aDZ6N2NsMmRCbzZNcVNzMnBqUjdqYW5TME56NC02bUVjaXQ4VXZaN3lGNVAtZFFnUUVoMVhTc0hsTHZaWGJhamlxZzFrZmJycnZ4TU5qaUF1blRLRHJJQnhjUklaRTRDWlV0QnA2VWJOMFZhdktmUWZrcDNuLTFHVFRfNWlja01XVzUxUG80dm9aYnlIYnI2Y19Da1hVQXl1MWc?oc=5",
           "published": "4d ago",
-          "raw_date": "Sat, 10 Oct 2026 15:35:00 GMT",
-          "sentiment": "bullish"
+          "raw_date": "Sat, 10 Oct 2026 08:34:00 GMT",
+          "sentiment": "neutral"
         }
       ],
-      "weight_pct": 0.7892158679744419,
+      "weight_pct": 0.7933857604573762,
       "alerts": [],
       "rating": {
         "stars_count": 4,
         "stars_str": "⭐⭐⭐⭐",
         "grade": "เกรด A (สุขภาพดี แข็งแกร่ง)",
-        "summary": "สถานะ กำไร +10.2%, กราฟ ยืนเหนือเส้น 200 วัน +6.0%.",
-        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+6.0%), กองทุนดัชนีชั้นนำ กระจายความเสี่ยงสูง",
+        "summary": "สถานะ กำไร +10.5%, กราฟ ยืนเหนือเส้น 200 วัน +6.2%.",
+        "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+6.2%), กองทุนดัชนีชั้นนำ กระจายความเสี่ยงสูง",
         "risk": "ไม่มีสัญญาณความเสี่ยงผิดปกติ.",
         "action": "สถานะแข็งแกร่ง ถือต่อตามแผนเทรดได้อย่างมั่นใจ."
       },

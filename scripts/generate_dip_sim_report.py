@@ -17,7 +17,7 @@ from typing import Any, Dict, List
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.tradingview import fetch_screener_data
-from src.screener import evaluate_stock
+from src.screener import FALLBACK_SL_RATIO, atr_stop_loss, evaluate_stock
 from src.outlook import get_forward_outlook
 from src.html_report import get_chart_modal_component
 
@@ -78,7 +78,7 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
         cap_usd = float(h.get("capital_usd", cap_thb / fx_rate))
         buy_price = float(h.get("buy_price_usd", 1.0))
         shares = float(h.get("shares", cap_usd / buy_price))
-        sl_price = float(h.get("stop_loss_usd", buy_price * 0.95))
+        sl_price = float(h.get("stop_loss_usd", buy_price * FALLBACK_SL_RATIO))
         tp_price = float(h.get("take_profit_usd", buy_price * 1.08))
 
         live_row = live_dict.get(ticker, {})
@@ -648,17 +648,13 @@ def add_sim_holding(ticker: str, capital_thb: float = 10000.0, notes: str = "") 
         raise ValueError(f"ไม่สามารถดึงราคาล่าสุดของ {ticker} ได้")
 
     name = live_row.get("description") or live_row.get("name") or ticker
-    exchange = symbols[0].split(":")[0] if ":" in symbols[0] else "NASDAQ"
+    exchange = live_row.get("exchange") or "NASDAQ"
     business = get_business_summary(ticker, live_row.get("description"))
 
     cap_usd = capital_thb / fx_rate
     shares = round(cap_usd / close_price, 4)
 
-    atr = live_row.get("ATR")
-    if atr and atr > 0:
-        sl_price = round(close_price - 1.5 * atr, 2)
-    else:
-        sl_price = round(close_price * 0.94, 2)
+    sl_price = atr_stop_loss(close_price, live_row.get("ATR"))
 
     sma50 = live_row.get("SMA50")
     if sma50 and sma50 > close_price:

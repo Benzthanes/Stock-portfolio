@@ -5,9 +5,10 @@ saved to reports/stock_chart.html.
 """
 
 import json
+from html import escape
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from src.chart_data import load_candles_cache
+from src.chart_data import compact_charts_for_page, load_candles_cache
 
 
 def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
@@ -181,8 +182,8 @@ def generate_stock_chart_page_html() -> str:
     - Native mouse-wheel chart zooming enabled.
     - Full AI Confluence Decision Engine & Classical Pattern Deep-Dive Breakdown.
     """
-    cache = load_candles_cache()
     meta = get_all_stocks_metadata()
+    cache = compact_charts_for_page(load_candles_cache(), meta)
 
     # Ensure all cache entries have price and name if missing
     for t, entry in cache.items():
@@ -205,7 +206,7 @@ def generate_stock_chart_page_html() -> str:
                 "target": 0.0,
             }
 
-    chart_data_json = json.dumps(cache, ensure_ascii=False)
+    chart_data_json = json.dumps(cache, ensure_ascii=False, separators=(",", ":"))
     meta_json = json.dumps(meta, ensure_ascii=False)
 
     reports_dir = Path(__file__).resolve().parent.parent / "reports"
@@ -214,7 +215,7 @@ def generate_stock_chart_page_html() -> str:
     (reports_dir / "chart_data.js").write_text(js_content, encoding="utf-8")
     all_tickers = sorted(list(cache.keys()))
     # Put portfolio core holdings first
-    priority_order = ["NVDA", "PLTR", "LLY", "ISRG", "MSFT", "AMZN", "GOOGL", "AAPL", "VST", "CRWD", "BMY", "JPM", "VOO", "VRT", "APP", "MNST", "ROST", "MU", "ARM", "NOK", "INTC", "C", "BAC", "VRTX", "ABNB", "NOW", "SPCX", "QQQI", "BNY", "AMAT", "LRCX", "JNJ"]
+    priority_order = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "BMY", "JPM", "ROST", "MU", "ARM", "INTC", "C", "VRTX", "NOW", "SPCX", "QQQI", "BNY", "AMAT", "LRCX", "JNJ"]
     sorted_tickers = [t for t in priority_order if t in all_tickers] + [t for t in all_tickers if t not in priority_order]
     sorted_tickers_json = json.dumps(sorted_tickers)
 
@@ -224,7 +225,7 @@ def generate_stock_chart_page_html() -> str:
         p = m.get("price", 0.0)
         p_txt = f"${p:,.2f}" if p > 0 else ""
         pills_html.append(
-            f'<button class="sp-pill" id="pill_{t}" onclick="selectStock(\'{t}\')" title="{m.get("name", t)}">'
+            f'<button class="sp-pill" id="pill_{t}" onclick="selectStock(\'{t}\')" title="{escape(str(m.get("name") or t), quote=True)}">'
             f'<span class="sp-pill-t">{t}</span>'
             f'<span class="sp-pill-p">{p_txt}</span>'
             f'</button>'

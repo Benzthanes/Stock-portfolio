@@ -17,6 +17,9 @@ from src.html_report import generate_portfolio_html
 from src.trades import load_trades, generate_trades_markdown, generate_trades_html
 
 
+def signed_money(value, sym):
+    return f"{'+' if value >= 0 else '-'}{sym}{abs(value):,.2f}"
+
 
 def run_all_reports():
     reports_dir = Path("reports")
@@ -188,8 +191,9 @@ def main():
         print(f"All-Time Net Profit  : {at_sign}฿{data['all_time_profit_thb']:,.2f} ({at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI)")
         print(f"Total Idle Cash      : ฿{data['total_cash_thb']:,.2f} (Dime! Save: ฿{data['dime_save_cash_thb']:,.2f} | Dime! USD: ${data['dime_usd_cash']:.2f})")
         print(f"Active Stock Holdings: {len(data['positions'])} stocks | Market Val: ${data['stock_market_val_usd']:,.2f} (฿{data['stock_market_val_thb']:,.2f})")
-        print(f"Realized Trades P&L  : +${data['trades_summary']['total_realized_pl_usd']:,.2f} (+฿{data['trades_summary']['total_realized_pl_thb']:,.2f}) | Win Rate 100.0%")
-        print(f"Total Dividends Recv : +${data['total_dividends_usd']:,.2f} (+฿{data['total_dividends_thb']:,.2f}) | 13 payments")
+        ts = data['trades_summary']
+        print(f"Realized Trades P&L  : {signed_money(ts['total_realized_pl_usd'], '$')} ({signed_money(ts['total_realized_pl_thb'], '฿')}) | Win Rate {ts['win_rate_pct']:.1f}%")
+        print(f"Total Dividends Recv : {signed_money(data['total_dividends_usd'], '$')} ({signed_money(data['total_dividends_thb'], '฿')}) | {len(data['dividends_list'])} payments")
         print("==========================================================================")
         print(f"Master HTML Dashboard: {out_path.resolve()}")
         print(f"Account JSON File    : {json_path.resolve()}")

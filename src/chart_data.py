@@ -11,10 +11,15 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.json"
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
+
+
+def _round_price(x: float) -> float:
+    x = float(x)
+    return round(x, 4) if abs(x) < 10 else round(x, 2)
 
 
 def fetch_ticker_candles(ticker: str) -> List[Dict[str, Any]]:
@@ -59,10 +64,10 @@ def fetch_ticker_candles(ticker: str) -> List[Dict[str, Any]]:
             t_str = datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d")
             candles.append({
                 "time": t_str,
-                "open": round(float(o), 2),
-                "high": round(float(h), 2),
-                "low": round(float(l), 2),
-                "close": round(float(c), 2),
+                "open": _round_price(o),
+                "high": _round_price(h),
+                "low": _round_price(l),
+                "close": _round_price(c),
                 "volume": int(v)
             })
         return candles
@@ -545,7 +550,7 @@ def compute_ai_confluence_signals(
 
     # 1. Detect Swing Troughs (BUY / DCA Signals)
     k_window = 3
-    for i in range(scan_start, n - 2):
+    for i in range(scan_start, n - k_window):
         if all(lows[i] <= lows[i + j] for j in range(-k_window, k_window + 1) if j != 0):
             c_low = lows[i]
             c_close = closes[i]
@@ -622,7 +627,7 @@ def compute_ai_confluence_signals(
                 })
 
     # 2. Detect Swing Peaks (SELL / TAKE PROFIT Signals)
-    for i in range(scan_start, n - 2):
+    for i in range(scan_start, n - k_window):
         if all(highs[i] >= highs[i + j] for j in range(-k_window, k_window + 1) if j != 0):
             c_high = highs[i]
             c_close = closes[i]
@@ -1022,8 +1027,10 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     # 13. ATR (14) Volatility
     atr14_val = atr10[-1] if len(atr10) > 0 else 0.0
     if n >= 14:
-        atr14_list = [sum(tr_list[i - 13 : i + 1]) / 14.0 for i in range(13, n)]
-        atr14_val = round(atr14_list[-1], 2)
+        atr14 = sum(tr_list[:14]) / 14.0
+        for tr in tr_list[14:]:
+            atr14 = (atr14 * 13.0 + tr) / 14.0
+        atr14_val = round(atr14, 2)
     atr14_pct = round((atr14_val / closes[-1]) * 100.0, 1) if closes[-1] > 0 else 0.0
 
     # 14. Volume 20D Average & Surge Ratio
@@ -1143,9 +1150,9 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
             or not entry.get("candles")
             or "inception_date" not in entry
             or "ath" not in entry
+            or not entry.get("full_history")
             or "ai_signals" not in entry
-            or not entry.get("ai_signals")
-            or "psychology" not in (entry.get("pattern") or {})
+            or (entry.get("pattern") and "psychology" not in entry["pattern"])
         ):
             tickers_to_fetch.append(t)
 
@@ -1153,12 +1160,21 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
         def _fetch_and_process(t):
             try:
                 entry = cache.get(t)
-                if entry and entry.get("candles") and len(entry["candles"]) > 30 and (now_ts - entry.get("timestamp", 0) <= CACHE_TTL_SECONDS):
+                if (
+                    not force_refresh
+                    and entry
+                    and entry.get("full_history")
+                    and len(entry.get("candles") or []) > 30
+                    and (now_ts - entry.get("timestamp", 0) <= CACHE_TTL_SECONDS)
+                ):
                     candles = entry["candles"]
+                    fetched_ts = entry["timestamp"]
                 else:
                     candles = fetch_ticker_candles(t)
+                    fetched_ts = now_ts
                 chart_data = compute_fibo_and_indicators(candles)
-                chart_data["timestamp"] = now_ts
+                chart_data["timestamp"] = fetched_ts
+                chart_data["full_history"] = True
                 return t, chart_data
             except Exception as e:
                 return t, None
@@ -1177,3 +1193,37 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
         if t in cache:
             output[t] = cache[t]
     return output
+
+
+PAGE_DAILY_BARS = 1260
+
+
+def compact_charts_for_page(cache: Dict[str, Any], tickers: Iterable[str]) -> Dict[str, Any]:
+    """
+    Indicators in each entry were computed from full history. For the chart page,
+    keep the last PAGE_DAILY_BARS daily candles (5Y button) and collapse older history
+    into monthly bars so the 1M view, ALL view and client-side EMA/VWAP still span inception.
+    """
+    wanted = set(tickers)
+    out = {}
+    for t, entry in cache.items():
+        candles = entry.get("candles") or []
+        if t not in wanted or not entry.get("full_history") or not candles:
+            continue
+        cut = max(0, len(candles) - PAGE_DAILY_BARS)
+        month = candles[cut]["time"][:7]
+        while cut > 0 and candles[cut - 1]["time"][:7] == month:
+            cut -= 1
+        monthly = []
+        for c in candles[:cut]:
+            if monthly and monthly[-1]["time"][:7] == c["time"][:7]:
+                m = monthly[-1]
+                m["time"] = c["time"]
+                m["high"] = max(m["high"], c["high"])
+                m["low"] = min(m["low"], c["low"])
+                m["close"] = c["close"]
+                m["volume"] += c["volume"]
+            else:
+                monthly.append(dict(c))
+        out[t] = {**entry, "candles": monthly + candles[cut:]}
+    return out
