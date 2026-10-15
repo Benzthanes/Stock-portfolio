@@ -74,10 +74,11 @@ def load_ocr_buy_orders():
         text = "\n".join(lines)
         full_str = " ".join(lines)
 
-        # Parse Buy Orders
         if "รายละเอียดคำสั่ง" in full_str and re.search(r"ซื้อ\s+[A-Z0-9]+", full_str):
             ticker_m = re.search(r"ซื้อ\s+([A-Z0-9]+)", full_str)
             ticker = ticker_m.group(1) if ticker_m else "UNKNOWN"
+            if ticker == "SKHYV":
+                ticker = "SKHY"
 
             # Shares
             shares = 0.0

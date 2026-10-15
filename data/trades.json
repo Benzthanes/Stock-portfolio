@@ -79,10 +79,10 @@
       "notes": "ขายปิดสถานะรับเงินคืน (ได้รับปันผลแยกอีก $18.50)"
     },
     {
-      "id": "TRD-20260710-SKHYV",
-      "ticker": "SKHYV",
-      "exchange": "NASDAQ",
-      "name": "SK hynix Inc. (ADS / ปัจจุบันคือ SKHY)",
+      "id": "TRD-20260710-SKHY",
+      "ticker": "SKHY",
+      "exchange": "OTC",
+      "name": "SK hynix Inc.",
       "action": "SELL",
       "date": "10 ก.ค. 69",
       "buy_date": "10 ก.ค. 69 - 22:34 น.",

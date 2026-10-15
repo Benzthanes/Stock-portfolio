@@ -52,6 +52,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
         "ABNB": ("Airbnb, Inc.", "Travel Services", "NASDAQ"),
         "APP": ("AppLovin Corporation", "Application Software", "NASDAQ"),
         "VST": ("Vistra Corp.", "Independent Power Producers", "NYSE"),
+        "SKHY": ("SK Hynix Inc.", "Memory Semiconductors", "OTC"),
     }
 
     # 1. From portfolio.json

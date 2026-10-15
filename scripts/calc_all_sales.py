@@ -107,7 +107,7 @@ for s in sells:
         matching_buys = [b for b in matching_buys if b["fn"] == "IMG_5579.PNG"]
     elif t == "SPCX":
         matching_buys = [b for b in matching_buys if b["fn"] == "IMG_5548.PNG"]
-    elif t == "SKHYV":
+    elif t in ("SKHY", "SKHYV"):
         matching_buys = [b for b in matching_buys if b["fn"] == "IMG_5559.PNG"]
     elif t == "QQQI":
         matching_buys = [b for b in matching_buys if b["fn"] == "IMG_5528.PNG"]
