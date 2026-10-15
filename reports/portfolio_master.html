@@ -88,6 +88,79 @@
         .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
         .badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
         .badge-neutral { background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }
+        .master-tab-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .master-tab-bar::-webkit-scrollbar { display: none; }
+        .master-tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .master-tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .master-tab-btn.active {
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+        .tab-badge {
+            padding: 2px 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: inherit;
+        }
+        .sub-tab-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .sub-tab-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .sub-tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .sub-tab-btn.active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            color: #c084fc;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -104,7 +177,7 @@
 .rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
 .rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link active" aria-current="page">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">ประวัติขาย</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-15 10:21</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link active" aria-current="page">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">ประวัติขาย</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-15 10:56</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
         <!-- HEADER -->
         <div class="header">
             <div>
@@ -176,6 +249,22 @@
             </div>
         </div>
 
+        <!-- MASTER TABS -->
+        <div class="master-tab-bar">
+            <button id="btn-tab-holdings" class="master-tab-btn active" onclick="switchMasterTab('holdings')">
+                <span style="font-size: 1.15rem;">📊</span>
+                <span>ภาพรวม & หุ้นที่ถือครอง</span>
+                <span class="tab-badge">9 หุ้น</span>
+            </button>
+            <button id="btn-tab-ledger" class="master-tab-btn" onclick="switchMasterTab('ledger')">
+                <span style="font-size: 1.15rem;">📑</span>
+                <span>รายการซื้อขายและเติมเงิน</span>
+                <span class="tab-badge">129 รายการ</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: ACTIVE HOLDINGS & OUTLOOK -->
+        <div id="tab-holdings" class="master-tab-content">
         <!-- SECTION 1: ACTIVE HOLDINGS TABLE -->
         <div style="margin-bottom: 36px;">
             <div class="section-title">
@@ -251,7 +340,7 @@
         
         <tr>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
-                <span class="clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.39, 55.23, 59.52, 49.39, 59.52, 65.3)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
+                <span class="clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.39, 55.23, 59.52, 49.39, 59.52, 65)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
             </td>
             <td>Bank of America Corp</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">27.3711</td>
@@ -466,7 +555,7 @@
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                     <div>
-                        <span class="clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.39, 55.23, 59.52, 49.39, 59.52, 65.3)" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
+                        <span class="clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.39, 55.23, 59.52, 49.39, 59.52, 65)" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">Bank of America Corp</div>
                     </div>
                     <span class="badge badge-danger">-5.4%</span>
@@ -486,13 +575,13 @@
             </div>
             <div>
                 <div style="font-size: 0.78rem; color: #cbd5e1; background: rgba(16, 185, 129, 0.06); padding: 6px 8px; border-radius: 4px; border-left: 2px solid var(--emerald); margin-bottom: 8px;">
-                    🎯 <strong>เป้าวอลล์สตรีท:</strong> $65.30 (+27.1%)
+                    🎯 <strong>เป้าวอลล์สตรีท:</strong> $65.00 (+26.5%)
                 </div>
                 <div style="font-size: 0.78rem; color: #fde047; background: rgba(245, 158, 11, 0.08); padding: 6px 8px; border-radius: 4px; border-left: 2px solid var(--amber);">
                     🧭 <strong>แผนแอ็กชัน:</strong> วันงบถัดไปอยู่ห่างอีก 92 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ
                 </div>
                 <div style="margin-top: 10px;">
-                    <button onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.39, 55.23, 59.52, 49.39, 59.52, 65.3)" style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <button onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.39, 55.23, 59.52, 49.39, 59.52, 65)" style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
         </div>
@@ -524,7 +613,7 @@
                     🎯 <strong>เป้าวอลล์สตรีท:</strong> $13.18 (+40.2%)
                 </div>
                 <div style="font-size: 0.78rem; color: #fde047; background: rgba(245, 158, 11, 0.08); padding: 6px 8px; border-radius: 4px; border-left: 2px solid var(--amber);">
-                    🧭 <strong>แผนแอ็กชัน:</strong> กำไรสุทธิ YoY -23.0%. มีวันงบออกในอีก 7.1 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.16) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $11.81
+                    🧭 <strong>แผนแอ็กชัน:</strong> กำไรสุทธิ YoY -23.0%. มีวันงบออกในอีก 7.0 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.16) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $11.81
                 </div>
                 <div style="margin-top: 10px;">
                     <button onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 11.8125, 9.4, 8.67, 10.24, 8.67, 10.24, 13.18)" style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
@@ -629,7 +718,7 @@
                     🎯 <strong>เป้าวอลล์สตรีท:</strong> $331.26 (+48.7%)
                 </div>
                 <div style="font-size: 0.78rem; color: #fde047; background: rgba(245, 158, 11, 0.08); padding: 6px 8px; border-radius: 4px; border-left: 2px solid var(--amber);">
-                    🧭 <strong>แผนแอ็กชัน:</strong> มีวันงบออกในอีก 13.4 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก
+                    🧭 <strong>แผนแอ็กชัน:</strong> มีวันงบออกในอีก 13.3 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก
                 </div>
                 <div style="margin-top: 10px;">
                     <button onclick="openChartModal(&quot;VRT&quot;, &quot;NYSE&quot;, &quot;Vertiv Holdings Co.&quot;, &quot;Electronic Technology&quot;, 237.8007, 222.83, 206.02, 258.1, 206.02, 258.1, 331.26)" style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
@@ -675,9 +764,20 @@
                 </div>
             </div>
         </div>
+        </div>
 
-        <!-- SECTION 2: COMPLETE BUY ORDERS HISTORY (55 BUYS) -->
-        <div style="margin-bottom: 36px;">
+        <!-- TAB 2: TRANSACTIONS & CASH MOVEMENTS -->
+        <div id="tab-ledger" class="master-tab-content" style="display: none;">
+            <div class="sub-tab-bar">
+                <button id="btn-sub-all" class="sub-tab-btn active" onclick="switchSubTab('all')">ทั้งหมด (129)</button>
+                <button id="btn-sub-buys" class="sub-tab-btn" onclick="switchSubTab('buys')">🛒 คำสั่งซื้อหุ้น (55)</button>
+                <button id="btn-sub-sells" class="sub-tab-btn" onclick="switchSubTab('sells')">🏆 ปิดขายทำกำไร (7)</button>
+                <button id="btn-sub-divs" class="sub-tab-btn" onclick="switchSubTab('divs')">💵 เงินปันผล (13)</button>
+                <button id="btn-sub-cash" class="sub-tab-btn" onclick="switchSubTab('cash')">🏦 เติมเงิน & เดินบัญชี (54)</button>
+            </div>
+
+            <!-- SECTION 2: COMPLETE BUY ORDERS HISTORY (55 BUYS) -->
+            <div id="section-buys" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>🛒</span> 2. ประวัติคำสั่งซื้อหุ้นทั้งหมดอย่างละเอียด (Complete Buy Orders History: 55 ไม้)
                 <span class="badge badge-info">สกัดจากสลิปคำสั่งซื้อ Dime! 100% เรียงตามวันเวลาสำเร็จจริง</span>
@@ -1475,9 +1575,10 @@
                 </table>
             </div>
         </div>
+        </div>
 
         <!-- SECTION 3: CLOSED TRADES TABLE (7 SELLS) -->
-        <div style="margin-bottom: 36px;">
+        <div id="section-sells" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <span>🏆</span> 3. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: 7 ไม้)
@@ -2029,9 +2130,10 @@
                 </table>
             </div>
         </div>
+        </div>
 
         <!-- SECTION 4: DIVIDEND STREAM -->
-        <div style="margin-bottom: 36px;">
+        <div id="section-divs" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>💵</span> 4. ประวัติเงินปันผลรับสะสม (Dividends Received: 13 ครั้ง)
                 <span class="badge badge-success">รวม +$141.74 (~฿4,765.30)</span>
@@ -2157,9 +2259,10 @@
                 </table>
             </div>
         </div>
+        </div>
 
         <!-- SECTION 5: CAPITAL & CASH MOVEMENTS STATEMENT -->
-        <div style="margin-bottom: 36px;">
+        <div id="section-cash" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>🏦</span> 5. ข้อมูลการเติมเงินและการเคลื่อนไหวเงินสดในบัญชี (Complete Cash Flow & Deposit Ledger: 54 รายการ)
                 <span class="badge badge-info">KKP Official Statement & สลิป Dime! Save ตั้งแต่วันเปิดบัญชี 2 ก.พ. 69</span>
@@ -2750,6 +2853,8 @@
                 </table>
             </div>
         </div>
+        </div>
+        </div>
 
     </div>
     <script>
@@ -2781,6 +2886,41 @@
             btnText.innerText = allExpanded ? 'หุบรายละเอียดทุกไม้ (Collapse All)' : 'คลี่ดูรายละเอียดทุกไม้ (Expand All)';
         }
     }
+
+    function switchMasterTab(tabName) {
+        document.querySelectorAll('.master-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.master-tab-content').forEach(function(c) { c.style.display = 'none'; });
+        var btn = document.getElementById('btn-tab-' + tabName);
+        var content = document.getElementById('tab-' + tabName);
+        if (btn) btn.classList.add('active');
+        if (content) content.style.display = 'block';
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, null, '#' + tabName);
+        }
+    }
+
+    function switchSubTab(subName) {
+        document.querySelectorAll('.sub-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        var btn = document.getElementById('btn-sub-' + subName);
+        if (btn) btn.classList.add('active');
+        var sections = ['buys', 'sells', 'divs', 'cash'];
+        sections.forEach(function(s) {
+            var el = document.getElementById('section-' + s);
+            if (el) {
+                el.style.display = (subName === 'all' || subName === s) ? 'block' : 'none';
+            }
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        var hash = (window.location.hash || '').replace('#', '');
+        if (hash === 'ledger' || hash === 'transactions' || hash === 'trades') {
+            switchMasterTab('ledger');
+        } else if (hash === 'buys' || hash === 'sells' || hash === 'divs' || hash === 'cash') {
+            switchMasterTab('ledger');
+            switchSubTab(hash);
+        }
+    });
     </script>
     
 <!-- Stock Chart Dedicated Navigation Handler -->

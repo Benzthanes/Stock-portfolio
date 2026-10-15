@@ -672,6 +672,79 @@ def generate_master_dashboard_html(data):
         .badge-info {{ background: rgba(59, 130, 246, 0.15); color: var(--blue); }}
         .badge-purple {{ background: rgba(139, 92, 246, 0.15); color: var(--purple); }}
         .badge-neutral {{ background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }}
+        .master-tab-bar {{
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }}
+        .master-tab-bar::-webkit-scrollbar {{ display: none; }}
+        .master-tab-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }}
+        .master-tab-btn:hover {{
+            color: #fff;
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
+        }}
+        .master-tab-btn.active {{
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }}
+        .tab-badge {{
+            padding: 2px 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: inherit;
+        }}
+        .sub-tab-bar {{
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }}
+        .sub-tab-btn {{
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }}
+        .sub-tab-btn:hover {{
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }}
+        .sub-tab-btn.active {{
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            color: #c084fc;
+            font-weight: 600;
+        }}
     </style>
 </head>
 <body>
@@ -748,6 +821,22 @@ def generate_master_dashboard_html(data):
             </div>
         </div>
 
+        <!-- MASTER TABS -->
+        <div class="master-tab-bar">
+            <button id="btn-tab-holdings" class="master-tab-btn active" onclick="switchMasterTab('holdings')">
+                <span style="font-size: 1.15rem;">📊</span>
+                <span>ภาพรวม & หุ้นที่ถือครอง</span>
+                <span class="tab-badge">{len(data['positions'])} หุ้น</span>
+            </button>
+            <button id="btn-tab-ledger" class="master-tab-btn" onclick="switchMasterTab('ledger')">
+                <span style="font-size: 1.15rem;">📑</span>
+                <span>รายการซื้อขายและเติมเงิน</span>
+                <span class="tab-badge">{len(data['buy_orders']) + len(data['closed_trades']) + len(data['dividends_list']) + len(data['cash_movements'])} รายการ</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: ACTIVE HOLDINGS & OUTLOOK -->
+        <div id="tab-holdings" class="master-tab-content">
         <!-- SECTION 1: ACTIVE HOLDINGS TABLE -->
         <div style="margin-bottom: 36px;">
             <div class="section-title">
@@ -788,9 +877,20 @@ def generate_master_dashboard_html(data):
                 </div>
             </div>
         </div>
+        </div>
 
-        <!-- SECTION 2: COMPLETE BUY ORDERS HISTORY (55 BUYS) -->
-        <div style="margin-bottom: 36px;">
+        <!-- TAB 2: TRANSACTIONS & CASH MOVEMENTS -->
+        <div id="tab-ledger" class="master-tab-content" style="display: none;">
+            <div class="sub-tab-bar">
+                <button id="btn-sub-all" class="sub-tab-btn active" onclick="switchSubTab('all')">ทั้งหมด ({len(data['buy_orders']) + len(data['closed_trades']) + len(data['dividends_list']) + len(data['cash_movements'])})</button>
+                <button id="btn-sub-buys" class="sub-tab-btn" onclick="switchSubTab('buys')">🛒 คำสั่งซื้อหุ้น ({len(data['buy_orders'])})</button>
+                <button id="btn-sub-sells" class="sub-tab-btn" onclick="switchSubTab('sells')">🏆 ปิดขายทำกำไร ({len(data['closed_trades'])})</button>
+                <button id="btn-sub-divs" class="sub-tab-btn" onclick="switchSubTab('divs')">💵 เงินปันผล ({len(data['dividends_list'])})</button>
+                <button id="btn-sub-cash" class="sub-tab-btn" onclick="switchSubTab('cash')">🏦 เติมเงิน & เดินบัญชี ({len(data['cash_movements'])})</button>
+            </div>
+
+            <!-- SECTION 2: COMPLETE BUY ORDERS HISTORY (55 BUYS) -->
+            <div id="section-buys" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>🛒</span> 2. ประวัติคำสั่งซื้อหุ้นทั้งหมดอย่างละเอียด (Complete Buy Orders History: {len(data['buy_orders'])} ไม้)
                 <span class="badge badge-info">สกัดจากสลิปคำสั่งซื้อ Dime! 100% เรียงตามวันเวลาสำเร็จจริง</span>
@@ -818,9 +918,10 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
+        </div>
 
         <!-- SECTION 3: CLOSED TRADES TABLE (7 SELLS) -->
-        <div style="margin-bottom: 36px;">
+        <div id="section-sells" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <span>🏆</span> 3. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: {len(data['closed_trades'])} ไม้)
@@ -856,9 +957,10 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
+        </div>
 
         <!-- SECTION 4: DIVIDEND STREAM -->
-        <div style="margin-bottom: 36px;">
+        <div id="section-divs" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>💵</span> 4. ประวัติเงินปันผลรับสะสม (Dividends Received: {len(data['dividends_list'])} ครั้ง)
                 <span class="badge badge-success">รวม +${data['total_dividends_usd']:.2f} (~฿{data['total_dividends_thb']:,.2f})</span>
@@ -880,9 +982,10 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
+        </div>
 
         <!-- SECTION 5: CAPITAL & CASH MOVEMENTS STATEMENT -->
-        <div style="margin-bottom: 36px;">
+        <div id="section-cash" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>🏦</span> 5. ข้อมูลการเติมเงินและการเคลื่อนไหวเงินสดในบัญชี (Complete Cash Flow & Deposit Ledger: {len(data['cash_movements'])} รายการ)
                 <span class="badge badge-info">KKP Official Statement & สลิป Dime! Save ตั้งแต่วันเปิดบัญชี 2 ก.พ. 69</span>
@@ -933,6 +1036,8 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
         </div>
+        </div>
+        </div>
 
     </div>
     <script>
@@ -964,6 +1069,41 @@ def generate_master_dashboard_html(data):
             btnText.innerText = allExpanded ? 'หุบรายละเอียดทุกไม้ (Collapse All)' : 'คลี่ดูรายละเอียดทุกไม้ (Expand All)';
         }}
     }}
+
+    function switchMasterTab(tabName) {{
+        document.querySelectorAll('.master-tab-btn').forEach(function(b) {{ b.classList.remove('active'); }});
+        document.querySelectorAll('.master-tab-content').forEach(function(c) {{ c.style.display = 'none'; }});
+        var btn = document.getElementById('btn-tab-' + tabName);
+        var content = document.getElementById('tab-' + tabName);
+        if (btn) btn.classList.add('active');
+        if (content) content.style.display = 'block';
+        if (window.history && window.history.replaceState) {{
+            window.history.replaceState(null, null, '#' + tabName);
+        }}
+    }}
+
+    function switchSubTab(subName) {{
+        document.querySelectorAll('.sub-tab-btn').forEach(function(b) {{ b.classList.remove('active'); }});
+        var btn = document.getElementById('btn-sub-' + subName);
+        if (btn) btn.classList.add('active');
+        var sections = ['buys', 'sells', 'divs', 'cash'];
+        sections.forEach(function(s) {{
+            var el = document.getElementById('section-' + s);
+            if (el) {{
+                el.style.display = (subName === 'all' || subName === s) ? 'block' : 'none';
+            }}
+        }});
+    }}
+
+    window.addEventListener('DOMContentLoaded', function() {{
+        var hash = (window.location.hash || '').replace('#', '');
+        if (hash === 'ledger' || hash === 'transactions' || hash === 'trades') {{
+            switchMasterTab('ledger');
+        }} else if (hash === 'buys' || hash === 'sells' || hash === 'divs' || hash === 'cash') {{
+            switchMasterTab('ledger');
+            switchSubTab(hash);
+        }}
+    }});
     </script>
     {get_chart_modal_component()}
 </body>
