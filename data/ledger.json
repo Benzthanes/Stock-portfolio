@@ -1,7 +1,7 @@
 {
   "cash": {
-    "dime_save_thb": 0.01,
-    "dime_usd": 140.96
+    "dime_save_thb": 0.0,
+    "dime_usd": 0.0
   },
   "net_injected_capital_thb": 1245000.0,
   "gross_deposits_thb": 1295000.0,

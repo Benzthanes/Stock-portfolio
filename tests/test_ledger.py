@@ -51,26 +51,30 @@ class BuyTest(LedgerCase):
         self.assertEqual((h["shares"], h["avg_cost_usd"], h["total_cost_usd"], h["cost_thb"]), (20.0, 45.0, 900.0, 30200.0))
         self.assertEqual(h["buy_date"], "2026-01-02")
         ledger = load_ledger(str(self.ledger))
-        self.assertEqual(ledger["cash"], {"dime_save_thb": -16999.99, "dime_usd": 140.96})
+        self.assertEqual(ledger["cash"], {"dime_save_thb": -17000.0, "dime_usd": 0.0})
         self.assertEqual(ledger["cash_movements"][-1], {
             "date_str": "15/10/2026", "type": "ชำระค่าซื้อหุ้น AAA", "amount_thb": -17000.0,
-            "balance_thb": -16999.99, "channel": "Dime! Save", "ref": "trades.py buy"})
+            "balance_thb": -17000.0, "channel": "Dime! Save", "ref": "trades.py buy"})
         self.assertEqual(ledger["buy_orders"], [{
             "fn": "CLI", "ticker": "AAA", "shares": 10.0, "price_usd": 50.0, "amt_usd": 500.0, "amt_thb": 17000.0,
             "fx_rate": 34.0, "date": "15 ต.ค. 69 - 12:00 น.", "order_type": "Market", "account": "Dime! Save (THB)"}])
 
     def test_buy_new_ticker_paid_in_usd_uses_resolver(self):
+        from src.trades import save_ledger
+        ledger = load_ledger(str(self.ledger))
+        ledger["cash"]["dime_usd"] = 100.0
+        save_ledger(ledger, str(self.ledger))
         res = self.buy("bbb", 2, 10.0, pay="usd", trade_date="2026-10-15", exchange_resolver=lambda t: ("NYSE", "Bbb Corp"))
         self.assertEqual(self.holding("BBB"), {"ticker": "BBB", "exchange": "NYSE", "name": "Bbb Corp", "shares": 2.0,
                                                "avg_cost_usd": 10.0, "total_cost_usd": 20.0, "cost_thb": 660.0,
                                                "buy_date": "2026-10-15"})
-        self.assertEqual(load_ledger(str(self.ledger))["cash"], {"dime_save_thb": 0.01, "dime_usd": 120.96})
+        self.assertEqual(load_ledger(str(self.ledger))["cash"], {"dime_save_thb": 0.0, "dime_usd": 80.0})
         self.assertEqual(res["warnings"], [])
 
     def test_buy_overspend_warns_without_blocking(self):
         res = self.buy("AAA", 10, 50.0, pay="usd", trade_date="2026-10-15")
-        self.assertEqual(res["warnings"], ["Dime! USD cash is negative: $-359.04"])
-        self.assertEqual(load_ledger(str(self.ledger))["cash"]["dime_usd"], -359.04)
+        self.assertEqual(res["warnings"], ["Dime! USD cash is negative: $-500.00"])
+        self.assertEqual(load_ledger(str(self.ledger))["cash"]["dime_usd"], -500.0)
 
     def test_buy_rejects_bad_input_and_dry_run_writes_nothing(self):
         with self.assertRaises(ValueError):
@@ -89,8 +93,8 @@ class CashTest(LedgerCase):
         ledger = load_ledger(str(self.ledger))
         self.assertEqual(ledger["net_injected_capital_thb"], 1265000.0)
         self.assertEqual(ledger["gross_deposits_thb"], 1315000.0)
-        self.assertEqual(ledger["cash"]["dime_save_thb"], 20000.01)
-        self.assertEqual(ledger["cash_movements"][-1]["balance_thb"], 20000.01)
+        self.assertEqual(ledger["cash"]["dime_save_thb"], 20000.0)
+        self.assertEqual(ledger["cash_movements"][-1]["balance_thb"], 20000.0)
         self.assertEqual(ledger["cash_movements"][-1]["channel"], "PROMPTPAY")
 
     def test_withdraw_reverses_deposit(self):
@@ -99,13 +103,13 @@ class CashTest(LedgerCase):
         ledger = load_ledger(str(self.ledger))
         self.assertEqual(ledger["net_injected_capital_thb"], 1245000.0)
         self.assertEqual(ledger["transfer_out_thb"], 50500.0)
-        self.assertEqual(ledger["cash"]["dime_save_thb"], 0.01)
+        self.assertEqual(ledger["cash"]["dime_save_thb"], 0.0)
         self.assertEqual(ledger["cash_movements"][-1]["amount_thb"], -500.0)
 
     def test_dividend_raises_dime_usd(self):
         record_dividend("VOO", 1.5, fx_rate=34.0, rate="1.8/หุ้น", trade_date="2026-10-15", ledger_path=str(self.ledger))
         ledger = load_ledger(str(self.ledger))
-        self.assertEqual(ledger["cash"]["dime_usd"], 142.46)
+        self.assertEqual(ledger["cash"]["dime_usd"], 1.5)
         self.assertEqual(ledger["dividends"][0], {"date": "15 ต.ค. 69", "ticker": "VOO", "amount_usd": 1.5,
                                                   "rate": "1.8/หุ้น", "amount_thb": 51.0, "fx_rate": 34.0})
         self.assertEqual(len(ledger["dividends"]), 14)
@@ -113,7 +117,7 @@ class CashTest(LedgerCase):
     def test_sell_credits_proceeds_to_dime_usd(self):
         record_sell("AAA", 50.0, shares=4, fees=1.0, fx_rate=34.0, trade_date="2026-10-15",
                     portfolio_path=str(self.portfolio), trades_path=str(self.trades), ledger_path=str(self.ledger))
-        self.assertEqual(load_ledger(str(self.ledger))["cash"]["dime_usd"], 339.96)
+        self.assertEqual(load_ledger(str(self.ledger))["cash"]["dime_usd"], 199.0)
 
 
 class SyncSkillTest(LedgerCase):
