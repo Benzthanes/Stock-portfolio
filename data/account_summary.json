@@ -3,7 +3,7 @@
   "broker": "Dime! (KKP Securities)",
   "account_no": "2081682995",
   "fx_rate": 33.62,
-  "updated_at": "2026-10-15 07:53:24",
+  "updated_at": "2026-10-15 13:43:30",
   "net_injected_capital_thb": 1245000.0,
   "gross_deposits_thb": 1295000.0,
   "transfer_out_thb": 50000.0,
@@ -659,9 +659,9 @@
         "Attractive PEG 0.4 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 14.1,
+      "days_to_earnings": 13.9,
       "earnings_date": "29 Oct 2026",
-      "is_earnings_near": false,
+      "is_earnings_near": true,
       "key_support": 1133.96,
       "support_desc": "ขอบล่าง Bollinger Band",
       "key_resistance": 1364.39,
@@ -695,50 +695,50 @@
             "published": "1d ago",
             "raw_date": "Tue, 13 Oct 2026 19:24:01 GMT",
             "sentiment": "bullish"
-          },
-          {
-            "title": "Lilly, Merck, AbbVie Stocks Surge. Why Healthcare Is Rallying Today.",
-            "source": "Barron's",
-            "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQanl3UmdlVjVnVTd2dVk3T1VwXzVoMHlBMGVtQnlEejh4dVBfQ1ZJR3FkcWE3eVIzalZkNGwtTkxSOHM5TUI2dlBkaTF5aUR4ODhaOFFnamFRdkpfNnpIWGgteDdaRHNqdlhDM0VOaHlzdlg4SmhEdVc5LTZna2VsQkp3VDRHdFZaRWc?oc=5",
-            "published": "11h ago",
-            "raw_date": "Wed, 14 Oct 2026 20:49:00 GMT",
-            "sentiment": "bullish"
           }
         ],
         "bearish": [],
         "neutral": [
           {
+            "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
+            "published": "16h ago",
+            "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "Why is Eli Lilly stock rallying today?",
             "source": "Investing.com",
             "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
-            "published": "16h ago",
+            "published": "22h ago",
             "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
             "sentiment": "neutral"
           },
           {
-            "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
-            "published": "10h ago",
-            "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
+            "title": "How Investors May Respond To Eli Lilly (LLY) Oral Weight Loss Rollout",
+            "source": "Simply Wall Street",
+            "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNRV82TzhaYnB3dzdBZVB3Zi1wcFJSbmt5TlljTEhPcWp1NzNTczBxOWNPdkx4SURfOHU1UlprbU5wamhITV91MGlOZWJHRGcybGJFMndKLWt6UUJEbVh1czB5WHo5VzN2Wl9QamhfczlRdEw2WkpIOTVlTlJMQWtYemFtdlAwc1dLZVRoYjRfdXJzWGpMUDgydkh5dFJlcnMzM2RBbDdYMUlmVm4wd2Z3VW9FTi1tREc4ZHlfdGdjdnY4SGpoTmF3TWNkM2xrcHZWbG9WTE130gHbAUFVX3lxTE4wWGhIZ1RCYTVuNmdBRlIzbHY0YTBZOVFzT0JhT0x1X1BqaXdkV0pJb0dVVU9rQkZVakVPZUtfUW14NkVhbmRaRFp3WV9SRldtRFk3elhQOG5Pc0RvZi10ZmpPWWdYcm1VYUU0Vm5QejBGQXFKN3MwdzV6ZzJnM2pSV2llbWE5R2tmM1JKSWJNbFo0X2dVTU1GeHlJbkhBdlR1b3ladE5NZXZlUWV0VXVmLWQ4R0NvVHVnQ3h6eHVIbzdTbVE5cVFVVnpxZVZXcGI2cjJwd1VlVGtuaw?oc=5",
+            "published": "4h ago",
+            "raw_date": "Thu, 15 Oct 2026 09:42:26 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
-            "title": "Why is Eli Lilly stock rallying today?",
-            "source": "Investing.com",
-            "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
-            "published": "16h ago",
-            "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
-            "sentiment": "neutral"
-          },
-          {
             "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
-            "published": "10h ago",
+            "published": "16h ago",
             "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "Why is Eli Lilly stock rallying today?",
+            "source": "Investing.com",
+            "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
+            "published": "22h ago",
+            "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
             "sentiment": "neutral"
           },
           {
@@ -750,36 +750,37 @@
             "sentiment": "bullish"
           },
           {
-            "title": "Lilly, Merck, AbbVie Stocks Surge. Why Healthcare Is Rallying Today.",
-            "source": "Barron's",
-            "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQanl3UmdlVjVnVTd2dVk3T1VwXzVoMHlBMGVtQnlEejh4dVBfQ1ZJR3FkcWE3eVIzalZkNGwtTkxSOHM5TUI2dlBkaTF5aUR4ODhaOFFnamFRdkpfNnpIWGgteDdaRHNqdlhDM0VOaHlzdlg4SmhEdVc5LTZna2VsQkp3VDRHdFZaRWc?oc=5",
-            "published": "11h ago",
-            "raw_date": "Wed, 14 Oct 2026 20:49:00 GMT",
-            "sentiment": "bullish"
+            "title": "How Investors May Respond To Eli Lilly (LLY) Oral Weight Loss Rollout",
+            "source": "Simply Wall Street",
+            "link": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNRV82TzhaYnB3dzdBZVB3Zi1wcFJSbmt5TlljTEhPcWp1NzNTczBxOWNPdkx4SURfOHU1UlprbU5wamhITV91MGlOZWJHRGcybGJFMndKLWt6UUJEbVh1czB5WHo5VzN2Wl9QamhfczlRdEw2WkpIOTVlTlJMQWtYemFtdlAwc1dLZVRoYjRfdXJzWGpMUDgydkh5dFJlcnMzM2RBbDdYMUlmVm4wd2Z3VW9FTi1tREc4ZHlfdGdjdnY4SGpoTmF3TWNkM2xrcHZWbG9WTE130gHbAUFVX3lxTE4wWGhIZ1RCYTVuNmdBRlIzbHY0YTBZOVFzT0JhT0x1X1BqaXdkV0pJb0dVVU9rQkZVakVPZUtfUW14NkVhbmRaRFp3WV9SRldtRFk3elhQOG5Pc0RvZi10ZmpPWWdYcm1VYUU0Vm5QejBGQXFKN3MwdzV6ZzJnM2pSV2llbWE5R2tmM1JKSWJNbFo0X2dVTU1GeHlJbkhBdlR1b3ladE5NZXZlUWV0VXVmLWQ4R0NvVHVnQ3h6eHVIbzdTbVE5cVFVVnpxZVZXcGI2cjJwd1VlVGtuaw?oc=5",
+            "published": "4h ago",
+            "raw_date": "Thu, 15 Oct 2026 09:42:26 GMT",
+            "sentiment": "neutral"
           }
         ]
       },
       "news": [
         {
-          "title": "Why is Eli Lilly stock rallying today?",
-          "source": "Investing.com",
-          "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
-          "published": "16h ago",
-          "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
-          "sentiment": "neutral"
-        },
-        {
           "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
           "source": "Yahoo Finance",
           "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
-          "published": "10h ago",
+          "published": "16h ago",
           "raw_date": "Wed, 14 Oct 2026 21:11:03 GMT",
+          "sentiment": "neutral"
+        },
+        {
+          "title": "Why is Eli Lilly stock rallying today?",
+          "source": "Investing.com",
+          "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQRkRZR2REYW5qaERsb3FKQ3FOVWFGQVFFRXJ0c2lyN1NMSlJyOXI1U2FkUmVUa0hmTWI2X193NzJvUk1UeEU3dWQzaVNpRXFjT0R3Z2RoSDJZaThTWmNVcVQ1anpDZGlKQ2Jrek1YY0lqRDdCVTdjMlVTd05iTkxyeU1XYlZqLXFBQmNFODMyOUhiZWR6emRvbll6Q2Q2SHBu?oc=5",
+          "published": "22h ago",
+          "raw_date": "Wed, 14 Oct 2026 14:58:22 GMT",
           "sentiment": "neutral"
         }
       ],
       "weight_pct": 75.68936276837799,
       "alerts": [
-        "🚨 Extreme Concentration (75.7%)"
+        "🚨 Extreme Concentration (75.7%)",
+        "⚠️ Earnings in 13.9d"
       ],
       "rating": {
         "stars_count": 4,
@@ -787,7 +788,7 @@
         "grade": "เกรด A (สุขภาพดี แข็งแกร่ง)",
         "summary": "สถานะ กำไร +18.4%, กราฟ ยืนเหนือเส้น 200 วัน +12.1%.",
         "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+12.1%), โมเมนตัมขาขึ้นแข็งแกร่ง (RSI 60.4), กำไรเติบโตเด่น YoY +93.5%, ฉันทามติตลาด Strong Buy",
-        "risk": "สัดส่วนกระจุกตัวสูง (75.7%)",
+        "risk": "สัดส่วนกระจุกตัวสูง (75.7%), วันประกาศงบใกล้เข้ามา (13.9 วัน)",
         "action": "สถานะแข็งแกร่ง ถือต่อตามแผนเทรดได้อย่างมั่นใจ."
       },
       "financial_health": {
@@ -814,7 +815,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (14.1 วัน)",
+            "period": "ปฏิทินงบ (13.9 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -872,7 +873,7 @@
         "Attractive PEG 0.2 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 12.2,
+      "days_to_earnings": 11.9,
       "earnings_date": "27 Oct 2026",
       "is_earnings_near": true,
       "key_support": 340.59,
@@ -902,19 +903,19 @@
         "ticker": "GOOGL",
         "bullish": [
           {
-            "title": "Prediction: Alphabet Stock Is Going to Soar After Oct. 28",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaFlsSXh3Z2NyZnQ4LWgxckpldGMxR05EaVNHYVJ5OXV0cXoxa0RGdGxqam9PSkt2QW1fVTU4eVgxOVpfV2tBQXpnelAwQlBsT2EtWnZYcDR2OHhaMnMxSXpfUDh5OVJMdUZ1YjRJTDFWY1NXSXNQRW92ekdLaVRvcnFPTW14TkhqQVd6d1hqVmRweExNR2xZ?oc=5",
-            "published": "19h ago",
-            "raw_date": "Wed, 14 Oct 2026 12:09:00 GMT",
+            "title": "Alphabet Stock Can Jump 24%, JPMorgan Says. Why Google Can Defy AI Fears.",
+            "source": "Barron's",
+            "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE91SExKR1JKUTMxSEpGTGxMYkRCX1ZIQ0wwd25pcEJVZ29pc2ZRdlZqN2N6ZHZYdWpVRV9TQkRKUGFwZk4tZFlPMmNQVHFUc25XRTd5YU9QUHVGTm5TQmpRczBYN3ROVjNnUGVQblg2akJKYVJTcG9RQnNLaUY?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 12:30:00 GMT",
             "sentiment": "bullish"
           },
           {
-            "title": "Claude AI Portfolio’s Best-Performing Stock Pick: Alphabet (GOOG)",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQUVVJYTVoR3AyUzM2SXNwdkNlN1NSSmVPYkZHUFlKZ1ExSi12TmVQYVpjT2tScm53LXRpQl9nWjVFR00tTF9jQzA5S3NRR2RCaDdqY1pMaUN5d0ZHR2JOcFBaSVZQYXJFdjZoNXFrdGVjMGY3UHNHYjZBV0JveU9MelRZYXR1UDFmeXJreC0tdG5nVHlBdzA4UG1XVzJHSEF1TkE?oc=5",
-            "published": "1d ago",
-            "raw_date": "Tue, 13 Oct 2026 13:45:22 GMT",
+            "title": "Should You Buy Alphabet Before Oct. 28?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxORFFNMmcyU1IzNWU0aFpXRFVjTlJOWGtxQTl1MHFOMnZ6ekZrbTdtX21yMVRtYlBSMXc3dU9abDJremxKQXBJLWkwaGZlQ2JRS3cxWGFZU0lrYjNvR2hxaWdvV2c1SThNS3B1bFR3WlBSMU40a25pc1FyYmRMZXlxNUJCUEJKaDA?oc=5",
+            "published": "21h ago",
+            "raw_date": "Wed, 14 Oct 2026 16:05:00 GMT",
             "sentiment": "bullish"
           },
           {
@@ -929,29 +930,37 @@
         "bearish": [],
         "neutral": [
           {
-            "title": "Alphabet Stock Climbs: What's Going On?",
-            "source": "Benzinga",
-            "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNV1JwcjNvUzJGeThPSXR2ai1YTnR3MEgtUlhsQnAyLWdYOFN2OTFYeHdFQUQwTHlKSGVIeVR2R3lOazBzWDVnYlNDSTFKemVWQzBacGpOR0FNenA2dHlBejJYUU05ck5pZnVJa3djd0RlSTdVaUJSOTFIdDJuSEtGRXpma2M0Z0o3alJBeHhHeFBweFN4NTNnZ0tuY1NNUQ?oc=5",
-            "published": "17h ago",
-            "raw_date": "Wed, 14 Oct 2026 14:13:01 GMT",
+            "title": "Berkshire Hathaway Quietly Built a $37.4 Billion Stake in Alphabet, Making It the Portfolio's Third-Largest Position",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPU1dHNlg0dHFKQ1RVLU5QV1kyTGl1ZEZtRHA2c2Z1S2tFaGUxNzlUSXFfQmhJcVhWZDRkcGU4bGUtZW1ZM3AxUDhPdllHeVh1NTRHU1FXZzhOTm1OVkxmS1VVSWhMV2F3MDdNRVhmbkRHblJOTHJreDJnUXBlQVFmMTRnTzFFNGh3RkQ3QXRVa3hscHJ2VVpjb1ZtNU9jTWE0WUE?oc=5",
+            "published": "21h ago",
+            "raw_date": "Wed, 14 Oct 2026 16:43:00 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
-            "title": "Prediction: Alphabet Stock Is Going to Soar After Oct. 28",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaFlsSXh3Z2NyZnQ4LWgxckpldGMxR05EaVNHYVJ5OXV0cXoxa0RGdGxqam9PSkt2QW1fVTU4eVgxOVpfV2tBQXpnelAwQlBsT2EtWnZYcDR2OHhaMnMxSXpfUDh5OVJMdUZ1YjRJTDFWY1NXSXNQRW92ekdLaVRvcnFPTW14TkhqQVd6d1hqVmRweExNR2xZ?oc=5",
-            "published": "19h ago",
-            "raw_date": "Wed, 14 Oct 2026 12:09:00 GMT",
+            "title": "Berkshire Hathaway Quietly Built a $37.4 Billion Stake in Alphabet, Making It the Portfolio's Third-Largest Position",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPU1dHNlg0dHFKQ1RVLU5QV1kyTGl1ZEZtRHA2c2Z1S2tFaGUxNzlUSXFfQmhJcVhWZDRkcGU4bGUtZW1ZM3AxUDhPdllHeVh1NTRHU1FXZzhOTm1OVkxmS1VVSWhMV2F3MDdNRVhmbkRHblJOTHJreDJnUXBlQVFmMTRnTzFFNGh3RkQ3QXRVa3hscHJ2VVpjb1ZtNU9jTWE0WUE?oc=5",
+            "published": "21h ago",
+            "raw_date": "Wed, 14 Oct 2026 16:43:00 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "Alphabet Stock Can Jump 24%, JPMorgan Says. Why Google Can Defy AI Fears.",
+            "source": "Barron's",
+            "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE91SExKR1JKUTMxSEpGTGxMYkRCX1ZIQ0wwd25pcEJVZ29pc2ZRdlZqN2N6ZHZYdWpVRV9TQkRKUGFwZk4tZFlPMmNQVHFUc25XRTd5YU9QUHVGTm5TQmpRczBYN3ROVjNnUGVQblg2akJKYVJTcG9RQnNLaUY?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 12:30:00 GMT",
             "sentiment": "bullish"
           },
           {
-            "title": "Claude AI Portfolio’s Best-Performing Stock Pick: Alphabet (GOOG)",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQUVVJYTVoR3AyUzM2SXNwdkNlN1NSSmVPYkZHUFlKZ1ExSi12TmVQYVpjT2tScm53LXRpQl9nWjVFR00tTF9jQzA5S3NRR2RCaDdqY1pMaUN5d0ZHR2JOcFBaSVZQYXJFdjZoNXFrdGVjMGY3UHNHYjZBV0JveU9MelRZYXR1UDFmeXJreC0tdG5nVHlBdzA4UG1XVzJHSEF1TkE?oc=5",
-            "published": "1d ago",
-            "raw_date": "Tue, 13 Oct 2026 13:45:22 GMT",
+            "title": "Should You Buy Alphabet Before Oct. 28?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxORFFNMmcyU1IzNWU0aFpXRFVjTlJOWGtxQTl1MHFOMnZ6ekZrbTdtX21yMVRtYlBSMXc3dU9abDJremxKQXBJLWkwaGZlQ2JRS3cxWGFZU0lrYjNvR2hxaWdvV2c1SThNS3B1bFR3WlBSMU40a25pc1FyYmRMZXlxNUJCUEJKaDA?oc=5",
+            "published": "21h ago",
+            "raw_date": "Wed, 14 Oct 2026 16:05:00 GMT",
             "sentiment": "bullish"
           },
           {
@@ -961,38 +970,30 @@
             "published": "2d ago",
             "raw_date": "Mon, 12 Oct 2026 21:43:14 GMT",
             "sentiment": "bullish"
-          },
-          {
-            "title": "Alphabet Stock Climbs: What's Going On?",
-            "source": "Benzinga",
-            "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNV1JwcjNvUzJGeThPSXR2ai1YTnR3MEgtUlhsQnAyLWdYOFN2OTFYeHdFQUQwTHlKSGVIeVR2R3lOazBzWDVnYlNDSTFKemVWQzBacGpOR0FNenA2dHlBejJYUU05ck5pZnVJa3djd0RlSTdVaUJSOTFIdDJuSEtGRXpma2M0Z0o3alJBeHhHeFBweFN4NTNnZ0tuY1NNUQ?oc=5",
-            "published": "17h ago",
-            "raw_date": "Wed, 14 Oct 2026 14:13:01 GMT",
-            "sentiment": "neutral"
           }
         ]
       },
       "news": [
         {
-          "title": "Prediction: Alphabet Stock Is Going to Soar After Oct. 28",
-          "source": "The Motley Fool",
-          "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaFlsSXh3Z2NyZnQ4LWgxckpldGMxR05EaVNHYVJ5OXV0cXoxa0RGdGxqam9PSkt2QW1fVTU4eVgxOVpfV2tBQXpnelAwQlBsT2EtWnZYcDR2OHhaMnMxSXpfUDh5OVJMdUZ1YjRJTDFWY1NXSXNQRW92ekdLaVRvcnFPTW14TkhqQVd6d1hqVmRweExNR2xZ?oc=5",
-          "published": "19h ago",
-          "raw_date": "Wed, 14 Oct 2026 12:09:00 GMT",
-          "sentiment": "bullish"
+          "title": "Berkshire Hathaway Quietly Built a $37.4 Billion Stake in Alphabet, Making It the Portfolio's Third-Largest Position",
+          "source": "Yahoo Finance",
+          "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPU1dHNlg0dHFKQ1RVLU5QV1kyTGl1ZEZtRHA2c2Z1S2tFaGUxNzlUSXFfQmhJcVhWZDRkcGU4bGUtZW1ZM3AxUDhPdllHeVh1NTRHU1FXZzhOTm1OVkxmS1VVSWhMV2F3MDdNRVhmbkRHblJOTHJreDJnUXBlQVFmMTRnTzFFNGh3RkQ3QXRVa3hscHJ2VVpjb1ZtNU9jTWE0WUE?oc=5",
+          "published": "21h ago",
+          "raw_date": "Wed, 14 Oct 2026 16:43:00 GMT",
+          "sentiment": "neutral"
         },
         {
-          "title": "Claude AI Portfolio’s Best-Performing Stock Pick: Alphabet (GOOG)",
-          "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQUVVJYTVoR3AyUzM2SXNwdkNlN1NSSmVPYkZHUFlKZ1ExSi12TmVQYVpjT2tScm53LXRpQl9nWjVFR00tTF9jQzA5S3NRR2RCaDdqY1pMaUN5d0ZHR2JOcFBaSVZQYXJFdjZoNXFrdGVjMGY3UHNHYjZBV0JveU9MelRZYXR1UDFmeXJreC0tdG5nVHlBdzA4UG1XVzJHSEF1TkE?oc=5",
-          "published": "1d ago",
-          "raw_date": "Tue, 13 Oct 2026 13:45:22 GMT",
+          "title": "Alphabet Stock Can Jump 24%, JPMorgan Says. Why Google Can Defy AI Fears.",
+          "source": "Barron's",
+          "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE91SExKR1JKUTMxSEpGTGxMYkRCX1ZIQ0wwd25pcEJVZ29pc2ZRdlZqN2N6ZHZYdWpVRV9TQkRKUGFwZk4tZFlPMmNQVHFUc25XRTd5YU9QUHVGTm5TQmpRczBYN3ROVjNnUGVQblg2akJKYVJTcG9RQnNLaUY?oc=5",
+          "published": "1h ago",
+          "raw_date": "Thu, 15 Oct 2026 12:30:00 GMT",
           "sentiment": "bullish"
         }
       ],
       "weight_pct": 8.810291213660165,
       "alerts": [
-        "⚠️ Earnings in 12.2d"
+        "⚠️ Earnings in 11.9d"
       ],
       "rating": {
         "stars_count": 5,
@@ -1000,7 +1001,7 @@
         "grade": "เกรด A+ (ยอดเยี่ยม ปลอดภัยสูง)",
         "summary": "สถานะ กำไร +1.7%, กราฟ ยืนเหนือเส้น 200 วัน +2.1%.",
         "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+2.1%), อยู่ใน Institutional Value Zone 💎, กำไรเติบโตเด่น YoY +111.3%, ฉันทามติตลาด Strong Buy",
-        "risk": "วันประกาศงบใกล้เข้ามา (12.2 วัน)",
+        "risk": "วันประกาศงบใกล้เข้ามา (11.9 วัน)",
         "action": "ถือรันเทรนด์ต่อ หรือสะสมเพิ่มตามแนวรับเส้น 200 วัน."
       },
       "financial_health": {
@@ -1027,7 +1028,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (12.2 วัน)",
+            "period": "ปฏิทินงบ (11.9 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -1082,7 +1083,7 @@
         "RSI Hook Up ⤴",
         "MACD Hist Tick 📈"
       ],
-      "days_to_earnings": 21.5,
+      "days_to_earnings": 21.3,
       "earnings_date": "05 Nov 2026",
       "is_earnings_near": false,
       "key_support": 151.66,
@@ -1112,10 +1113,18 @@
         "ticker": "ABNB",
         "bullish": [
           {
+            "title": "Airbnb, Inc. $ABNB Shares Bought by ZWJ Investment Counsel Inc.",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ2pLWUF5QlpxLTF2M001blVkaGJ0bG5wRV9QVFUwck1zTGd4bVk2RERtRjU0Q0VTUUk5aHViSW5qQlhBOWtPNW9uUjZpT3FiY2ZuZ2xuZngwY05Pbk1JczIxemZNY18yU29La05Ob0NmOXYzb3NIeXV0ZGJtemItb3U0Z3VuRGJHX0lpMlFQalkwOG1WN3pXc0s4WDNjN3ZyODQwRGJEZVRBWlN0X2RHQjJuRTFFVXI0N3cwMg?oc=5",
+            "published": "2h ago",
+            "raw_date": "Thu, 15 Oct 2026 11:31:33 GMT",
+            "sentiment": "bullish"
+          },
+          {
             "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
-            "published": "15h ago",
+            "published": "20h ago",
             "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
             "sentiment": "bullish"
           },
@@ -1123,81 +1132,73 @@
             "title": "ABNB Stock Soars 11% After-Hours — Airbnb Raises 2026 Outlook Again On Strong Travel Demand",
             "source": "Stocktwits",
             "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ19BU043SnhnVGNIQndNbDJ1WVFUVVNtd19NZFAwY1dKeFdJMndyUE4zRHhqbjdNSVJBeVhPZHBSSndhVUdlQWtKX0FvVGtKSW0xWVlPcE45ZWlqYUcya3BpeGdsZXVvdDhtY0xOR1JWNThkT0NvdjVqUkVXMzB5c2MtS005OWt3WmdOQkdhLVRCa1RVUk1PM0hmYkt1cWNwdUhzSEZ2bkdtVDJUS3V3Q2RiZTVzZGJiNk1NcQ?oc=5",
-            "published": "2d ago",
+            "published": "3d ago",
             "raw_date": "Mon, 12 Oct 2026 10:39:12 GMT",
-            "sentiment": "bullish"
-          },
-          {
-            "title": "Should You Buy Airbnb Stock For Its Cash?",
-            "source": "Trefis",
-            "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNUGlVYi1QUkJlMUQwX29TcTZwaFUyV3VQQkZxZXdWSUV0OWlZVkc3cGJDcGJzZFZ3VkNRQTlGMW1zZWQtNlY0UkdQZU1EUloxaW9lbmI3YUNNaWNzNWIzNHJaSnhINk5UdXN1WlNrSndMa2R2N09OSEFxaGtuWHV4ZVBCcDhTWkQwcFI3S3lSZlliUkpxVG14enZHS0FHUDgzQWc0?oc=5",
-            "published": "6d ago",
-            "raw_date": "Thu, 08 Oct 2026 20:24:38 GMT",
             "sentiment": "bullish"
           }
         ],
         "bearish": [],
         "neutral": [
           {
-            "title": "Insider Selling: Airbnb (NASDAQ:ABNB) Insider Sells $2,248,925.70 in Stock",
-            "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOYXFYV1I3empkUUd6U1ptWlpPX2pyXzdpVnlUSmMyRGl3ZDI4VnllQ1Mxd2R5SGJwTzdZTW5UQ0VTQ2ZtcFJ2VWt0Q044RlFGa095Q1ZZdXpURXJhRHl3X0tkZ3cxZ0pvcWVRVlVDR0RQQUtMUjhPeGpYaWhLTDIxMGpHR1EtLWZ1cjFtal9oSEw5cS1RYmctNmJXVXNRSUxjMGdFMHE2QnRGajJ5VDY3MGlDc1F3UWVScVVnVDliaXdSWm9OVXFmTg?oc=5",
-            "published": "10h ago",
-            "raw_date": "Wed, 14 Oct 2026 21:33:16 GMT",
+            "title": "Bernstein reiterates Airbnb stock rating on dynamic pricing rollout",
+            "source": "Investing.com",
+            "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPeHpjczBTT0Z2RHVZaTZpNlpHY2EwWUg2NDlMSWs5cHpmczh4bkQ3N0pBM29kRlFBN05ETGRFSmUzZHNtQ21iNG83bDZkLXhrX0Y1cHBoQm9CUTZhVVNOMVhoZ3EzSVg4Q2Q4VGZWOTZ6TEhZUGtkYTFwMkpJOXFpdEZVSGFtVW1NOVlYLWducEo1Y0syNHdvTXoyOGNiNjNmbDBmM1ZaV0luVjJ3dDJYb2k4c3R6Q2V1MEhFTVUzd1pnN2NWdHc?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 13:57:22 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
-            "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
-            "published": "15h ago",
-            "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
+            "title": "Airbnb, Inc. $ABNB Shares Bought by ZWJ Investment Counsel Inc.",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ2pLWUF5QlpxLTF2M001blVkaGJ0bG5wRV9QVFUwck1zTGd4bVk2RERtRjU0Q0VTUUk5aHViSW5qQlhBOWtPNW9uUjZpT3FiY2ZuZ2xuZngwY05Pbk1JczIxemZNY18yU29La05Ob0NmOXYzb3NIeXV0ZGJtemItb3U0Z3VuRGJHX0lpMlFQalkwOG1WN3pXc0s4WDNjN3ZyODQwRGJEZVRBWlN0X2RHQjJuRTFFVXI0N3cwMg?oc=5",
+            "published": "2h ago",
+            "raw_date": "Thu, 15 Oct 2026 11:31:33 GMT",
             "sentiment": "bullish"
           },
           {
-            "title": "Insider Selling: Airbnb (NASDAQ:ABNB) Insider Sells $2,248,925.70 in Stock",
-            "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOYXFYV1I3empkUUd6U1ptWlpPX2pyXzdpVnlUSmMyRGl3ZDI4VnllQ1Mxd2R5SGJwTzdZTW5UQ0VTQ2ZtcFJ2VWt0Q044RlFGa095Q1ZZdXpURXJhRHl3X0tkZ3cxZ0pvcWVRVlVDR0RQQUtMUjhPeGpYaWhLTDIxMGpHR1EtLWZ1cjFtal9oSEw5cS1RYmctNmJXVXNRSUxjMGdFMHE2QnRGajJ5VDY3MGlDc1F3UWVScVVnVDliaXdSWm9OVXFmTg?oc=5",
-            "published": "10h ago",
-            "raw_date": "Wed, 14 Oct 2026 21:33:16 GMT",
-            "sentiment": "neutral"
+            "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
+            "published": "20h ago",
+            "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
+            "sentiment": "bullish"
           },
           {
             "title": "ABNB Stock Soars 11% After-Hours — Airbnb Raises 2026 Outlook Again On Strong Travel Demand",
             "source": "Stocktwits",
             "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ19BU043SnhnVGNIQndNbDJ1WVFUVVNtd19NZFAwY1dKeFdJMndyUE4zRHhqbjdNSVJBeVhPZHBSSndhVUdlQWtKX0FvVGtKSW0xWVlPcE45ZWlqYUcya3BpeGdsZXVvdDhtY0xOR1JWNThkT0NvdjVqUkVXMzB5c2MtS005OWt3WmdOQkdhLVRCa1RVUk1PM0hmYkt1cWNwdUhzSEZ2bkdtVDJUS3V3Q2RiZTVzZGJiNk1NcQ?oc=5",
-            "published": "2d ago",
+            "published": "3d ago",
             "raw_date": "Mon, 12 Oct 2026 10:39:12 GMT",
             "sentiment": "bullish"
           },
           {
-            "title": "Should You Buy Airbnb Stock For Its Cash?",
-            "source": "Trefis",
-            "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNUGlVYi1QUkJlMUQwX29TcTZwaFUyV3VQQkZxZXdWSUV0OWlZVkc3cGJDcGJzZFZ3VkNRQTlGMW1zZWQtNlY0UkdQZU1EUloxaW9lbmI3YUNNaWNzNWIzNHJaSnhINk5UdXN1WlNrSndMa2R2N09OSEFxaGtuWHV4ZVBCcDhTWkQwcFI3S3lSZlliUkpxVG14enZHS0FHUDgzQWc0?oc=5",
-            "published": "6d ago",
-            "raw_date": "Thu, 08 Oct 2026 20:24:38 GMT",
-            "sentiment": "bullish"
+            "title": "Bernstein reiterates Airbnb stock rating on dynamic pricing rollout",
+            "source": "Investing.com",
+            "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPeHpjczBTT0Z2RHVZaTZpNlpHY2EwWUg2NDlMSWs5cHpmczh4bkQ3N0pBM29kRlFBN05ETGRFSmUzZHNtQ21iNG83bDZkLXhrX0Y1cHBoQm9CUTZhVVNOMVhoZ3EzSVg4Q2Q4VGZWOTZ6TEhZUGtkYTFwMkpJOXFpdEZVSGFtVW1NOVlYLWducEo1Y0syNHdvTXoyOGNiNjNmbDBmM1ZaV0luVjJ3dDJYb2k4c3R6Q2V1MEhFTVUzd1pnN2NWdHc?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 13:57:22 GMT",
+            "sentiment": "neutral"
           }
         ]
       },
       "news": [
         {
-          "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
-          "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
-          "published": "15h ago",
-          "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
+          "title": "Airbnb, Inc. $ABNB Shares Bought by ZWJ Investment Counsel Inc.",
+          "source": "MarketBeat",
+          "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNZ2pLWUF5QlpxLTF2M001blVkaGJ0bG5wRV9QVFUwck1zTGd4bVk2RERtRjU0Q0VTUUk5aHViSW5qQlhBOWtPNW9uUjZpT3FiY2ZuZ2xuZngwY05Pbk1JczIxemZNY18yU29La05Ob0NmOXYzb3NIeXV0ZGJtemItb3U0Z3VuRGJHX0lpMlFQalkwOG1WN3pXc0s4WDNjN3ZyODQwRGJEZVRBWlN0X2RHQjJuRTFFVXI0N3cwMg?oc=5",
+          "published": "2h ago",
+          "raw_date": "Thu, 15 Oct 2026 11:31:33 GMT",
           "sentiment": "bullish"
         },
         {
-          "title": "Insider Selling: Airbnb (NASDAQ:ABNB) Insider Sells $2,248,925.70 in Stock",
-          "source": "MarketBeat",
-          "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOYXFYV1I3empkUUd6U1ptWlpPX2pyXzdpVnlUSmMyRGl3ZDI4VnllQ1Mxd2R5SGJwTzdZTW5UQ0VTQ2ZtcFJ2VWt0Q044RlFGa095Q1ZZdXpURXJhRHl3X0tkZ3cxZ0pvcWVRVlVDR0RQQUtMUjhPeGpYaWhLTDIxMGpHR1EtLWZ1cjFtal9oSEw5cS1RYmctNmJXVXNRSUxjMGdFMHE2QnRGajJ5VDY3MGlDc1F3UWVScVVnVDliaXdSWm9OVXFmTg?oc=5",
-          "published": "10h ago",
-          "raw_date": "Wed, 14 Oct 2026 21:33:16 GMT",
-          "sentiment": "neutral"
+          "title": "Airbnb (ABNB) vs. EXPE and TCOM: Can Double-Digit Growth Offset Rising Regulatory Pressure?",
+          "source": "Yahoo Finance",
+          "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPYkRRS0plaGUyeTlPQVJlcjRLeEVUbkxubjU2bE1JeDZ6a1ZKR1hnMzJlRG4wcTNRVUU5UGc4UFdtWDYtUUt0V09TVXFRSnF0b1pUZnBjd3VLdl9wNHZDVk1Fdnp1WGZBQmt1OFVHTWtEYkRDUkRYRTBGMUkwY0tUZWFhbWlTalV3YXFKcUJxVm5SbzA?oc=5",
+          "published": "20h ago",
+          "raw_date": "Wed, 14 Oct 2026 16:45:11 GMT",
+          "sentiment": "bullish"
         }
       ],
       "weight_pct": 3.717411510096079,
@@ -1235,7 +1236,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (21.5 วัน)",
+            "period": "ปฏิทินงบ (21.3 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -1294,7 +1295,7 @@
         "Wall St Strong Buy 🌟",
         "⚠️ High ADX Falling Knife"
       ],
-      "days_to_earnings": 92.2,
+      "days_to_earnings": 91.9,
       "earnings_date": "15 Jan 2027",
       "is_earnings_near": false,
       "key_support": 55.23,
@@ -1309,106 +1310,105 @@
       "net_inc_growth_yoy": 8.74,
       "peg": 0.9,
       "pe": 12.25,
-      "rec_mark": 1.27,
+      "rec_mark": 1.25,
       "fcf": null,
-      "price_target_average": 64.57,
+      "price_target_average": 64.04,
       "price_target_high": 75,
       "price_target_low": 56,
-      "target_upside_pct": 25.6,
+      "target_upside_pct": 24.6,
       "rec_buy": 19,
-      "rec_hold": 6,
+      "rec_hold": 5,
       "rec_sell": 0,
       "sector": "Finance",
       "industry": "Major Banks",
       "catalysts": {
         "ticker": "BAC",
-        "bullish": [
-          {
-            "title": "Is Bank of America's Stock a Buy Ahead of Its Q3 Earnings Report on Oct. 14?",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOTkxJR1FJVUtiSVVoUmJpZzVxRkFPUlhFQ011M3hCY1NYY3ZPTUZ1SlNVSWdRU0VjNmp4eWlTYjJOMEZobGZUMUNOSUU5dE53TlBVQjU3T0x5ZS04QUZKWndFYnRoSHBWb2pEbEV2d2NSNU1aWUgwbmlDclBEa1lhZ1NHeV9feVFSVWZHOGNIeG9RZ1ZKeHN6eXpXcmplcUhwdmJJeC1mSXVvcG1wS0p4dmtBTGlMd0lD?oc=5",
-            "published": "2d ago",
-            "raw_date": "Mon, 12 Oct 2026 21:30:00 GMT",
-            "sentiment": "bullish"
-          }
-        ],
+        "bullish": [],
         "bearish": [
+          {
+            "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+            "published": "1d ago",
+            "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
+            "sentiment": "bearish"
+          },
           {
             "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
             "source": "CNBC",
             "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
-            "published": "21h ago",
+            "published": "1d ago",
             "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
+            "sentiment": "bearish"
+          },
+          {
+            "title": "Bank of America stock falls after earnings miss and $1.2 billion penalty",
+            "source": "Quartz",
+            "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5zdmYtQWFhUmFkSE9EU2xPVXB6aWt4Ykc4aTl0OXoyMmpMZnV0OVU0VEJxczdZN2J2SzFQY1pHaXJSMUNFaW5ISVJ6aVMyZ3pxaDFoTHdGOUFYanl5ZnA0eVhUOFV1NU8wQVlfWkFmc1I?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 12:13:08 GMT",
             "sentiment": "bearish"
           }
         ],
         "neutral": [
           {
-            "title": "Bank of America Q3 profit tumbles 17% as deals, trading revenue fall",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQOEpNQ2FyTTdDSEE1WHhKelROYlBtTGVIbi1LUnFtbVBfSWNDaDZ3LUR2anVJdzdsVnJpa3hhUFcybkJzbzRaQlM1akFsOUdXLWp5Zkh1bHhwN3hVMWc0RXpJZWJJSGZtS3JvRUZ1MUNaOGJtNmFxZ0NJbnVPaGhaV1RPeDNRVWVUUlJxY0RBa0FJVEFxei1xaDdtQjc4dTBTOEF0ektwaGw0TUlzQTVIYkd5YW1vcTRQZ1BGb0M5eWk?oc=5",
-            "published": "20h ago",
-            "raw_date": "Wed, 14 Oct 2026 11:20:16 GMT",
-            "sentiment": "mixed"
-          },
-          {
             "title": "The black sheep of bank earnings: Why BofA stock is having its worst day in 18 months",
             "source": "Business Insider",
             "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOdk5xcDFadEgyOG1wNzVhNzlfOHJ1c3BLNmdUclR6MDRvTlZRT09YVW5BTHpRc3M0N3VEdDBxcF9CcFZ5aGphMWU4dU1md3duWFVkZGtyNGpoMHdkNlFpVl9CY3BiWURPbWpiMXV3T0pIcFJmQ3lGQ0xWYU1uV0N3UElnMGpXR2tSS0ZiMFkzd0FSZw?oc=5",
-            "published": "11h ago",
+            "published": "17h ago",
             "raw_date": "Wed, 14 Oct 2026 20:16:00 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
-            "title": "Bank of America Q3 profit tumbles 17% as deals, trading revenue fall",
+            "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
             "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQOEpNQ2FyTTdDSEE1WHhKelROYlBtTGVIbi1LUnFtbVBfSWNDaDZ3LUR2anVJdzdsVnJpa3hhUFcybkJzbzRaQlM1akFsOUdXLWp5Zkh1bHhwN3hVMWc0RXpJZWJJSGZtS3JvRUZ1MUNaOGJtNmFxZ0NJbnVPaGhaV1RPeDNRVWVUUlJxY0RBa0FJVEFxei1xaDdtQjc4dTBTOEF0ektwaGw0TUlzQTVIYkd5YW1vcTRQZ1BGb0M5eWk?oc=5",
-            "published": "20h ago",
-            "raw_date": "Wed, 14 Oct 2026 11:20:16 GMT",
-            "sentiment": "mixed"
+            "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+            "published": "1d ago",
+            "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
+            "sentiment": "bearish"
           },
           {
             "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
             "source": "CNBC",
             "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
-            "published": "21h ago",
+            "published": "1d ago",
             "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
+            "sentiment": "bearish"
+          },
+          {
+            "title": "Bank of America stock falls after earnings miss and $1.2 billion penalty",
+            "source": "Quartz",
+            "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5zdmYtQWFhUmFkSE9EU2xPVXB6aWt4Ykc4aTl0OXoyMmpMZnV0OVU0VEJxczdZN2J2SzFQY1pHaXJSMUNFaW5ISVJ6aVMyZ3pxaDFoTHdGOUFYanl5ZnA0eVhUOFV1NU8wQVlfWkFmc1I?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 12:13:08 GMT",
             "sentiment": "bearish"
           },
           {
             "title": "The black sheep of bank earnings: Why BofA stock is having its worst day in 18 months",
             "source": "Business Insider",
             "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOdk5xcDFadEgyOG1wNzVhNzlfOHJ1c3BLNmdUclR6MDRvTlZRT09YVW5BTHpRc3M0N3VEdDBxcF9CcFZ5aGphMWU4dU1md3duWFVkZGtyNGpoMHdkNlFpVl9CY3BiWURPbWpiMXV3T0pIcFJmQ3lGQ0xWYU1uV0N3UElnMGpXR2tSS0ZiMFkzd0FSZw?oc=5",
-            "published": "11h ago",
+            "published": "17h ago",
             "raw_date": "Wed, 14 Oct 2026 20:16:00 GMT",
             "sentiment": "neutral"
-          },
-          {
-            "title": "Is Bank of America's Stock a Buy Ahead of Its Q3 Earnings Report on Oct. 14?",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOTkxJR1FJVUtiSVVoUmJpZzVxRkFPUlhFQ011M3hCY1NYY3ZPTUZ1SlNVSWdRU0VjNmp4eWlTYjJOMEZobGZUMUNOSUU5dE53TlBVQjU3T0x5ZS04QUZKWndFYnRoSHBWb2pEbEV2d2NSNU1aWUgwbmlDclBEa1lhZ1NHeV9feVFSVWZHOGNIeG9RZ1ZKeHN6eXpXcmplcUhwdmJJeC1mSXVvcG1wS0p4dmtBTGlMd0lD?oc=5",
-            "published": "2d ago",
-            "raw_date": "Mon, 12 Oct 2026 21:30:00 GMT",
-            "sentiment": "bullish"
           }
         ]
       },
       "news": [
         {
-          "title": "Bank of America Q3 profit tumbles 17% as deals, trading revenue fall",
+          "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
           "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQOEpNQ2FyTTdDSEE1WHhKelROYlBtTGVIbi1LUnFtbVBfSWNDaDZ3LUR2anVJdzdsVnJpa3hhUFcybkJzbzRaQlM1akFsOUdXLWp5Zkh1bHhwN3hVMWc0RXpJZWJJSGZtS3JvRUZ1MUNaOGJtNmFxZ0NJbnVPaGhaV1RPeDNRVWVUUlJxY0RBa0FJVEFxei1xaDdtQjc4dTBTOEF0ektwaGw0TUlzQTVIYkd5YW1vcTRQZ1BGb0M5eWk?oc=5",
-          "published": "20h ago",
-          "raw_date": "Wed, 14 Oct 2026 11:20:16 GMT",
-          "sentiment": "mixed"
+          "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+          "published": "1d ago",
+          "raw_date": "Wed, 14 Oct 2026 13:03:49 GMT",
+          "sentiment": "bearish"
         },
         {
           "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
           "source": "CNBC",
           "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
-          "published": "21h ago",
+          "published": "1d ago",
           "raw_date": "Wed, 14 Oct 2026 10:15:01 GMT",
           "sentiment": "bearish"
         }
@@ -1460,7 +1460,7 @@
             "event": "การกลับมาของกิจกรรมซื้อหุ้นคืน (Share Repurchase Program) หลังเงินกองทุน Tier 1 แข็งแกร่งเกินเกณฑ์"
           }
         ],
-        "wall_street_verdict": "สถาบัน 25 แห่งไม่มีคำแนะนำ 'Sell' เลยแม้แต่รายเดียว! เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ $56.00 (สูงกว่าต้นทุนของคุณ $54.31 แล้ว!) เป้าหมายเฉลี่ย $64.57 (Upside +25.6%)",
+        "wall_street_verdict": "สถาบัน 25 แห่งไม่มีคำแนะนำ 'Sell' เลยแม้แต่รายเดียว! เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ $56.00 (สูงกว่าต้นทุนของคุณ $54.31 แล้ว!) เป้าหมายเฉลี่ย $64.04 (Upside +24.6%)",
         "tailored_roadmap": "วันงบถัดไปอยู่ห่างอีก 92 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ",
         "invalidation_risk": "หากราคาปิดหลุดแนวรับ Stop-Loss และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง"
       }
@@ -1500,7 +1500,7 @@
       "signal_tags": [
         "Touch BB Lower Band"
       ],
-      "days_to_earnings": 6.9,
+      "days_to_earnings": 6.6,
       "earnings_date": "22 Oct 2026",
       "is_earnings_near": true,
       "key_support": 8.67,
@@ -1528,18 +1528,17 @@
       "industry": "Telecommunications Equipment",
       "catalysts": {
         "ticker": "NOK",
-        "bullish": [
-          {
-            "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
-            "source": "24/7 Wall St.",
-            "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQNjZwaVoxeXlJcW93ZlowUmdWTUdDcWF4N1ZURmk2NmRnUmtEUHhxQkdkaHFXSkRkRUZMRUhVVTkzVnBWZmFEWHZGUEVvMHNha2R1T09QLWg1eU9jVUllTmhCc1RKRjBlRk1GU2hPUWVkb0U1OWhLeFNmWW96RTgxMnFwZDZZSldrUUZDUG0xVHZrZWtuYnR1LVZ3WmY0aTBvcThIZE1JU0tMVFlsaGE1SllEYw?oc=5",
-            "published": "1d ago",
-            "raw_date": "Tue, 13 Oct 2026 13:20:00 GMT",
-            "sentiment": "bullish"
-          }
-        ],
+        "bullish": [],
         "bearish": [],
         "neutral": [
+          {
+            "title": "Nokia stock may move 8.9% on earnings release next week",
+            "source": "Investing.com",
+            "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOdE1yWmVnSF9ySUtYbVhaclJfbnFqa3ZCd0s1MlNtTEtWbUNPWklhQUZvWmtuS0d3clFvM0l0bm1qMXZFMXc3VE1fVkdyd0RDdTNzd0pyZTl2UXFYQjRkNWRkWFVjLVU2NUctUHM0dEthbW5zNXFrdzhTV2JFS0FxZGRlRXZ2aEpEOEtyVkNocjhzSkV3SnF3SUlLVFRQNGlJVWR1emtYQkNEclpieGgxakMxSGZwUQ?oc=5",
+            "published": "40m ago",
+            "raw_date": "Thu, 15 Oct 2026 13:03:28 GMT",
+            "sentiment": "neutral"
+          },
           {
             "title": "Nokia Stock Is Falling Monday: What's Going On?",
             "source": "Benzinga",
@@ -1549,12 +1548,12 @@
             "sentiment": "neutral"
           },
           {
-            "title": "Nokia Corporation Sponsored (NOK) Stock Forecasts",
+            "title": "NOK Gears Up to Report Q3 Earnings: Buy, Sell or Hold the Stock?",
             "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPbHlsTG50b0JBZDFMaWtGUzBZQ1J2RENCcHY1VWJxb3pOUFpKZXRZbGp6OUJfOWgwdDNfNHcxZ3o1VWs0ZlJUWlBCSGkyUFNqTU03elB6OGJJcURzU3pic0NqS1pQZjRTakhoZHMwTk12SjBpVVN4TU5BTzhnUHA4aUJ6WkZ2ZlN2SWRzTA?oc=5",
-            "published": "6h ago",
-            "raw_date": "Thu, 15 Oct 2026 01:48:10 GMT",
-            "sentiment": "neutral"
+            "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPbGk1dENEOGhDZE91VEJHNTdiYnAwY2dDVloyMndhTVBqWVo5NG1tdWUwakJhSm1SNmliS0UyUkFZajVUMk5vWXVxQVNQMlliZlVOQ3JLSW1PTGJ1SDduZEZ3V2tMMy05dUZBOWNuUjNRYlFKcEVqTlRQQ2tSakx0eGZGZzJrVF83VWZRc1BjNl9ZYkwzRUgxWg?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 14:58:00 GMT",
+            "sentiment": "mixed"
           },
           {
             "title": "Nokia to sell Enterprise Campus Edge business to AURELIUS",
@@ -1567,6 +1566,14 @@
         ],
         "all": [
           {
+            "title": "Nokia stock may move 8.9% on earnings release next week",
+            "source": "Investing.com",
+            "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOdE1yWmVnSF9ySUtYbVhaclJfbnFqa3ZCd0s1MlNtTEtWbUNPWklhQUZvWmtuS0d3clFvM0l0bm1qMXZFMXc3VE1fVkdyd0RDdTNzd0pyZTl2UXFYQjRkNWRkWFVjLVU2NUctUHM0dEthbW5zNXFrdzhTV2JFS0FxZGRlRXZ2aEpEOEtyVkNocjhzSkV3SnF3SUlLVFRQNGlJVWR1emtYQkNEclpieGgxakMxSGZwUQ?oc=5",
+            "published": "40m ago",
+            "raw_date": "Thu, 15 Oct 2026 13:03:28 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "Nokia Stock Is Falling Monday: What's Going On?",
             "source": "Benzinga",
             "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxOelJfZG5ZZVlNVUljb29oOWFaUUdMM1k2MHQ4UlQ3QVhIZXpkQVFMT0d4b1hPTUdIdnVJZmJabGx2a1ctbTlkTS1mUDBuY3Y4RXpqMXQ2cUpyWEU2WjQySFVfd3EwekM3cHNydHNUX1BXSUNaMWJRbk9hVVVLZy1vRVJ5MEtKQUhSeFk1WThhclhMY2ZHb21kanEwRG1DUQ?oc=5",
@@ -1575,12 +1582,12 @@
             "sentiment": "neutral"
           },
           {
-            "title": "Nokia Corporation Sponsored (NOK) Stock Forecasts",
+            "title": "NOK Gears Up to Report Q3 Earnings: Buy, Sell or Hold the Stock?",
             "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPbHlsTG50b0JBZDFMaWtGUzBZQ1J2RENCcHY1VWJxb3pOUFpKZXRZbGp6OUJfOWgwdDNfNHcxZ3o1VWs0ZlJUWlBCSGkyUFNqTU03elB6OGJJcURzU3pic0NqS1pQZjRTakhoZHMwTk12SjBpVVN4TU5BTzhnUHA4aUJ6WkZ2ZlN2SWRzTA?oc=5",
-            "published": "6h ago",
-            "raw_date": "Thu, 15 Oct 2026 01:48:10 GMT",
-            "sentiment": "neutral"
+            "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPbGk1dENEOGhDZE91VEJHNTdiYnAwY2dDVloyMndhTVBqWVo5NG1tdWUwakJhSm1SNmliS0UyUkFZajVUMk5vWXVxQVNQMlliZlVOQ3JLSW1PTGJ1SDduZEZ3V2tMMy05dUZBOWNuUjNRYlFKcEVqTlRQQ2tSakx0eGZGZzJrVF83VWZRc1BjNl9ZYkwzRUgxWg?oc=5",
+            "published": "2d ago",
+            "raw_date": "Mon, 12 Oct 2026 14:58:00 GMT",
+            "sentiment": "mixed"
           },
           {
             "title": "Nokia to sell Enterprise Campus Edge business to AURELIUS",
@@ -1589,18 +1596,18 @@
             "published": "2d ago",
             "raw_date": "Tue, 13 Oct 2026 05:00:33 GMT",
             "sentiment": "mixed"
-          },
-          {
-            "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
-            "source": "24/7 Wall St.",
-            "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQNjZwaVoxeXlJcW93ZlowUmdWTUdDcWF4N1ZURmk2NmRnUmtEUHhxQkdkaHFXSkRkRUZMRUhVVTkzVnBWZmFEWHZGUEVvMHNha2R1T09QLWg1eU9jVUllTmhCc1RKRjBlRk1GU2hPUWVkb0U1OWhLeFNmWW96RTgxMnFwZDZZSldrUUZDUG0xVHZrZWtuYnR1LVZ3WmY0aTBvcThIZE1JU0tMVFlsaGE1SllEYw?oc=5",
-            "published": "1d ago",
-            "raw_date": "Tue, 13 Oct 2026 13:20:00 GMT",
-            "sentiment": "bullish"
           }
         ]
       },
       "news": [
+        {
+          "title": "Nokia stock may move 8.9% on earnings release next week",
+          "source": "Investing.com",
+          "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOdE1yWmVnSF9ySUtYbVhaclJfbnFqa3ZCd0s1MlNtTEtWbUNPWklhQUZvWmtuS0d3clFvM0l0bm1qMXZFMXc3VE1fVkdyd0RDdTNzd0pyZTl2UXFYQjRkNWRkWFVjLVU2NUctUHM0dEthbW5zNXFrdzhTV2JFS0FxZGRlRXZ2aEpEOEtyVkNocjhzSkV3SnF3SUlLVFRQNGlJVWR1emtYQkNEclpieGgxakMxSGZwUQ?oc=5",
+          "published": "40m ago",
+          "raw_date": "Thu, 15 Oct 2026 13:03:28 GMT",
+          "sentiment": "neutral"
+        },
         {
           "title": "Nokia Stock Is Falling Monday: What's Going On?",
           "source": "Benzinga",
@@ -1608,20 +1615,12 @@
           "published": "2d ago",
           "raw_date": "Mon, 12 Oct 2026 15:42:32 GMT",
           "sentiment": "neutral"
-        },
-        {
-          "title": "Nokia Corporation Sponsored (NOK) Stock Forecasts",
-          "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPbHlsTG50b0JBZDFMaWtGUzBZQ1J2RENCcHY1VWJxb3pOUFpKZXRZbGp6OUJfOWgwdDNfNHcxZ3o1VWs0ZlJUWlBCSGkyUFNqTU03elB6OGJJcURzU3pic0NqS1pQZjRTakhoZHMwTk12SjBpVVN4TU5BTzhnUHA4aUJ6WkZ2ZlN2SWRzTA?oc=5",
-          "published": "6h ago",
-          "raw_date": "Thu, 15 Oct 2026 01:48:10 GMT",
-          "sentiment": "neutral"
         }
       ],
       "weight_pct": 2.9323013674204987,
       "alerts": [
         "🔻 Drawdown (-20.4%)",
-        "⚠️ Earnings in 6.9d"
+        "⚠️ Earnings in 6.6d"
       ],
       "rating": {
         "stars_count": 2,
@@ -1629,7 +1628,7 @@
         "grade": "เกรด C (เฝ้าระวัง / เสี่ยงสูง)",
         "summary": "สถานะ ขาดทุน -20.4%, กราฟ ยืนเหนือเส้น 200 วัน -7.5%.",
         "strength": "ราคาทรงตัวในกรอบสะสมพลัง.",
-        "risk": "ขาดทุนสะสม (-20.4%), ราคาหลุดต่ำกว่าเส้น 200 วัน (-7.5%), วันประกาศงบใกล้เข้ามา (6.9 วัน), กำไรสุทธิหดตัว YoY -23.0%",
+        "risk": "ขาดทุนสะสม (-20.4%), ราคาหลุดต่ำกว่าเส้น 200 วัน (-7.5%), วันประกาศงบใกล้เข้ามา (6.6 วัน), กำไรสุทธิหดตัว YoY -23.0%",
         "action": "ระมัดระวังการซื้อถัวเฉลี่ย รอแท่งเทียนสร้างฐานชัดเจน."
       },
       "financial_health": {
@@ -1656,7 +1655,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะประชิด (6.9 วัน)",
+            "period": "ระยะประชิด (6.6 วัน)",
             "event": "ประกาศผลประกอบการไตรมาส 3: ตัวชี้ขาด Gross Margin และคำสั่งซื้อ Network Infrastructure"
           },
           {
@@ -1669,7 +1668,7 @@
           }
         ],
         "wall_street_verdict": "สถาบัน 27 แห่งให้เป้าหมายเฉลี่ย $13.18 (Upside +40.2%) โดยเป้าหมายต่ำสุดอยู่ที่ $7.39 และสูงสุดที่ $20.41",
-        "tailored_roadmap": "กำไรสุทธิ YoY -23.0%. มีวันงบออกในอีก 6.9 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.16) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $11.81",
+        "tailored_roadmap": "กำไรสุทธิ YoY -23.0%. มีวันงบออกในอีก 6.6 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.16) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $11.81",
         "invalidation_risk": "หากงบ Q3 ชะลอตัวลงเกินคาดและราคาหลุดจุดตัดขาดทุน (หลุดแนวรับโครงสร้างหลัก) ต้องพิจารณา Cut Loss เพื่อปกป้องเงินต้นส่วนใหญ่"
       }
     },
@@ -1713,7 +1712,7 @@
         "Attractive PEG 0.2 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 20.5,
+      "days_to_earnings": 20.3,
       "earnings_date": "04 Nov 2026",
       "is_earnings_near": false,
       "key_support": 252.42,
@@ -1743,29 +1742,21 @@
         "ticker": "APP",
         "bullish": [
           {
-            "title": "AppLovin (APP) vs. U and TTD: Can AXON’s AI Advantage Outpace Execution Risks?",
-            "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZnlXTEViaGVUV2MxcXZyUmRmTUpHRmNQbUZxZ3AxajMxVzBvVDAzQkhrVk5vSFdrTVJOa1pkT25leDNQRXIyRkZLLXF1bzlPRGVVRE91R3A0ekpobGJ5SHhDMDdqaXVKQTBaeGhfXzRoZlROalgtek9DUmNkR3IyTE5RaWxRaTk0dHFHaU5MVQ?oc=5",
-            "published": "15h ago",
-            "raw_date": "Wed, 14 Oct 2026 16:42:58 GMT",
+            "title": "AppLovin vs. Reddit: Which Technology Stock Is a Better Buy in 2026?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPUFpEZTl4NU1DdTVsVW5uSXV3djRLTzkwS1VFTzY3RVBHVUxPb1BiWVJWdlVfTkY5VGlLNF9zb3YtWGx5SzBJZmR6T0RNNnEzLWNFMnE1MldnOUxMU29XRFczZHg3UFpNaEtHSWhlSXJ5R0tIVUhvRk01ZjJFekJETU1NSS1WZVBwOGhfT2pVVzcyQ3pEanY2bzNyOEpiSy1EaFUwY3VXUjZPWjBHMmlLS0otUHhGQjJQVHc?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 16:15:00 GMT",
             "sentiment": "bullish"
           }
         ],
         "bearish": [
           {
-            "title": "Applovin stock hits 52-week low at 266.41 USD",
-            "source": "Investing.com",
-            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNRnJhaFlwYW9ORFVGM1E3ZXhrTDllVldTZ29MVjdfV3d1YnpMR3JmOWRWVTVWZTF6V1k3Qm9Zc3IzQ3V3ekVSXzkzdGZxdVVaNTVmV2NyaEdCbmZTRjdPZHdEVnJSS3BHSXBYRFQ2dUtZZEIzdmpSX29Ubi1od3EweG80QVgxWkNNa25MdGd1MWp0b2pjYVZCT18xdk95a0VxNGc?oc=5",
-            "published": "17h ago",
-            "raw_date": "Wed, 14 Oct 2026 14:02:34 GMT",
-            "sentiment": "bearish"
-          },
-          {
-            "title": "AppLovin Corporation (APP) Class Action Lawsuit Seeks Recovery for Investors; November 16, 2026, Deadline - Contact Kessler Topaz Meltzer & Check, LLP",
-            "source": "PR Newswire",
-            "link": "https://news.google.com/rss/articles/CBMipgJBVV95cUxQX1ZpQTJ6clJwNzROTlhtQmo1R3owWnZaZGI4cFRTYU44VDlOMXpzRVNIZXlqY3Nockc0MHpUb3RUNWpMVkwwdGRHNGppRndYUV9DN293SlJwZ1YtWEpIWUFsdTUtckROZmhMS2V5TnNrYkNHbXJBOUUwdHVDelZQb2N6TnU5SWszXzdTbnVFRlJ2bk81MjRhODF3NVVBQ0FUNzZRWWtIZWVhOXRCWVRNUU5Fc21KVTF3Rjkzem1WMmZsZGp0bnB6MjVyb0lNbHVEZ0ZOU3BXa1VxeVg2ZE05d1dmU2VzQjlSa2p3amtIWDdWOGhzTkl5Y1FyWWVHN2J4UGJiQ3kyclVtS281MkFHTU5YNUdoYWpadnhtVTJ1dkFrSWlBakE?oc=5",
-            "published": "9h ago",
-            "raw_date": "Wed, 14 Oct 2026 22:44:00 GMT",
+            "title": "AppLovin Stock Sinks To 52-Week Low - Here's Why",
+            "source": "Benzinga",
+            "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOOUotazFoTkp3RGdlVHRVbWhoTU9iN3pWVHNSSXh1WkYtc0l5ZGhoUGVxa2ZCZE1GS2Fva2ZXZ0FuTnBmSzNBeGRhYWt2V2stOFN2S3NQOVdPdTNxMGZscExWRjNXYjY2NmUzWE5sSmtpODNsWXpneE9kWWdBTHNta2N2c1NCSlBRdzdSa2pmNEJiLXY2bjdYVDVLemNMUzZhN2QzSllSalBQSlJz?oc=5",
+            "published": "2h ago",
+            "raw_date": "Thu, 15 Oct 2026 10:52:48 GMT",
             "sentiment": "bearish"
           }
         ],
@@ -1774,62 +1765,70 @@
             "title": "What Does AppLovin Offer That Omnicom Does Not?",
             "source": "Trefis",
             "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQSHJmVXRtOE96Q3RTWnVnTGNlVm1rUVZ1cWE1RFNIQm1HSXZOMG5fbDQxRUtVVmx1U0JhMTRlSjNJano4SnA1V3E0VkdsOFRhQXFCdEN5STlhQTBLYmdUMXZOLTJPZjg4SDdPQk9ZaVpQVEI3RmFvcTJOdFdiSGJNUmhtWjhJVDFjUHZycXdLTXpNWVBrc1AydTBKYk9LYlRwbDVKRENUZFM4QQ?oc=5",
-            "published": "8h ago",
+            "published": "14h ago",
             "raw_date": "Wed, 14 Oct 2026 23:10:41 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "AppLovin Q3 seen by Wedbush as key test of model update",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNV3NCY0ZRa1hpUHJKajAyTlJ3dVZpWndfMmpseDRqVDhwa1dVXzJmQ2E2V0FyYkZ6WlhPeERWcDMxU3RVbFdRUi0wSDhPZE1uMFE2N3h3dUl4dXRNUjA1S0JIcjk0TWVyT3FjYlZ1T1RIYmJKdHhsbEtvSFBSQUQ5bHk5RHdNLTlnWFNncThzZDh2akdDcUJxMg?oc=5",
+            "published": "17h ago",
+            "raw_date": "Wed, 14 Oct 2026 19:58:00 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
+            "title": "AppLovin Stock Sinks To 52-Week Low - Here's Why",
+            "source": "Benzinga",
+            "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOOUotazFoTkp3RGdlVHRVbWhoTU9iN3pWVHNSSXh1WkYtc0l5ZGhoUGVxa2ZCZE1GS2Fva2ZXZ0FuTnBmSzNBeGRhYWt2V2stOFN2S3NQOVdPdTNxMGZscExWRjNXYjY2NmUzWE5sSmtpODNsWXpneE9kWWdBTHNta2N2c1NCSlBRdzdSa2pmNEJiLXY2bjdYVDVLemNMUzZhN2QzSllSalBQSlJz?oc=5",
+            "published": "2h ago",
+            "raw_date": "Thu, 15 Oct 2026 10:52:48 GMT",
+            "sentiment": "bearish"
+          },
+          {
             "title": "What Does AppLovin Offer That Omnicom Does Not?",
             "source": "Trefis",
             "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQSHJmVXRtOE96Q3RTWnVnTGNlVm1rUVZ1cWE1RFNIQm1HSXZOMG5fbDQxRUtVVmx1U0JhMTRlSjNJano4SnA1V3E0VkdsOFRhQXFCdEN5STlhQTBLYmdUMXZOLTJPZjg4SDdPQk9ZaVpQVEI3RmFvcTJOdFdiSGJNUmhtWjhJVDFjUHZycXdLTXpNWVBrc1AydTBKYk9LYlRwbDVKRENUZFM4QQ?oc=5",
-            "published": "8h ago",
+            "published": "14h ago",
             "raw_date": "Wed, 14 Oct 2026 23:10:41 GMT",
             "sentiment": "neutral"
           },
           {
-            "title": "AppLovin (APP) vs. U and TTD: Can AXON’s AI Advantage Outpace Execution Risks?",
+            "title": "AppLovin Q3 seen by Wedbush as key test of model update",
             "source": "Yahoo Finance",
-            "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZnlXTEViaGVUV2MxcXZyUmRmTUpHRmNQbUZxZ3AxajMxVzBvVDAzQkhrVk5vSFdrTVJOa1pkT25leDNQRXIyRkZLLXF1bzlPRGVVRE91R3A0ekpobGJ5SHhDMDdqaXVKQTBaeGhfXzRoZlROalgtek9DUmNkR3IyTE5RaWxRaTk0dHFHaU5MVQ?oc=5",
-            "published": "15h ago",
-            "raw_date": "Wed, 14 Oct 2026 16:42:58 GMT",
-            "sentiment": "bullish"
-          },
-          {
-            "title": "Applovin stock hits 52-week low at 266.41 USD",
-            "source": "Investing.com",
-            "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNRnJhaFlwYW9ORFVGM1E3ZXhrTDllVldTZ29MVjdfV3d1YnpMR3JmOWRWVTVWZTF6V1k3Qm9Zc3IzQ3V3ekVSXzkzdGZxdVVaNTVmV2NyaEdCbmZTRjdPZHdEVnJSS3BHSXBYRFQ2dUtZZEIzdmpSX29Ubi1od3EweG80QVgxWkNNa25MdGd1MWp0b2pjYVZCT18xdk95a0VxNGc?oc=5",
+            "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNV3NCY0ZRa1hpUHJKajAyTlJ3dVZpWndfMmpseDRqVDhwa1dVXzJmQ2E2V0FyYkZ6WlhPeERWcDMxU3RVbFdRUi0wSDhPZE1uMFE2N3h3dUl4dXRNUjA1S0JIcjk0TWVyT3FjYlZ1T1RIYmJKdHhsbEtvSFBSQUQ5bHk5RHdNLTlnWFNncThzZDh2akdDcUJxMg?oc=5",
             "published": "17h ago",
-            "raw_date": "Wed, 14 Oct 2026 14:02:34 GMT",
-            "sentiment": "bearish"
+            "raw_date": "Wed, 14 Oct 2026 19:58:00 GMT",
+            "sentiment": "neutral"
           },
           {
-            "title": "AppLovin Corporation (APP) Class Action Lawsuit Seeks Recovery for Investors; November 16, 2026, Deadline - Contact Kessler Topaz Meltzer & Check, LLP",
-            "source": "PR Newswire",
-            "link": "https://news.google.com/rss/articles/CBMipgJBVV95cUxQX1ZpQTJ6clJwNzROTlhtQmo1R3owWnZaZGI4cFRTYU44VDlOMXpzRVNIZXlqY3Nockc0MHpUb3RUNWpMVkwwdGRHNGppRndYUV9DN293SlJwZ1YtWEpIWUFsdTUtckROZmhMS2V5TnNrYkNHbXJBOUUwdHVDelZQb2N6TnU5SWszXzdTbnVFRlJ2bk81MjRhODF3NVVBQ0FUNzZRWWtIZWVhOXRCWVRNUU5Fc21KVTF3Rjkzem1WMmZsZGp0bnB6MjVyb0lNbHVEZ0ZOU3BXa1VxeVg2ZE05d1dmU2VzQjlSa2p3amtIWDdWOGhzTkl5Y1FyWWVHN2J4UGJiQ3kyclVtS281MkFHTU5YNUdoYWpadnhtVTJ1dkFrSWlBakE?oc=5",
-            "published": "9h ago",
-            "raw_date": "Wed, 14 Oct 2026 22:44:00 GMT",
-            "sentiment": "bearish"
+            "title": "AppLovin vs. Reddit: Which Technology Stock Is a Better Buy in 2026?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPUFpEZTl4NU1DdTVsVW5uSXV3djRLTzkwS1VFTzY3RVBHVUxPb1BiWVJWdlVfTkY5VGlLNF9zb3YtWGx5SzBJZmR6T0RNNnEzLWNFMnE1MldnOUxMU29XRFczZHg3UFpNaEtHSWhlSXJ5R0tIVUhvRk01ZjJFekJETU1NSS1WZVBwOGhfT2pVVzcyQ3pEanY2bzNyOEpiSy1EaFUwY3VXUjZPWjBHMmlLS0otUHhGQjJQVHc?oc=5",
+            "published": "1d ago",
+            "raw_date": "Tue, 13 Oct 2026 16:15:00 GMT",
+            "sentiment": "bullish"
           }
         ]
       },
       "news": [
         {
+          "title": "AppLovin Stock Sinks To 52-Week Low - Here's Why",
+          "source": "Benzinga",
+          "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOOUotazFoTkp3RGdlVHRVbWhoTU9iN3pWVHNSSXh1WkYtc0l5ZGhoUGVxa2ZCZE1GS2Fva2ZXZ0FuTnBmSzNBeGRhYWt2V2stOFN2S3NQOVdPdTNxMGZscExWRjNXYjY2NmUzWE5sSmtpODNsWXpneE9kWWdBTHNta2N2c1NCSlBRdzdSa2pmNEJiLXY2bjdYVDVLemNMUzZhN2QzSllSalBQSlJz?oc=5",
+          "published": "2h ago",
+          "raw_date": "Thu, 15 Oct 2026 10:52:48 GMT",
+          "sentiment": "bearish"
+        },
+        {
           "title": "What Does AppLovin Offer That Omnicom Does Not?",
           "source": "Trefis",
           "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQSHJmVXRtOE96Q3RTWnVnTGNlVm1rUVZ1cWE1RFNIQm1HSXZOMG5fbDQxRUtVVmx1U0JhMTRlSjNJano4SnA1V3E0VkdsOFRhQXFCdEN5STlhQTBLYmdUMXZOLTJPZjg4SDdPQk9ZaVpQVEI3RmFvcTJOdFdiSGJNUmhtWjhJVDFjUHZycXdLTXpNWVBrc1AydTBKYk9LYlRwbDVKRENUZFM4QQ?oc=5",
-          "published": "8h ago",
+          "published": "14h ago",
           "raw_date": "Wed, 14 Oct 2026 23:10:41 GMT",
           "sentiment": "neutral"
-        },
-        {
-          "title": "AppLovin (APP) vs. U and TTD: Can AXON’s AI Advantage Outpace Execution Risks?",
-          "source": "Yahoo Finance",
-          "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZnlXTEViaGVUV2MxcXZyUmRmTUpHRmNQbUZxZ3AxajMxVzBvVDAzQkhrVk5vSFdrTVJOa1pkT25leDNQRXIyRkZLLXF1bzlPRGVVRE91R3A0ekpobGJ5SHhDMDdqaXVKQTBaeGhfXzRoZlROalgtek9DUmNkR3IyTE5RaWxRaTk0dHFHaU5MVQ?oc=5",
-          "published": "15h ago",
-          "raw_date": "Wed, 14 Oct 2026 16:42:58 GMT",
-          "sentiment": "bullish"
         }
       ],
       "weight_pct": 1.7678744877473829,
@@ -1867,7 +1866,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะประชิด (20.5 วัน)",
+            "period": "ระยะประชิด (20.3 วัน)",
             "event": "รายงานงบการเงิน Q3: จับตาการเติบโตของรายได้จากลูกค้า Web Advertising และการเติบโตของซอฟต์แวร์ AXON 2.0"
           },
           {
@@ -1925,9 +1924,9 @@
         "Rev Growth +20% 🚀",
         "Attractive PEG 1.2 💎"
       ],
-      "days_to_earnings": 14.2,
+      "days_to_earnings": 13.9,
       "earnings_date": "29 Oct 2026",
-      "is_earnings_near": false,
+      "is_earnings_near": true,
       "key_support": 42.61,
       "support_desc": "เส้น 200 วัน (SMA 200)",
       "key_resistance": 44.79,
@@ -1955,103 +1954,105 @@
         "ticker": "MNST",
         "bullish": [
           {
-            "title": "e.l.f. Beauty vs. Monster Beverage: Which Consumer Goods Stock Is a Better Buy in 2026?",
+            "title": "Monster Beverage vs. PepsiCo: Which Consumer Goods Stock Is a Better Buy in 2026?",
             "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQa0pCMjFMaDN5QVZRTVE1UHVrYXY4X1M1dnp2VXJTNjRYX0RUUXVnVnVYZUlwaEZJVUpJMkc1ZlhvYV9BYTBlY1dLeEVoR3BxY2FTVFZQS0Q3ZUI1czBORmY1TG9zWnA5UUFueWFuUzlScEVlRW1uNVI2eWVTcm9HaWI3cEhmMXlodnFzOVB6aU5jc19tLUo4bmpWMUV1Si1IZ0NfN29rb0cxTWU4TUE3eVhZVE53V3VHbm9ObS0wYlFsd1I1UW9FUFBWRUxDVWc?oc=5",
-            "published": "1d ago",
-            "raw_date": "Tue, 13 Oct 2026 10:54:00 GMT",
+            "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPZWh1T1lETzFJdlphLXFPdjU2d0duYU9UTlN3S1JtbU9vLW1rc0JqbTJSS3BMQmV0b0p2TGdTeGJObW1yQ09DSGRyWWZhenBsQ0gxc3dacWw5eFVuQUwwRGN5dXdiRDlrbDVWZi1IaWlnRmFfNW4zNzJ6WHNjRldzNWRwVVg3SC1tbFlEZDVNZVl4el80MGJwVVlrY2p0a0NOb2pfenJXaTR6bzJtbUxJNUl5QnNZM0Jnemw3RzNJZm9GNzc1djZnNnVRMA?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 11:52:34 GMT",
             "sentiment": "bullish"
           }
         ],
         "bearish": [],
         "neutral": [
           {
+            "title": "Monster Beverage Corporation $MNST Stock Purchased by Signal Advisors Wealth LLC",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxQcTJEa1NUcGxHUVhWZ1NSdHlqc1daaGZTcnV5TzRhZ0hLZ3Azb0JVV2ZNbjVQdTRHNm5KTGdfUVJRZWNBVGkwODNnVHJGS2RIbnVSWGtkTWo4MF9IRHpSbkVaazlKTjJCT3FOZzdoNFJ0ZkVUWjJoZUpUMEZXdmI2bl9WV2FOZ1pjRzhIQWoyLTFCRFN5TWVQUS1TLXRaOTNNM3RtZmhDSnJZdHM1MG9NSnloRTRaWHJmT252THhIZkNwWVpCejF5N0xDU2s1MUh3aFBSLUNWZw?oc=5",
+            "published": "5h ago",
+            "raw_date": "Thu, 15 Oct 2026 07:56:35 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "If You Invested $100 In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
             "source": "Benzinga",
             "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
-            "published": "16h ago",
+            "published": "22h ago",
             "raw_date": "Wed, 14 Oct 2026 15:15:34 GMT",
             "sentiment": "neutral"
           },
           {
-            "title": "Western Financial Corp CA Purchases 100,690 Shares of Monster Beverage Corporation $MNST",
-            "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcWQ2Z3dZT2JvcHZUN1ZJNFp6ZnFmVEJWRTVrTnJFcUpvQl9fcDJ0TmhGQWl4MGx1bWV0MUtWZEE0MHJwNFVZcHNJcFl3elJwZ0VfMklNc2pFZS1DcUYtLWtwSGtMSVhjb2NHNmN2T3RCangzSVBLWVE4N0dEMEpwLXVXdWFyVGZNTWtHRTR1NVNWeXN6ek5TQzBRWlJORGxwV1pubWJIUWxBQ3drNmhLZ010Z051MHpDV1pqRHhLc014dG1mVEJBM0ozdmJPVERjMllFS3htWGNxUlJsSVVHdg?oc=5",
-            "published": "8h ago",
-            "raw_date": "Wed, 14 Oct 2026 23:47:29 GMT",
-            "sentiment": "neutral"
-          },
-          {
-            "title": "How Investors Are Reacting To Monster Beverage Stock Free Cash Flow Outlook",
-            "source": "Simply Wall Street",
-            "link": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPQThUODg1b1M5Q2EtODRwdWdDUXU0X3RrMVd2TGxMWWRNVlNMQTlOZGJrQV9aQWQzUTR1Mk1razJ2TXhZbEVxSDU0eXJmV3RrX3IzZGZfVGpsZDVKU2RkMXFENzhfTEg5U1FDb0Y0S0c2SFFNb2NHOU5IUExmQVBsel9vUUlZbERieWRCdk9BYzBqejk0M3JhQWNBcnNJWS10eUg3M2lQYW5lVlY5bVBBUU5TUGU2aVhFOEZkcEVQcjN3Uko4dWEwQ1l0SmtxZHpEcGZVMzhfcV9qOV9yR3VSZ3ZB0gHnAUFVX3lxTE5DM1dvb0hzS2hsb3dibmlFQmJXZWpFaDM2X3FuUWgtVDVmX2paSWVhOXVFY2ZWcmxma1BWTzBKUjlMTGNvUkZoamdiVVhXSjZCemFLQ1EzYndXMXVhM0dKb1pEVkNRb1pWd1FBcVdpNGI5ekd3N3pXWlBsYzctTENtb0UzNEVWLVFXYzZkQTlTVlJTWnRiYXJLaHplcmp1Y01EMDItSXJpVmYxb0loT3oycEhodWpTamRQYXI1QnJLNTh6SGFhcE1vejNHZldlZ2c2dmN6cWhydVhFNU9mcGVEdXpTdTFWZw?oc=5",
-            "published": "2d ago",
-            "raw_date": "Mon, 12 Oct 2026 17:41:23 GMT",
+            "title": "Monster Beverage (MNST) Stock Looks Reasonable As Cash Flow Supports The Price",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOZ2hQTlh2NkFwdnRDS3pTd1BHMDE4bjgtM18zY3I1d2tGRnVIR0JxWjNGbm1jcTNnTUZJVGdqUERITE9xSEh1RXotTGFJenRKN0NCQ3NLMWxCMXg1bHFXT1dsMHdsTTE4bXN5ZlNETi1la1BKRFMxVUFYZDVuQ3g1TmRJNTk2X19uMEszNURuZ0t6UF9Ud1FkZEMxejRfaHc?oc=5",
+            "published": "4d ago",
+            "raw_date": "Sun, 11 Oct 2026 12:13:06 GMT",
             "sentiment": "neutral"
           }
         ],
         "all": [
           {
+            "title": "Monster Beverage vs. PepsiCo: Which Consumer Goods Stock Is a Better Buy in 2026?",
+            "source": "The Motley Fool",
+            "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPZWh1T1lETzFJdlphLXFPdjU2d0duYU9UTlN3S1JtbU9vLW1rc0JqbTJSS3BMQmV0b0p2TGdTeGJObW1yQ09DSGRyWWZhenBsQ0gxc3dacWw5eFVuQUwwRGN5dXdiRDlrbDVWZi1IaWlnRmFfNW4zNzJ6WHNjRldzNWRwVVg3SC1tbFlEZDVNZVl4el80MGJwVVlrY2p0a0NOb2pfenJXaTR6bzJtbUxJNUl5QnNZM0Jnemw3RzNJZm9GNzc1djZnNnVRMA?oc=5",
+            "published": "1h ago",
+            "raw_date": "Thu, 15 Oct 2026 11:52:34 GMT",
+            "sentiment": "bullish"
+          },
+          {
+            "title": "Monster Beverage Corporation $MNST Stock Purchased by Signal Advisors Wealth LLC",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxQcTJEa1NUcGxHUVhWZ1NSdHlqc1daaGZTcnV5TzRhZ0hLZ3Azb0JVV2ZNbjVQdTRHNm5KTGdfUVJRZWNBVGkwODNnVHJGS2RIbnVSWGtkTWo4MF9IRHpSbkVaazlKTjJCT3FOZzdoNFJ0ZkVUWjJoZUpUMEZXdmI2bl9WV2FOZ1pjRzhIQWoyLTFCRFN5TWVQUS1TLXRaOTNNM3RtZmhDSnJZdHM1MG9NSnloRTRaWHJmT252THhIZkNwWVpCejF5N0xDU2s1MUh3aFBSLUNWZw?oc=5",
+            "published": "5h ago",
+            "raw_date": "Thu, 15 Oct 2026 07:56:35 GMT",
+            "sentiment": "neutral"
+          },
+          {
             "title": "If You Invested $100 In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
             "source": "Benzinga",
             "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
-            "published": "16h ago",
+            "published": "22h ago",
             "raw_date": "Wed, 14 Oct 2026 15:15:34 GMT",
             "sentiment": "neutral"
           },
           {
-            "title": "Western Financial Corp CA Purchases 100,690 Shares of Monster Beverage Corporation $MNST",
-            "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcWQ2Z3dZT2JvcHZUN1ZJNFp6ZnFmVEJWRTVrTnJFcUpvQl9fcDJ0TmhGQWl4MGx1bWV0MUtWZEE0MHJwNFVZcHNJcFl3elJwZ0VfMklNc2pFZS1DcUYtLWtwSGtMSVhjb2NHNmN2T3RCangzSVBLWVE4N0dEMEpwLXVXdWFyVGZNTWtHRTR1NVNWeXN6ek5TQzBRWlJORGxwV1pubWJIUWxBQ3drNmhLZ010Z051MHpDV1pqRHhLc014dG1mVEJBM0ozdmJPVERjMllFS3htWGNxUlJsSVVHdg?oc=5",
-            "published": "8h ago",
-            "raw_date": "Wed, 14 Oct 2026 23:47:29 GMT",
-            "sentiment": "neutral"
-          },
-          {
-            "title": "e.l.f. Beauty vs. Monster Beverage: Which Consumer Goods Stock Is a Better Buy in 2026?",
-            "source": "The Motley Fool",
-            "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQa0pCMjFMaDN5QVZRTVE1UHVrYXY4X1M1dnp2VXJTNjRYX0RUUXVnVnVYZUlwaEZJVUpJMkc1ZlhvYV9BYTBlY1dLeEVoR3BxY2FTVFZQS0Q3ZUI1czBORmY1TG9zWnA5UUFueWFuUzlScEVlRW1uNVI2eWVTcm9HaWI3cEhmMXlodnFzOVB6aU5jc19tLUo4bmpWMUV1Si1IZ0NfN29rb0cxTWU4TUE3eVhZVE53V3VHbm9ObS0wYlFsd1I1UW9FUFBWRUxDVWc?oc=5",
-            "published": "1d ago",
-            "raw_date": "Tue, 13 Oct 2026 10:54:00 GMT",
-            "sentiment": "bullish"
-          },
-          {
-            "title": "How Investors Are Reacting To Monster Beverage Stock Free Cash Flow Outlook",
-            "source": "Simply Wall Street",
-            "link": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPQThUODg1b1M5Q2EtODRwdWdDUXU0X3RrMVd2TGxMWWRNVlNMQTlOZGJrQV9aQWQzUTR1Mk1razJ2TXhZbEVxSDU0eXJmV3RrX3IzZGZfVGpsZDVKU2RkMXFENzhfTEg5U1FDb0Y0S0c2SFFNb2NHOU5IUExmQVBsel9vUUlZbERieWRCdk9BYzBqejk0M3JhQWNBcnNJWS10eUg3M2lQYW5lVlY5bVBBUU5TUGU2aVhFOEZkcEVQcjN3Uko4dWEwQ1l0SmtxZHpEcGZVMzhfcV9qOV9yR3VSZ3ZB0gHnAUFVX3lxTE5DM1dvb0hzS2hsb3dibmlFQmJXZWpFaDM2X3FuUWgtVDVmX2paSWVhOXVFY2ZWcmxma1BWTzBKUjlMTGNvUkZoamdiVVhXSjZCemFLQ1EzYndXMXVhM0dKb1pEVkNRb1pWd1FBcVdpNGI5ekd3N3pXWlBsYzctTENtb0UzNEVWLVFXYzZkQTlTVlJTWnRiYXJLaHplcmp1Y01EMDItSXJpVmYxb0loT3oycEhodWpTamRQYXI1QnJLNTh6SGFhcE1vejNHZldlZ2c2dmN6cWhydVhFNU9mcGVEdXpTdTFWZw?oc=5",
-            "published": "2d ago",
-            "raw_date": "Mon, 12 Oct 2026 17:41:23 GMT",
+            "title": "Monster Beverage (MNST) Stock Looks Reasonable As Cash Flow Supports The Price",
+            "source": "Yahoo Finance",
+            "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOZ2hQTlh2NkFwdnRDS3pTd1BHMDE4bjgtM18zY3I1d2tGRnVIR0JxWjNGbm1jcTNnTUZJVGdqUERITE9xSEh1RXotTGFJenRKN0NCQ3NLMWxCMXg1bHFXT1dsMHdsTTE4bXN5ZlNETi1la1BKRFMxVUFYZDVuQ3g1TmRJNTk2X19uMEszNURuZ0t6UF9Ud1FkZEMxejRfaHc?oc=5",
+            "published": "4d ago",
+            "raw_date": "Sun, 11 Oct 2026 12:13:06 GMT",
             "sentiment": "neutral"
           }
         ]
       },
       "news": [
         {
-          "title": "If You Invested $100 In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
-          "source": "Benzinga",
-          "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
-          "published": "16h ago",
-          "raw_date": "Wed, 14 Oct 2026 15:15:34 GMT",
-          "sentiment": "neutral"
+          "title": "Monster Beverage vs. PepsiCo: Which Consumer Goods Stock Is a Better Buy in 2026?",
+          "source": "The Motley Fool",
+          "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPZWh1T1lETzFJdlphLXFPdjU2d0duYU9UTlN3S1JtbU9vLW1rc0JqbTJSS3BMQmV0b0p2TGdTeGJObW1yQ09DSGRyWWZhenBsQ0gxc3dacWw5eFVuQUwwRGN5dXdiRDlrbDVWZi1IaWlnRmFfNW4zNzJ6WHNjRldzNWRwVVg3SC1tbFlEZDVNZVl4el80MGJwVVlrY2p0a0NOb2pfenJXaTR6bzJtbUxJNUl5QnNZM0Jnemw3RzNJZm9GNzc1djZnNnVRMA?oc=5",
+          "published": "1h ago",
+          "raw_date": "Thu, 15 Oct 2026 11:52:34 GMT",
+          "sentiment": "bullish"
         },
         {
-          "title": "Western Financial Corp CA Purchases 100,690 Shares of Monster Beverage Corporation $MNST",
+          "title": "Monster Beverage Corporation $MNST Stock Purchased by Signal Advisors Wealth LLC",
           "source": "MarketBeat",
-          "link": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcWQ2Z3dZT2JvcHZUN1ZJNFp6ZnFmVEJWRTVrTnJFcUpvQl9fcDJ0TmhGQWl4MGx1bWV0MUtWZEE0MHJwNFVZcHNJcFl3elJwZ0VfMklNc2pFZS1DcUYtLWtwSGtMSVhjb2NHNmN2T3RCangzSVBLWVE4N0dEMEpwLXVXdWFyVGZNTWtHRTR1NVNWeXN6ek5TQzBRWlJORGxwV1pubWJIUWxBQ3drNmhLZ010Z051MHpDV1pqRHhLc014dG1mVEJBM0ozdmJPVERjMllFS3htWGNxUlJsSVVHdg?oc=5",
-          "published": "8h ago",
-          "raw_date": "Wed, 14 Oct 2026 23:47:29 GMT",
+          "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxQcTJEa1NUcGxHUVhWZ1NSdHlqc1daaGZTcnV5TzRhZ0hLZ3Azb0JVV2ZNbjVQdTRHNm5KTGdfUVJRZWNBVGkwODNnVHJGS2RIbnVSWGtkTWo4MF9IRHpSbkVaazlKTjJCT3FOZzdoNFJ0ZkVUWjJoZUpUMEZXdmI2bl9WV2FOZ1pjRzhIQWoyLTFCRFN5TWVQUS1TLXRaOTNNM3RtZmhDSnJZdHM1MG9NSnloRTRaWHJmT252THhIZkNwWVpCejF5N0xDU2s1MUh3aFBSLUNWZw?oc=5",
+          "published": "5h ago",
+          "raw_date": "Thu, 15 Oct 2026 07:56:35 GMT",
           "sentiment": "neutral"
         }
       ],
       "weight_pct": 1.7370763901953234,
-      "alerts": [],
+      "alerts": [
+        "⚠️ Earnings in 13.9d"
+      ],
       "rating": {
         "stars_count": 5,
         "stars_str": "⭐⭐⭐⭐⭐",
         "grade": "เกรด A+ (ยอดเยี่ยม ปลอดภัยสูง)",
         "summary": "สถานะ กำไร +3.0%, กราฟ ยืนเหนือเส้น 200 วัน +3.8%.",
         "strength": "เทรนด์ขาขึ้นเหนือเส้น 200 วัน (+3.8%), อยู่ใน Institutional Value Zone 💎, กำไรเติบโตเด่น YoY +35.2%",
-        "risk": "ไม่มีสัญญาณความเสี่ยงผิดปกติ.",
+        "risk": "วันประกาศงบใกล้เข้ามา (13.9 วัน)",
         "action": "ถือรันเทรนด์ต่อ หรือสะสมเพิ่มตามแนวรับเส้น 200 วัน."
       },
       "financial_health": {
@@ -2078,7 +2079,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ปฏิทินงบ (14.2 วัน)",
+            "period": "ปฏิทินงบ (13.9 วัน)",
             "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"
           },
           {
@@ -2136,7 +2137,7 @@
         "Attractive PEG 0.5 💎",
         "Wall St Strong Buy 🌟"
       ],
-      "days_to_earnings": 13.2,
+      "days_to_earnings": 12.8,
       "earnings_date": "28 Oct 2026",
       "is_earnings_near": true,
       "key_support": 206.02,
@@ -2174,30 +2175,29 @@
             "sentiment": "bullish"
           }
         ],
-        "bearish": [
-          {
-            "title": "Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade",
-            "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5",
-            "published": "10h ago",
-            "raw_date": "Wed, 14 Oct 2026 21:06:39 GMT",
-            "sentiment": "bearish"
-          }
-        ],
+        "bearish": [],
         "neutral": [
           {
             "title": "Why Should Vertiv Stock Holders Watch This One Number?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
-            "published": "7h ago",
+            "published": "12h ago",
             "raw_date": "Thu, 15 Oct 2026 00:46:00 GMT",
+            "sentiment": "neutral"
+          },
+          {
+            "title": "7,248 Vertiv Holdings Co. $VRT Shares Purchased by LDR Capital Management LLC",
+            "source": "MarketBeat",
+            "link": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQd0hXT0pMaUkzZ0poZXE3c2xaNFV4Ynl1OFJ0S0dWdWdqNnNIWDVGVEZ2ZlZ0R1NMYU9IdTFwTW9Ta1E5YjYtRmZ3d05JczZoOE9VZXFTcGFqcVQxaFdyNEFSa21BNkZCVzdaYlRqajgxemszbFN3aElkUmFQOHZIOXh1LWtSaERRR0FsSjMtRkh2VHowTEYxajJYNXpLdExwU2x6LWdqZy1Ea21yQzU1WmtsMG1wSFI3OUdtRm04T0hHcHRORUQzdmdoX1NNQmN4?oc=5",
+            "published": "5h ago",
+            "raw_date": "Thu, 15 Oct 2026 08:33:50 GMT",
             "sentiment": "neutral"
           },
           {
             "title": "Bloom Energy vs. Vertiv: Which AI Infrastructure Stock Is the Better Buy After the Pullback?",
             "source": "The Motley Fool",
             "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOay05Zi1QN2o4ZnZkSV9LLUNjWkFIZ1FNbXQ3N0tZRU9nNjF0c2gyVG9adVZkemZ2WlQ3d1dEbGlFWks5R2xlbThmZEg4eVRCR1lmdEJWbUVxWEtCQ3psRnpiRFhlNVB4aXUyS1RHanZvLWJPTWZ1eGFLSWU3ZFVHNTlpdVh3aEVYUl80aXJiQlUtVzBpQnNZbw?oc=5",
-            "published": "2d ago",
+            "published": "3d ago",
             "raw_date": "Mon, 12 Oct 2026 11:30:00 GMT",
             "sentiment": "mixed"
           }
@@ -2207,7 +2207,7 @@
             "title": "Why Should Vertiv Stock Holders Watch This One Number?",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
-            "published": "7h ago",
+            "published": "12h ago",
             "raw_date": "Thu, 15 Oct 2026 00:46:00 GMT",
             "sentiment": "neutral"
           },
@@ -2220,18 +2220,18 @@
             "sentiment": "bullish"
           },
           {
-            "title": "Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade",
+            "title": "7,248 Vertiv Holdings Co. $VRT Shares Purchased by LDR Capital Management LLC",
             "source": "MarketBeat",
-            "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5",
-            "published": "10h ago",
-            "raw_date": "Wed, 14 Oct 2026 21:06:39 GMT",
-            "sentiment": "bearish"
+            "link": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQd0hXT0pMaUkzZ0poZXE3c2xaNFV4Ynl1OFJ0S0dWdWdqNnNIWDVGVEZ2ZlZ0R1NMYU9IdTFwTW9Ta1E5YjYtRmZ3d05JczZoOE9VZXFTcGFqcVQxaFdyNEFSa21BNkZCVzdaYlRqajgxemszbFN3aElkUmFQOHZIOXh1LWtSaERRR0FsSjMtRkh2VHowTEYxajJYNXpLdExwU2x6LWdqZy1Ea21yQzU1WmtsMG1wSFI3OUdtRm04T0hHcHRORUQzdmdoX1NNQmN4?oc=5",
+            "published": "5h ago",
+            "raw_date": "Thu, 15 Oct 2026 08:33:50 GMT",
+            "sentiment": "neutral"
           },
           {
             "title": "Bloom Energy vs. Vertiv: Which AI Infrastructure Stock Is the Better Buy After the Pullback?",
             "source": "The Motley Fool",
             "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOay05Zi1QN2o4ZnZkSV9LLUNjWkFIZ1FNbXQ3N0tZRU9nNjF0c2gyVG9adVZkemZ2WlQ3d1dEbGlFWks5R2xlbThmZEg4eVRCR1lmdEJWbUVxWEtCQ3psRnpiRFhlNVB4aXUyS1RHanZvLWJPTWZ1eGFLSWU3ZFVHNTlpdVh3aEVYUl80aXJiQlUtVzBpQnNZbw?oc=5",
-            "published": "2d ago",
+            "published": "3d ago",
             "raw_date": "Mon, 12 Oct 2026 11:30:00 GMT",
             "sentiment": "mixed"
           }
@@ -2242,7 +2242,7 @@
           "title": "Why Should Vertiv Stock Holders Watch This One Number?",
           "source": "Yahoo Finance",
           "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
-          "published": "7h ago",
+          "published": "12h ago",
           "raw_date": "Thu, 15 Oct 2026 00:46:00 GMT",
           "sentiment": "neutral"
         },
@@ -2257,7 +2257,7 @@
       ],
       "weight_pct": 1.3665353666617606,
       "alerts": [
-        "⚠️ Earnings in 13.2d"
+        "⚠️ Earnings in 12.8d"
       ],
       "rating": {
         "stars_count": 3,
@@ -2265,7 +2265,7 @@
         "grade": "เกรด B (ปานกลาง / พักฐาน)",
         "summary": "สถานะ ขาดทุน -6.3%, กราฟ ยืนเหนือเส้น 200 วัน -16.8%.",
         "strength": "RSI Oversold (33.4) ลุ้นเด้งรีบาวด์, กำไรเติบโตเด่น YoY +113.2%, ฉันทามติตลาด Strong Buy",
-        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-16.8%), วันประกาศงบใกล้เข้ามา (13.2 วัน)",
+        "risk": "ราคาหลุดต่ำกว่าเส้น 200 วัน (-16.8%), วันประกาศงบใกล้เข้ามา (12.8 วัน)",
         "action": "ติดตามแนวรับสำคัญและรอสัญญาณเบรกแนวต้าน."
       },
       "financial_health": {
@@ -2292,7 +2292,7 @@
         ],
         "catalyst_timeline": [
           {
-            "period": "ระยะประชิด (13.2 วัน)",
+            "period": "ระยะประชิด (12.8 วัน)",
             "event": "ประกาศผลประกอบการ Q3: จับตาการเร่งส่งมอบคำสั่งซื้อและ Guidance ปี 2027"
           },
           {
@@ -2305,7 +2305,7 @@
           }
         ],
         "wall_street_verdict": "โบรกเกอร์ 27 แห่งแนะนำ 'Buy' เป้าหมายเฉลี่ย $331.26 (Upside +48.7% จากราคาปัจจุบัน และสูงกว่าต้นทุนของคุณ +39.3%)",
-        "tailored_roadmap": "มีวันงบออกในอีก 13.2 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก",
+        "tailored_roadmap": "มีวันงบออกในอีก 12.8 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก",
         "invalidation_risk": "หากประกาศงบแล้วพบว่าปัญหา Supply Chain คอขวดรุนแรงจนยกเลิกออเดอร์ หรือราคาปิดหลุดแนวรับ Stop-Loss ให้พิจารณาลดสัดส่วนเพื่อถือเงินสด"
       }
     },
@@ -2387,7 +2387,7 @@
             "title": "If I Could Invest $1,000 in Just 1 Dividend Stock for the Next 5 Years, I'd Pick This Clear Standout Over the Vanguard S&P 500 ETF (VOO)",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPaUZEdElpdWxBdUs0bzFoYVpFdER5SS1pcXEwblVva1FscTZKUGRzS245cDZSSDRZQTMxdnJfQTNxRXB2ZkV5R19XZlp4VTk4ejVDc2UxTWdObGFHblcwRWFTeGlBT2d3MjZYSTNBVEFHTEtRUW9KNHlXVm4wcHRxOWJMS0IxM2NUNVpkTXoybVFfZw?oc=5",
-            "published": "1d ago",
+            "published": "2d ago",
             "raw_date": "Tue, 13 Oct 2026 11:19:00 GMT",
             "sentiment": "bullish"
           }
@@ -2398,7 +2398,7 @@
             "title": "Why \"VOO and Chill\" Lost Money for 8 Straight Years: What $100,000 in the S&P 500 Did From 2000 to 2008",
             "source": "24/7 Wall St.",
             "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNWTl4aEZ4cm1JMF84NjRod2xwR05ocWx3dXpTNzZnMFI2M3Q4dUsyNlJKNzFtX1c1SnRLMnFGVzV4Q005aDZ6N2NsMmRCbzZNcVNzMnBqUjdqYW5TME56NC02bUVjaXQ4VXZaN3lGNVAtZFFnUUVoMVhTc0hsTHZaWGJhamlxZzFrZmJycnZ4TU5qaUF1blRLRHJJQnhjUklaRTRDWlV0QnA2VWJOMFZhdktmUWZrcDNuLTFHVFRfNWlja01XVzUxUG80dm9aYnlIYnI2Y19Da1hVQXl1MWc?oc=5",
-            "published": "4d ago",
+            "published": "5d ago",
             "raw_date": "Sat, 10 Oct 2026 08:34:00 GMT",
             "sentiment": "neutral"
           },
@@ -2424,7 +2424,7 @@
             "title": "Why \"VOO and Chill\" Lost Money for 8 Straight Years: What $100,000 in the S&P 500 Did From 2000 to 2008",
             "source": "24/7 Wall St.",
             "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNWTl4aEZ4cm1JMF84NjRod2xwR05ocWx3dXpTNzZnMFI2M3Q4dUsyNlJKNzFtX1c1SnRLMnFGVzV4Q005aDZ6N2NsMmRCbzZNcVNzMnBqUjdqYW5TME56NC02bUVjaXQ4VXZaN3lGNVAtZFFnUUVoMVhTc0hsTHZaWGJhamlxZzFrZmJycnZ4TU5qaUF1blRLRHJJQnhjUklaRTRDWlV0QnA2VWJOMFZhdktmUWZrcDNuLTFHVFRfNWlja01XVzUxUG80dm9aYnlIYnI2Y19Da1hVQXl1MWc?oc=5",
-            "published": "4d ago",
+            "published": "5d ago",
             "raw_date": "Sat, 10 Oct 2026 08:34:00 GMT",
             "sentiment": "neutral"
           },
@@ -2440,7 +2440,7 @@
             "title": "If I Could Invest $1,000 in Just 1 Dividend Stock for the Next 5 Years, I'd Pick This Clear Standout Over the Vanguard S&P 500 ETF (VOO)",
             "source": "Yahoo Finance",
             "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPaUZEdElpdWxBdUs0bzFoYVpFdER5SS1pcXEwblVva1FscTZKUGRzS245cDZSSDRZQTMxdnJfQTNxRXB2ZkV5R19XZlp4VTk4ejVDc2UxTWdObGFHblcwRWFTeGlBT2d3MjZYSTNBVEFHTEtRUW9KNHlXVm4wcHRxOWJMS0IxM2NUNVpkTXoybVFfZw?oc=5",
-            "published": "1d ago",
+            "published": "2d ago",
             "raw_date": "Tue, 13 Oct 2026 11:19:00 GMT",
             "sentiment": "bullish"
           }
@@ -2459,7 +2459,7 @@
           "title": "Why \"VOO and Chill\" Lost Money for 8 Straight Years: What $100,000 in the S&P 500 Did From 2000 to 2008",
           "source": "24/7 Wall St.",
           "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNWTl4aEZ4cm1JMF84NjRod2xwR05ocWx3dXpTNzZnMFI2M3Q4dUsyNlJKNzFtX1c1SnRLMnFGVzV4Q005aDZ6N2NsMmRCbzZNcVNzMnBqUjdqYW5TME56NC02bUVjaXQ4VXZaN3lGNVAtZFFnUUVoMVhTc0hsTHZaWGJhamlxZzFrZmJycnZ4TU5qaUF1blRLRHJJQnhjUklaRTRDWlV0QnA2VWJOMFZhdktmUWZrcDNuLTFHVFRfNWlja01XVzUxUG80dm9aYnlIYnI2Y19Da1hVQXl1MWc?oc=5",
-          "published": "4d ago",
+          "published": "5d ago",
           "raw_date": "Sat, 10 Oct 2026 08:34:00 GMT",
           "sentiment": "neutral"
         }
