@@ -358,7 +358,7 @@ def get_live_refresh_script(data):
             try {{
                 const fxRes = await fetch('https://scanner.tradingview.com/forex/scan', {{
                     method: 'POST',
-                    headers: {{ 'Content-Type': 'application/json' }},
+                    headers: {{ 'Content-Type': 'text/plain' }},
                     body: JSON.stringify({{
                         symbols: {{ tickers: ['FX_IDC:USDTHB'] }},
                         columns: ['close']
@@ -389,10 +389,10 @@ def get_live_refresh_script(data):
                 throw new Error('ไม่พบรายชื่อหุ้นในตาราง');
             }}
 
-            // 3. Fetch stock quotes from TradingView Scanner API
+            // 3. Fetch stock quotes from TradingView Scanner API (using text/plain to avoid CORS preflight check)
             const stockRes = await fetch('https://scanner.tradingview.com/america/scan', {{
                 method: 'POST',
-                headers: {{ 'Content-Type': 'application/json' }},
+                headers: {{ 'Content-Type': 'text/plain' }},
                 body: JSON.stringify({{
                     symbols: {{ tickers: tickers }},
                     columns: ['close', 'change']
