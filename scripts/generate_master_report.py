@@ -325,6 +325,237 @@ def generate_master_dashboard_data(ledger_path=None):
     }
 
 
+def get_live_refresh_script(data):
+    net_injected = float(data.get("net_injected_capital_thb", 0.0))
+    dime_save_cash = float(data.get("dime_save_cash_thb", 0.0))
+    dime_usd_cash = float(data.get("dime_usd_cash", 0.0))
+    fx_rate = float(data.get("fx_rate", 33.62))
+
+    return f"""
+    <script>
+    const PORTFOLIO_STATIC = {{
+        netInjectedCapitalThb: {net_injected},
+        dimeSaveCashThb: {dime_save_cash},
+        dimeUsdCash: {dime_usd_cash},
+        fxRate: {fx_rate}
+    }};
+
+    async function refreshLiveQuotes() {{
+        const btn = document.getElementById('btn-refresh-live');
+        const icon = document.getElementById('refresh-icon');
+        const text = document.getElementById('refresh-text');
+        const ts = document.getElementById('refresh-timestamp');
+
+        if (!btn) return;
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        if (text) text.textContent = 'กำลังดึงราคา...';
+        if (icon) icon.style.transform = 'rotate(360deg)';
+
+        try {{
+            // 1. Fetch USD/THB rate
+            let currentFx = PORTFOLIO_STATIC.fxRate;
+            try {{
+                const fxRes = await fetch('https://scanner.tradingview.com/forex/scan', {{
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{
+                        symbols: {{ tickers: ['FX_IDC:USDTHB'] }},
+                        columns: ['close']
+                    }})
+                }});
+                if (fxRes.ok) {{
+                    const fxData = await fxRes.json();
+                    if (fxData.data && fxData.data.length > 0 && fxData.data[0].d && fxData.data[0].d[0]) {{
+                        currentFx = parseFloat(fxData.data[0].d[0]);
+                    }}
+                }}
+            }} catch (e) {{
+                console.warn('Could not fetch latest FX rate, using fallback', e);
+            }}
+
+            // 2. Collect symbols from rows
+            const rows = document.querySelectorAll('tr.holding-row');
+            const tickers = [];
+            rows.forEach(r => {{
+                const ex = r.dataset.exchange || 'NASDAQ';
+                const tk = r.dataset.ticker;
+                if (tk) {{
+                    tickers.push(ex + ':' + tk);
+                }}
+            }});
+
+            if (tickers.length === 0) {{
+                throw new Error('ไม่พบรายชื่อหุ้นในตาราง');
+            }}
+
+            // 3. Fetch stock quotes from TradingView Scanner API
+            const stockRes = await fetch('https://scanner.tradingview.com/america/scan', {{
+                method: 'POST',
+                headers: {{ 'Content-Type': 'application/json' }},
+                body: JSON.stringify({{
+                    symbols: {{ tickers: tickers }},
+                    columns: ['close', 'change']
+                }})
+            }});
+
+            if (!stockRes.ok) {{
+                throw new Error('TradingView API responded with status ' + stockRes.status);
+            }}
+
+            const stockData = await stockRes.json();
+            const quotes = {{}};
+            (stockData.data || []).forEach(item => {{
+                const symParts = (item.s || '').split(':');
+                const ticker = symParts.length > 1 ? symParts[1] : symParts[0];
+                quotes[ticker] = {{
+                    close: item.d[0],
+                    change: item.d[1]
+                }};
+            }});
+
+            // 4. Update rows and compute totals
+            let totalMarketValUsd = 0;
+            let totalCostUsd = 0;
+
+            rows.forEach(r => {{
+                const ticker = r.dataset.ticker;
+                const shares = parseFloat(r.dataset.shares) || 0;
+                const avgCost = parseFloat(r.dataset.cost) || 0;
+                const quote = quotes[ticker];
+
+                if (quote && typeof quote.close === 'number') {{
+                    const close = quote.close;
+                    const costUsd = shares * avgCost;
+                    const valUsd = shares * close;
+                    const valThb = valUsd * currentFx;
+                    const plUsd = valUsd - costUsd;
+                    const plThb = plUsd * currentFx;
+                    const plPct = costUsd > 0 ? (plUsd / costUsd * 100) : 0;
+
+                    totalMarketValUsd += valUsd;
+                    totalCostUsd += costUsd;
+
+                    r.dataset.currentValUsd = valUsd;
+
+                    const priceCell = r.querySelector('.cell-price');
+                    const valUsdCell = r.querySelector('.cell-val-usd');
+                    const valThbCell = r.querySelector('.cell-val-thb');
+                    const plUsdCell = r.querySelector('.cell-pl-usd');
+                    const plThbCell = r.querySelector('.cell-pl-thb');
+                    const plPctCell = r.querySelector('.cell-pl-pct');
+
+                    const color = plUsd >= 0 ? '#10b981' : '#f43f5e';
+                    const sign = plUsd >= 0 ? '+' : '';
+
+                    if (priceCell) priceCell.textContent = '$' + close.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                    if (valUsdCell) valUsdCell.textContent = '$' + valUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                    if (valThbCell) valThbCell.textContent = '฿' + valThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+
+                    if (plUsdCell) {{
+                        plUsdCell.textContent = sign + '$' + plUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                        plUsdCell.style.color = color;
+                    }}
+                    if (plThbCell) {{
+                        plThbCell.textContent = sign + '฿' + plThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                        plThbCell.style.color = color;
+                    }}
+                    if (plPctCell) {{
+                        plPctCell.textContent = sign + plPct.toFixed(2) + '%';
+                        plPctCell.style.color = color;
+                    }}
+
+                    // Also update Forward Outlook card badge if present
+                    const outlookBadge = document.querySelector(`.badge-outlook-pl[data-outlook-ticker="${{ticker}}"]`);
+                    if (outlookBadge) {{
+                        outlookBadge.textContent = sign + plPct.toFixed(1) + '%';
+                        outlookBadge.className = 'badge badge-outlook-pl ' + (plUsd >= 0 ? 'badge-success' : 'badge-danger');
+                    }}
+
+                    // Subtle highlight animation
+                    r.style.transition = 'background-color 0.4s ease';
+                    r.style.backgroundColor = 'rgba(59, 130, 246, 0.12)';
+                    setTimeout(() => {{ r.style.backgroundColor = ''; }}, 600);
+                }}
+            }});
+
+            // 5. Update weights
+            rows.forEach(r => {{
+                const valUsd = parseFloat(r.dataset.currentValUsd) || 0;
+                const weightPct = totalMarketValUsd > 0 ? (valUsd / totalMarketValUsd * 100) : 0;
+                const weightCell = r.querySelector('.cell-weight');
+                if (weightCell) weightCell.textContent = weightPct.toFixed(1) + '%';
+            }});
+
+            // 6. Update KPIs
+            const totalMarketValThb = totalMarketValUsd * currentFx;
+            const totalPlUsd = totalMarketValUsd - totalCostUsd;
+            const totalPlThb = totalPlUsd * currentFx;
+            const totalPlPct = totalCostUsd > 0 ? (totalPlUsd / totalCostUsd * 100) : 0;
+
+            const totalCashThb = PORTFOLIO_STATIC.dimeSaveCashThb + (PORTFOLIO_STATIC.dimeUsdCash * currentFx);
+            const totalNetWorthThb = totalMarketValThb + totalCashThb;
+            const totalNetWorthUsd = currentFx > 0 ? (totalNetWorthThb / currentFx) : 0;
+
+            const allTimeProfitThb = totalNetWorthThb - PORTFOLIO_STATIC.netInjectedCapitalThb;
+            const allTimeRoiPct = PORTFOLIO_STATIC.netInjectedCapitalThb > 0 ? (allTimeProfitThb / PORTFOLIO_STATIC.netInjectedCapitalThb * 100) : 0;
+
+            // DOM updates
+            const kpiNetWorthThb = document.getElementById('kpi-net-worth-thb');
+            const kpiNetWorthUsdSub = document.getElementById('kpi-net-worth-usd-sub');
+            const kpiAllTimeProfitThb = document.getElementById('kpi-all-time-profit-thb');
+            const kpiAllTimeRoiSub = document.getElementById('kpi-all-time-roi-sub');
+            const kpiStockValUsd = document.getElementById('kpi-stock-market-val-usd');
+            const kpiStockValThb = document.getElementById('kpi-stock-market-val-thb');
+            const kpiStockUnrealizedPl = document.getElementById('kpi-stock-unrealized-pl');
+            const kpiFxPill = document.getElementById('kpi-fx-pill');
+            const kpiTotalCashThb = document.getElementById('kpi-total-cash-thb');
+
+            if (kpiNetWorthThb) kpiNetWorthThb.textContent = '฿' + totalNetWorthThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+            if (kpiNetWorthUsdSub) kpiNetWorthUsdSub.textContent = '~$' + totalNetWorthUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' USD (หุ้น + เงินสด)';
+
+            const atColor = allTimeProfitThb >= 0 ? '#10b981' : '#f43f5e';
+            const atSign = allTimeProfitThb >= 0 ? '+' : '';
+            if (kpiAllTimeProfitThb) {{
+                kpiAllTimeProfitThb.textContent = atSign + '฿' + allTimeProfitThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                kpiAllTimeProfitThb.style.color = atColor;
+            }}
+            if (kpiAllTimeRoiSub) {{
+                kpiAllTimeRoiSub.textContent = atSign + allTimeRoiPct.toFixed(2) + '% All-Time ROI';
+                kpiAllTimeRoiSub.style.color = atColor;
+            }}
+
+            if (kpiStockValUsd) kpiStockValUsd.textContent = '$' + totalMarketValUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+            if (kpiStockValThb) kpiStockValThb.textContent = '฿' + totalMarketValThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+
+            const unColor = totalPlUsd >= 0 ? '#10b981' : '#f43f5e';
+            const unSign = totalPlUsd >= 0 ? '+' : '';
+            if (kpiStockUnrealizedPl) {{
+                kpiStockUnrealizedPl.textContent = unSign + '$' + totalPlUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' (' + unSign + totalPlPct.toFixed(2) + '%)';
+                kpiStockUnrealizedPl.style.color = unColor;
+            }}
+
+            if (kpiTotalCashThb) kpiTotalCashThb.textContent = '฿' + totalCashThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+            if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + currentFx.toFixed(2) + ' THB';
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('th-TH', {{ hour: '2-digit', minute: '2-digit', second: '2-digit' }});
+            if (ts) ts.innerHTML = '🟢 ราคาเรียลไทม์ล่าสุด: <strong style="color: #60a5fa;">' + timeStr + ' น.</strong>';
+
+        }} catch (err) {{
+            console.error('Failed to refresh quotes:', err);
+            alert('เกิดข้อผิดพลาดในการดึงราคา: ' + err.message);
+        }} finally {{
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            if (text) text.textContent = 'รีเฟรชราคาเรียลไทม์';
+            if (icon) icon.style.transform = '';
+        }}
+    }}
+    </script>
+    """
+
+
 def generate_master_dashboard_html(data):
     at_sign = "+" if data["all_time_profit_thb"] >= 0 else ""
     at_color = "#10b981" if data["all_time_profit_thb"] >= 0 else "#f43f5e"
@@ -345,21 +576,22 @@ def generate_master_dashboard_html(data):
         c = "#10b981" if p_pl_usd >= 0 else "#f43f5e"
         s = "+" if p_pl_usd >= 0 else ""
         onclick_js = _make_chart_onclick(p)
+        ex = p.get('exchange', 'NASDAQ')
         holdings_rows += f"""
-        <tr>
+        <tr class="holding-row" data-ticker="{p['ticker']}" data-exchange="{ex}" data-shares="{p['shares']}" data-cost="{p['avg_cost_usd']}">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="{onclick_js}" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{p['ticker']} 📈</span>
             </td>
             <td>{p.get('name', '-')}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{p['shares']:.4f}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">${p['avg_cost_usd']:,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">${p['close_price']:,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${p['current_val_usd']:,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">฿{p['current_val_thb']:,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}${p_pl_usd:,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{s}฿{p_pl_thb:,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}{p_pl_pct:.2f}%</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{p['weight_pct']:.1f}%</td>
+            <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">${p['close_price']:,.2f}</td>
+            <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">${p['current_val_usd']:,.2f}</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿{p['current_val_thb']:,.2f}</td>
+            <td class="cell-pl-usd" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}${p_pl_usd:,.2f}</td>
+            <td class="cell-pl-thb" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{s}฿{p_pl_thb:,.2f}</td>
+            <td class="cell-pl-pct" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}{p_pl_pct:.2f}%</td>
+            <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">{p['weight_pct']:.1f}%</td>
         </tr>
         """
 
@@ -396,7 +628,7 @@ def generate_master_dashboard_html(data):
                         <span class="clickable-ticker" onclick="{onclick_js}" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">{p.get('name', '')}</div>
                     </div>
-                    <span class="badge {c_badge}">{s_sign}{pl_pct:.1f}%</span>
+                    <span class="badge {c_badge} badge-outlook-pl" data-outlook-ticker="{t}">{s_sign}{pl_pct:.1f}%</span>
                 </div>
                 <div style="font-size: 0.76rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px;">
                     {quality}
@@ -607,10 +839,15 @@ def generate_master_dashboard_html(data):
                     บัญชี: <code>{data['account_no']}</code>
                 </p>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <span class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                    <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
+                    <button id="btn-refresh-live" onclick="refreshLiveQuotes()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
+                        <span id="refresh-icon" style="display: inline-block; transition: transform 0.6s ease;">🔄</span>
+                        <span id="refresh-text">รีเฟรชราคาเรียลไทม์</span>
+                    </button>
                 </div>
+                <span id="refresh-timestamp" style="font-size: 0.78rem; color: var(--text-muted);"></span>
             </div>
         </div>
 
@@ -618,8 +855,8 @@ def generate_master_dashboard_html(data):
         <div class="grid-4-cols">
             <div class="card" style="border-left: 4px solid var(--blue);">
                 <div class="kpi-label">มูลค่าพอร์ตรวมสุทธิ (Total Net Worth / NAV)</div>
-                <div class="kpi-value" style="color: #60a5fa;">฿{data['total_net_worth_thb']:,.2f}</div>
-                <div class="kpi-subtext">~${data['total_net_worth_usd']:,.2f} USD (หุ้น + เงินสด)</div>
+                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa;">฿{data['total_net_worth_thb']:,.2f}</div>
+                <div id="kpi-net-worth-usd-sub" class="kpi-subtext">~${data['total_net_worth_usd']:,.2f} USD (หุ้น + เงินสด)</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--purple);">
                 <div class="kpi-label">เงินต้นทุนเติมสุทธิ (Net Deposited Capital)</div>
@@ -628,12 +865,12 @@ def generate_master_dashboard_html(data):
             </div>
             <div class="card" style="border-left: 4px solid {at_color};">
                 <div class="kpi-label">กำไรรวมสุทธิของพอร์ต (All-Time Net Profit)</div>
-                <div class="kpi-value" style="color: {at_color};">{at_sign}฿{data['all_time_profit_thb']:,.2f}</div>
-                <div class="kpi-subtext" style="color: {at_color}; font-weight: 700;">{at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI</div>
+                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: {at_color};">{at_sign}฿{data['all_time_profit_thb']:,.2f}</div>
+                <div id="kpi-all-time-roi-sub" class="kpi-subtext" style="color: {at_color}; font-weight: 700;">{at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--emerald);">
                 <div class="kpi-label">เงินสดคงเหลือรวม (Total Idle Cash)</div>
-                <div class="kpi-value">฿{data['total_cash_thb']:,.2f}</div>
+                <div id="kpi-total-cash-thb" class="kpi-value">฿{data['total_cash_thb']:,.2f}</div>
                 <div class="kpi-subtext">Dime! Save: ฿{data['dime_save_cash_thb']:,.2f} | Dime! USD: ${data['dime_usd_cash']:.2f}</div>
             </div>
         </div>
@@ -644,8 +881,8 @@ def generate_master_dashboard_html(data):
                 <div class="kpi-label">หุ้นที่กำลังถือครอง (Active Holdings)</div>
                 <div style="font-size: 1.45rem; font-weight: 700;">{len(data['positions'])} บริษัท</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    มูลค่าตลาด: <strong>${data['stock_market_val_usd']:,.2f}</strong> (฿{data['stock_market_val_thb']:,.2f})<br>
-                    กำไรที่ยังไม่ขาย: <strong style="color: {un_color};">{un_sign}${data['stock_unrealized_pl_usd']:,.2f} ({un_sign}{data['stock_unrealized_pl_pct']:.2f}%)</strong>
+                    มูลค่าตลาด: <strong id="kpi-stock-market-val-usd">${data['stock_market_val_usd']:,.2f}</strong> (<span id="kpi-stock-market-val-thb">฿{data['stock_market_val_thb']:,.2f}</span>)<br>
+                    กำไรที่ยังไม่ขาย: <strong id="kpi-stock-unrealized-pl" style="color: {un_color};">{un_sign}${data['stock_unrealized_pl_usd']:,.2f} ({un_sign}{data['stock_unrealized_pl_pct']:.2f}%)</strong>
                 </div>
             </div>
             <div class="card">
@@ -729,6 +966,7 @@ def generate_master_dashboard_html(data):
         }}
     }});
     </script>
+    {get_live_refresh_script(data)}
     {get_chart_modal_component()}
 </body>
 </html>
