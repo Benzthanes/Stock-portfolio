@@ -745,7 +745,6 @@ def main():
     parser = argparse.ArgumentParser(description="Stock Recovery & Breakeven Strategy Analyzer")
     parser.add_argument("ticker", nargs="?", default=None, help="Stock ticker to analyze (default: all underwater holdings)")
     parser.add_argument("--file", "-f", type=str, default=None, help="Path to portfolio JSON file (default: data/portfolio.json)")
-    parser.add_argument("--all", action="store_true", help="Scan all underwater stocks in portfolio")
     parser.add_argument("--shares", type=float, default=None, help="Custom share quantity")
     parser.add_argument("--cost", type=float, default=None, help="Custom average cost")
     parser.add_argument("--json", action="store_true", help="Output JSON format")
@@ -755,14 +754,14 @@ def main():
 
     # Automatically set Thai recovery report name if Thai portfolio is specified
     if not args.save_report:
-        if args.ticker and not args.all:
+        if args.ticker:
             args.save_report = f"reports/recovery_{args.ticker.upper()}.md"
         elif args.file and ("set" in Path(args.file).name.lower() or "thai" in Path(args.file).name.lower()):
             args.save_report = "reports/portfolio_set_recovery.html"
         else:
             args.save_report = "reports/portfolio_recovery.html"
 
-    if args.ticker and not args.all:
+    if args.ticker:
         try:
             res = analyze_recovery(args.ticker, args.shares, args.cost, portfolio_path=args.file)
         except Exception as e:

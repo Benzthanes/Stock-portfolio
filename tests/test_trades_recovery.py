@@ -12,7 +12,6 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import portfolio
 import recovery
 from src.trades import record_sell
 
@@ -159,8 +158,9 @@ class MasterOutputTest(TempDirCase):
         out = io.StringIO()
         with mock.patch.object(gmr, "generate_master_dashboard_data", return_value=data), \
              mock.patch.object(gmr, "generate_master_dashboard_html", return_value="<html/>"), \
-             mock.patch.object(sys, "argv", ["portfolio.py", "--master"]), contextlib.redirect_stdout(out):
-            portfolio.main()
+             mock.patch.object(gmr, "sync_skill_numbers") as sync, contextlib.redirect_stdout(out):
+            gmr.main()
+        sync.assert_called_once_with(data)
         text = out.getvalue()
         self.assertIn("Realized Trades P&L  : -$12.50 (-฿420.25) | Win Rate 66.7%", text)
         self.assertIn("Total Dividends Recv : +$3.00 (+฿100.86) | 2 payments", text)

@@ -12,7 +12,7 @@ This skill automatically synthesizes:
 3. Complete Buy Orders Ledger (all 55 buy orders parsed from Dime! order confirmation slips).
 4. Closed Realized Trades Ledger & Win Rate (from `data/trades.json` - 7 winning sales).
 5. Total Dividends Received (13 payments from historical corporate actions).
-6. Dime! Save Cash Movement & Deposit Ledger (41 transactions including PromptPay deposits, stock deductions, and interest).
+6. Dime! Save Cash Movement & Deposit Ledger (54 transactions including PromptPay deposits, stock deductions, and interest).
 7. Current Cash Reserves (Dime! Save THB and Dime! USD cash).
 
 ---
@@ -34,18 +34,34 @@ This skill automatically synthesizes:
    - 🛒 **ประวัติคำสั่งซื้อหุ้นทั้งหมด (Buy Orders History):** 55 ไม้พร้อมจำนวนหุ้น ราคาที่ได้จริง ยอดเงิน และช่องทางชำระเงิน.
    - 🏆 **กำไรที่ปิดทำกำไรจริง (Realized P&L):** กำไรสะสมจากการขายหุ้นจริง (7 ไม้ Win Rate 100%).
    - 💸 **เงินปันผลรับสะสม (Dividends):** ยอดรับปันผลสุทธิทั้งหมด (13 ครั้ง).
-   - 🏦 **ประวัติการเติมเงินและเงินสด (Cash Flow & Deposits):** รายการเดินบัญชี Dime! Save 41 รายการ.
+   - 🏦 **ประวัติการเติมเงินและเงินสด (Cash Flow & Deposits):** รายการเดินบัญชี Dime! Save 54 รายการ.
    - 📈 **สถานะหุ้นปัจจุบันในพอร์ต (Active Holdings):** ราคาตลาดสด กำไร Unrealized P/L รายตัว.
 4. **แนบลิงก์คลิกเปิดรายงานหน้าเว็บสวยงาม:**
-   - [reports/portfolio_master.html](file:///Users/thanessriamornruttanakul/Documents/filter-stock/reports/portfolio_master.html)
+   - `reports/portfolio_master.html`
+
+---
+
+## ✍️ บันทึกรายการใหม่ (ไม่ต้องแก้โค้ด)
+
+เมื่อผู้ใช้บอกว่าซื้อหุ้น ฝากเงิน ถอนเงิน หรือได้ปันผล ให้รันคำสั่งที่ตรงกันแล้วรัน `/master` ใหม่:
+- ซื้อหุ้น: `python3 trades.py buy -t TICKER -s SHARES -p PRICE_USD [--fx RATE] [--pay thb|usd]`.
+- ขายหุ้น: `python3 trades.py sell -t TICKER -p PRICE_USD [-s SHARES]`.
+- ฝากเงิน: `python3 trades.py deposit --amount THB`.
+- ถอนเงิน: `python3 trades.py withdraw --amount THB`.
+- รับปันผล: `python3 trades.py dividend -t TICKER --usd AMOUNT`.
+
+ทุกคำสั่งรองรับ `--dry-run` และ `--date YYYY-MM-DD`.
+ข้อมูลเงินสด เงินต้น รายการเดินบัญชี และปันผล เก็บอยู่ใน `data/ledger.json`.
+ตัวเลขสรุปในไฟล์นี้ (จำนวนไม้ จำนวนครั้ง และเงินต้น) อัปเดตอัตโนมัติทุกครั้งที่รัน `/master` หรือ `/all` ผ่าน `scripts/sync_skill_numbers.py`.
 
 ---
 
 ## 📂 Source Code Architecture
 
-- Master Report Generator: [scripts/generate_master_report.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/scripts/generate_master_report.py)
-- Master HTML Dashboard: [reports/portfolio_master.html](file:///Users/thanessriamornruttanakul/Documents/filter-stock/reports/portfolio_master.html)
-- Aggregated Account Data JSON: [data/account_summary.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/account_summary.json)
-- Closed Trades Database: [data/trades.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/trades.json)
-- Active Holdings Data: [data/portfolio.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/portfolio.json)
-- Official KKP Statement PDF: [data/KKP_STATEMENT_20261007.pdf](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/KKP_STATEMENT_20261007.pdf)
+- Master Report Generator: `scripts/generate_master_report.py`
+- Master HTML Dashboard: `reports/portfolio_master.html`
+- Aggregated Account Data JSON: `data/account_summary.json`
+- Closed Trades Database: `data/trades.json`
+- Active Holdings Data: `data/portfolio.json`
+- Cash, Deposits & Dividends Ledger: `data/ledger.json`
+- Official KKP Statement PDF: `data/KKP_STATEMENT_20261007.pdf`

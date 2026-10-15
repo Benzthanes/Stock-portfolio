@@ -20,6 +20,7 @@ from src.tradingview import fetch_screener_data
 from src.screener import FALLBACK_SL_RATIO, atr_stop_loss, evaluate_stock
 from src.outlook import get_forward_outlook
 from src.html_report import get_chart_modal_component
+from src.nav import nav_bar_html
 
 
 def _make_dip_chart_onclick(p: Dict[str, Any]) -> str:
@@ -197,7 +198,6 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def generate_html_report(data: Dict[str, Any]) -> str:
-    now_str = data["updated_at"]
     total_pl_thb = data["total_pl_thb"]
     total_pl_usd = data["total_pl_usd"]
     total_pl_pct = data["total_pl_pct"]
@@ -404,20 +404,6 @@ def generate_html_report(data: Dict[str, Any]) -> str:
             flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
         }}
-        .nav-links {{
-            display: flex; gap: 10px; flex-wrap: wrap;
-        }}
-        .nav-pill {{
-            padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.88rem;
-            text-decoration: none; color: var(--text-secondary); background: var(--bg-card);
-            border: 1px solid var(--border-color); transition: all 0.2s;
-        }}
-        .nav-pill:hover {{
-            color: var(--text-main); border-color: var(--blue);
-        }}
-        .nav-pill.active {{
-            background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: var(--blue); font-weight: 600;
-        }}
         .meta-pill {{
             background: var(--bg-card); padding: 8px 16px; border-radius: var(--radius-sm);
             border: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-secondary);
@@ -488,6 +474,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
 </head>
 <body>
     <div class="container">
+        {nav_bar_html('dip_sim')}
         <!-- HEADER -->
         <div class="header">
             <div>
@@ -499,14 +486,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div class="nav-links">
-                    <a href="portfolio_master.html" class="nav-pill">🏛️ พอร์ตหลักความมั่งคั่ง</a>
-                    <a href="portfolio_review.html" class="nav-pill">🏥 ตรวจสุขภาพพอร์ต</a>
-                    <a href="portfolio_dip_sim.html" class="nav-pill active">🧪 พอร์ตจำลองช้อนซื้อ Dip</a>
-                </div>
-                <div class="meta-pill">
-                    อัปเดตราคาล่าสุด: <strong style="color: var(--text-main);">{now_str}</strong> | FX: {data['fx_rate']:.2f} THB/USD
-                </div>
+                <div class="meta-pill">FX: {data['fx_rate']:.2f} THB/USD</div>
             </div>
         </div>
 

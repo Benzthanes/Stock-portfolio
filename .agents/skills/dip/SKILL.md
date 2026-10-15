@@ -9,9 +9,10 @@ Use this skill to scan and filter top US mega/large cap stocks (S&P 100 and Nasd
 
 ---
 
-## 💡 ระบบถามตัวเลือกฟังก์ชันต่อท้ายอัตโนมัติ (Interactive Sub-Function Prompt)
+## 💡 ตัวเลือกฟังก์ชันต่อท้าย (Sub-Functions)
 
-เมื่อผู้ใช้พิมพ์คำสั่งสั้นๆ เพียง `/dip` ให้ระบบเสนอตัวเลือกฟังก์ชันต่อท้ายให้ผู้ใช้เลือกเสมอ:
+เมื่อผู้ใช้พิมพ์คำสั่งสั้นๆ เพียง `/dip` ให้รันตัวเลือก (Recommended) ทันทีโดยไม่ต้องถามก่อน.
+เมื่อแสดงผลเสร็จ ให้ปิดท้ายด้วยตัวเลือกอื่นด้านล่างแบบสั้นๆ:
 1. `(Recommended) /dip`: สแกนหาหุ้นย่อตัวชั้นนำที่ดีที่สุดประจำวัน.
 2. `/dip best`: กรองเฉพาะหุ้นที่มี Reward-to-Risk คุ้มค่าตั้งแต่ 2.0 เท่าขึ้นไป.
 3. `/dip growth`: กรองเฉพาะหุ้นที่รายได้เติบโตเป็นบวก (Quality Growth).
@@ -57,12 +58,12 @@ Use this skill to scan and filter top US mega/large cap stocks (S&P 100 and Nasd
 
 7. **Portfolio Tracking & Health Scan**:
    - User types: `/dip port` or `/dip portfolio`
-   - Agent runs: `python3 portfolio.py` (or `python3 screener.py --port`)
+   - Agent runs: `python3 portfolio.py`
 
 8. **Simulated Paper Trading (ช้อนซื้อในพอร์ตจำลองตามคำสั่งผู้ใช้)**:
    - User types: `ซื้อ [TICKER] ในพอร์ตจำลอง` หรือ `ช้อน [TICKER] ใน sim` (เช่น `ซื้อ BNY ในพอร์ตจำลอง`, `ช้อน JPM 20000 ในพอร์ตจำลอง`)
    - Agent runs: `python3 scripts/generate_dip_sim_report.py --buy [TICKER] [--capital [THB]]`
-   - ระบบจะเข้าซื้อจำลองที่ราคาตลาด คำนวณจุดตัดขาดทุน (SL 1.5 ATR) และเป้าหมายทำกำไร (TP 50D Mean Reversion) ให้ทันที พร้อมอัปเดต [portfolio_dip_sim.html](file:///Users/thanessriamornruttanakul/Documents/filter-stock/reports/portfolio_dip_sim.html).
+   - ระบบจะเข้าซื้อจำลองที่ราคาตลาด คำนวณจุดตัดขาดทุน (SL 1.5 ATR) และเป้าหมายทำกำไร (TP 50D Mean Reversion) ให้ทันที พร้อมอัปเดต `reports/portfolio_dip_sim.html`.
    - คำสั่งขาย/ลบ: `ขาย [TICKER] ในพอร์ตจำลอง` หรือ `ลบ [TICKER] ออกจากพอร์ตจำลอง` -> `python3 scripts/generate_dip_sim_report.py --sell [TICKER]`
    - คำสั่งล้างพอร์ตจำลอง: `ล้างพอร์ตจำลอง` -> `python3 scripts/generate_dip_sim_report.py --reset`
    - คำสั่งดูสรุปพอร์ตจำลอง: `ดูพอร์ตจำลอง` หรือ `สรุปพอร์ตจำลอง` -> `python3 scripts/generate_dip_sim_report.py`
@@ -125,11 +126,11 @@ python3 portfolio.py
 
 ## 📂 Source Code Architecture
 
-- Screener Entrypoint CLI: [screener.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/screener.py)
-- Financial News Engine: [src/news.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/news.py)
-- Portfolio Entrypoint CLI: [portfolio.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/portfolio.py)
-- Portfolio Holdings Data: [data/portfolio.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/portfolio.json)
-- Portfolio Analyzer Engine: [src/portfolio.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/portfolio.py)
-- Stock Universe & Ticker Resolver: [src/universe.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/universe.py)
-- TradingView Screener API Client: [src/tradingview.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/tradingview.py)
-- Indicator Evaluation & Scoring Engine: [src/screener.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/screener.py)
+- Screener Entrypoint CLI: `screener.py`
+- Financial News Engine: `src/news.py`
+- Portfolio Entrypoint CLI: `portfolio.py`
+- Portfolio Holdings Data: `data/portfolio.json`
+- Portfolio Analyzer Engine: `src/portfolio.py`
+- Stock Universe & Ticker Resolver: `src/universe.py`
+- TradingView Screener API Client: `src/tradingview.py`
+- Indicator Evaluation & Scoring Engine: `src/screener.py`

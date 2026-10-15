@@ -13,12 +13,14 @@
 เพียงพิมพ์คำสั่งสั้นๆ เหล่านี้ในช่องแชท:
 
 ### 🌟 `/all` อัปเดตทุกรายงานพร้อมกันในคลิกเดียว (All-in-One Refresh)
-- รันอัปเดตข้อมูลสดของทั้ง 5 รายงานให้พร้อมกันในรอบเดียว:
+- รันอัปเดตข้อมูลสดของทั้ง 6 รายงานให้พร้อมกันในรอบเดียว:
   1. แดชบอร์ดภาพรวมพอร์ต ([portfolio_master.html](reports/portfolio_master.html))
   2. รายงานตรวจสุขภาพพอร์ต ([portfolio_review.html](reports/portfolio_review.html))
   3. กลยุทธ์ฟื้นฟูแก้ดอย ([portfolio_recovery.html](reports/portfolio_recovery.html))
   4. พอร์ตจำลองช้อนซื้อ Dip ([portfolio_dip_sim.html](reports/portfolio_dip_sim.html))
   5. บัญชีประวัติปิดการขาย ([trades_ledger.html](reports/trades_ledger.html))
+  6. หน้ากราฟและ AI เต็มจอ ([stock_chart.html](reports/stock_chart.html))
+- ทุกรายงานมีแถบเมนูด้านบนสำหรับสลับหน้า และแสดงเวลาอัปเดตล่าสุด.
 - หรือรันผ่าน Terminal ด้วยคำสั่ง: `python3 portfolio.py --all`
 
 ### 1. `/master` แดชบอร์ดความมั่งคั่งรวม (Master Wealth Dashboard)
@@ -53,9 +55,40 @@
 
 ---
 
+## ✍️ บันทึกรายการใหม่ (ไม่ต้องแก้โค้ด)
+
+เมื่อซื้อหุ้น ขายหุ้น ฝากเงิน ถอนเงิน หรือได้ปันผล ให้บอกในแชท หรือรันคำสั่งเหล่านี้.
+จากนั้นรัน `/all` เพื่ออัปเดตรายงาน.
+
+```bash
+python3 trades.py buy -t BAC -s 2 -p 48.10          # ซื้อหุ้น คำนวณต้นทุนเฉลี่ยใหม่และตัดเงินสดให้อัตโนมัติ
+python3 trades.py sell -t VST -p 160.50             # ขายหุ้นทั้งหมด (ใส่ -s เพื่อขายบางส่วน)
+python3 trades.py deposit --amount 20000            # ฝากเงินเข้า Dime! Save
+python3 trades.py withdraw --amount 5000            # ถอนเงินออก
+python3 trades.py dividend -t LLY --usd 3.50        # รับเงินปันผล
+```
+
+- ทุกคำสั่งใส่ `--dry-run` เพื่อดูผลก่อนบันทึกจริงได้.
+- ใส่ `--date YYYY-MM-DD` เมื่อบันทึกย้อนหลัง.
+
+---
+
+## 🇹🇭 พอร์ตหุ้นไทย (SET)
+
+พอร์ตหุ้นไทยไม่อยู่ใน `/all` เพราะเปิดดูนานๆ ครั้ง.
+ข้อมูลอยู่ที่ [portfolio_set.json](data/portfolio_set.json) และต้องแก้ราคาในไฟล์เองเมื่อต้องการอัปเดต.
+
+```bash
+python3 portfolio.py -f data/portfolio_set.json --save-report reports/portfolio_set_review.html
+python3 recovery.py -f data/portfolio_set.json
+```
+
+---
+
 ## 💡 ระบบถามตัวเลือกฟังก์ชันอัตโนมัติ (Interactive Menu)
 
-เมื่อคุณพิมพ์คำสั่งสั้นๆ เช่น `/fix`, หรือ `/dip` ระบบจะแสดงกล่องเมนูตัวเลือกให้คุณกดเลือกทันที:
+เมื่อคุณพิมพ์คำสั่งสั้นๆ เช่น `/fix` หรือ `/dip` ระบบจะรันตัวเลือกแนะนำทันที.
+เมื่อแสดงผลเสร็จ ระบบจะบอกตัวเลือกอื่นที่พิมพ์ต่อได้:
 - คำสั่ง `/port`: ทำงานแบบ All-in-One ทันที ไม่ต้องเลือกฟังก์ชันย่อยซ้ำซ้อน เพราะรายงานรวบรวมทั้งตรวจสุขภาพ, ตรวจความเสี่ยง, สแกน DCA และจัดอันดับซื้อเพิ่มไว้ให้ครบแล้วในคำสั่งเดียว.
 - ตัวอย่างคำสั่ง `/fix`: มีตัวเลือกให้เลือกระหว่าง แผนกู้พอร์ตภาพรวม, หรือเจาะลึกหุ้นรายตัวเช่น `/fix APP`, `/fix NOK`, `/fix BAC`.
 - ตัวอย่างคำสั่ง `/dip`: มีตัวเลือกให้เลือกระหว่าง หุ้นย่อตัวที่ดีที่สุด, หุ้นที่มีความคุ้มค่าสูง, หรือหุ้นเฉพาะกลุ่มเทคโนโลยี.
@@ -90,6 +123,7 @@
 
 - ข้อมูลพอร์ตของคุณ: [portfolio.json](data/portfolio.json).
 - รายงานสุขภาพพอร์ตล่าสุด: [portfolio_review.html](reports/portfolio_review.html).
-- รายงานแผนกู้พอร์ตล่าสุด: [portfolio_recovery.md](reports/portfolio_recovery.md).
-- รายงานสแกนหาหุ้นย่อซื้อล่าสุด: [daily_scan.md](reports/daily_scan.md).
+- รายงานแผนกู้พอร์ตล่าสุด: [portfolio_recovery.html](reports/portfolio_recovery.html).
+- แดชบอร์ดภาพรวมพอร์ต: [portfolio_master.html](reports/portfolio_master.html).
+- ข้อมูลเงินสด เงินต้น รายการเดินบัญชี และปันผล: [ledger.json](data/ledger.json).
 - คู่มือการทำงานแต่ละคำสั่ง: [.agents/skills/all/SKILL.md](.agents/skills/all/SKILL.md), [.agents/skills/master/SKILL.md](.agents/skills/master/SKILL.md), [.agents/skills/port/SKILL.md](.agents/skills/port/SKILL.md), [.agents/skills/fix/SKILL.md](.agents/skills/fix/SKILL.md), [.agents/skills/dip/SKILL.md](.agents/skills/dip/SKILL.md).

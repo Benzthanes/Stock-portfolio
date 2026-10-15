@@ -10,9 +10,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from src.html_report import get_chart_modal_component
+from src.nav import nav_bar_html
 
 DEFAULT_PORTFOLIO_PATH = Path("data/portfolio.json")
 DEFAULT_TRADES_PATH = Path("data/trades.json")
+DEFAULT_LEDGER_PATH = Path("data/ledger.json")
+THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
 
 
 def load_trades(filepath: Optional[str] = None) -> Dict[str, Any]:
@@ -34,6 +37,241 @@ def save_trades(trades_data: Dict[str, Any], filepath: Optional[str] = None) -> 
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(trades_data, f, indent=2, ensure_ascii=False)
+
+
+def load_ledger(filepath: Optional[str] = None) -> Dict[str, Any]:
+    path = Path(filepath) if filepath else DEFAULT_LEDGER_PATH
+    if not path.exists():
+        return {
+            "cash": {"dime_save_thb": 0.0, "dime_usd": 0.0},
+            "net_injected_capital_thb": 0.0,
+            "gross_deposits_thb": 0.0,
+            "transfer_out_thb": 0.0,
+            "dime_save_interest_thb": 0.0,
+            "cash_movements": [],
+            "dividends": [],
+            "buy_orders": [],
+        }
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_ledger(ledger: Dict[str, Any], filepath: Optional[str] = None) -> None:
+    path = Path(filepath) if filepath else DEFAULT_LEDGER_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(ledger, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def _when(trade_date: Optional[str]) -> datetime:
+    if trade_date is None:
+        return datetime.now().replace(second=0, microsecond=0)
+    return datetime.strptime(trade_date, "%Y-%m-%d").replace(hour=12)
+
+
+def _cash_date_str(when: datetime, trade_date: Optional[str]) -> str:
+    return when.strftime("%d/%m/%Y") if trade_date else when.strftime("%d/%m/%Y %H:%M น.")
+
+
+def _thai_date_str(when: datetime) -> str:
+    return f"{when.day} {THAI_MONTHS[when.month - 1]} {(when.year + 543) % 100:02d}"
+
+
+def _portfolio_fx(portfolio_path: Optional[str]) -> float:
+    p_path = Path(portfolio_path) if portfolio_path else DEFAULT_PORTFOLIO_PATH
+    if not p_path.exists():
+        return 33.62
+    return float(json.loads(p_path.read_text(encoding="utf-8")).get("fx_rate_usd_thb", 33.62))
+
+
+def _move_save_cash(ledger: Dict[str, Any], amount_thb: float, movement_type: str, channel: str,
+                    when: datetime, trade_date: Optional[str], ref: str) -> Dict[str, Any]:
+    balance = round(ledger["cash"]["dime_save_thb"] + amount_thb, 2)
+    ledger["cash"]["dime_save_thb"] = balance
+    movement = {
+        "date_str": _cash_date_str(when, trade_date),
+        "type": movement_type,
+        "amount_thb": round(amount_thb, 2),
+        "balance_thb": balance,
+        "channel": channel,
+        "ref": ref,
+    }
+    ledger["cash_movements"].append(movement)
+    return movement
+
+
+def _cash_warnings(ledger: Dict[str, Any]) -> List[str]:
+    warnings = []
+    if ledger["cash"]["dime_save_thb"] < 0:
+        warnings.append(f"Dime! Save cash is negative: ฿{ledger['cash']['dime_save_thb']:,.2f}")
+    if ledger["cash"]["dime_usd"] < 0:
+        warnings.append(f"Dime! USD cash is negative: ${ledger['cash']['dime_usd']:,.2f}")
+    return warnings
+
+
+def resolve_exchange(ticker: str) -> tuple:
+    from src.universe import resolve_custom_tickers
+    from src.tradingview import fetch_screener_data
+
+    candidates = resolve_custom_tickers([ticker])
+    try:
+        rows = fetch_screener_data(candidates)
+    except Exception:
+        rows = []
+    if rows:
+        return rows[0]["exchange"], rows[0].get("description") or ticker
+    if len(candidates) == 1:
+        return candidates[0].split(":", 1)[0], ticker
+    raise ValueError(f"Cannot resolve exchange for {ticker}. Pass --exchange NASDAQ|NYSE|AMEX.")
+
+
+def record_buy(
+    ticker: str,
+    shares: float,
+    price_usd: float,
+    fx_rate: Optional[float] = None,
+    pay: str = "thb",
+    trade_date: Optional[str] = None,
+    exchange: Optional[str] = None,
+    portfolio_path: Optional[str] = None,
+    ledger_path: Optional[str] = None,
+    dry_run: bool = False,
+    exchange_resolver=resolve_exchange,
+) -> Dict[str, Any]:
+    if shares <= 0:
+        raise ValueError(f"Shares to buy must be greater than 0 (got {shares}).")
+    if price_usd <= 0:
+        raise ValueError(f"Price must be greater than 0 (got {price_usd}).")
+    if pay not in ("thb", "usd"):
+        raise ValueError(f"--pay must be thb or usd (got {pay}).")
+
+    p_path = Path(portfolio_path) if portfolio_path else DEFAULT_PORTFOLIO_PATH
+    if not p_path.exists():
+        raise FileNotFoundError(f"Portfolio file not found at {p_path}")
+    portfolio_data = json.loads(p_path.read_text(encoding="utf-8"))
+    holdings: List[Dict[str, Any]] = portfolio_data.setdefault("holdings", [])
+    target_ticker = ticker.strip().upper()
+    current_fx = fx_rate if fx_rate is not None else float(portfolio_data.get("fx_rate_usd_thb", 33.62))
+    when = _when(trade_date)
+    exec_date = when.strftime("%Y-%m-%d")
+
+    add_usd = shares * price_usd
+    amt_usd = round(add_usd, 2)
+    amt_thb = round(add_usd * current_fx, 2)
+
+    holding = next((h for h in holdings if h.get("ticker", "").upper() == target_ticker), None)
+    if holding:
+        old_shares = float(holding.get("shares", 0.0))
+        old_total = float(holding.get("total_cost_usd", old_shares * float(holding.get("avg_cost_usd", 0.0))))
+        old_cost_thb = float(holding.get("cost_thb", old_total * current_fx))
+        new_shares = old_shares + shares
+        holding.update({
+            "shares": round(new_shares, 7),
+            "avg_cost_usd": round((old_total + add_usd) / new_shares, 4),
+            "total_cost_usd": round(old_total + add_usd, 2),
+            "cost_thb": round(old_cost_thb + amt_thb, 2),
+        })
+        status_action = f"Added {shares} shares to existing {target_ticker} position ({new_shares:.4f} total)."
+    else:
+        if exchange:
+            exch, name = exchange.upper(), target_ticker
+        else:
+            exch, name = exchange_resolver(target_ticker)
+        holding = {
+            "ticker": target_ticker,
+            "exchange": exch,
+            "name": name,
+            "shares": round(float(shares), 7),
+            "avg_cost_usd": round(float(price_usd), 4),
+            "total_cost_usd": amt_usd,
+            "cost_thb": amt_thb,
+            "buy_date": exec_date,
+        }
+        holdings.append(holding)
+        status_action = f"Opened new {target_ticker} position on {holding['exchange']}."
+
+    ledger = load_ledger(ledger_path)
+    buy_order = {
+        "fn": "CLI",
+        "ticker": target_ticker,
+        "shares": float(shares),
+        "price_usd": float(price_usd),
+        "amt_usd": amt_usd,
+        "amt_thb": amt_thb if pay == "thb" else 0.0,
+        "fx_rate": current_fx,
+        "date": f"{_thai_date_str(when)} - {when.strftime('%H:%M')} น.",
+        "order_type": "Market",
+        "account": "Dime! Save (THB)" if pay == "thb" else "Dime! USD",
+    }
+    ledger["buy_orders"].append(buy_order)
+    if pay == "thb":
+        _move_save_cash(ledger, -amt_thb, f"ชำระค่าซื้อหุ้น {target_ticker}", "Dime! Save", when, trade_date, "trades.py buy")
+    else:
+        ledger["cash"]["dime_usd"] = round(ledger["cash"]["dime_usd"] - amt_usd, 2)
+
+    if not dry_run:
+        p_path.write_text(json.dumps(portfolio_data, indent=2, ensure_ascii=False), encoding="utf-8")
+        save_ledger(ledger, ledger_path)
+
+    return {
+        "holding": holding,
+        "buy_order": buy_order,
+        "cash": dict(ledger["cash"]),
+        "status_action": status_action,
+        "warnings": _cash_warnings(ledger),
+        "dry_run": dry_run,
+    }
+
+
+def record_deposit(amount_thb: float, channel: str = "PROMPTPAY", trade_date: Optional[str] = None,
+                   ledger_path: Optional[str] = None, dry_run: bool = False) -> Dict[str, Any]:
+    if amount_thb <= 0:
+        raise ValueError(f"Deposit amount must be greater than 0 (got {amount_thb}).")
+    ledger = load_ledger(ledger_path)
+    when = _when(trade_date)
+    movement = _move_save_cash(ledger, amount_thb, "ฝากเงิน (โอนเข้า Dime! Save)", channel, when, trade_date, "trades.py deposit")
+    ledger["net_injected_capital_thb"] = round(ledger["net_injected_capital_thb"] + amount_thb, 2)
+    ledger["gross_deposits_thb"] = round(ledger["gross_deposits_thb"] + amount_thb, 2)
+    if not dry_run:
+        save_ledger(ledger, ledger_path)
+    return {"movement": movement, "cash": dict(ledger["cash"]), "net_injected_capital_thb": ledger["net_injected_capital_thb"],
+            "warnings": _cash_warnings(ledger), "dry_run": dry_run}
+
+
+def record_withdraw(amount_thb: float, trade_date: Optional[str] = None,
+                    ledger_path: Optional[str] = None, dry_run: bool = False) -> Dict[str, Any]:
+    if amount_thb <= 0:
+        raise ValueError(f"Withdraw amount must be greater than 0 (got {amount_thb}).")
+    ledger = load_ledger(ledger_path)
+    when = _when(trade_date)
+    movement = _move_save_cash(ledger, -amount_thb, "โอนเงินออกไปต่างธนาคาร", "Dime! Save", when, trade_date, "trades.py withdraw")
+    ledger["net_injected_capital_thb"] = round(ledger["net_injected_capital_thb"] - amount_thb, 2)
+    ledger["transfer_out_thb"] = round(ledger["transfer_out_thb"] + amount_thb, 2)
+    if not dry_run:
+        save_ledger(ledger, ledger_path)
+    return {"movement": movement, "cash": dict(ledger["cash"]), "net_injected_capital_thb": ledger["net_injected_capital_thb"],
+            "warnings": _cash_warnings(ledger), "dry_run": dry_run}
+
+
+def record_dividend(ticker: str, amount_usd: float, fx_rate: Optional[float] = None, rate: str = "-",
+                    trade_date: Optional[str] = None, portfolio_path: Optional[str] = None,
+                    ledger_path: Optional[str] = None, dry_run: bool = False) -> Dict[str, Any]:
+    if amount_usd <= 0:
+        raise ValueError(f"Dividend amount must be greater than 0 (got {amount_usd}).")
+    current_fx = fx_rate if fx_rate is not None else _portfolio_fx(portfolio_path)
+    ledger = load_ledger(ledger_path)
+    entry = {
+        "date": _thai_date_str(_when(trade_date)),
+        "ticker": ticker.strip().upper(),
+        "amount_usd": round(float(amount_usd), 2),
+        "rate": rate,
+        "amount_thb": round(amount_usd * current_fx, 2),
+        "fx_rate": current_fx,
+    }
+    ledger["dividends"].insert(0, entry)
+    ledger["cash"]["dime_usd"] = round(ledger["cash"]["dime_usd"] + amount_usd, 2)
+    if not dry_run:
+        save_ledger(ledger, ledger_path)
+    return {"dividend": entry, "cash": dict(ledger["cash"]), "dry_run": dry_run}
 
 
 def calculate_trades_summary(trades_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -113,6 +351,7 @@ def record_sell(
     portfolio_path: Optional[str] = None,
     trades_path: Optional[str] = None,
     dry_run: bool = False,
+    ledger_path: Optional[str] = None,
 ) -> Dict[str, Any]:
     p_path = Path(portfolio_path) if portfolio_path else DEFAULT_PORTFOLIO_PATH
     if not p_path.exists():
@@ -222,10 +461,16 @@ def record_sell(
         trades_data["trades"].append(trade_entry)
         save_trades(trades_data, trades_path)
 
+    ledger = load_ledger(ledger_path)
+    ledger["cash"]["dime_usd"] = round(ledger["cash"]["dime_usd"] + net_rev_usd, 2)
+    if not dry_run:
+        save_ledger(ledger, ledger_path)
+
     return {
         "trade": trade_entry,
         "status_action": status_action,
         "dry_run": dry_run,
+        "cash": dict(ledger["cash"]),
         "updated_summary": calculate_trades_summary(trades_data if not dry_run else {"trades": trades_data.get("trades", []) + [trade_entry]}),
     }
 
@@ -444,6 +689,7 @@ def generate_trades_html(trades_data: Dict[str, Any]) -> str:
 </head>
 <body>
     <div class="container">
+        {nav_bar_html('ledger')}
         <div class="header">
             <div>
                 <h1 style="font-size: 1.85rem; font-weight: 700;">📈 บัญชีกำไรขาดทุนจากการซื้อขาย (Realized Trade Ledger)</h1>

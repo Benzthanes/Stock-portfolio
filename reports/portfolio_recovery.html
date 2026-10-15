@@ -242,6 +242,19 @@
 </head>
 <body>
     <div class="container">
+        <style>
+.rnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; box-sizing: border-box; width: 100%; max-width: 100%;
+  padding: 10px 16px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
+.rnav-links { display: flex; gap: 6px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rnav-links::-webkit-scrollbar { display: none; }
+.rnav-link { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8;
+  border: 1px solid transparent; transition: color 0.15s, background 0.15s; }
+.rnav-link:hover { color: #f8fafc; background: rgba(255,255,255,0.06); }
+.rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
+.rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
+</style>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link active" aria-current="page">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">ประวัติขาย</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-15 10:21</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
         <header class="header">
             <div>
                 <h1>🧗 แผนกลยุทธ์แก้หลุดดอย 360 องศา</h1>
@@ -249,7 +262,6 @@
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.62 THB/USD</span>
-                <span class="meta-pill">🕒 <strong>อัปเดต:</strong> 15 Oct 2026, 09:57</span>
             </div>
         </header>
 
@@ -318,7 +330,7 @@
             <td style="text-align: right;" class="text-emerald fw-bold">+8.8%</td>
             <td style="text-align: right;"><strong>$481.3</strong> <span class='text-emerald small'>(+84%)</span></td>
             <td style="text-align: center;"><span class="badge badge-neutral">Rev +28.5% | Net +89.9%</span></td>
-            <td style="text-align: center;"><span class='badge badge-neutral'>20.8d</span></td>
+            <td style="text-align: center;"><span class='badge badge-neutral'>20.7d</span></td>
             <td><span class="badge badge-amber">🟢 Smart DCA เมื่อคอนเฟิร์มฐาน (พื้นฐานโตแกร่ง ทยอยดึงทุนต่ำได้)</span></td>
         </tr>
         
@@ -350,7 +362,7 @@
             <td style="text-align: right;" class="text-emerald fw-bold">+5.7%</td>
             <td style="text-align: right;"><strong>$65.3</strong> <span class='text-emerald small'>(+27%)</span></td>
             <td style="text-align: center;"><span class="badge badge-neutral">Rev -1.0% | Net +8.7%</span></td>
-            <td style="text-align: center;"><span class='badge badge-neutral'>92.4d</span></td>
+            <td style="text-align: center;"><span class='badge badge-neutral'>92.3d</span></td>
             <td><span class="badge badge-amber">🎯 Rebound Exit (ทุนต่ำกว่า SMA20 รอเด้งออกเท่าทุน ไม่เติมเงิน)</span></td>
         </tr>
         
@@ -635,7 +647,7 @@
                 </div>
                 <div class="timeline-grid">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ระยะประชิด (20.8 วัน)</span>
+                <span class="timeline-step-badge">ระยะประชิด (20.7 วัน)</span>
                 <div class="timeline-step-desc">รายงานงบการเงิน Q3: จับตาการเติบโตของรายได้จากลูกค้า Web Advertising และการเติบโตของซอฟต์แวร์ AXON 2.0</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -688,7 +700,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li><strong class='source-tag'>[Morningstar]</strong> <a href='https://news.google.com/rss/articles/CBMiqAJBVV95cUxQS1NjUnJvZDJDSDljRkttN1MzT0xqYjU3Z1U3TVdYemR2Y2ZCbnpCMW1xMUZYT0hfbVkyTlhUZTc3U0p4U1RTZ3RBNFBjMF9iX1RQNmp3Sjk2QnhKakdiak8tZFctVDQtYTNhMmN5aUlwcUtidG1ld1JtYnhjckUzbjFmb0x5NXFncy1FRy1mYnhLVmVWR3k3TUpNRzhBaVZEYlJWY0EzVVpvc3hEM2o5bWZlM2R1VnBwN3JSeTVtNTQyYjFyLVFkdXN6TGRYaUltYzd1T0VyN21MeGtnZV9YaVp4YkIyS3RwNkVxRUxvREFaVzZhMmJJQ1htbFUyT0U1RWx4NkJVVUZfSmV3bFQyRHdpdmdzYjN2aEJKNi1OVWV0X240dlh6ZQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>AppLovin Corporation (APP) Class Action Lawsuit Seeks Recovery for Investors; November 16, 2026, Deadline - Contact Kessler Topaz Meltzer &amp; Check, LLP ↗</a> <span class='text-muted small'>(4h ago)</span></li><li><strong class='source-tag'>[Investing.com]</strong> <a href='https://news.google.com/rss/articles/CBMiogFBVV95cUxNRnJhaFlwYW9ORFVGM1E3ZXhrTDllVldTZ29MVjdfV3d1YnpMR3JmOWRWVTVWZTF6V1k3Qm9Zc3IzQ3V3ekVSXzkzdGZxdVVaNTVmV2NyaEdCbmZTRjdPZHdEVnJSS3BHSXBYRFQ2dUtZZEIzdmpSX29Ubi1od3EweG80QVgxWkNNa25MdGd1MWp0b2pjYVZCT18xdk95a0VxNGc?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Applovin stock hits 52-week low at 266.41 USD ↗</a> <span class='text-muted small'>(12h ago)</span></li></ul>
+                    <ul class="cat-list"><li><strong class='source-tag'>[Morningstar]</strong> <a href='https://news.google.com/rss/articles/CBMiqAJBVV95cUxQS1NjUnJvZDJDSDljRkttN1MzT0xqYjU3Z1U3TVdYemR2Y2ZCbnpCMW1xMUZYT0hfbVkyTlhUZTc3U0p4U1RTZ3RBNFBjMF9iX1RQNmp3Sjk2QnhKakdiak8tZFctVDQtYTNhMmN5aUlwcUtidG1ld1JtYnhjckUzbjFmb0x5NXFncy1FRy1mYnhLVmVWR3k3TUpNRzhBaVZEYlJWY0EzVVpvc3hEM2o5bWZlM2R1VnBwN3JSeTVtNTQyYjFyLVFkdXN6TGRYaUltYzd1T0VyN21MeGtnZV9YaVp4YkIyS3RwNkVxRUxvREFaVzZhMmJJQ1htbFUyT0U1RWx4NkJVVUZfSmV3bFQyRHdpdmdzYjN2aEJKNi1OVWV0X240dlh6ZQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>AppLovin Corporation (APP) Class Action Lawsuit Seeks Recovery for Investors; November 16, 2026, Deadline - Contact Kessler Topaz Meltzer &amp; Check, LLP ↗</a> <span class='text-muted small'>(4h ago)</span></li><li><strong class='source-tag'>[Investing.com]</strong> <a href='https://news.google.com/rss/articles/CBMiogFBVV95cUxNRnJhaFlwYW9ORFVGM1E3ZXhrTDllVldTZ29MVjdfV3d1YnpMR3JmOWRWVTVWZTF6V1k3Qm9Zc3IzQ3V3ekVSXzkzdGZxdVVaNTVmV2NyaEdCbmZTRjdPZHdEVnJSS3BHSXBYRFQ2dUtZZEIzdmpSX29Ubi1od3EweG80QVgxWkNNa25MdGd1MWp0b2pjYVZCT18xdk95a0VxNGc?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Applovin stock hits 52-week low at 266.41 USD ↗</a> <span class='text-muted small'>(13h ago)</span></li></ul>
                 </div>
             </div>
 
@@ -880,7 +892,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li><strong class='source-tag'>[MarketBeat]</strong> <a href='https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade ↗</a> <span class='text-muted small'>(5h ago)</span></li></ul>
+                    <ul class="cat-list"><li><strong class='source-tag'>[MarketBeat]</strong> <a href='https://news.google.com/rss/articles/CBMitwFBVV95cUxNNU5nVXRYQXFDSnljYmJXZUJUS3BBRXROSENWWk1uYWs2R2VudVpmcW9TVWZTTEdRTmtQZWh6eE5OOC15R3Nubmx0OU1nY1VCVGFsZ3BkakJOSmZsRFBQOHZiYWR5OU13YVVYMmJiRXB0bS0yUkd6NmQyQW83ZnhDV0VHOU1IdDJDcmM4dWFLZWR0WWVSaWZnUTFieE4ySmNWU0J0SDgwVXlpLTh4R3BFdFJjeFF4SjA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Vertiv (NYSE:VRT) Stock Price Down 6.2% on Analyst Downgrade ↗</a> <span class='text-muted small'>(6h ago)</span></li></ul>
                 </div>
             </div>
 

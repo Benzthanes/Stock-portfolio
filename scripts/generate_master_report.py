@@ -20,8 +20,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.portfolio import load_portfolio, analyze_portfolio
-from src.trades import load_trades, calculate_trades_summary
+from src.trades import load_trades, calculate_trades_summary, load_ledger
 from src.html_report import get_chart_modal_component, _make_chart_onclick
+from src.nav import nav_bar_html
+from scripts.sync_skill_numbers import sync_skill_numbers
 
 MONTH_MAP = {
     "มค": 1, "กพ": 2, "มีค": 3, "เมย": 4, "พค": 5, "มิย": 6,
@@ -161,19 +163,21 @@ def load_ocr_buy_orders():
                 "account": account
             })
 
-    # Sort chronologically descending
+    sort_buy_orders(buy_orders)
+    return buy_orders
+
+
+def sort_buy_orders(buy_orders):
     buy_orders.sort(
         key=lambda x: (parse_thai_date(x["date"]), int(re.sub(r"\D", "", x["fn"])) if re.sub(r"\D", "", x["fn"]) else 0),
         reverse=True
     )
 
-    return buy_orders
 
-
-def load_statement_cash_flow():
+def load_statement_cash_flow(manual_movements):
     stmt_path = Path("data/.statement_text.txt")
     if not stmt_path.exists() or stmt_path.stat().st_size == 0:
-        return []
+        return list(manual_movements)
 
     text = stmt_path.read_text(encoding="utf-8")
 
@@ -215,18 +219,7 @@ def load_statement_cash_flow():
             "ref": "KKP Statement (ทางการ)"
         })
 
-    # 3. Post-statement transactions (after 03/10/2026) verified by slips IMG_5683 and IMG_5684
-    post_statement = [
-        {"date_str": "07/10/2026 23:30 น.", "type": "ชำระค่าซื้อหุ้น BAC", "amount_thb": -4999.73, "balance_thb": 20001.33, "channel": "Dime! Save", "ref": "IMG_5683.PNG"},
-        {"date_str": "08/10/2026 23:09 น.", "type": "ชำระค่าซื้อหุ้น NOK", "amount_thb": -4999.70, "balance_thb": 15001.63, "channel": "Dime! Save", "ref": "IMG_5683.PNG"},
-        {"date_str": "13/10/2026 21:16 น.", "type": "ชำระค่าซื้อหุ้น BAC", "amount_thb": -4999.80, "balance_thb": 10001.83, "channel": "Dime! Save", "ref": "IMG_5684.PNG"},
-        {"date_str": "13/10/2026 21:23 น.", "type": "ชำระค่าซื้อหุ้น VRT", "amount_thb": -10000.94, "balance_thb": 0.89, "channel": "Dime! Save", "ref": "IMG_5684.PNG"},
-        {"date_str": "14/10/2026 20:26 น.", "type": "ฝากเงิน (โอนเข้า Dime! Save)", "amount_thb": 20000.00, "balance_thb": 20000.89, "channel": "PROMPTPAY", "ref": "IMG_5684.PNG"},
-        {"date_str": "14/10/2026 20:33 น.", "type": "ชำระค่าซื้อหุ้น BAC", "amount_thb": -9999.89, "balance_thb": 10001.00, "channel": "Dime! Save", "ref": "IMG_5684.PNG"},
-        {"date_str": "14/10/2026 21:03 น.", "type": "ชำระค่าซื้อหุ้น APP", "amount_thb": -10001.00, "balance_thb": 0.01, "channel": "Dime! Save", "ref": "IMG_5684.PNG"},
-    ]
-
-    all_records = post_statement + records
+    all_records = list(manual_movements) + records
 
     def parse_dt(d_str):
         m = re.search(r"(\d{2})/(\d{2})/(\d{4})", d_str)
@@ -241,7 +234,9 @@ def load_statement_cash_flow():
     return all_records
 
 
-def generate_master_dashboard_data():
+def generate_master_dashboard_data(ledger_path=None):
+    ledger = load_ledger(ledger_path)
+
     # 1. Active Portfolio Live Market Data
     portfolio_data = load_portfolio()
     live_summary = analyze_portfolio(portfolio_data)
@@ -251,15 +246,15 @@ def generate_master_dashboard_data():
     trades_data = load_trades()
     trades_summary = calculate_trades_summary(trades_data)
 
-    # 3. Official KKP Statement Numbers (from KKP_STATEMENT_20261007.pdf & Slips)
-    net_injected_capital_thb = 1245000.00
-    gross_promptpay_deposits_thb = 1295000.00
-    transfer_out_thb = 50000.00
-    dime_save_cash_thb = 0.01
-    dime_save_interest_thb = 30.91
+    # 3. Capital and cash balances from data/ledger.json (seeded from KKP_STATEMENT_20261007.pdf & slips)
+    net_injected_capital_thb = ledger["net_injected_capital_thb"]
+    gross_promptpay_deposits_thb = ledger["gross_deposits_thb"]
+    transfer_out_thb = ledger["transfer_out_thb"]
+    dime_save_cash_thb = ledger["cash"]["dime_save_thb"]
+    dime_save_interest_thb = ledger["dime_save_interest_thb"]
 
     # 4. Dime! USD Cash Balance
-    dime_usd_cash = 140.96
+    dime_usd_cash = ledger["cash"]["dime_usd"]
     dime_usd_cash_thb = round(dime_usd_cash * fx_rate, 2)
 
     # 5. Total Combined Net Worth (NAV)
@@ -281,29 +276,15 @@ def generate_master_dashboard_data():
     # 6. Realized & Dividend Streams
     total_realized_pl_usd = trades_summary["total_realized_pl_usd"]
     total_realized_pl_thb = trades_summary["total_realized_pl_thb"]
-    # Dividend details list
-    dividends_list = [
-        {"date": "1 ต.ค. 69", "ticker": "VOO", "amount_usd": 0.90, "rate": "1.8226/หุ้น"},
-        {"date": "14 ก.ย. 69", "ticker": "GOOGL", "amount_usd": 1.95, "rate": "0.22/หุ้น"},
-        {"date": "10 ก.ย. 69", "ticker": "LLY", "amount_usd": 47.83, "rate": "1.73/หุ้น"},
-        {"date": "12 ส.ค. 69", "ticker": "NOK", "amount_usd": 2.69, "rate": "0.0285/หุ้น"},
-        {"date": "1 ก.ค. 69", "ticker": "VOO", "amount_usd": 0.97, "rate": "1.9622/หุ้น"},
-        {"date": "19 มิ.ย. 69", "ticker": "QQQI", "amount_usd": 3.84, "rate": "0.6572/หุ้น"},
-        {"date": "11 มิ.ย. 69", "ticker": "LLY", "amount_usd": 46.24, "rate": "1.73/หุ้น"},
-        {"date": "23 พ.ค. 69", "ticker": "QQQI", "amount_usd": 3.85, "rate": "0.6589/หุ้น"},
-        {"date": "25 เม.ย. 69", "ticker": "QQQI", "amount_usd": 3.68, "rate": "0.6297/หุ้น"},
-        {"date": "1 เม.ย. 69", "ticker": "VOO", "amount_usd": 0.93, "rate": "1.8724/หุ้น"},
-        {"date": "21 มี.ค. 69", "ticker": "QQQI", "amount_usd": 3.55, "rate": "0.6089/หุ้น"},
-        {"date": "10 มี.ค. 69", "ticker": "LLY", "amount_usd": 21.73, "rate": "1.73/หุ้น"},
-        {"date": "21 ก.พ. 69", "ticker": "QQQI", "amount_usd": 3.58, "rate": "0.6140/หุ้น"},
-    ]
+    dividends_list = ledger["dividends"]
     total_dividends_usd = round(sum(d["amount_usd"] for d in dividends_list), 2)
     total_dividends_thb = round(total_dividends_usd * fx_rate, 2)
     total_realized_and_div_thb = round(total_realized_pl_thb + total_dividends_thb + dime_save_interest_thb, 2)
 
     # 7. Detailed Buy Orders (55 orders from OCR) & Cash Flow (54 transactions from KKP Statement)
-    buy_orders = load_ocr_buy_orders()
-    cash_movements = load_statement_cash_flow()
+    buy_orders = load_ocr_buy_orders() + ledger["buy_orders"]
+    sort_buy_orders(buy_orders)
+    cash_movements = load_statement_cash_flow(ledger["cash_movements"])
 
     return {
         "portfolio_name": live_summary.get("portfolio_name", "ไม่รวยก็ซวยอ่ะค้าบ"),
@@ -342,7 +323,6 @@ def generate_master_dashboard_data():
 
 
 def generate_master_dashboard_html(data):
-    now_str = data["updated_at"]
     at_sign = "+" if data["all_time_profit_thb"] >= 0 else ""
     at_color = "#10b981" if data["all_time_profit_thb"] >= 0 else "#f43f5e"
 
@@ -696,6 +676,7 @@ def generate_master_dashboard_html(data):
 </head>
 <body>
     <div class="container">
+        {nav_bar_html('master')}
         <!-- HEADER -->
         <div class="header">
             <div>
@@ -709,16 +690,8 @@ def generate_master_dashboard_html(data):
                 </p>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <a href="portfolio_master.html" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid var(--blue); font-weight: 600; padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem;">🏛️ พอร์ตหลัก Master</a>
-                    <a href="portfolio_review.html" style="color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem;">🏥 ตรวจสุขภาพพอร์ต</a>
-                    <a href="portfolio_recovery.html" style="color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem;">🩹 แผนกู้พอร์ต 360°</a>
-                    <a href="portfolio_dip_sim.html" style="color: #a855f7; background: rgba(168, 85, 247, 0.1); border: 1px solid var(--purple); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; font-weight: 600;">🧪 พอร์ตจำลอง Dip (ตัวละ ฿10k)</a>
-                    <a href="trades_ledger.html" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--emerald); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; font-weight: 600;">📈 บัญชีขายปิดรอบ</a>
-                </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <span class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
-                    <span class="meta-pill">🕒 {now_str}</span>
                 </div>
             </div>
         </div>
@@ -1013,8 +986,31 @@ def main():
     json_path = Path("data/account_summary.json")
     json_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    print(f"Master Dashboard saved to: {out_path.resolve()}")
-    print(f"Account JSON data saved to: {json_path.resolve()}")
+    sync_skill_numbers(data)
+    print_master_summary(data, out_path, json_path)
+
+
+def signed_money(value, sym):
+    return f"{'+' if value >= 0 else '-'}{sym}{abs(value):,.2f}"
+
+
+def print_master_summary(data, html_path, json_path):
+    at_sign = "+" if data['all_time_profit_thb'] >= 0 else ""
+    ts = data['trades_summary']
+    print("==========================================================================")
+    print("         MASTER WEALTH & PORTFOLIO SUMMARY (DIME! & KKP)")
+    print("==========================================================================")
+    print(f"Portfolio Name       : {data['portfolio_name']}")
+    print(f"Total Net Worth (NAV): ฿{data['total_net_worth_thb']:,.2f} (~${data['total_net_worth_usd']:,.2f} USD)")
+    print(f"Net Injected Capital : ฿{data['net_injected_capital_thb']:,.2f} (from KKP Statement)")
+    print(f"All-Time Net Profit  : {at_sign}฿{data['all_time_profit_thb']:,.2f} ({at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI)")
+    print(f"Total Idle Cash      : ฿{data['total_cash_thb']:,.2f} (Dime! Save: ฿{data['dime_save_cash_thb']:,.2f} | Dime! USD: ${data['dime_usd_cash']:.2f})")
+    print(f"Active Stock Holdings: {len(data['positions'])} stocks | Market Val: ${data['stock_market_val_usd']:,.2f} (฿{data['stock_market_val_thb']:,.2f})")
+    print(f"Realized Trades P&L  : {signed_money(ts['total_realized_pl_usd'], '$')} ({signed_money(ts['total_realized_pl_thb'], '฿')}) | Win Rate {ts['win_rate_pct']:.1f}%")
+    print(f"Total Dividends Recv : {signed_money(data['total_dividends_usd'], '$')} ({signed_money(data['total_dividends_thb'], '฿')}) | {len(data['dividends_list'])} payments")
+    print("==========================================================================")
+    print(f"Master HTML Dashboard: {html_path.resolve()}")
+    print(f"Account JSON File    : {json_path.resolve()}")
 
 
 if __name__ == "__main__":

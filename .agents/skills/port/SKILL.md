@@ -44,34 +44,34 @@ Use this skill to track live portfolio performance, evaluate each holding with a
 # รันวิเคราะห์พอร์ตโฟลิโอและตัดเกรดดาว พร้อมตารางงบ ปฏิทินงบ และฟีดข่าว
 python3 portfolio.py
 
-# รันผ่านคำสั่ง screener
-python3 screener.py --port
+# บันทึกรายการใหม่ (ทุกคำสั่งใส่ --dry-run เพื่อดูผลก่อนได้)
+python3 trades.py buy -t BAC -s 2 -p 48.10          # ซื้อหุ้น คำนวณต้นทุนเฉลี่ยใหม่และตัดเงินสดให้อัตโนมัติ
+python3 trades.py sell --ticker VST --price 160.50  # ขายหุ้น บันทึกกำไรขาดทุนและเพิ่มเงิน USD
+python3 trades.py deposit --amount 20000            # ฝากเงินเข้า Dime! Save
+python3 trades.py withdraw --amount 5000            # ถอนเงินออก
+python3 trades.py dividend -t LLY --usd 3.50        # รับเงินปันผล
 
 # บันทึกผลลัพธ์เป็นไฟล์รายงาน HTML สวยงาม
 python3 portfolio.py --save-report reports/portfolio_review.html
 
-# บันทึกการขายหุ้นและคำนวณกำไรขาดทุนสะสม (Realized P&L)
-python3 trades.py sell --ticker VST --price 160.50
-
 # ดูบัญชีกำไรขาดทุนและอัตรา Win Rate
 python3 trades.py list
-python3 portfolio.py --trades
 
 # รวมศูนย์ข้อมูลพอร์ตทั้งหมดเป็นที่เดียว (Master Dashboard)
-python3 portfolio.py --master
+python3 scripts/generate_master_report.py
 ```
 
 ---
 
 ## 📂 Source Code Architecture
 
-- Portfolio Entrypoint CLI: [portfolio.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/portfolio.py)
-- Trade Ledger Entrypoint CLI: [trades.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/trades.py)
-- Trade Ledger Engine: [src/trades.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/trades.py)
-- Closed Trades Database: [data/trades.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/trades.json)
-- Financial News Engine: [src/news.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/news.py)
-- Portfolio Holdings Data: [data/portfolio.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/portfolio.json)
-- Portfolio Analytics Engine: [src/portfolio.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/portfolio.py)
-- Screener Entrypoint CLI: [screener.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/screener.py)
-- TradingView Screener API Client: [src/tradingview.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/tradingview.py)
+- Portfolio Entrypoint CLI: `portfolio.py`
+- Trade Ledger Entrypoint CLI: `trades.py`
+- Trade Ledger Engine: `src/trades.py`
+- Closed Trades Database: `data/trades.json`
+- Financial News Engine: `src/news.py`
+- Portfolio Holdings Data: `data/portfolio.json`
+- Portfolio Analytics Engine: `src/portfolio.py`
+- Screener Entrypoint CLI: `screener.py`
+- TradingView Screener API Client: `src/tradingview.py`
 

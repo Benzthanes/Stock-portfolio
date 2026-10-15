@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Trade Ledger CLI Tool
-Record closed stock sales, update active holdings in portfolio.json,
-and calculate realized profit/loss metrics.
+Record buys, sells, deposits, withdrawals and dividends. Updates active holdings
+in portfolio.json, cash and capital in ledger.json, and realized profit/loss metrics.
 """
 
 import argparse
@@ -17,12 +17,35 @@ from src.trades import (
     load_trades,
     save_trades,
     record_sell,
+    record_buy,
+    record_deposit,
+    record_withdraw,
+    record_dividend,
     calculate_trades_summary,
     generate_trades_markdown,
     generate_trades_html,
     DEFAULT_PORTFOLIO_PATH,
     DEFAULT_TRADES_PATH,
+    DEFAULT_LEDGER_PATH,
 )
+
+
+def print_ledger_result(result, lines):
+    mode_str = "[DRY-RUN PREVIEW] " if result["dry_run"] else "[EXECUTED] "
+    print(f"\n{mode_str}{lines[0]}")
+    print("--------------------------------------------------")
+    for line in lines[1:]:
+        print(line)
+    cash = result["cash"]
+    print(f"Dime! Save Cash : ฿{cash['dime_save_thb']:,.2f}")
+    print(f"Dime! USD Cash  : ${cash['dime_usd']:,.2f}")
+    print("--------------------------------------------------")
+    for w in result.get("warnings", []):
+        print(f"Warning: {w}", file=sys.stderr)
+    if result["dry_run"]:
+        print("Note: This was a dry-run. No files were modified.")
+    else:
+        print(f"Updated ledger: {DEFAULT_LEDGER_PATH}")
 
 
 def main():
@@ -42,6 +65,38 @@ def main():
     sell_parser.add_argument("--notes", type=str, default="", help="Trade notes or rationale")
     sell_parser.add_argument("--dry-run", action="store_true", help="Calculate realized P&L without modifying files")
     sell_parser.add_argument("--save-report", type=str, nargs="?", const="reports/trades_ledger.html", help="Save HTML report")
+
+    # buy command
+    buy_parser = subparsers.add_parser("buy", help="Record a buy, update holdings and deduct cash")
+    buy_parser.add_argument("--ticker", "-t", required=True, type=str, help="Stock ticker symbol (e.g. NVDA)")
+    buy_parser.add_argument("--shares", "-s", required=True, type=float, help="Number of shares bought")
+    buy_parser.add_argument("--price", "-p", required=True, type=float, help="Execution price in USD")
+    buy_parser.add_argument("--fx", type=float, default=None, help="USD/THB exchange rate (default: from portfolio.json)")
+    buy_parser.add_argument("--pay", choices=["thb", "usd"], default="thb", help="Pay from Dime! Save THB (default) or Dime! USD")
+    buy_parser.add_argument("--exchange", type=str, default=None, help="Exchange for a new ticker (default: auto lookup)")
+    buy_parser.add_argument("--date", "-d", type=str, default=None, help="Trade date (YYYY-MM-DD, default: today)")
+    buy_parser.add_argument("--dry-run", action="store_true", help="Preview without modifying files")
+
+    # deposit / withdraw commands
+    dep_parser = subparsers.add_parser("deposit", help="Record a THB deposit into Dime! Save")
+    dep_parser.add_argument("--amount", required=True, type=float, help="Amount in THB")
+    dep_parser.add_argument("--channel", type=str, default="PROMPTPAY", help="Deposit channel (default: PROMPTPAY)")
+    dep_parser.add_argument("--date", "-d", type=str, default=None, help="Date (YYYY-MM-DD, default: today)")
+    dep_parser.add_argument("--dry-run", action="store_true", help="Preview without modifying files")
+
+    wd_parser = subparsers.add_parser("withdraw", help="Record a THB withdrawal out of Dime! Save")
+    wd_parser.add_argument("--amount", required=True, type=float, help="Amount in THB")
+    wd_parser.add_argument("--date", "-d", type=str, default=None, help="Date (YYYY-MM-DD, default: today)")
+    wd_parser.add_argument("--dry-run", action="store_true", help="Preview without modifying files")
+
+    # dividend command
+    div_parser = subparsers.add_parser("dividend", help="Record a dividend paid into Dime! USD")
+    div_parser.add_argument("--ticker", "-t", required=True, type=str, help="Stock ticker symbol")
+    div_parser.add_argument("--usd", required=True, type=float, help="Net dividend received in USD")
+    div_parser.add_argument("--rate", type=str, default="-", help="Per-share rate label (e.g. 0.22/หุ้น)")
+    div_parser.add_argument("--fx", type=float, default=None, help="USD/THB exchange rate (default: from portfolio.json)")
+    div_parser.add_argument("--date", "-d", type=str, default=None, help="Payment date (YYYY-MM-DD, default: today)")
+    div_parser.add_argument("--dry-run", action="store_true", help="Preview without modifying files")
 
     # list command
     list_parser = subparsers.add_parser("list", help="List all closed trades and show realized P&L summary")
@@ -94,6 +149,45 @@ def main():
             print("==================================================")
         return
 
+    try:
+        if args.command == "buy":
+            r = record_buy(args.ticker, args.shares, args.price, fx_rate=args.fx, pay=args.pay,
+                           trade_date=args.date, exchange=args.exchange, dry_run=args.dry_run)
+            h, b = r["holding"], r["buy_order"]
+            print_ledger_result(r, [
+                f"Recorded buy of {b['ticker']}:",
+                f"Bought          : {b['shares']:.4f} @ ${b['price_usd']:,.2f} = ${b['amt_usd']:,.2f} (paid via {b['account']})",
+                f"Holding         : {h['shares']:.4f} sh | avg ${h['avg_cost_usd']:,.4f} | cost ${h['total_cost_usd']:,.2f} (฿{h['cost_thb']:,.2f})",
+                f"Status          : {r['status_action']}",
+            ])
+            if not r["dry_run"]:
+                print(f"Updated active holdings in: {DEFAULT_PORTFOLIO_PATH}")
+            return
+        if args.command in ("deposit", "withdraw"):
+            if args.command == "deposit":
+                r = record_deposit(args.amount, channel=args.channel, trade_date=args.date, dry_run=args.dry_run)
+            else:
+                r = record_withdraw(args.amount, trade_date=args.date, dry_run=args.dry_run)
+            m = r["movement"]
+            print_ledger_result(r, [
+                f"Recorded {args.command}:",
+                f"Movement        : {m['type']} ฿{m['amount_thb']:,.2f} ({m['date_str']})",
+                f"Net Capital     : ฿{r['net_injected_capital_thb']:,.2f}",
+            ])
+            return
+        if args.command == "dividend":
+            r = record_dividend(args.ticker, args.usd, fx_rate=args.fx, rate=args.rate,
+                                trade_date=args.date, dry_run=args.dry_run)
+            d = r["dividend"]
+            print_ledger_result(r, [
+                f"Recorded dividend from {d['ticker']}:",
+                f"Dividend        : ${d['amount_usd']:,.2f} (฿{d['amount_thb']:,.2f} @ {d['fx_rate']}) on {d['date']}",
+            ])
+            return
+    except Exception as e:
+        print(f"Error processing {args.command}: {e}", file=sys.stderr)
+        sys.exit(1)
+
     if args.command == "sell":
         try:
             result = record_sell(
@@ -130,6 +224,7 @@ def main():
         if not result["dry_run"]:
             print(f"Updated active holdings in: {DEFAULT_PORTFOLIO_PATH}")
             print(f"Appended trade record to : {DEFAULT_TRADES_PATH}")
+            print(f"Credited ${t['net_revenue_usd']:,.2f} to Dime! USD : ${result['cash']['dime_usd']:,.2f} ({DEFAULT_LEDGER_PATH})")
 
             if args.save_report:
                 trades_data = load_trades()

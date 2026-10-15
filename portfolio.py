@@ -12,20 +12,17 @@ from pathlib import Path
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from src.portfolio import load_portfolio, analyze_portfolio, generate_portfolio_markdown, generate_fresh_cash_markdown
+from src.portfolio import load_portfolio, analyze_portfolio, generate_portfolio_markdown
 from src.html_report import generate_portfolio_html
 from src.trades import load_trades, generate_trades_markdown, generate_trades_html
 
-
-def signed_money(value, sym):
-    return f"{'+' if value >= 0 else '-'}{sym}{abs(value):,.2f}"
 
 
 def run_all_reports():
     reports_dir = Path("reports")
     reports_dir.mkdir(parents=True, exist_ok=True)
 
-    print("📊 [0/5] กำลังอัปเดตข้อมูลแท่งเทียนย้อนหลังและคำนวณ Fibonacci อัจฉริยะ...", flush=True)
+    print("📊 [0/6] กำลังอัปเดตข้อมูลแท่งเทียนย้อนหลังและคำนวณ Fibonacci อัจฉริยะ...", flush=True)
     try:
         from src.chart_data import get_all_charts_payload
         p_path = Path("data/portfolio.json")
@@ -44,34 +41,36 @@ def run_all_reports():
     except Exception as e:
         print(f"⚠️ เกิดข้อผิดพลาดในการโหลดแท่งเทียน: {e}", flush=True)
 
-    print("🚀 [1/5] กำลังอัปเดต Master Wealth Dashboard (KKP + Dime!)...", flush=True)
+    print("🚀 [1/6] กำลังอัปเดต Master Wealth Dashboard (KKP + Dime!)...", flush=True)
     from scripts.generate_master_report import generate_master_dashboard_data, generate_master_dashboard_html
     master_data = generate_master_dashboard_data()
     master_html = generate_master_dashboard_html(master_data)
     (reports_dir / "portfolio_master.html").write_text(master_html, encoding="utf-8")
     Path("data/account_summary.json").write_text(json.dumps(master_data, indent=2, ensure_ascii=False), encoding="utf-8")
+    from scripts.sync_skill_numbers import sync_skill_numbers
+    sync_skill_numbers(master_data)
 
-    print("🏥 [2/5] กำลังอัปเดต Portfolio Health Review (9 หุ้นพอร์ตจริง)...", flush=True)
+    print("🏥 [2/6] กำลังอัปเดต Portfolio Health Review (พอร์ตจริง)...", flush=True)
     portfolio_data = load_portfolio()
     summary = analyze_portfolio(portfolio_data)
     review_html = generate_portfolio_html(summary)
     (reports_dir / "portfolio_review.html").write_text(review_html, encoding="utf-8")
 
-    print("🛟 [3/5] กำลังอัปเดต Drawdown Recovery Strategy (แผนแก้ดอย 360 องศา)...", flush=True)
+    print("🛟 [3/6] กำลังอัปเดต Drawdown Recovery Strategy (แผนแก้ดอย 360 องศา)...", flush=True)
     from recovery import analyze_all_underwater
     from src.html_report import generate_recovery_html
     rec_summary = analyze_all_underwater()
     rec_html = generate_recovery_html(rec_summary)
     (reports_dir / "portfolio_recovery.html").write_text(rec_html, encoding="utf-8")
 
-    print("🎯 [4/5] กำลังอัปเดต Simulated Dip Portfolio (พอร์ตจำลองช้อนซื้อ)...", flush=True)
+    print("🎯 [4/6] กำลังอัปเดต Simulated Dip Portfolio (พอร์ตจำลองช้อนซื้อ)...", flush=True)
     from scripts.generate_dip_sim_report import load_simulation_data, analyze_simulation, generate_html_report as generate_dip_html
     sim_data = load_simulation_data()
     sim_summary = analyze_simulation(sim_data)
     dip_html = generate_dip_html(sim_summary)
     (reports_dir / "portfolio_dip_sim.html").write_text(dip_html, encoding="utf-8")
 
-    print("📈 [5/5] กำลังอัปเดต Realized Trades Ledger (ประวัติปิดออเดอร์)...", flush=True)
+    print("📈 [5/6] กำลังอัปเดต Realized Trades Ledger (ประวัติปิดออเดอร์)...", flush=True)
     trades_data = load_trades()
     trades_html = generate_trades_html(trades_data)
     (reports_dir / "trades_ledger.html").write_text(trades_html, encoding="utf-8")
@@ -110,11 +109,6 @@ def main():
         help="Path to portfolio JSON file (default: data/portfolio.json)"
     )
     parser.add_argument(
-        "--buy",
-        action="store_true",
-        help="Focus on fresh capital allocation and rebalancing top picks"
-    )
-    parser.add_argument(
         "--json",
         action="store_true",
         dest="output_json",
@@ -126,14 +120,9 @@ def main():
         help="Show realized profit/loss trade ledger"
     )
     parser.add_argument(
-        "--master",
-        action="store_true",
-        help="Generate unified Master Dashboard combining Statement, Live Holdings, Trades, and Dividends"
-    )
-    parser.add_argument(
         "--all",
         action="store_true",
-        help="Generate and update all 5 HTML reports and summaries in one shot"
+        help="Generate and update all 6 HTML reports in one shot"
     )
     parser.add_argument(
         "--save-report",
@@ -168,37 +157,6 @@ def main():
                 print(f"\nReport saved to: {out_path.resolve()}", file=sys.stderr)
         return
 
-    if args.master:
-        from scripts.generate_master_report import generate_master_dashboard_data, generate_master_dashboard_html
-        data = generate_master_dashboard_data()
-        out_file = args.save_report if (args.save_report and args.save_report != "reports/portfolio_review.html") else "reports/portfolio_master.html"
-        out_path = Path(out_file)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        html = generate_master_dashboard_html(data)
-        out_path.write_text(html, encoding="utf-8")
-        
-        # Save JSON
-        json_path = Path("data/account_summary.json")
-        json_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-
-        at_sign = "+" if data['all_time_profit_thb'] >= 0 else ""
-        print("==========================================================================")
-        print("         MASTER WEALTH & PORTFOLIO SUMMARY (DIME! & KKP)")
-        print("==========================================================================")
-        print(f"Portfolio Name       : {data['portfolio_name']}")
-        print(f"Total Net Worth (NAV): ฿{data['total_net_worth_thb']:,.2f} (~${data['total_net_worth_usd']:,.2f} USD)")
-        print(f"Net Injected Capital : ฿{data['net_injected_capital_thb']:,.2f} (from KKP Statement)")
-        print(f"All-Time Net Profit  : {at_sign}฿{data['all_time_profit_thb']:,.2f} ({at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI)")
-        print(f"Total Idle Cash      : ฿{data['total_cash_thb']:,.2f} (Dime! Save: ฿{data['dime_save_cash_thb']:,.2f} | Dime! USD: ${data['dime_usd_cash']:.2f})")
-        print(f"Active Stock Holdings: {len(data['positions'])} stocks | Market Val: ${data['stock_market_val_usd']:,.2f} (฿{data['stock_market_val_thb']:,.2f})")
-        ts = data['trades_summary']
-        print(f"Realized Trades P&L  : {signed_money(ts['total_realized_pl_usd'], '$')} ({signed_money(ts['total_realized_pl_thb'], '฿')}) | Win Rate {ts['win_rate_pct']:.1f}%")
-        print(f"Total Dividends Recv : {signed_money(data['total_dividends_usd'], '$')} ({signed_money(data['total_dividends_thb'], '฿')}) | {len(data['dividends_list'])} payments")
-        print("==========================================================================")
-        print(f"Master HTML Dashboard: {out_path.resolve()}")
-        print(f"Account JSON File    : {json_path.resolve()}")
-        return
-
     try:
         portfolio_data = load_portfolio(args.file)
     except Exception as e:
@@ -216,10 +174,7 @@ def main():
     if args.output_json:
         print(json.dumps(summary, indent=2, ensure_ascii=False))
     else:
-        if args.buy:
-            report = generate_fresh_cash_markdown(summary)
-        else:
-            report = generate_portfolio_markdown(summary)
+        report = generate_portfolio_markdown(summary)
         print(report)
 
         if args.save_report:

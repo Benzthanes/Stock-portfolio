@@ -42,20 +42,6 @@
             flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
         }
-        .nav-links {
-            display: flex; gap: 10px; flex-wrap: wrap;
-        }
-        .nav-pill {
-            padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.88rem;
-            text-decoration: none; color: var(--text-secondary); background: var(--bg-card);
-            border: 1px solid var(--border-color); transition: all 0.2s;
-        }
-        .nav-pill:hover {
-            color: var(--text-main); border-color: var(--blue);
-        }
-        .nav-pill.active {
-            background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: var(--blue); font-weight: 600;
-        }
         .meta-pill {
             background: var(--bg-card); padding: 8px 16px; border-radius: var(--radius-sm);
             border: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-secondary);
@@ -126,6 +112,19 @@
 </head>
 <body>
     <div class="container">
+        <style>
+.rnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; box-sizing: border-box; width: 100%; max-width: 100%;
+  padding: 10px 16px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
+.rnav-links { display: flex; gap: 6px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rnav-links::-webkit-scrollbar { display: none; }
+.rnav-link { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8;
+  border: 1px solid transparent; transition: color 0.15s, background 0.15s; }
+.rnav-link:hover { color: #f8fafc; background: rgba(255,255,255,0.06); }
+.rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
+.rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
+</style>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link active" aria-current="page">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">ประวัติขาย</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-15 10:21</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
         <!-- HEADER -->
         <div class="header">
             <div>
@@ -137,14 +136,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div class="nav-links">
-                    <a href="portfolio_master.html" class="nav-pill">🏛️ พอร์ตหลักความมั่งคั่ง</a>
-                    <a href="portfolio_review.html" class="nav-pill">🏥 ตรวจสุขภาพพอร์ต</a>
-                    <a href="portfolio_dip_sim.html" class="nav-pill active">🧪 พอร์ตจำลองช้อนซื้อ Dip</a>
-                </div>
-                <div class="meta-pill">
-                    อัปเดตราคาล่าสุด: <strong style="color: var(--text-main);">2026-10-15 09:57:10</strong> | FX: 33.62 THB/USD
-                </div>
+                <div class="meta-pill">FX: 33.62 THB/USD</div>
             </div>
         </div>
 

@@ -15,30 +15,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from src.universe import get_tv_symbols, resolve_custom_tickers
 from src.tradingview import fetch_screener_data
 from src.screener import filter_stocks, generate_markdown_report
-from src.portfolio import load_portfolio, analyze_portfolio, generate_portfolio_markdown
-from src.trades import load_trades, generate_trades_markdown
 
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="US Stock Dip Screener (Strategy: Super Pullback in Uptrend) & Portfolio Tracker"
-    )
-    parser.add_argument(
-        "--port",
-        action="store_true",
-        help="Run live portfolio tracking and health analysis for data/portfolio.json"
-    )
-    parser.add_argument(
-        "--trades",
-        action="store_true",
-        help="Display closed trades log and realized profit/loss metrics"
-    )
-    parser.add_argument(
-        "--port-file",
-        type=str,
-        default=None,
-        help="Specify custom path to portfolio JSON file"
+        description="US Stock Dip Screener (Strategy: Super Pullback in Uptrend)"
     )
     parser.add_argument(
         "--rsi-max",
@@ -136,54 +118,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    # Realized Trades Mode
-    if args.trades:
-        trades_data = load_trades()
-        if args.output_json:
-            print(json.dumps(trades_data, indent=2, ensure_ascii=False))
-        else:
-            report = generate_trades_markdown(trades_data)
-            print(report)
-            if args.save_report and args.save_report != "reports/latest_screener_report.md":
-                out_path = Path(args.save_report)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                out_path.write_text(report, encoding="utf-8")
-                print(f"\nTrades report saved to: {out_path.resolve()}", file=sys.stderr)
-        return
-
-    # Portfolio Mode
-    if args.port or args.port_file:
-        try:
-            port_data = load_portfolio(args.port_file)
-        except Exception as e:
-            print(f"Error loading portfolio file: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        print(f"Tracking {len(port_data.get('holdings', []))} positions for portfolio '{port_data.get('portfolio_name')}'...", file=sys.stderr)
-        try:
-            summary = analyze_portfolio(port_data)
-        except Exception as e:
-            print(f"Error analyzing portfolio: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        if args.output_json:
-            print(json.dumps(summary, indent=2, ensure_ascii=False))
-        else:
-            report = generate_portfolio_markdown(summary)
-            print(report)
-
-            if args.save_report:
-                out_path = Path(args.save_report)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                if out_path.suffix.lower() == ".html":
-                    from src.html_report import generate_portfolio_html
-                    html_content = generate_portfolio_html(summary)
-                    out_path.write_text(html_content, encoding="utf-8")
-                else:
-                    out_path.write_text(report, encoding="utf-8")
-                print(f"\nReport saved to: {out_path.resolve()}", file=sys.stderr)
-        return
 
     # Determine symbols
     if args.tickers:

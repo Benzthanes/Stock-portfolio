@@ -4,9 +4,10 @@ Generates a modern, luxury dark-mode, responsive financial dashboard HTML report
 """
 
 import json
-from datetime import datetime
 from html import escape
 from typing import Any, Dict, List, Optional
+
+from src.nav import nav_bar_html
 
 
 def _fmt_curr(val: float, sym: str = "$") -> str:
@@ -104,7 +105,6 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     sector_sorted = summary.get("sector_sorted", [])
     positions = summary.get("positions", [])
 
-    now_str = datetime.now().strftime("%d %b %Y, %H:%M")
     is_thb = summary.get("base_currency") == "THB"
     curr_sym = "฿" if is_thb else "$"
     sub_sym = "$" if is_thb else "฿"
@@ -1086,6 +1086,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
 </head>
 <body>
     <div class="container">
+        {nav_bar_html('review')}
         <!-- Header -->
         <header class="header">
             <div class="header-title">
@@ -1094,7 +1095,6 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             <div class="header-meta">
                 <span class="meta-pill">🏦 <strong>Broker:</strong> {broker}</span>
                 <span class="meta-pill">💱 <strong>FX Rate:</strong> {fx:.2f} THB/USD</span>
-                <span class="meta-pill">🕒 <strong>อัปเดต:</strong> {now_str}</span>
             </div>
         </header>
 
@@ -1275,7 +1275,6 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
     loss_usd = summary.get("total_underwater_loss_usd", 0.0)
     loss_thb = summary.get("total_underwater_loss_thb", 0.0)
     positions = summary.get("positions", [])
-    now_str = datetime.now().strftime("%d %b %Y, %H:%M")
     is_thb = summary.get("base_currency") == "THB"
     curr_sym = "฿" if is_thb else "$"
     sub_sym = "$" if is_thb else "฿"
@@ -1481,7 +1480,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">{t_avg_str} <span class="small">({t_up:+.0f}%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">{t_avg_str}{f' <span class="small">({t_up:+.0f}%)</span>' if t_up is not None else ''}</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -1802,6 +1801,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
 </head>
 <body>
     <div class="container">
+        {nav_bar_html('recovery')}
         <header class="header">
             <div>
                 <h1>🧗 แผนกลยุทธ์แก้หลุดดอย 360 องศา</h1>
@@ -1809,7 +1809,6 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <span class="meta-pill">💱 <strong>FX Rate:</strong> {fx:.2f} THB/USD</span>
-                <span class="meta-pill">🕒 <strong>อัปเดต:</strong> {now_str}</span>
             </div>
         </header>
 

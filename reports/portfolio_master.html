@@ -92,6 +92,19 @@
 </head>
 <body>
     <div class="container">
+        <style>
+.rnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; box-sizing: border-box; width: 100%; max-width: 100%;
+  padding: 10px 16px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
+.rnav-links { display: flex; gap: 6px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rnav-links::-webkit-scrollbar { display: none; }
+.rnav-link { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8;
+  border: 1px solid transparent; transition: color 0.15s, background 0.15s; }
+.rnav-link:hover { color: #f8fafc; background: rgba(255,255,255,0.06); }
+.rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
+.rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
+</style>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link active" aria-current="page">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">ประวัติขาย</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-15 10:21</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
         <!-- HEADER -->
         <div class="header">
             <div>
@@ -105,16 +118,8 @@
                 </p>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <a href="portfolio_master.html" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid var(--blue); font-weight: 600; padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem;">🏛️ พอร์ตหลัก Master</a>
-                    <a href="portfolio_review.html" style="color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem;">🏥 ตรวจสุขภาพพอร์ต</a>
-                    <a href="portfolio_recovery.html" style="color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem;">🩹 แผนกู้พอร์ต 360°</a>
-                    <a href="portfolio_dip_sim.html" style="color: #a855f7; background: rgba(168, 85, 247, 0.1); border: 1px solid var(--purple); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; font-weight: 600;">🧪 พอร์ตจำลอง Dip (ตัวละ ฿10k)</a>
-                    <a href="trades_ledger.html" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--emerald); padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; font-weight: 600;">📈 บัญชีขายปิดรอบ</a>
-                </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <span class="meta-pill">⚡ 1 USD = 33.62 THB</span>
-                    <span class="meta-pill">🕒 2026-10-15 09:57:06</span>
                 </div>
             </div>
         </div>

@@ -13,9 +13,10 @@ Use this skill to diagnose and recover underwater stock positions in your portfo
 
 ---
 
-## 💡 ระบบถามตัวเลือกฟังก์ชันต่อท้ายอัตโนมัติ (Interactive Sub-Function Prompt)
+## 💡 ตัวเลือกฟังก์ชันต่อท้าย (Sub-Functions)
 
-เมื่อผู้ใช้พิมพ์คำสั่งสั้นๆ เพียง `/fix` ให้ระบบเสนอตัวเลือกฟังก์ชันต่อท้ายให้ผู้ใช้เลือกเสมอ:
+เมื่อผู้ใช้พิมพ์คำสั่งสั้นๆ เพียง `/fix` ให้รันตัวเลือก (Recommended) ทันทีโดยไม่ต้องถามก่อน.
+เมื่อแสดงผลเสร็จ ให้ปิดท้ายด้วยตัวเลือกอื่นด้านล่างแบบสั้นๆ:
 1. `(Recommended) /fix`: รันแผนกู้พอร์ต 360 องศา สรุปภาพรวมหุ้นติดลบทุกตัวในพอร์ตทันที.
 2. `/fix [TICKER]`: เจาะลึกแผนแก้ดอยหุ้นรายตัว (เช่น `/fix APP`, `/fix NOK`, `/fix BAC`).
 3. `/fix [TICKER] --shares [N] --cost [PRICE]`: วิเคราะห์หุ้นนอกพอร์ตพร้อมระบุจำนวนและต้นทุน.
@@ -86,8 +87,8 @@ python3 recovery.py APP --save-report reports/app_recovery.md
 
 ## 📂 Source Code Architecture
 
-- Recovery CLI Tool: [recovery.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/recovery.py)
-- Financial News Engine: [src/news.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/news.py)
-- Portfolio Holdings Data: [data/portfolio.json](file:///Users/thanessriamornruttanakul/Documents/filter-stock/data/portfolio.json)
-- TradingView Screener API Client: [src/tradingview.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/tradingview.py)
-- Portfolio Analytics Engine: [src/portfolio.py](file:///Users/thanessriamornruttanakul/Documents/filter-stock/src/portfolio.py)
+- Recovery CLI Tool: `recovery.py`
+- Financial News Engine: `src/news.py`
+- Portfolio Holdings Data: `data/portfolio.json`
+- TradingView Screener API Client: `src/tradingview.py`
+- Portfolio Analytics Engine: `src/portfolio.py`

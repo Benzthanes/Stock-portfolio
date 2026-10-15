@@ -1,0 +1,149 @@
+{
+  "cash": {
+    "dime_save_thb": 0.01,
+    "dime_usd": 140.96
+  },
+  "net_injected_capital_thb": 1245000.0,
+  "gross_deposits_thb": 1295000.0,
+  "transfer_out_thb": 50000.0,
+  "dime_save_interest_thb": 30.91,
+  "cash_movements": [
+    {
+      "date_str": "07/10/2026 23:30 น.",
+      "type": "ชำระค่าซื้อหุ้น BAC",
+      "amount_thb": -4999.73,
+      "balance_thb": 20001.33,
+      "channel": "Dime! Save",
+      "ref": "IMG_5683.PNG"
+    },
+    {
+      "date_str": "08/10/2026 23:09 น.",
+      "type": "ชำระค่าซื้อหุ้น NOK",
+      "amount_thb": -4999.7,
+      "balance_thb": 15001.63,
+      "channel": "Dime! Save",
+      "ref": "IMG_5683.PNG"
+    },
+    {
+      "date_str": "13/10/2026 21:16 น.",
+      "type": "ชำระค่าซื้อหุ้น BAC",
+      "amount_thb": -4999.8,
+      "balance_thb": 10001.83,
+      "channel": "Dime! Save",
+      "ref": "IMG_5684.PNG"
+    },
+    {
+      "date_str": "13/10/2026 21:23 น.",
+      "type": "ชำระค่าซื้อหุ้น VRT",
+      "amount_thb": -10000.94,
+      "balance_thb": 0.89,
+      "channel": "Dime! Save",
+      "ref": "IMG_5684.PNG"
+    },
+    {
+      "date_str": "14/10/2026 20:26 น.",
+      "type": "ฝากเงิน (โอนเข้า Dime! Save)",
+      "amount_thb": 20000.0,
+      "balance_thb": 20000.89,
+      "channel": "PROMPTPAY",
+      "ref": "IMG_5684.PNG"
+    },
+    {
+      "date_str": "14/10/2026 20:33 น.",
+      "type": "ชำระค่าซื้อหุ้น BAC",
+      "amount_thb": -9999.89,
+      "balance_thb": 10001.0,
+      "channel": "Dime! Save",
+      "ref": "IMG_5684.PNG"
+    },
+    {
+      "date_str": "14/10/2026 21:03 น.",
+      "type": "ชำระค่าซื้อหุ้น APP",
+      "amount_thb": -10001.0,
+      "balance_thb": 0.01,
+      "channel": "Dime! Save",
+      "ref": "IMG_5684.PNG"
+    }
+  ],
+  "dividends": [
+    {
+      "date": "1 ต.ค. 69",
+      "ticker": "VOO",
+      "amount_usd": 0.9,
+      "rate": "1.8226/หุ้น"
+    },
+    {
+      "date": "14 ก.ย. 69",
+      "ticker": "GOOGL",
+      "amount_usd": 1.95,
+      "rate": "0.22/หุ้น"
+    },
+    {
+      "date": "10 ก.ย. 69",
+      "ticker": "LLY",
+      "amount_usd": 47.83,
+      "rate": "1.73/หุ้น"
+    },
+    {
+      "date": "12 ส.ค. 69",
+      "ticker": "NOK",
+      "amount_usd": 2.69,
+      "rate": "0.0285/หุ้น"
+    },
+    {
+      "date": "1 ก.ค. 69",
+      "ticker": "VOO",
+      "amount_usd": 0.97,
+      "rate": "1.9622/หุ้น"
+    },
+    {
+      "date": "19 มิ.ย. 69",
+      "ticker": "QQQI",
+      "amount_usd": 3.84,
+      "rate": "0.6572/หุ้น"
+    },
+    {
+      "date": "11 มิ.ย. 69",
+      "ticker": "LLY",
+      "amount_usd": 46.24,
+      "rate": "1.73/หุ้น"
+    },
+    {
+      "date": "23 พ.ค. 69",
+      "ticker": "QQQI",
+      "amount_usd": 3.85,
+      "rate": "0.6589/หุ้น"
+    },
+    {
+      "date": "25 เม.ย. 69",
+      "ticker": "QQQI",
+      "amount_usd": 3.68,
+      "rate": "0.6297/หุ้น"
+    },
+    {
+      "date": "1 เม.ย. 69",
+      "ticker": "VOO",
+      "amount_usd": 0.93,
+      "rate": "1.8724/หุ้น"
+    },
+    {
+      "date": "21 มี.ค. 69",
+      "ticker": "QQQI",
+      "amount_usd": 3.55,
+      "rate": "0.6089/หุ้น"
+    },
+    {
+      "date": "10 มี.ค. 69",
+      "ticker": "LLY",
+      "amount_usd": 21.73,
+      "rate": "1.73/หุ้น"
+    },
+    {
+      "date": "21 ก.พ. 69",
+      "ticker": "QQQI",
+      "amount_usd": 3.58,
+      "rate": "0.6140/หุ้น"
+    }
+  ],
+  "buy_orders": []
+}

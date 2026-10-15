@@ -9,6 +9,7 @@ from html import escape
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from src.chart_data import compact_charts_for_page, load_candles_cache
+from src.nav import nav_bar_html
 
 
 def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
@@ -337,32 +338,6 @@ def generate_stock_chart_page_html() -> str:
             color: #ffffff;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
-        }}
-
-        .nav-links {{
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }}
-        .nav-link-btn {{
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.18s;
-        }}
-        .nav-link-btn:hover {{
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.2);
         }}
 
         .hotkey-badge {{
@@ -948,6 +923,7 @@ def generate_stock_chart_page_html() -> str:
 </head>
 <body>
     <div class="chart-page-container">
+        {nav_bar_html('chart')}
         <!-- Top Navigation Bar -->
         <div class="top-nav-bar">
             <button class="nav-back-btn" onclick="goBackToPortfolio()">
@@ -955,14 +931,6 @@ def generate_stock_chart_page_html() -> str:
             </button>
             <div class="hotkey-badge">
                 ⌨️ <b>คีย์ลัด:</b> <kbd>←</kbd> <kbd>→</kbd> สลับหุ้น • <kbd>/</kbd> ค้นหา • <kbd>F</kbd> Fibo • <kbd>E</kbd> EMA200 • <kbd>S</kbd> Supertrend • <kbd>T</kbd> Live
-            </div>
-            <div class="nav-links">
-                <span style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-right: 4px;">รายงานทั้งหมด:</span>
-                <a href="portfolio_master.html" class="nav-link-btn">🏛️ Master</a>
-                <a href="portfolio_review.html" class="nav-link-btn">🏥 Health</a>
-                <a href="portfolio_recovery.html" class="nav-link-btn">🩹 Recovery</a>
-                <a href="portfolio_dip_sim.html" class="nav-link-btn">🧪 Dip Sim</a>
-                <a href="trades_ledger.html" class="nav-link-btn">📈 Trades</a>
             </div>
         </div>
 

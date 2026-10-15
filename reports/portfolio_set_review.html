@@ -403,6 +403,113 @@
             color: var(--text-secondary);
         }
 
+        /* Forward Outlook & Dossier Styles */
+        .outlook-card {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.88));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+        }
+        .outlook-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 18px;
+        }
+        .thesis-banner {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.10));
+            border-left: 4px solid var(--blue);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 18px;
+        }
+        .drivers-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+        .drivers-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .drivers-list li {
+            position: relative;
+            padding-left: 18px;
+            color: #cbd5e1;
+        }
+        .drivers-list li::before {
+            content: "✦";
+            position: absolute;
+            left: 2px;
+            color: var(--emerald);
+            font-size: 0.8rem;
+        }
+        .timeline-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .timeline-step {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+        }
+        .timeline-step-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            margin-bottom: 6px;
+        }
+        .timeline-step-desc {
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
+        .wallstreet-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.04), rgba(15, 23, 42, 0.6));
+            border: 1px solid rgba(16, 185, 129, 0.22);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+        .ws-targets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .ws-target-cell {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .roadmap-callout {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(15, 23, 42, 0.8));
+            border-left: 4px solid var(--amber);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+
         /* Typography helpers */
         .text-emerald { color: var(--emerald); }
         .text-rose { color: var(--rose); }
@@ -443,6 +550,19 @@
 </head>
 <body>
     <div class="container">
+        <style>
+.rnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; box-sizing: border-box; width: 100%; max-width: 100%;
+  padding: 10px 16px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
+.rnav-links { display: flex; gap: 6px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rnav-links::-webkit-scrollbar { display: none; }
+.rnav-link { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8;
+  border: 1px solid transparent; transition: color 0.15s, background 0.15s; }
+.rnav-link:hover { color: #f8fafc; background: rgba(255,255,255,0.06); }
+.rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
+.rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
+</style>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">ประวัติขาย</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-15 10:13</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
         <!-- Header -->
         <header class="header">
             <div class="header-title">
@@ -451,7 +571,6 @@
             <div class="header-meta">
                 <span class="meta-pill">🏦 <strong>Broker:</strong> InnovestX</span>
                 <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.62 THB/USD</span>
-                <span class="meta-pill">🕒 <strong>อัปเดต:</strong> 08 Oct 2026, 21:40</span>
             </div>
         </header>
 
@@ -462,7 +581,7 @@
                 <div class="grade-box">
                     <div class="grade-badge">D</div>
                     <div>
-                        <div class="fw-bold" style="font-size: 1.1rem;">16/100 คะแนน</div>
+                        <div class="fw-bold" style="font-size: 1.1rem;">26/100 คะแนน</div>
                         <div class="kpi-subtext">🔴 เสี่ยงสูง ต้องรีบปรับพอร์ต</div>
                     </div>
                 </div>
@@ -470,20 +589,20 @@
 
             <div class="card kpi-card">
                 <div class="kpi-label">💰 มูลค่าพอร์ตปัจจุบัน</div>
-                <div class="kpi-value">฿1,546,980.00</div>
-                <div class="kpi-subtext">≈ $46,013.68 USD (ต้นทุน ฿2,549,319.00)</div>
+                <div class="kpi-value">฿1,512,620.00</div>
+                <div class="kpi-subtext">≈ $44,991.67 USD (ต้นทุน ฿2,549,319.00)</div>
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">📈 กำไร/ขาดทุนสุทธิ (Unrealized)</div>
-                <div class="kpi-value" style="color: var(--rose);">-฿1,002,339.00 (-39.32%)</div>
-                <div class="kpi-subtext">≈ -$29,813.77 USD</div>
+                <div class="kpi-value" style="color: var(--rose);">-฿1,036,699.00 (-40.67%)</div>
+                <div class="kpi-subtext">≈ -$30,835.78 USD</div>
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">⚡ กำไร/ขาดทุนวันนี้ (1D Change)</div>
-                <div class="kpi-value" style="color: var(--emerald);">+฿1,640.00 (+0.11%)</div>
-                <div class="kpi-subtext">HHI: 2164 (Moderate)</div>
+                <div class="kpi-value" style="color: var(--rose);">-฿7,340.00 (-0.48%)</div>
+                <div class="kpi-subtext">HHI: 2121 (Moderate)</div>
             </div>
         </div>
 
@@ -493,10 +612,10 @@
             <p style="color: var(--text-secondary); margin-bottom: 12px;">พอร์ตขาดทุนหนักหรือมีความเสี่ยงรุนแรง ต้องใช้แผนกู้พอร์ตทันที.</p>
             <div class="grid-2-cols" style="margin-bottom: 12px; gap: 12px;">
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> [SCB] SCB X PCL (+67.8%)
+                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> [SCB] SCB X PCL (+69.6%)
                 </div>
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🔻 <strong>ตัวฉุดดอยหนัก:</strong> [NOBLE] Noble Development PCL (-78.4%)
+                    🔻 <strong>ตัวฉุดดอยหนัก:</strong> [NOBLE] Noble Development PCL (-78.6%)
                 </div>
             </div>
             <ul class="layman-checklist">
@@ -524,10 +643,10 @@
             <td style="font-weight: 600;">Finance</td>
             <td style="width: 45%;">
                 <div class="progress-wrap">
-                    <div class="progress-bar" style="width: 70.93045805375635%; background: var(--rose);"></div>
+                    <div class="progress-bar" style="width: 70.50019172032633%; background: var(--rose);"></div>
                 </div>
             </td>
-            <td style="text-align: right; font-weight: 700;">70.9%</td>
+            <td style="text-align: right; font-weight: 700;">70.5%</td>
             <td><span class="badge badge-warn">⚠️ สัดส่วนสูงมาก</span></td>
         </tr>
         
@@ -535,10 +654,10 @@
             <td style="font-weight: 600;">Industrial Services</td>
             <td style="width: 45%;">
                 <div class="progress-wrap">
-                    <div class="progress-bar" style="width: 14.434575754049824%; background: var(--blue);"></div>
+                    <div class="progress-bar" style="width: 14.558844918089143%; background: var(--blue);"></div>
                 </div>
             </td>
-            <td style="text-align: right; font-weight: 700;">14.4%</td>
+            <td style="text-align: right; font-weight: 700;">14.6%</td>
             <td><span class="badge badge-neutral">⚪ กระจายตัวดี</span></td>
         </tr>
         
@@ -546,10 +665,10 @@
             <td style="font-weight: 600;">Producer Manufacturing</td>
             <td style="width: 45%;">
                 <div class="progress-wrap">
-                    <div class="progress-bar" style="width: 10.85986890586821%; background: var(--blue);"></div>
+                    <div class="progress-bar" style="width: 11.106556835160188%; background: var(--blue);"></div>
                 </div>
             </td>
-            <td style="text-align: right; font-weight: 700;">10.9%</td>
+            <td style="text-align: right; font-weight: 700;">11.1%</td>
             <td><span class="badge badge-neutral">⚪ กระจายตัวดี</span></td>
         </tr>
         
@@ -557,7 +676,7 @@
             <td style="font-weight: 600;">Consumer Durables</td>
             <td style="width: 45%;">
                 <div class="progress-wrap">
-                    <div class="progress-bar" style="width: 3.775097286325615%; background: var(--blue);"></div>
+                    <div class="progress-bar" style="width: 3.834406526424349%; background: var(--blue);"></div>
                 </div>
             </td>
             <td style="text-align: right; font-weight: 700;">3.8%</td>
@@ -593,134 +712,134 @@
                     
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:BLAND" target="_blank" class="ticker-pill">BLAND</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;BLAND&quot;, &quot;SET&quot;, &quot;Bangkok Land PCL&quot;, &quot;Finance&quot;, 1.01, 0.52, 0.49, 0.57, 0.49, 0.57, null)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BLAND 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Bangkok Land PCL</div>
                 <div class="text-muted small">บริษัท บางกอกแลนด์ จำกัด (มหาชน) พัฒนาอสังหาริมทรัพย์และบริหารจัดการศูนย์แสดงสินค้าและการประชุม อิมแพ็ค เมืองทองธานี (IMPACT)</div>
             </td>
             <td style="white-space: nowrap;">⭐⭐⭐</td>
-            <td style="text-align: right; font-weight: 700;">34.5%</td>
+            <td style="text-align: right; font-weight: 700;">33.3%</td>
             <td style="text-align: right;">฿1.01</td>
-            <td style="text-align: right; font-weight: 600;">฿0.55</td>
+            <td style="text-align: right; font-weight: 600;">฿0.52</td>
             <td style="text-align: right;">
-                <div class="text-emerald small fw-bold">รับ ฿0.52</div>
-                <div class="text-amber small">ต้าน ฿0.58</div>
+                <div class="text-emerald small fw-bold">รับ ฿0.49</div>
+                <div class="text-amber small">ต้าน ฿0.57</div>
             </td>
             <td style="text-align: right;">
-                <div>฿533,500.00</div>
-                <div class="text-muted small">≈ $15,868.53</div>
+                <div>฿504,400.00</div>
+                <div class="text-muted small">≈ $15,002.97</div>
             </td>
             <td style="text-align: right;" class="text-rose">
-                <div class="fw-bold">-45.54%</div>
-                <div class="small">(฿446,200.00)</div>
+                <div class="fw-bold">-48.51%</div>
+                <div class="small">(฿475,300.00)</div>
             </td>
             <td style="text-align: right;" class="text-emerald">+0.00%</td>
-            <td style="text-align: center;">42.8</td>
-            <td style="text-align: center;">+13.8%</td>
-            <td><span class="badge badge-amber">⚠️ Heavy Allocation (34.5%)</span> <span class="badge badge-rose">🔻 Drawdown (-45.5%)</span> </td>
+            <td style="text-align: center;"><span class="badge badge-amber">32.0 📉</span></td>
+            <td style="text-align: center;">+7.2% <span title="Value Zone">💎</span></td>
+            <td><span class="badge badge-amber">⚠️ Heavy Allocation (33.3%)</span> <span class="badge badge-rose">🔻 Drawdown (-48.5%)</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
         </tr>
         
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:KTC" target="_blank" class="ticker-pill">KTC</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;KTC&quot;, &quot;SET&quot;, &quot;Krungthai Card PCL&quot;, &quot;Finance&quot;, 47.45, 34.5, 32.26, 36.73, 33.19, 36.73, 43.03)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">KTC 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Krungthai Card PCL</div>
                 <div class="text-muted small">บริษัท บัตรกรุงไทย จำกัด (มหาชน) ผู้ให้บริการสินเชื่อเพื่อผู้บริโภค บัตรเครดิต สินเชื่อส่วนบุคคล และสินเชื่อทะเบียนรถยนต์ (KTC พี่เบิ้ม)</div>
             </td>
             <td style="white-space: nowrap;">⭐⭐⭐</td>
-            <td style="text-align: right; font-weight: 700;">18.8%</td>
+            <td style="text-align: right; font-weight: 700;">18.9%</td>
             <td style="text-align: right;">฿47.45</td>
-            <td style="text-align: right; font-weight: 600;">฿35.00</td>
+            <td style="text-align: right; font-weight: 600;">฿34.50</td>
             <td style="text-align: right;">
-                <div class="text-emerald small fw-bold">รับ ฿33.29</div>
-                <div class="text-amber small">ต้าน ฿37.02</div>
+                <div class="text-emerald small fw-bold">รับ ฿32.26</div>
+                <div class="text-amber small">ต้าน ฿36.73</div>
             </td>
             <td style="text-align: right;">
-                <div>฿290,500.00</div>
-                <div class="text-muted small">≈ $8,640.69</div>
+                <div>฿286,350.00</div>
+                <div class="text-muted small">≈ $8,517.25</div>
             </td>
             <td style="text-align: right;" class="text-rose">
-                <div class="fw-bold">-26.24%</div>
-                <div class="small">(฿103,335.00)</div>
+                <div class="fw-bold">-27.29%</div>
+                <div class="small">(฿107,485.00)</div>
             </td>
-            <td style="text-align: right;" class="text-emerald">+1.45%</td>
-            <td style="text-align: center;">41.6</td>
-            <td style="text-align: center;">+9.0% <span title="Value Zone">💎</span></td>
-            <td><span class="badge badge-rose">🔻 Drawdown (-26.2%)</span> <span class="badge badge-amber">⚠️ Earnings in 7.9d</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
+            <td style="text-align: right;" class="text-rose">-1.43%</td>
+            <td style="text-align: center;">40.0</td>
+            <td style="text-align: center;">+7.0% <span title="Value Zone">💎</span></td>
+            <td><span class="badge badge-rose">🔻 Drawdown (-27.3%)</span> <span class="badge badge-amber">⚠️ Earnings in 1.4d</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
         </tr>
         
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:SCB" target="_blank" class="ticker-pill">SCB</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;SCB&quot;, &quot;SET&quot;, &quot;SCB X PCL&quot;, &quot;Finance&quot;, 85.8, 145.5, 144.27, 151.1, 142.47, 151.1, 157.9)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">SCB 📈</span>
             </td>
             <td>
                 <div class="fw-bold">SCB X PCL</div>
                 <div class="text-muted small">บริษัท เอสซีบี เอกซ์ จำกัด (มหาชน) ยานแม่กลุ่มธุรกิจทางการเงิน ธนาคารไทยพาณิชย์ และบริการเทคโนโลยีการเงินดิจิทัล (Fintech)</div>
             </td>
-            <td style="white-space: nowrap;">⭐⭐⭐</td>
-            <td style="text-align: right; font-weight: 700;">16.8%</td>
+            <td style="white-space: nowrap;">⭐⭐⭐⭐</td>
+            <td style="text-align: right; font-weight: 700;">17.3%</td>
             <td style="text-align: right;">฿85.80</td>
-            <td style="text-align: right; font-weight: 600;">฿144.00</td>
+            <td style="text-align: right; font-weight: 600;">฿145.50</td>
             <td style="text-align: right;">
-                <div class="text-emerald small fw-bold">รับ ฿144.04</div>
-                <div class="text-amber small">ต้าน ฿151.71</div>
+                <div class="text-emerald small fw-bold">รับ ฿144.27</div>
+                <div class="text-amber small">ต้าน ฿151.10</div>
             </td>
             <td style="text-align: right;">
-                <div>฿259,200.00</div>
-                <div class="text-muted small">≈ $7,709.70</div>
+                <div>฿261,900.00</div>
+                <div class="text-muted small">≈ $7,790.01</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
-                <div class="fw-bold">+67.83%</div>
-                <div class="small">(+฿104,760.00)</div>
+                <div class="fw-bold">+69.58%</div>
+                <div class="small">(+฿107,460.00)</div>
             </td>
-            <td style="text-align: right;" class="text-rose">-1.37%</td>
-            <td style="text-align: center;"><span class="badge badge-rose">27.9 🚨</span></td>
-            <td style="text-align: center;">-0.0% <span title="Value Zone">💎</span></td>
-            <td><span class="badge badge-amber">⚠️ Earnings in 7.9d</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
+            <td style="text-align: right;" class="text-emerald">+0.00%</td>
+            <td style="text-align: center;">36.3</td>
+            <td style="text-align: center;">+0.8% <span title="Value Zone">💎</span></td>
+            <td><span class="badge badge-amber">⚠️ Earnings in 1.4d</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
         </tr>
         
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:SEAFCO" target="_blank" class="ticker-pill">SEAFCO</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;SEAFCO&quot;, &quot;SET&quot;, &quot;Seafco PCL&quot;, &quot;Industrial Services&quot;, 3.56, 2.86, 2.81, 2.91, 2.77, 2.91, 3.94)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">SEAFCO 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Seafco PCL</div>
                 <div class="text-muted small">บริษัท ซีฟโก้ จำกัด (มหาชน) ผู้นำงานรับเหมาก่อสร้างงานฐานราก เสาเข็มเจาะ และกำแพงกันดินสำหรับอาคารสูงและโครงการขนาดใหญ่</div>
             </td>
-            <td style="white-space: nowrap;">⭐⭐⭐</td>
-            <td style="text-align: right; font-weight: 700;">14.4%</td>
+            <td style="white-space: nowrap;">⭐⭐⭐⭐⭐</td>
+            <td style="text-align: right; font-weight: 700;">14.6%</td>
             <td style="text-align: right;">฿3.56</td>
-            <td style="text-align: right; font-weight: 600;">฿2.90</td>
+            <td style="text-align: right; font-weight: 600;">฿2.86</td>
             <td style="text-align: right;">
                 <div class="text-emerald small fw-bold">รับ ฿2.81</div>
-                <div class="text-amber small">ต้าน ฿2.90</div>
+                <div class="text-amber small">ต้าน ฿2.91</div>
             </td>
             <td style="text-align: right;">
-                <div>฿223,300.00</div>
-                <div class="text-muted small">≈ $6,641.88</div>
+                <div>฿220,220.00</div>
+                <div class="text-muted small">≈ $6,550.27</div>
             </td>
             <td style="text-align: right;" class="text-rose">
-                <div class="fw-bold">-18.54%</div>
-                <div class="small">(฿50,820.00)</div>
+                <div class="fw-bold">-19.66%</div>
+                <div class="small">(฿53,900.00)</div>
             </td>
-            <td style="text-align: right;" class="text-emerald">+0.00%</td>
-            <td style="text-align: center;">50.0</td>
-            <td style="text-align: center;">+12.4%</td>
-            <td><span class="badge badge-rose">🔻 Drawdown (-18.5%)</span> </td>
+            <td style="text-align: right;" class="text-rose">-1.38%</td>
+            <td style="text-align: center;">44.7</td>
+            <td style="text-align: center;">+10.3%</td>
+            <td><span class="badge badge-rose">🔻 Drawdown (-19.7%)</span> </td>
         </tr>
         
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:KCM" target="_blank" class="ticker-pill">KCM</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;KCM&quot;, &quot;SET&quot;, &quot;K.C. Metal Sheet PCL&quot;, &quot;Producer Manufacturing&quot;, 0.74, 0.28, 0.27, 0.29, 0.26, 0.3, null)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">KCM 📈</span>
             </td>
             <td>
                 <div class="fw-bold">K.C. Metal Sheet PCL</div>
                 <div class="text-muted small">บริษัท เค.ซี.เมททอลชีท จำกัด (มหาชน) ผู้ผลิตและจำหน่ายแผ่นเหล็กเมทัลชีท โครงสร้างเหล็กสำเร็จรูป และอุปกรณ์หลังคางานก่อสร้าง</div>
             </td>
             <td style="white-space: nowrap;">⭐⭐⭐</td>
-            <td style="text-align: right; font-weight: 700;">10.9%</td>
+            <td style="text-align: right; font-weight: 700;">11.1%</td>
             <td style="text-align: right;">฿0.74</td>
             <td style="text-align: right; font-weight: 600;">฿0.28</td>
             <td style="text-align: right;">
@@ -736,14 +855,14 @@
                 <div class="small">(฿276,000.00)</div>
             </td>
             <td style="text-align: right;" class="text-emerald">+0.00%</td>
-            <td style="text-align: center;">50.2</td>
-            <td style="text-align: center;">+24.8%</td>
+            <td style="text-align: center;">50.8</td>
+            <td style="text-align: center;">+24.0%</td>
             <td><span class="badge badge-rose">🔻 Drawdown (-62.2%)</span> </td>
         </tr>
         
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:NOBLE" target="_blank" class="ticker-pill">NOBLE</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;NOBLE&quot;, &quot;SET&quot;, &quot;Noble Development PCL&quot;, &quot;Consumer Durables&quot;, 6.76, 1.45, 1.39, 1.55, 1.41, 1.55, null)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOBLE 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Noble Development PCL</div>
@@ -752,28 +871,28 @@
             <td style="white-space: nowrap;">⭐</td>
             <td style="text-align: right; font-weight: 700;">3.8%</td>
             <td style="text-align: right;">฿6.76</td>
-            <td style="text-align: right; font-weight: 600;">฿1.46</td>
+            <td style="text-align: right; font-weight: 600;">฿1.45</td>
             <td style="text-align: right;">
-                <div class="text-emerald small fw-bold">รับ ฿1.40</div>
-                <div class="text-amber small">ต้าน ฿1.58</div>
+                <div class="text-emerald small fw-bold">รับ ฿1.39</div>
+                <div class="text-amber small">ต้าน ฿1.55</div>
             </td>
             <td style="text-align: right;">
-                <div>฿58,400.00</div>
-                <div class="text-muted small">≈ $1,737.06</div>
+                <div>฿58,000.00</div>
+                <div class="text-muted small">≈ $1,725.16</div>
             </td>
             <td style="text-align: right;" class="text-rose">
-                <div class="fw-bold">-78.40%</div>
-                <div class="small">(฿212,000.00)</div>
+                <div class="fw-bold">-78.55%</div>
+                <div class="small">(฿212,400.00)</div>
             </td>
-            <td style="text-align: right;" class="text-emerald">+2.10%</td>
-            <td style="text-align: center;">47.9</td>
-            <td style="text-align: center;">-23.9%</td>
-            <td><span class="badge badge-rose">🔻 Drawdown (-78.4%)</span> </td>
+            <td style="text-align: right;" class="text-emerald">+0.00%</td>
+            <td style="text-align: center;">45.1</td>
+            <td style="text-align: center;">-23.8%</td>
+            <td><span class="badge badge-rose">🔻 Drawdown (-78.6%)</span> </td>
         </tr>
         
         <tr>
             <td>
-                <a href="https://www.tradingview.com/chart/?symbol=SET:BAM" target="_blank" class="ticker-pill">BAM</a>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;BAM&quot;, &quot;SET&quot;, &quot;Bangkok Commercial Asset Management PCL&quot;, &quot;Finance&quot;, 14.92, 6.25, 6.2, 6.55, 6.03, 6.55, 7.02)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAM 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Bangkok Commercial Asset Management PCL</div>
@@ -782,23 +901,23 @@
             <td style="white-space: nowrap;">⭐</td>
             <td style="text-align: right; font-weight: 700;">0.9%</td>
             <td style="text-align: right;">฿14.92</td>
-            <td style="text-align: right; font-weight: 600;">฿6.40</td>
+            <td style="text-align: right; font-weight: 600;">฿6.25</td>
             <td style="text-align: right;">
-                <div class="text-emerald small fw-bold">รับ ฿6.31</div>
-                <div class="text-amber small">ต้าน ฿6.59</div>
+                <div class="text-emerald small fw-bold">รับ ฿6.20</div>
+                <div class="text-amber small">ต้าน ฿6.55</div>
             </td>
             <td style="text-align: right;">
-                <div>฿14,080.00</div>
-                <div class="text-muted small">≈ $418.80</div>
+                <div>฿13,750.00</div>
+                <div class="text-muted small">≈ $408.98</div>
             </td>
             <td style="text-align: right;" class="text-rose">
-                <div class="fw-bold">-57.10%</div>
-                <div class="small">(฿18,744.00)</div>
+                <div class="fw-bold">-58.11%</div>
+                <div class="small">(฿19,074.00)</div>
             </td>
-            <td style="text-align: right;" class="text-rose">-0.78%</td>
-            <td style="text-align: center;">40.4</td>
-            <td style="text-align: center;">-9.0%</td>
-            <td><span class="badge badge-rose">🔻 Drawdown (-57.1%)</span> </td>
+            <td style="text-align: right;" class="text-rose">-0.79%</td>
+            <td style="text-align: center;">36.0</td>
+            <td style="text-align: center;">-10.8%</td>
+            <td><span class="badge badge-rose">🔻 Drawdown (-58.1%)</span> </td>
         </tr>
         
                 </tbody>
@@ -837,7 +956,7 @@
                 <div class="fw-bold">0.39</div>
                 <div class="text-muted small">ถูกมาก (0.39 💎)</div>
             </td>
-            <td style="text-align: right;">12.6x</td>
+            <td style="text-align: right;">11.9x</td>
             <td style="text-align: right; font-weight: 600;">$1.2B</td>
             <td style="text-align: right;">-</td>
             <td style="text-align: center;">-</td>
@@ -852,15 +971,15 @@
             <td style="text-align: right; font-weight: 600;">+1.4%</td>
             <td style="text-align: right; font-weight: 600;">+11.4%</td>
             <td style="text-align: right;">
-                <div class="fw-bold">0.93</div>
-                <div class="text-muted small">คุ้มค่ามาก (0.93 💎)</div>
+                <div class="fw-bold">0.95</div>
+                <div class="text-muted small">คุ้มค่ามาก (0.95 💎)</div>
             </td>
-            <td style="text-align: right;">10.7x</td>
+            <td style="text-align: right;">10.6x</td>
             <td style="text-align: right; font-weight: 600;">$14.8B</td>
-            <td style="text-align: right;"><strong>$43.03</strong> <span class='text-emerald small'>(+22.9%)</span></td>
+            <td style="text-align: right;"><strong>$43.03</strong> <span class='text-emerald small'>(+24.7%)</span></td>
             <td style="text-align: center;">$30 - $54</td>
             <td><span class='badge badge-emerald'>Buy 12</span> <span class='badge badge-amber'>Hold 4</span> <span class='badge badge-rose'>Sell 1</span></td>
-            <td><span class='badge badge-rose'>⚠️ 16 Oct 2026 (7.9d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 16 Oct 2026 (1.4d)</span></td>
         </tr>
         
         <tr>
@@ -873,12 +992,12 @@
                 <div class="fw-bold">-</div>
                 <div class="text-muted small">-</div>
             </td>
-            <td style="text-align: right;">11.1x</td>
+            <td style="text-align: right;">11.3x</td>
             <td style="text-align: right; font-weight: 600;">$58.8B</td>
-            <td style="text-align: right;"><strong>$157.90</strong> <span class='text-emerald small'>(+9.7%)</span></td>
+            <td style="text-align: right;"><strong>$157.90</strong> <span class='text-emerald small'>(+8.5%)</span></td>
             <td style="text-align: center;">$125 - $190</td>
             <td><span class='badge badge-emerald'>Buy 7</span> <span class='badge badge-amber'>Hold 13</span> <span class='badge badge-rose'>Sell 2</span></td>
-            <td><span class='badge badge-rose'>⚠️ 16 Oct 2026 (7.9d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 16 Oct 2026 (1.4d)</span></td>
         </tr>
         
         <tr>
@@ -891,12 +1010,12 @@
                 <div class="fw-bold">-</div>
                 <div class="text-muted small">-</div>
             </td>
-            <td style="text-align: right;">5.8x</td>
+            <td style="text-align: right;">5.7x</td>
             <td style="text-align: right; font-weight: 600;">$195.3M</td>
-            <td style="text-align: right;"><strong>$3.94</strong> <span class='text-emerald small'>(+36.0%)</span></td>
+            <td style="text-align: right;"><strong>$3.94</strong> <span class='text-emerald small'>(+37.9%)</span></td>
             <td style="text-align: center;">$4 - $4</td>
             <td><span class='badge badge-emerald'>Buy 2</span> <span class='badge badge-amber'>Hold 0</span> <span class='badge badge-rose'>Sell 0</span></td>
-            <td><span class='text-muted'>18 Nov 2026 (40.9d)</span></td>
+            <td><span class='text-muted'>18 Nov 2026 (34.4d)</span></td>
         </tr>
         
         <tr>
@@ -927,12 +1046,12 @@
                 <div class="fw-bold">-</div>
                 <div class="text-muted small">-</div>
             </td>
-            <td style="text-align: right;">10.2x</td>
+            <td style="text-align: right;">10.1x</td>
             <td style="text-align: right; font-weight: 600;">$1.9B</td>
             <td style="text-align: right;">-</td>
             <td style="text-align: center;">-</td>
             <td>-</td>
-            <td><span class='text-muted'>05 Nov 2026 (27.9d)</span></td>
+            <td><span class='text-muted'>05 Nov 2026 (21.4d)</span></td>
         </tr>
         
         <tr>
@@ -945,12 +1064,12 @@
                 <div class="fw-bold">-</div>
                 <div class="text-muted small">-</div>
             </td>
-            <td style="text-align: right;">27.5x</td>
+            <td style="text-align: right;">26.9x</td>
             <td style="text-align: right; font-weight: 600;">$4.0B</td>
-            <td style="text-align: right;"><strong>$7.19</strong> <span class='text-emerald small'>(+12.3%)</span></td>
+            <td style="text-align: right;"><strong>$7.02</strong> <span class='text-emerald small'>(+12.3%)</span></td>
             <td style="text-align: center;">$6 - $9</td>
-            <td><span class='badge badge-emerald'>Buy 3</span> <span class='badge badge-amber'>Hold 3</span> <span class='badge badge-rose'>Sell 3</span></td>
-            <td><span class='text-muted'>05 Nov 2026 (27.9d)</span></td>
+            <td><span class='badge badge-emerald'>Buy 3</span> <span class='badge badge-amber'>Hold 3</span> <span class='badge badge-rose'>Sell 4</span></td>
+            <td><span class='text-muted'>05 Nov 2026 (21.4d)</span></td>
         </tr>
         
                 </tbody>
@@ -966,23 +1085,23 @@
                 <span class="buy-rank" style="color: var(--gold);">🥇 อันดับ 1</span>
                 <span class="ticker-pill">SEAFCO</span>
             </div>
-            <h4 style="margin: 8px 0 4px 0;">Seafco PCL ⭐⭐⭐</h4>
+            <h4 style="margin: 8px 0 4px 0;">Seafco PCL ⭐⭐⭐⭐⭐</h4>
             <p class="text-muted small" style="margin-bottom: 12px;">บริษัท ซีฟโก้ จำกัด (มหาชน) ผู้นำงานรับเหมาก่อสร้างงานฐานราก เสาเข็มเจาะ และกำแพงกันดินสำหรับอาคารสูงและโครงการขนาดใหญ่</p>
             <div class="buy-reason-box">
-                💡 <strong>เหตุผลสำหรับมือใหม่:</strong> หุ้นคุณภาพดี พื้นฐานแกร่ง เทรนด์ขาขึ้นเหนือเส้น 200 วัน สถาบันให้เป้าหมายมี Upside +36.0%.
+                💡 <strong>เหตุผลสำหรับมือใหม่:</strong> หุ้นคุณภาพดี พื้นฐานแกร่ง เทรนด์ขาขึ้นเหนือเส้น 200 วัน สถาบันให้เป้าหมายมี Upside +37.9%.
             </div>
             <div class="grid-2-cols" style="margin-top: 14px; font-size: 0.9rem;">
-                <div><span class="text-muted">สัดส่วนปัจจุบัน:</span> <strong>14.4%</strong></div>
-                <div><span class="text-muted">ราคาตลาด:</span> <strong>฿2.90</strong></div>
+                <div><span class="text-muted">สัดส่วนปัจจุบัน:</span> <strong>14.6%</strong></div>
+                <div><span class="text-muted">ราคาตลาด:</span> <strong>฿2.86</strong></div>
             </div>
             <div class="order-box">
                 <div class="order-row">
                     <span>โซนตั้งซื้อ (Limit Order):</span>
-                    <strong class="text-emerald">฿2.84 - ฿2.93</strong>
+                    <strong class="text-emerald">฿2.80 - ฿2.89</strong>
                 </div>
                 <div class="order-row">
                     <span>จุดตัดขาดทุน (SL):</span>
-                    <strong class="text-rose">฿2.82</strong>
+                    <strong class="text-rose">฿2.77</strong>
                 </div>
             </div>
         </div>
@@ -998,7 +1117,7 @@
                 💡 <strong>เหตุผลสำหรับมือใหม่:</strong> หุ้นคุณภาพดี พื้นฐานมั่นคง เทรนด์ทางเทคนิคประคองตัวได้ดี.
             </div>
             <div class="grid-2-cols" style="margin-top: 14px; font-size: 0.9rem;">
-                <div><span class="text-muted">สัดส่วนปัจจุบัน:</span> <strong>10.9%</strong></div>
+                <div><span class="text-muted">สัดส่วนปัจจุบัน:</span> <strong>11.1%</strong></div>
                 <div><span class="text-muted">ราคาตลาด:</span> <strong>฿0.28</strong></div>
             </div>
             <div class="order-box">
@@ -1022,17 +1141,17 @@
             
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ BLAND</span>
-            <div><strong>Bangkok Land PCL:</strong> สัดส่วนในพอร์ตสูงเกินเกณฑ์ความปลอดภัยแล้ว (34.5%) ห้ามซื้อเพิ่มเพื่อป้องกันความเสี่ยงกระจุกตัว ให้ถือรันเทรนด์.</div>
+            <div><strong>Bangkok Land PCL:</strong> สัดส่วนในพอร์ตสูงเกินเกณฑ์ความปลอดภัยแล้ว (33.3%) ห้ามซื้อเพิ่มเพื่อป้องกันความเสี่ยงกระจุกตัว ให้ถือรันเทรนด์.</div>
         </div>
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ KTC</span>
-            <div><strong>Krungthai Card PCL:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 7.9 วัน (16 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>Krungthai Card PCL:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 1.4 วัน (16 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ SCB</span>
-            <div><strong>SCB X PCL:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 7.9 วัน (16 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>SCB X PCL:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 1.4 วัน (16 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         <div class="forbidden-item">
@@ -1048,169 +1167,748 @@
         </div>
         
 
-        <!-- Catalysts & News Grid -->
-        <div class="section-header">⚖️ 6. ตาชั่งข่าวดี vs ข่าวร้ายรายตัว (Bullish vs Bearish Catalysts)</div>
-        <div class="grid-2-cols">
+        <!-- Catalysts & Forward Intelligence -->
+        <div class="section-header">🔭 6. บทวิเคราะห์เจาะลึกวิสัยทัศน์ & ตัวเร่งราคาในอนาคต (Forward Intelligence & Catalysts: 7 ตัว)</div>
+        <div style="display: flex; flex-direction: column; gap: 24px;">
             
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">BLAND</span>
-                    <strong style="margin-left: 8px;">Bangkok Land PCL</strong>
-                    <div class="text-muted small">บริษัท บางกอกแลนด์ จำกัด (มหาชน) พัฒนาอสังหาริมทรัพย์และบริหารจัดการศูนย์แสดงสินค้าและการประชุม อิมแพ็ค เมืองทองธานี (IMPACT)</div>
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--rose);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;BLAND&quot;, &quot;SET&quot;, &quot;Bangkok Land PCL&quot;, &quot;Finance&quot;, 1.01, 0.52, 0.49, 0.57, 0.49, 0.57, null)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BLAND 📈</span>
+                    <strong style="font-size: 1.25rem;">Bangkok Land PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Finance • Real Estate Development</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-48.51%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 33.3% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;BLAND&quot;, &quot;SET&quot;, &quot;Bangkok Land PCL&quot;, &quot;Finance&quot;, 1.01, 0.52, 0.49, 0.57, 0.49, 0.57, null)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต BLAND ในกลุ่ม Finance (Real Estate Development)</div>
+            </div>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ -7.3% YoY และความสามารถในการทำกำไรสุทธิ +31.8% YoY</li><li>อัตราการประเมินมูลค่า P/E 11.9x และค่า PEG 0.39 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Real Estate Development</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">รอบผลประกอบการถัดไป</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿1.01</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">฿0.52</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">-</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">- <span class="small"></span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">-</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ยังไม่มีการตั้งราคาเป้าหมายจากสถาบัน
+                </div>
+            </div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
+                    <ul class="cat-list"><li><strong class='source-tag'>[Sebastian Barros Newsletter]</strong> <a href='https://news.google.com/rss/articles/CBMie0FVX3lxTE5xOGd1bmptZVQtTEVuSUdqX0dmY0ZWSzN5TGlWQXo2eFFSMVNkS0JLUjJEQUhTUDBoZ0p0SmlLWjctTGVBNHpabEloTkp1ZEdpVlJDcG5VaWJSSEkwRnJNLTU2aG4wX0ZCaVpMTkdHVkctZlowQXgzbXBkZw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Twilio Shares Surged 60% on Voice AI. Thanks, Telcos. ↗</a> <span class='text-muted small'>(149d ago)</span></li></ul>
+                </div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
+                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                </div>
+            </div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ BLAND (Action Roadmap):
+                </div>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                </div>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
+                </div>
+            </div>
+        </div>
+        
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--rose);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;KTC&quot;, &quot;SET&quot;, &quot;Krungthai Card PCL&quot;, &quot;Finance&quot;, 47.45, 34.5, 32.26, 36.73, 33.19, 36.73, 43.03)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">KTC 📈</span>
+                    <strong style="font-size: 1.25rem;">Krungthai Card PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Finance • Finance/Rental/Leasing</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-27.29%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 18.9% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;KTC&quot;, &quot;SET&quot;, &quot;Krungthai Card PCL&quot;, &quot;Finance&quot;, 47.45, 34.5, 32.26, 36.73, 33.19, 36.73, 43.03)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                </div>
+            </div>
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต KTC ในกลุ่ม Finance (Finance/Rental/Leasing)</div>
+            </div>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ +1.4% YoY และความสามารถในการทำกำไรสุทธิ +11.4% YoY</li><li>อัตราการประเมินมูลค่า P/E 10.6x และค่า PEG 0.95 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Finance/Rental/Leasing</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">ปฏิทินงบ (1.4 วัน)</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"><span class='text-emerald fw-bold'>🟢 Buy: 12</span> &nbsp;|&nbsp; <span class='text-amber fw-bold'>🟡 Hold: 4</span> &nbsp;|&nbsp; <span class='text-rose fw-bold'>🔴 Sell: 1</span></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿47.45</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">฿34.50</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">฿30.00</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">฿43.03 <span class="small"> (+24.7%)</span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">฿54.00</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $43.03 (Upside +24.7%)
+                </div>
+            </div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
                 </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                </div>
+            </div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ KTC (Action Roadmap):
+                </div>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                </div>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
                 </div>
             </div>
         </div>
         
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">KTC</span>
-                    <strong style="margin-left: 8px;">Krungthai Card PCL</strong>
-                    <div class="text-muted small">บริษัท บัตรกรุงไทย จำกัด (มหาชน) ผู้ให้บริการสินเชื่อเพื่อผู้บริโภค บัตรเครดิต สินเชื่อส่วนบุคคล และสินเชื่อทะเบียนรถยนต์ (KTC พี่เบิ้ม)</div>
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--emerald);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;SCB&quot;, &quot;SET&quot;, &quot;SCB X PCL&quot;, &quot;Finance&quot;, 85.8, 145.5, 144.27, 151.1, 142.47, 151.1, 157.9)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">SCB 📈</span>
+                    <strong style="font-size: 1.25rem;">SCB X PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Finance • Regional Banks</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-emerald" style="font-size: 0.95rem; padding: 5px 12px;">+69.58%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 17.3% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;SCB&quot;, &quot;SET&quot;, &quot;SCB X PCL&quot;, &quot;Finance&quot;, 85.8, 145.5, 144.27, 151.1, 142.47, 151.1, 157.9)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
-            
-            <div class="catalyst-target-box">
-                🎯 สถาบันให้เป้าหมายเฉลี่ย: <strong>฿43.03</strong> (Upside +22.9%) | มติ: 🟢12 🟡4 🔴1
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต SCB ในกลุ่ม Finance (Regional Banks)</div>
             </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
-                    <ul class="cat-list"><li><strong class='source-tag'>[Team-BHP]</strong> <a href='https://news.google.com/rss/articles/CBMilgFBVV95cUxQSFRMSEtlZ0JIaFV5eXZCS3VNdTBNdXRFN2xBdkwzYkUweE15b2p6UFk4TmRQYzBoOGRORGMxYjZOLUZvWjc1Q1gwdU9mVjUyTzVST1dSLTFMaEl6N21Oa09jeFdBQXM4RDE4c3J6SkVFQ05wQ2ZSa2EyUVNhVlVidEtzRmpHeUZWQ3dfbTBxaFBScFNjVnfSAZsBQVVfeXFMTmtoMVdzaVNDZHhRLWJKclZGbmVOTDNoQlBpMi1QNWR6TGI1MjdReG9zV2VhZk9rV3RGZ2JCYnY2aWJjZURDVjA5bGg1emtCQVcwaUx1TGpXYkxJRXV3RGIzNm14cUx3dG1YVm51UkVUeGttN2JOVjdGWW5aSVBwWm1QWGM2ZHpHQkF5R1NuY1VOMnBzektlaldaeGs?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Suspension upgrade on my Yamaha Aerox 155: Cost & first impressions ↗</a> <span class='text-muted small'>(233d ago)</span></li></ul>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ -4.8% YoY และความสามารถในการทำกำไรสุทธิ -9.2% YoY</li><li>อัตราการประเมินมูลค่า P/E 11.3x และค่า PEG 0.00 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Regional Banks</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">ปฏิทินงบ (1.4 วัน)</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
                 </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
+            </div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"><span class='text-emerald fw-bold'>🟢 Buy: 7</span> &nbsp;|&nbsp; <span class='text-amber fw-bold'>🟡 Hold: 13</span> &nbsp;|&nbsp; <span class='text-rose fw-bold'>🔴 Sell: 2</span></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿85.80</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">฿145.50</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">฿125.00</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">฿157.90 <span class="small"> (+8.5%)</span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">฿190.00</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $157.90 (Upside +8.5%)
+                </div>
+            </div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
+                    <ul class="cat-list"><li><strong class='source-tag'>[Simply Wall Street]</strong> <a href='https://news.google.com/rss/articles/CBMi3wJBVV95cUxOeVBhbDBhZ1dGVTJWdG0yXzZkNzE1X2RhNkIxX3RvSEJOVm1Zd0d0aWh1cldGSGVwTEFIQnBQVktsSWlIZzd2Q0ZXbXFzMVlnelp2YkdTZ1JGVlVzaXltNzlQczhHc1czSlZEdjU4RXRxeWEyck9BUkNrc2pOdmV6SHJFUWRxZlhKejd1WEVLcHJoemVoYzVEcnVZMHdIVEVyRnQ5WVZmYzdRQmJwZ2dOM2gyUExLTktKQURlR2VPamhJQ2dLbi1UYVFSc3hITzhCR3NXYmFwaFJETnAzQTJnVjFlR1Zyc2dkZFpJYVBPOHpFM2hmQy1Vb241WnBla0J6ckppTVRhZG1XbzZCenpHNXg4WDYxdnV3ZlBxeVV5RXpfcmJNWEQxSUVBb2lyTU04RDdUOUVqUDJBamVaMkFPbHFoVU42T05qQ2dKRHA3dDZnQVJBT0luYm1MRU85Q2M?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>SCB: AI Discipline Supports Margins, Fee Growth Must Broaden The Earnings Base ↗</a> <span class='text-muted small'>(5d ago)</span></li><li><strong class='source-tag'>[Yahoo Finance]</strong> <a href='https://news.google.com/rss/articles/CBMimgFBVV95cUxOXzJwM29ESlBaOGlNeFpNY2xFZUZJcVNwQ25KU2ZYV0dVVUwwUW9JemNfcUxNNU5BYkE1T05EZTBCVXp5S05DcFJ5cnA1UThNWFVDNUh4bVJNRFR3QUR1Nl9CckZsOWI5emE3QS14Yks1Y0dQR2h0amp2YWduNkVxT2lfeWdTalZGSklHNXh6MnRxNS1YQU5Bb0VR?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>US Bancorp Declares SCB &amp; Plans Dividend Hike After 2026 Stress Test ↗</a> <span class='text-muted small'>(111d ago)</span></li><li><strong class='source-tag'>[TradingView]</strong> <a href='https://news.google.com/rss/articles/CBMivwFBVV95cUxQcVhneEVXSzZpVUlmQ3UzN1lrV1h4dFR5RmE4RlhmUVQ2MTFXNFFlSmNKWVlaQzcxMmdZeVFmemxOUWRzT21BSWowTXhyQWQ0UHFPWDREdnVlSjh3NHoxWDM2NC1YMS1mVldvY2tQbUZtMk12ZW9CV3lvdXZpZ01PSUtLNU9ISWtXWGUtZkRBcnN4WGVwZk85eVNzVE85ZW1ZLXJxNER2VkZpYlVvM19XR1VueXJEaHk0YzBlNmFvMA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>US Bancorp Declares SCB &amp; Plans Dividend Hike After 2026 Stress Test ↗</a> <span class='text-muted small'>(111d ago)</span></li></ul>
+                </div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                </div>
+            </div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ SCB (Action Roadmap):
+                </div>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                </div>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
                 </div>
             </div>
         </div>
         
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">SCB</span>
-                    <strong style="margin-left: 8px;">SCB X PCL</strong>
-                    <div class="text-muted small">บริษัท เอสซีบี เอกซ์ จำกัด (มหาชน) ยานแม่กลุ่มธุรกิจทางการเงิน ธนาคารไทยพาณิชย์ และบริการเทคโนโลยีการเงินดิจิทัล (Fintech)</div>
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--rose);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;SEAFCO&quot;, &quot;SET&quot;, &quot;Seafco PCL&quot;, &quot;Industrial Services&quot;, 3.56, 2.86, 2.81, 2.91, 2.77, 2.91, 3.94)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">SEAFCO 📈</span>
+                    <strong style="font-size: 1.25rem;">Seafco PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Industrial Services • Engineering &amp; Construction</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-19.66%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 14.6% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;SEAFCO&quot;, &quot;SET&quot;, &quot;Seafco PCL&quot;, &quot;Industrial Services&quot;, 3.56, 2.86, 2.81, 2.91, 2.77, 2.91, 3.94)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
-            
-            <div class="catalyst-target-box">
-                🎯 สถาบันให้เป้าหมายเฉลี่ย: <strong>฿157.90</strong> (Upside +9.7%) | มติ: 🟢7 🟡13 🔴2
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต SEAFCO ในกลุ่ม Industrial Services (Engineering & Construction)</div>
             </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ +66.6% YoY และความสามารถในการทำกำไรสุทธิ +0.0% YoY</li><li>อัตราการประเมินมูลค่า P/E 5.7x และค่า PEG 0.00 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Engineering & Construction</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">ปฏิทินงบ (34.4 วัน)</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"><span class='text-emerald fw-bold'>🟢 Buy: 2</span> &nbsp;|&nbsp; <span class='text-amber fw-bold'>🟡 Hold: 0</span> &nbsp;|&nbsp; <span class='text-rose fw-bold'>🔴 Sell: 0</span></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿3.56</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">฿2.86</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">฿3.50</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">฿3.94 <span class="small"> (+37.9%)</span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">฿4.39</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $3.94 (Upside +37.9%)
+                </div>
+            </div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
                 </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                </div>
+            </div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ SEAFCO (Action Roadmap):
+                </div>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                </div>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
                 </div>
             </div>
         </div>
         
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">SEAFCO</span>
-                    <strong style="margin-left: 8px;">Seafco PCL</strong>
-                    <div class="text-muted small">บริษัท ซีฟโก้ จำกัด (มหาชน) ผู้นำงานรับเหมาก่อสร้างงานฐานราก เสาเข็มเจาะ และกำแพงกันดินสำหรับอาคารสูงและโครงการขนาดใหญ่</div>
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--rose);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;KCM&quot;, &quot;SET&quot;, &quot;K.C. Metal Sheet PCL&quot;, &quot;Producer Manufacturing&quot;, 0.74, 0.28, 0.27, 0.29, 0.26, 0.3, null)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">KCM 📈</span>
+                    <strong style="font-size: 1.25rem;">K.C. Metal Sheet PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Producer Manufacturing • Building Products</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-62.16%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 11.1% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;KCM&quot;, &quot;SET&quot;, &quot;K.C. Metal Sheet PCL&quot;, &quot;Producer Manufacturing&quot;, 0.74, 0.28, 0.27, 0.29, 0.26, 0.3, null)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
-            
-            <div class="catalyst-target-box">
-                🎯 สถาบันให้เป้าหมายเฉลี่ย: <strong>฿3.94</strong> (Upside +36.0%) | มติ: 🟢2 🟡0 🔴0
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต KCM ในกลุ่ม Producer Manufacturing (Building Products)</div>
             </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ -9.4% YoY และความสามารถในการทำกำไรสุทธิ +64.5% YoY</li><li>อัตราการประเมินมูลค่า P/E 0.0x และค่า PEG 0.00 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Building Products</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">รอบผลประกอบการถัดไป</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿0.74</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">฿0.28</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">-</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">- <span class="small"></span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">-</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ยังไม่มีการตั้งราคาเป้าหมายจากสถาบัน
+                </div>
+            </div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
+                    <ul class="cat-list"><li><strong class='source-tag'>[MarketBeat]</strong> <a href='https://news.google.com/rss/articles/CBMi1wFBVV95cUxPa3VnazB2eTIzeVpTV3VHRGFRZ3hhd3FOdTBWaVBqVFQ5UlliSzZXWmVWM0FWb3E1WnBwSzA2YUdoMXg1ZF9LX0xsUmV4N1FPVThiZ0ZhOW5iRHVWbThwbWZ5ajE5LXhSNUhFem1kbVNuQXhBNUo1eS1BR0Noek13UG5YZWt3OV9DMjhHRXFDMG9DenNGNWZ1WW1EMGhBN2doNllRdTU4S2lCeGtXWEw0SUQwbGxoa0V4ZDYxUWVWRWYweWxIYUN6SlUzcFllOC1xN3A2bnBNUQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>KCM Investment Advisors LLC Sells 48,266 Shares of Verizon Communications Inc. $VZ ↗</a> <span class='text-muted small'>(122d ago)</span></li></ul>
+                </div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
+                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                </div>
+            </div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ KCM (Action Roadmap):
+                </div>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                </div>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
+                </div>
+            </div>
+        </div>
+        
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--rose);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;NOBLE&quot;, &quot;SET&quot;, &quot;Noble Development PCL&quot;, &quot;Consumer Durables&quot;, 6.76, 1.45, 1.39, 1.55, 1.41, 1.55, null)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOBLE 📈</span>
+                    <strong style="font-size: 1.25rem;">Noble Development PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Consumer Durables • Homebuilding</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-78.55%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 3.8% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;NOBLE&quot;, &quot;SET&quot;, &quot;Noble Development PCL&quot;, &quot;Consumer Durables&quot;, 6.76, 1.45, 1.39, 1.55, 1.41, 1.55, null)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                </div>
+            </div>
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต NOBLE ในกลุ่ม Consumer Durables (Homebuilding)</div>
+            </div>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ -37.9% YoY และความสามารถในการทำกำไรสุทธิ -23.0% YoY</li><li>อัตราการประเมินมูลค่า P/E 10.1x และค่า PEG 0.00 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Homebuilding</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">ปฏิทินงบ (21.4 วัน)</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿6.76</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">฿1.45</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">-</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">- <span class="small"></span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">-</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ยังไม่มีการตั้งราคาเป้าหมายจากสถาบัน
+                </div>
+            </div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
                 </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                </div>
+            </div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ NOBLE (Action Roadmap):
+                </div>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                </div>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
                 </div>
             </div>
         </div>
         
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">KCM</span>
-                    <strong style="margin-left: 8px;">K.C. Metal Sheet PCL</strong>
-                    <div class="text-muted small">บริษัท เค.ซี.เมททอลชีท จำกัด (มหาชน) ผู้ผลิตและจำหน่ายแผ่นเหล็กเมทัลชีท โครงสร้างเหล็กสำเร็จรูป และอุปกรณ์หลังคางานก่อสร้าง</div>
+        <div class="card outlook-card" style="margin-bottom: 24px; border-left: 4px solid var(--rose);">
+            <!-- Header -->
+            <div class="outlook-card-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;BAM&quot;, &quot;SET&quot;, &quot;Bangkok Commercial Asset Management PCL&quot;, &quot;Finance&quot;, 14.92, 6.25, 6.2, 6.55, 6.03, 6.55, 7.02)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAM 📈</span>
+                    <strong style="font-size: 1.25rem;">Bangkok Commercial Asset Management PCL</strong>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem;">Finance • Investment Managers</span>
+                    <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-58.11%</span>
+                    <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 0.9% (⭐⭐⭐)</span>
+                    <button onclick="openChartModal(&quot;BAM&quot;, &quot;SET&quot;, &quot;Bangkok Commercial Asset Management PCL&quot;, &quot;Finance&quot;, 14.92, 6.25, 6.2, 6.55, 6.03, 6.55, 7.02)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
-                    <ul class="cat-list"><li><strong class='source-tag'>[MarketBeat]</strong> <a href='https://news.google.com/rss/articles/CBMi1wFBVV95cUxPa3VnazB2eTIzeVpTV3VHRGFRZ3hhd3FOdTBWaVBqVFQ5UlliSzZXWmVWM0FWb3E1WnBwSzA2YUdoMXg1ZF9LX0xsUmV4N1FPVThiZ0ZhOW5iRHVWbThwbWZ5ajE5LXhSNUhFem1kbVNuQXhBNUo1eS1BR0Noek13UG5YZWt3OV9DMjhHRXFDMG9DenNGNWZ1WW1EMGhBN2doNllRdTU4S2lCeGtXWEw0SUQwbGxoa0V4ZDYxUWVWRWYweWxIYUN6SlUzcFllOC1xN3A2bnBNUQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>KCM Investment Advisors LLC Sells 48,266 Shares of Verizon Communications Inc. $VZ ↗</a> <span class='text-muted small'>(116d ago)</span></li></ul>
-                </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+
+            <!-- Thesis Banner -->
+            <div class="thesis-banner">
+                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">การวิเคราะห์เจาะลึกศักยภาพการเติบโต BAM ในกลุ่ม Finance (Investment Managers)</div>
+            </div>
+
+            <!-- 4 Future Growth Drivers -->
+            <div class="drivers-box">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <ul class="drivers-list">
+                    <li>การขยายตัวของรายได้ระดับ -20.1% YoY และความสามารถในการทำกำไรสุทธิ -66.3% YoY</li><li>อัตราการประเมินมูลค่า P/E 26.9x และค่า PEG 0.00 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Investment Managers</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                </ul>
+            </div>
+
+            <!-- Catalyst Timeline -->
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
+                <div class="timeline-strip">
+                    <div class="timeline-step">
+                <span class="timeline-step-badge">ปฏิทินงบ (21.4 วัน)</span>
+                <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
+                <div class="timeline-step-desc">การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท</div>
+            </div><div class="timeline-step">
+                <span class="timeline-step-badge">ระยะ 6-12 เดือน</span>
+                <div class="timeline-step-desc">การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่</div>
+            </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">NOBLE</span>
-                    <strong style="margin-left: 8px;">Noble Development PCL</strong>
-                    <div class="text-muted small">บริษัท โนเบิล ดีเวลลอปเมนท์ จำกัด (มหาชน) ผู้พัฒนาอสังหาริมทรัพย์เพื่อการอยู่อาศัย บ้านเดี่ยว และคอนโดมิเนียมแนวรถไฟฟ้า</div>
+
+            <!-- Wall Street Consensus & Targets -->
+            <div class="wallstreet-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div class="fw-bold" style="font-size: 0.95rem; color: #10b981;">🎯 มุมมองราคาเป้าหมายสถาบันการเงินวอลล์สตรีท (Wall Street Consensus)</div>
+                    <div class="small"><span class='text-emerald fw-bold'>🟢 Buy: 3</span> &nbsp;|&nbsp; <span class='text-amber fw-bold'>🟡 Hold: 3</span> &nbsp;|&nbsp; <span class='text-rose fw-bold'>🔴 Sell: 4</span></div>
+                </div>
+                <div class="ws-targets-grid">
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ต้นทุนของคุณ</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">฿14.92</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">ราคาปัจจุบัน</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">฿6.25</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าต่ำสุด (Low)</div>
+                        <div class="fw-bold text-amber" style="font-size: 1.1rem;">฿5.50</div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">฿7.02 <span class="small"> (+12.3%)</span></div>
+                    </div>
+                    <div class="ws-target-cell">
+                        <div class="text-muted small">เป้าสูงสุด (High)</div>
+                        <div class="fw-bold text-blue" style="font-size: 1.1rem;">฿9.00</div>
+                    </div>
+                </div>
+                <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $7.02 (Upside +12.3%)
                 </div>
             </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
+
+            <!-- Live News & Catalysts Grid -->
+            <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
+                <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
                 </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
+                <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
+                    <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
                     <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
                 </div>
             </div>
-        </div>
-        
-        <div class="card catalyst-card">
-            <div class="catalyst-header">
-                <div>
-                    <span class="ticker-pill">BAM</span>
-                    <strong style="margin-left: 8px;">Bangkok Commercial Asset Management PCL</strong>
-                    <div class="text-muted small">บริษัทบริหารสินทรัพย์ กรุงเทพพาณิชย์ จำกัด (มหาชน) รับซื้อและบริหารจัดการหนี้เสีย (NPLs) และทรัพย์สินรอการขาย (NPA) รายใหญ่ที่สุดในไทย</div>
+
+            <!-- Tailored Strategic Roadmap & Invalidation Risk -->
+            <div class="roadmap-callout">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    🧭 แผนกลยุทธ์ฟันธงสำหรับ BAM (Action Roadmap):
                 </div>
-            </div>
-            
-            <div class="catalyst-target-box">
-                🎯 สถาบันให้เป้าหมายเฉลี่ย: <strong>฿7.19</strong> (Upside +12.3%) | มติ: 🟢3 🟡3 🔴3
-            </div>
-            
-            <div class="grid-2-cols" style="margin-top: 12px; gap: 16px;">
-                <div class="bull-box">
-                    <div class="cat-label text-emerald">🟢 ปัจจัยบวกและข่าวดี (Bullish)</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
+                <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
+                    ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
                 </div>
-                <div class="bear-box">
-                    <div class="cat-label text-rose">🔴 ความเสี่ยงและข่าวลบ (Bearish)</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
+                    🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
                 </div>
             </div>
         </div>
@@ -1235,5 +1933,25 @@
             <div style="margin-top: 8px; font-size: 0.75rem;">Report generated by Filter-Stock Automated Engine. All rights reserved.</div>
         </div>
     </div>
+    
+<!-- Stock Chart Dedicated Navigation Handler -->
+<script>
+function openChartModal(ticker, exchange, name, sector, cost, price, support, resistance, sl, tp, targetAvg) {
+    const params = new URLSearchParams();
+    if (ticker) params.set('ticker', ticker);
+    if (exchange) params.set('exchange', exchange);
+    if (name) params.set('name', name);
+    if (sector) params.set('sector', sector);
+    if (cost) params.set('cost', cost);
+    if (price) params.set('price', price);
+    if (support) params.set('support', support);
+    if (resistance) params.set('resistance', resistance);
+    if (sl) params.set('sl', sl);
+    if (tp) params.set('tp', tp);
+    if (targetAvg) params.set('target', targetAvg);
+    window.location.href = 'stock_chart.html?' + params.toString() + '#' + encodeURIComponent(ticker || '');
+}
+</script>
+
 </body>
 </html>
