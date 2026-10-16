@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technical Chart & AI Confluence Hub</title>
+    <title>Technical Chart & Rule-based Confluence Hub</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1254,7 +1254,7 @@
 .rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
 .rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-17 02:06</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a><a href="portfolio_set_review.html" class="rnav-link">หุ้นไทย สุขภาพพอร์ต</a><a href="portfolio_set_recovery.html" class="rnav-link">หุ้นไทย แก้ดอย</a></div><span class="rnav-time">อัปเดต: 2026-10-17 02:32</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
 
         <!-- Ticker Switcher Carousel -->
         <div class="ticker-carousel-wrap">
@@ -1306,6 +1306,7 @@
                                     <span id="st_name">NVIDIA Corporation</span>
                                     <span class="header-price-chip" id="st_head_price">$0.00</span>
                                     <span class="header-change-chip" id="st_head_change">0.00%</span>
+                                    <span id="st_stale_badge" title="ดึงข้อมูลล่าสุดไม่สำเร็จ กำลังแสดงข้อมูลจากรอบก่อน" style="display:none; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:6px; color:#fbbf24; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4);">⚠️ ข้อมูลเก่า</span>
                                 </h1>
                                 <p id="st_sector_exchange">Semiconductors • NASDAQ</p>
                             </div>
@@ -1379,7 +1380,7 @@
                         <span class="fibo-chip" id="chip_f100">100.0%: -</span>
                         <span class="fibo-chip" id="chip_w52_hi" style="display: none; color: #fb923c; border-color: rgba(251, 146, 60, 0.45); background: rgba(251, 146, 60, 0.10); font-weight: 600;">📅 52W High: -</span>
                         <span class="fibo-chip" id="chip_w52_lo" style="display: none; color: #38bdf8; border-color: rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.10); font-weight: 600;">📅 52W Low: -</span>
-                        <button class="botbar-btn" id="btn_fibo_mode" onclick="toggleFiboCycleMode()" style="margin-left: auto; color: #38bdf8; font-size: 0.70rem; padding: 2px 8px;">🔄 All-Time Macro</button>
+                        <button class="botbar-btn" id="btn_fibo_mode" onclick="toggleFiboCycleMode()" style="margin-left: auto; color: #38bdf8; font-size: 0.70rem; padding: 2px 8px;">🔄 2Y Macro</button>
                     </div>
 
                     <!-- Modern Flat Toolbar - All Indicators Always Accessible -->
@@ -1461,7 +1462,7 @@
                     <div class="ai-decision-section" id="ai_decision_panel">
                         <div class="ai-sec-header">
                             <div class="ai-sec-title">
-                                <span>🤖 AI Multi-Technical Confluence Decision Engine</span>
+                                <span>🤖 Rule-based Confluence Decision Engine</span>
                                 <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(ระบบตัดสินใจซื้อ-ขาย-ทยอยสะสม DCA ด้วยคอนฟลูเอนซ์ 5 มิติ)</span>
                             </div>
                             <div style="font-size: 0.74rem; color: #64748b;">
@@ -1598,7 +1599,7 @@
                         <div class="sc-title">
                             <span>🎙️ ผู้ช่วยวิเคราะห์อ่านทรงหุ้น</span>
                         </div>
-                        <span class="sc-subtitle">AI Technical Readout</span>
+                        <span class="sc-subtitle">Rule-based Technical Readout</span>
                     </div>
 
                     <div id="ai_narrative_badge_container"></div>
@@ -1884,9 +1885,9 @@
             icon: '📐',
             title: 'Fibonacci Retracement (สัดส่วนทองคำธรรมชาติ)',
             cat: 'Support & Resistance',
-            desc: 'อัตราส่วนพักฐานธรรมชาติ 23.6%, 38.2%, 50.0%, 61.8% (Golden Ratio) และ 78.6% คำนวณจากรอบ High และ Low ของวัฏจักร 52 สัปดาห์ หรือรอบ All-Time Macro.',
+            desc: 'อัตราส่วนพักฐานธรรมชาติ 23.6%, 38.2%, 50.0%, 61.8% (Golden Ratio) และ 78.6% คำนวณจากรอบ High และ Low ของวัฏจักร 52 สัปดาห์ หรือรอบ 2Y Macro (504 แท่งล่าสุด).',
             usage: 'ระดับ 61.8% และ 50.0% เป็นแนวรับทองคำที่มีแรงซื้อจากนักลงทุนทั่วโลกเข้ามาดักรับหนาแน่นที่สุด.',
-            tip: 'สามารถกดปุ่ม All-Time Macro บนแถบ Fibo เพื่อสลับดูสัดส่วนราคาทั้งรอบชีวิตของหุ้นตั้งแต่เข้าตลาดได้ทันที.'
+            tip: 'สามารถกดปุ่ม 2Y Macro บนแถบ Fibo เพื่อสลับดูสัดส่วนราคาของรอบ 2 ปีล่าสุดได้ทันที.'
         },
         pat: {
             icon: '🏛️',
@@ -2239,13 +2240,13 @@
         const fiboObj = isMacro ? (tData.fibo_macro || {}) : (tData.fibo_cycle || tData.fibo || {});
         const lines = [];
         const levels = [
-            { key: '0.0', title: isMacro ? '🏔️ 0.0% ATH' : '📅 0.0% 52W High', color: 'rgba(244, 63, 94, 0.85)', width: isMacro ? 2 : 1 },
+            { key: '0.0', title: isMacro ? '🏔️ 0.0% 2Y High' : '📅 0.0% 52W High', color: 'rgba(244, 63, 94, 0.85)', width: isMacro ? 2 : 1 },
             { key: '23.6', title: '23.6%', color: 'rgba(56, 189, 248, 0.65)' },
             { key: '38.2', title: '38.2%', color: 'rgba(56, 189, 248, 0.75)' },
             { key: '50.0', title: '50.0% Mid', color: 'rgba(250, 204, 21, 0.85)' },
             { key: '61.8', title: '⭐ 61.8% Golden', color: 'rgba(16, 185, 129, 0.95)', width: 2 },
             { key: '78.6', title: '78.6%', color: 'rgba(168, 85, 247, 0.75)' },
-            { key: '100.0', title: isMacro ? '🌊 100.0% ATL' : '📅 100.0% 52W Low', color: 'rgba(16, 185, 129, 0.85)', width: isMacro ? 2 : 1 },
+            { key: '100.0', title: isMacro ? '🌊 100.0% 2Y Low' : '📅 100.0% 52W Low', color: 'rgba(16, 185, 129, 0.85)', width: isMacro ? 2 : 1 },
         ];
 
         levels.forEach(lvl => {
@@ -2265,7 +2266,7 @@
             }
         });
 
-        // When in All-Time Macro mode, ALSO draw the 52-Week High and 52-Week Low reference lines
+        // When in 2Y Macro mode, ALSO draw the 52-Week High and 52-Week Low reference lines
         if (isMacro) {
             const cycleFibo = tData.fibo_cycle || tData.fibo || {};
             const w52Hi = cycleFibo['0.0'];
@@ -2307,9 +2308,9 @@
         const lbl = document.getElementById('fibo_title_label');
         if (currentFiboMode === 'macro') {
             if (btn) btn.textContent = '🔄 สลับเป็น: 52W Cycle';
-            if (lbl) lbl.textContent = '🏔️ ALL-TIME MACRO FIBO:';
+            if (lbl) lbl.textContent = '🏔️ 2Y MACRO FIBO:';
         } else {
-            if (btn) btn.textContent = '🔄 สลับเป็น: All-Time Macro';
+            if (btn) btn.textContent = '🔄 สลับเป็น: 2Y Macro';
             if (lbl) lbl.textContent = '📐 52W CYCLE FIBO:';
         }
 
@@ -2378,13 +2379,13 @@
 
         const chip0 = document.getElementById('chip_f0');
         const chip100 = document.getElementById('chip_f100');
-        if (chip0) chip0.textContent = (isMacro ? '0.0% ATH: ' : '0.0% High: ') + fmt(fibo['0.0']);
+        if (chip0) chip0.textContent = (isMacro ? '0.0% 2Y High: ' : '0.0% High: ') + fmt(fibo['0.0']);
         document.getElementById('chip_f236').textContent = '23.6%: ' + fmt(fibo['23.6']);
         document.getElementById('chip_f382').textContent = '38.2%: ' + fmt(fibo['38.2']);
         document.getElementById('chip_f500').textContent = '50.0%: ' + fmt(fibo['50.0']);
         document.getElementById('chip_f618').textContent = '⭐ 61.8%: ' + fmt(fibo['61.8']);
         document.getElementById('chip_f786').textContent = '78.6%: ' + fmt(fibo['78.6']);
-        if (chip100) chip100.textContent = (isMacro ? '100.0% ATL: ' : '100.0% Low: ') + fmt(fibo['100.0']);
+        if (chip100) chip100.textContent = (isMacro ? '100.0% 2Y Low: ' : '100.0% Low: ') + fmt(fibo['100.0']);
 
         const chip52Hi = document.getElementById('chip_w52_hi');
         const chip52Lo = document.getElementById('chip_w52_lo');
@@ -3180,6 +3181,7 @@
                     <div class="news-title">
                         ${displayTitle}
                     </div>
+                    <div class="news-heuristic" title="เซนติเมนต์และสรุปสร้างจากคีย์เวิร์ดในพาดหัว ไม่ได้อ่านเนื้อข่าวจริง" style="font-size:0.62rem; color:#94a3b8; margin:4px 0 6px;">🔎 วิเคราะห์จากคีย์เวิร์ด</div>
                     <div class="news-actions-row">
                         <button class="news-btn-th" onclick="event.stopPropagation(); openNewsModal('${ticker}', ${idx})">
                             🔍 สรุปไทย & วิเคราะห์
@@ -3237,12 +3239,13 @@
         return res;
     }
 
-    function calcVWAP(candles) {
+    function calcVWAP(candles, anchorTime) {
         if (!candles || candles.length === 0) return [];
         let cumV = 0, cumVP = 0;
         const res = [];
         for (let i = 0; i < candles.length; i++) {
             const c = candles[i];
+            if (anchorTime && c.time < anchorTime) continue;
             const v = c.volume > 0 ? c.volume : 1;
             const typ = (c.high + c.low + c.close) / 3;
             cumVP += typ * v;
@@ -3520,14 +3523,13 @@
             chartSeriesRegistry.cdc.push(sEma);
         }
 
-        // Inception VWAP
-        const vwapData = calcVWAP(currentCandles);
+        const vwapData = calcVWAP(currentCandles, tData.anchor_2y && tData.anchor_2y.time);
         chartSeriesRegistry.vwap = [];
         if (vwapData.length > 0) {
             const s = chart.addLineSeries({
                 color: '#eab308',
                 lineWidth: 1.5,
-                title: 'Inception VWAP',
+                title: (tData.anchor_2y ? 'VWAP (2Y)' : 'Inception VWAP'),
                 visible: indicatorVisibility.vwap,
             });
             s.setData(vwapData);
@@ -4112,13 +4114,20 @@
         }
 
         // Update Page Title & URL hash
-        document.title = `${ticker} • Technical Chart & AI Decisions`;
+        document.title = `${ticker} • Technical Chart & Rule-based Confluence`;
         history.replaceState(null, '', `stock_chart.html?ticker=${ticker}#${ticker}`);
 
         // Update Header
         document.getElementById('st_ticker_pill').textContent = ticker;
         document.getElementById('st_name').textContent = m.name || ticker;
         document.getElementById('st_sector_exchange').textContent = (m.sector ? m.sector + ' • ' : '') + currentStockExchange;
+        const staleBadge = document.getElementById('st_stale_badge');
+        if (staleBadge) {
+            staleBadge.style.display = tData.stale ? 'inline-block' : 'none';
+            if (tData.stale && tData.timestamp) {
+                staleBadge.title = 'ดึงข้อมูลล่าสุดไม่สำเร็จ ข้อมูลนี้อัปเดตเมื่อ ' + new Date(tData.timestamp * 1000).toLocaleString('th-TH');
+            }
+        }
 
         const lastPrice = m.price || (tData.candles && tData.candles.length ? tData.candles[tData.candles.length - 1].close : 0);
         const headPriceElem = document.getElementById('st_head_price');
@@ -4614,7 +4623,7 @@
             badge.style.borderColor = isBear ? 'rgba(251, 113, 133, 0.4)' : 'rgba(52, 211, 153, 0.4)';
             badge.style.background = isBear ? 'rgba(251, 113, 133, 0.15)' : 'rgba(52, 211, 153, 0.15)';
         }
-        if (winrate) winrate.textContent = '🎯 สถิติความแม่นยำ: ' + (pat.win_rate || '70%+');
+        if (winrate) winrate.textContent = '🎯 สถิติความแม่นยำ: ' + (pat.win_rate || 'ไม่มีสถิติยืนยัน (heuristic)');
         if (dTitle) dTitle.textContent = 'แผนผัง ' + pat.name + ' (Visual Pattern Blueprint)';
         if (dType) {
             dType.textContent = pat.type || 'Technical Model';
