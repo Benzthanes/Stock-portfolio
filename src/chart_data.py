@@ -114,6 +114,10 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     neck_val = min(t["price"] for t in inter_troughs)
                     head_h = p2["price"] - neck_val
                     target = round(neck_val - head_h, 2)
+                    t_left = [t for t in inter_troughs if p1["idx"] < t["idx"] < p2["idx"]]
+                    t_right = [t for t in inter_troughs if p2["idx"] < t["idx"] < p3["idx"]]
+                    tl = min(t_left, key=lambda x: x["price"]) if t_left else inter_troughs[0]
+                    tr = min(t_right, key=lambda x: x["price"]) if t_right else inter_troughs[-1]
                     detected = {
                         "name": "Head & Shoulders (หัวและไหล่กลับทิศ)",
                         "type": "Bearish Reversal",
@@ -130,8 +134,10 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                         "win_rate": "71% (Bulkowski Classical Chart Pattern Database)",
                         "target_calc": f"วัดความสูงจาก Head (${p2['price']:.2f}) ถึง Neckline (${neck_val:.2f}) รวม {head_h:.2f} แล้วลบลงมาจาก Neckline",
                         "key_points": [
-                            {"name": "Left Shoulder", "time": p1["time"], "price": p1["price"]},
+                            {"name": "Left Shoulder", "time": p1["time"], "price": p1["price"], "role": "start"},
+                            {"name": "Left Neckline Trough", "time": tl["time"], "price": tl["price"]},
                             {"name": "Head", "time": p2["time"], "price": p2["price"]},
+                            {"name": "Right Neckline Trough", "time": tr["time"], "price": tr["price"]},
                             {"name": "Right Shoulder", "time": p3["time"], "price": p3["price"]},
                         ],
                         "lines": [
@@ -150,6 +156,10 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     neck_val = max(p["price"] for p in inter_peaks)
                     head_h = neck_val - t2["price"]
                     target = round(neck_val + head_h, 2)
+                    p_left = [p for p in inter_peaks if t1["idx"] < p["idx"] < t2["idx"]]
+                    p_right = [p for p in inter_peaks if t2["idx"] < p["idx"] < t3["idx"]]
+                    pl = max(p_left, key=lambda x: x["price"]) if p_left else inter_peaks[0]
+                    pr = max(p_right, key=lambda x: x["price"]) if p_right else inter_peaks[-1]
                     detected = {
                         "name": "Inverted Head & Shoulders (หัวไหล่กลับหัว)",
                         "type": "Bullish Reversal",
@@ -166,8 +176,10 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                         "win_rate": "78% (หนึ่งในรูปแบบกลับตัวเป็นกระทิงที่แม่นยำที่สุดในตลาดหุ้น)",
                         "target_calc": f"วัดระยะลึกจาก Neckline (${neck_val:.2f}) ลงไปถึง Head (${t2['price']:.2f}) รวม {head_h:.2f} แล้วบวกขึ้นจาก Neckline",
                         "key_points": [
-                            {"name": "Left Shoulder", "time": t1["time"], "price": t1["price"]},
+                            {"name": "Left Shoulder", "time": t1["time"], "price": t1["price"], "role": "start"},
+                            {"name": "Left Neckline Peak", "time": pl["time"], "price": pl["price"]},
                             {"name": "Head", "time": t2["time"], "price": t2["price"]},
+                            {"name": "Right Neckline Peak", "time": pr["time"], "price": pr["price"]},
                             {"name": "Right Shoulder", "time": t3["time"], "price": t3["price"]},
                         ],
                         "lines": [
@@ -185,6 +197,10 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 neck_p = max(p["price"] for p in mid_peaks)
                 avg_bottom = (t1["price"] + t2["price"] + t3["price"]) / 3.0
                 target = round(neck_p + (neck_p - avg_bottom), 2)
+                p_mid1 = [p for p in mid_peaks if t1["idx"] < p["idx"] < t2["idx"]]
+                p_mid2 = [p for p in mid_peaks if t2["idx"] < p["idx"] < t3["idx"]]
+                pm1 = max(p_mid1, key=lambda x: x["price"]) if p_mid1 else mid_peaks[0]
+                pm2 = max(p_mid2, key=lambda x: x["price"]) if p_mid2 else mid_peaks[-1]
                 detected = {
                     "name": "Bullish Triple Bottom (สามฐานแข็งแกร่ง)",
                     "type": "Bullish Reversal",
@@ -200,6 +216,13 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "invalidation": f"Stop Loss ทันทีหากราคาปิดหลุดฐานต่ำสุด ${min(t1['price'], t2['price'], t3['price']):.2f}",
                     "win_rate": "74% (Thomas Bulkowski)",
                     "target_calc": f"วัดความสูงจากฐาน ${avg_bottom:.2f} ถึงยอด Neckline ${neck_p:.2f} แล้วนำไปบวกเพิ่มจากยอด Neckline",
+                    "key_points": [
+                        {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
+                        {"name": "Neckline Peak 1", "time": pm1["time"], "price": pm1["price"]},
+                        {"name": "Bottom 2", "time": t2["time"], "price": t2["price"]},
+                        {"name": "Neckline Peak 2", "time": pm2["time"], "price": pm2["price"]},
+                        {"name": "Bottom 3", "time": t3["time"], "price": t3["price"]},
+                    ],
                     "lines": [
                         {"name": "Triple Support Floor", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": avg_bottom}, {"time": times[-1], "value": avg_bottom}]},
                         {"name": "Neckline Breakout", "color": "#38bdf8", "style": 2, "points": [{"time": t1["time"], "value": neck_p}, {"time": times[-1], "value": neck_p}]}
@@ -232,7 +255,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "win_rate": "72% (รูปแบบยอดนิยมความแม่นยำสูง)",
                     "target_calc": f"วัดส่วนสูงฐานคู่ถึงยอดกลาง (${neck_p['price'] - min(t1['price'], t2['price']):.2f}) บวกเพิ่มจากยอด Neckline",
                     "key_points": [
-                        {"name": "Bottom 1", "time": t1["time"], "price": t1["price"]},
+                        {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
                         {"name": "Neckline Peak", "time": neck_p["time"], "price": neck_p["price"]},
                         {"name": "Bottom 2", "time": t2["time"], "price": t2["price"]},
                     ],
@@ -268,7 +291,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "win_rate": "69% (Thomas Bulkowski)",
                     "target_calc": f"วัดส่วนสูงของยอดคู่แล้วหักลบออกจาก Neckline ${neck_t['price']:.2f}",
                     "key_points": [
-                        {"name": "Peak 1", "time": p1["time"], "price": p1["price"]},
+                        {"name": "Peak 1", "time": p1["time"], "price": p1["price"], "role": "start"},
                         {"name": "Neckline Trough", "time": neck_t["time"], "price": neck_t["price"]},
                         {"name": "Peak 2", "time": p2["time"], "price": p2["price"]},
                     ],
@@ -280,14 +303,32 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
 
     # 6. Bull Flag / Bear Flag Check
     if not detected and n >= 25:
-        pole_base = min(lows[-25:-8])
-        pole_peak = max(highs[-25:-8])
+        sub_lows = lows[-25:-8]
+        sub_highs = highs[-25:-8]
+        pole_base = min(sub_lows)
+        pole_peak = max(sub_highs)
+        base_sub_idx = sub_lows.index(pole_base)
+        peak_sub_idx = sub_highs.index(pole_peak)
         pole_gain = (pole_peak - pole_base) / pole_base
-        if pole_gain >= 0.08:
-            flag_high = max(highs[-8:])
-            flag_low = min(lows[-8:])
+        if pole_gain >= 0.08 and base_sub_idx < peak_sub_idx:
+            base_real_idx = -25 + base_sub_idx
+            peak_real_idx = -25 + peak_sub_idx
+            flag_highs = highs[-8:]
+            flag_lows = lows[-8:]
+            flag_high = max(flag_highs)
+            flag_low = min(flag_lows)
             if flag_high <= pole_peak * 1.01 and flag_low >= pole_base + (pole_peak - pole_base) * 0.45:
                 target = round(flag_high + (pole_peak - pole_base), 2)
+                f_high_idx = -8 + flag_highs.index(flag_high)
+                f_low_idx = -8 + flag_lows.index(flag_low)
+                flag_swings = sorted([
+                    {"name": "Flag Resistance", "time": times[f_high_idx], "price": flag_high, "idx": n + f_high_idx},
+                    {"name": "Flag Support", "time": times[f_low_idx], "price": flag_low, "idx": n + f_low_idx}
+                ], key=lambda x: x["idx"])
+                kp = [
+                    {"name": "Pole Base (จุดเริ่มเสาธง)", "time": times[base_real_idx], "price": pole_base, "role": "start"},
+                    {"name": "Pole Peak (ยอดเสาธง)", "time": times[peak_real_idx], "price": pole_peak},
+                ] + [{"name": s["name"], "time": s["time"], "price": s["price"]} for s in flag_swings]
                 detected = {
                     "name": "Bullish Flag (ธงสะสมพลังขาขึ้น)",
                     "type": "Bullish Continuation",
@@ -303,7 +344,9 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "invalidation": f"รูปแบบเสียทรงหากราคาหลุดต่ำกว่ากรอบล่าง ${flag_low:.2f}",
                     "win_rate": "70% (Bullish Continuation Pattern)",
                     "target_calc": f"วัดความสูงของเสาธง ({pole_peak - pole_base:.2f}) แล้วนำไปทาบต่อจากจุดเบรกเอาท์ของกรอบธง",
+                    "key_points": kp,
                     "lines": [
+                        {"name": "Flagpole", "color": "#facc15", "style": 0, "points": [{"time": times[base_real_idx], "value": pole_base}, {"time": times[peak_real_idx], "value": pole_peak}]},
                         {"name": "Flag Resistance", "color": "#10b981", "style": 2, "points": [{"time": times[-8], "value": flag_high}, {"time": times[-1], "value": flag_high}]},
                         {"name": "Flag Support", "color": "#38bdf8", "style": 2, "points": [{"time": times[-8], "value": flag_low}, {"time": times[-1], "value": flag_low}]}
                     ]
@@ -319,6 +362,15 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         # Ascending Triangle: Flat Resistance (p1 ~= p2), Rising Support (t2 > t1)
         if abs(p2["price"] - p1["price"]) / p1["price"] <= 0.025 and t2["price"] > t1["price"] * 1.015:
             target = round(p2["price"] + (p2["price"] - t1["price"]), 2)
+            raw_pts = [
+                {"name": "Upper Resistance 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                {"name": "Ascending Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                {"name": "Upper Resistance 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                {"name": "Ascending Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+            ]
+            raw_pts.sort(key=lambda x: x["idx"])
+            raw_pts[0]["role"] = "start"
+            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
                 "name": "Ascending Triangle (สามเหลี่ยมลู่ขึ้น)",
                 "type": "Bullish Continuation",
@@ -334,6 +386,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "invalidation": f"รูปแบบเสียทรงหากราคาหลุดแนวรับเฉียงขึ้น",
                 "win_rate": "73% (มีโอกาสเบรกขึ้นสูงกว่าลง 3 ต่อ 1)",
                 "target_calc": f"วัดความกว้างของสามเหลี่ยมที่ฐานแรก (${p2['price'] - t1['price']:.2f}) บวกเพิ่มจากจุดต้าน ${p2['price']:.2f}",
+                "key_points": kp,
                 "lines": [
                     {"name": "Flat Resistance", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": p2["price"]}]},
                     {"name": "Ascending Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
@@ -342,6 +395,15 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         # Descending Triangle: Falling Resistance (p2 < p1), Flat Support (t1 ~= t2)
         elif abs(t2["price"] - t1["price"]) / t1["price"] <= 0.025 and p2["price"] < p1["price"] * 0.985:
             target = round(t2["price"] - (p1["price"] - t2["price"]), 2)
+            raw_pts = [
+                {"name": "Descending High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                {"name": "Horizontal Floor 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                {"name": "Descending High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                {"name": "Horizontal Floor 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+            ]
+            raw_pts.sort(key=lambda x: x["idx"])
+            raw_pts[0]["role"] = "start"
+            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
                 "name": "Descending Triangle (สามเหลี่ยมกดไฮ)",
                 "type": "Bearish Continuation",
@@ -357,6 +419,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "invalidation": f"รูปแบบล้มเหลวหากเบรกทะลุเส้นแนวต้านเฉียงกดขึ้นไปได้",
                 "win_rate": "68% (Bearish Continuation Pattern)",
                 "target_calc": f"วัดความสูงสามเหลี่ยมแล้วหักลบออกจากแนวรับ ${t2['price']:.2f}",
+                "key_points": kp,
                 "lines": [
                     {"name": "Descending Resistance", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
                     {"name": "Flat Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": t2["price"]}]}
@@ -366,6 +429,15 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         elif p2["price"] > p1["price"] * 1.02 and t2["price"] < t1["price"] * 0.98:
             height = p2["price"] - t2["price"]
             target = round(p2["price"] + height * 0.5, 2)
+            raw_pts = [
+                {"name": "Expanding High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                {"name": "Expanding Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                {"name": "Expanding High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                {"name": "Expanding Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+            ]
+            raw_pts.sort(key=lambda x: x["idx"])
+            raw_pts[0]["role"] = "start"
+            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
                 "name": "Expanding Triangle (สามเหลี่ยมปากแตรขยายตัว)",
                 "type": "High Volatility",
@@ -381,6 +453,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "invalidation": "ผันผวนรุนแรง ควรวาง Stop Loss กว้าง 2.0 ATR",
                 "win_rate": "55% (ความผันผวนสูง ควรรอการยืนยัน)",
                 "target_calc": f"เป้าหมายสวิงที่ ${target:.2f}",
+                "key_points": kp,
                 "lines": [
                     {"name": "Diverging Resistance", "color": "#f59e0b", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
                     {"name": "Diverging Support", "color": "#f43f5e", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
@@ -390,6 +463,15 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         elif p2["price"] < p1["price"] * 0.985 and t2["price"] > t1["price"] * 1.015:
             height = p1["price"] - t1["price"]
             target = round(current_price + height * 0.75, 2)
+            raw_pts = [
+                {"name": "Lower High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                {"name": "Higher Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                {"name": "Lower High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                {"name": "Higher Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+            ]
+            raw_pts.sort(key=lambda x: x["idx"])
+            raw_pts[0]["role"] = "start"
+            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
                 "name": "Symmetrical Triangle (สามเหลี่ยมบีบอัด)",
                 "type": "Neutral Breakout",
@@ -405,6 +487,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "invalidation": "หากราคาสวิงตัดไปมาโดยไร้ Volume ถือเป็น False Breakout",
                 "win_rate": "65% (เตรียมระเบิดเทรนด์ตามทิศทางเบรก)",
                 "target_calc": f"วัดความกว้างสูงสุดของสามเหลี่ยม ({p1['price'] - t1['price']:.2f}) นำไปทาบจากจุดเบรก",
+                "key_points": kp,
                 "lines": [
                     {"name": "Upper Resistance Line", "color": "#f59e0b", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
                     {"name": "Lower Support Line", "color": "#38bdf8", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
@@ -413,6 +496,15 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         # Falling Wedge (Bullish Reversal)
         elif p2["price"] < p1["price"] and t2["price"] < t1["price"]:
             target = round(p1["price"], 2)
+            raw_pts = [
+                {"name": "Wedge High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                {"name": "Wedge Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                {"name": "Wedge High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                {"name": "Wedge Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+            ]
+            raw_pts.sort(key=lambda x: x["idx"])
+            raw_pts[0]["role"] = "start"
+            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
                 "name": "Bullish Falling Wedge (ลิ่มเฉียงลงสะสมแรง)",
                 "type": "Bullish Reversal",
@@ -428,6 +520,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "invalidation": f"รูปแบบเสียทรงหากราคาหลุดเส้นรับล่างของลิ่ม",
                 "win_rate": "74% (หนึ่งในรูปแบบกลับตัวยอดเยี่ยมของสถาบัน)",
                 "target_calc": f"เป้าหมายเชิงเทคนิคคือจุดเริ่มต้นของลิ่มที่ ${p1['price']:.2f}",
+                "key_points": kp,
                 "lines": [
                     {"name": "Upper Wedge Resistance", "color": "#38bdf8", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
                     {"name": "Lower Wedge Support", "color": "#10b981", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
@@ -436,6 +529,15 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         # Channel Up / Rising Trend
         elif p2["price"] > p1["price"] and t2["price"] > t1["price"]:
             target = round(p2["price"] * 1.08, 2)
+            raw_pts = [
+                {"name": "Channel High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                {"name": "Channel Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                {"name": "Channel High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                {"name": "Channel Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+            ]
+            raw_pts.sort(key=lambda x: x["idx"])
+            raw_pts[0]["role"] = "start"
+            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
                 "name": "Bullish Ascending Channel (ช่องคู่ขนานขาขึ้น)",
                 "type": "Bullish Trend",
@@ -451,6 +553,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "invalidation": f"ระวังหากราคาหลุดกรอบล่าง Channel อาจเข้าสู่ช่วงการพักฐานใหญ่",
                 "win_rate": "76% (Trend Following Setup)",
                 "target_calc": f"เป้าหมายแนวต้านกรอบบนคำนวณที่ ${target:.2f}",
+                "key_points": kp,
                 "lines": [
                     {"name": "Upper Channel Line", "color": "#10b981", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2['idx']), 2)}]},
                     {"name": "Lower Channel Support", "color": "#38bdf8", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2['idx']), 2)}]}
@@ -462,6 +565,19 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         recent_high = max(highs[-30:])
         recent_low = min(lows[-30:])
         target = round(recent_high + (recent_high - recent_low) * 0.5, 2)
+        h_sub = highs[-30:].index(recent_high)
+        l_sub = lows[-30:].index(recent_low)
+        h_idx = -30 + h_sub
+        l_idx = -30 + l_sub
+        start_idx = -30
+        raw_pts = [
+            {"name": "Box Start (จุดเริ่มกรอบ)", "time": times[start_idx], "price": closes[start_idx], "idx": n + start_idx},
+            {"name": "Box Resistance", "time": times[h_idx], "price": recent_high, "idx": n + h_idx},
+            {"name": "Box Support", "time": times[l_idx], "price": recent_low, "idx": n + l_idx},
+        ]
+        raw_pts.sort(key=lambda x: x["idx"])
+        raw_pts[0]["role"] = "start"
+        kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
         detected = {
             "name": "Consolidation Box (กรอบสะสมพลัง)",
             "type": "Neutral Consolidation",
@@ -477,6 +593,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             "invalidation": f"Stop Loss หากราคาปิดหลุดแนวรับ ${recent_low:.2f}",
             "win_rate": "60% (Range Trading Strategy)",
             "target_calc": f"ความสูงของกรอบบวกเพิ่มจากแนวต้านเป้าหมาย ${target:.2f}",
+            "key_points": kp,
             "lines": [
                 {"name": "Box Resistance", "color": "#f43f5e", "style": 2, "points": [{"time": times[-30], "value": recent_high}, {"time": times[-1], "value": recent_high}]},
                 {"name": "Box Support", "color": "#10b981", "style": 2, "points": [{"time": times[-30], "value": recent_low}, {"time": times[-1], "value": recent_low}]}
@@ -484,6 +601,971 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         }
 
     return detected
+
+
+BULLISH_DEVELOPING_WAVE_TYPES = {"Bullish Impulse (1-2-3-4-5)", "Emerging Bullish Impulse (1-2-3)"}
+
+
+def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -> Optional[Dict[str, Any]]:
+    """
+    Detects Elliott Wave structures (Impulse 1-2-3-4-5, Emerging 1-2-3, or Corrective A-B-C)
+    using strict academic Elliott Wave rules (Cardinal Rules 1-3, consecutive swings, and floor integrity).
+    Returns detected: False when the stock is in consolidation or has an invalidated wave.
+    """
+    if not candles or len(candles) < 20:
+        return {
+            "detected": False,
+            "type": "Insufficient Data",
+            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+            "current_wave": "ข้อมูลแท่งเทียนไม่เพียงพอ",
+            "current_wave_badge": "N/A",
+            "summary": "ข้อมูลแท่งเทียนไม่เพียงพอต่อการวิเคราะห์โครงสร้างคลื่น",
+            "points": [],
+            "lines": [],
+            "target": None,
+            "invalidation": None
+        }
+
+    recent = candles if is_macro else (candles[-252:] if len(candles) >= 252 else candles)
+    current_c = recent[-1]
+    current_p = round(float(current_c["close"]), 2)
+    current_t = current_c["time"]
+
+    # Volatility for adaptive threshold
+    sample = recent[-60:] if len(recent) >= 60 else recent
+    diffs = [abs(sample[i]["close"] - sample[i - 1]["close"]) / max(1e-4, sample[i - 1]["close"]) for i in range(1, len(sample))]
+    avg_vol = sum(diffs) / len(diffs) if diffs else 0.015
+    base_thresh = max(0.025, min(0.10, avg_vol * (4.0 if is_macro else 3.0)))
+
+    # Find best swings with index tracking
+    best_swings = []
+    target_count = 10 if not is_macro else 8
+
+    for mult in [1.0, 1.3, 0.75, 1.8, 0.5, 2.2]:
+        thresh = base_thresh * mult
+        swings = []
+        last_type = None
+        last_p = recent[0]["close"]
+        last_idx = 0
+        for i, c in enumerate(recent):
+            p = c["close"]
+            if last_type is None:
+                if p >= last_p * (1 + thresh):
+                    last_type = "high"
+                    last_p = c["high"]
+                    last_idx = i
+                    swings.append({"type": "low", "time": recent[0]["time"], "price": round(recent[0]["low"], 2), "idx": 0})
+                elif p <= last_p * (1 - thresh):
+                    last_type = "low"
+                    last_p = c["low"]
+                    last_idx = i
+                    swings.append({"type": "high", "time": recent[0]["time"], "price": round(recent[0]["high"], 2), "idx": 0})
+            elif last_type == "high":
+                if c["high"] > last_p:
+                    last_p = c["high"]
+                    last_idx = i
+                elif c["low"] <= last_p * (1 - thresh):
+                    swings.append({"type": "high", "time": recent[last_idx]["time"], "price": round(last_p, 2), "idx": last_idx})
+                    last_type = "low"
+                    last_p = c["low"]
+                    last_idx = i
+            elif last_type == "low":
+                if c["low"] < last_p:
+                    last_p = c["low"]
+                    last_idx = i
+                elif c["high"] >= last_p * (1 + thresh):
+                    swings.append({"type": "low", "time": recent[last_idx]["time"], "price": round(last_p, 2), "idx": last_idx})
+                    last_type = "high"
+                    last_p = c["high"]
+                    last_idx = i
+
+        if last_type == "high":
+            swings.append({"type": "high", "time": recent[last_idx]["time"], "price": round(last_p, 2), "idx": last_idx})
+        elif last_type == "low":
+            swings.append({"type": "low", "time": recent[last_idx]["time"], "price": round(last_p, 2), "idx": last_idx})
+
+        if 5 <= len(swings) <= 18:
+            best_swings = swings
+            break
+        if not best_swings or abs(len(swings) - target_count) < abs(len(best_swings) - target_count):
+            best_swings = swings
+
+    if len(best_swings) < 3:
+        return {
+            "detected": False,
+            "type": "No Clear Wave / Consolidation",
+            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+            "current_wave": "ไม่มีโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์",
+            "current_wave_badge": "Consolidation",
+            "summary": "ไม่พบโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์ (ราคาอยู่ในสภาวะพักฐาน ปรับฐาน หรือสะสมพลังไซด์เวย์ แนะนำอ้างอิง Classical Chart Pattern หรือแนวรับต้าน EMA)",
+            "points": [],
+            "lines": [],
+            "target": None,
+            "invalidation": None
+        }
+
+    n_sw = len(best_swings)
+
+    # 1. Active Bullish Impulse (0)-(1)-(2)-(3)-(4) -> developing Wave (5)
+    for k in range(max(0, n_sw - 6), n_sw - 4):
+        s0, s1, s2, s3, s4 = best_swings[k:k + 5]
+        if s0["type"] == "low" and s1["type"] == "high" and s2["type"] == "low" and s3["type"] == "high" and s4["type"] == "low":
+            len1 = s1["price"] - s0["price"]
+            len3 = s3["price"] - s2["price"]
+
+            # Cardinal Rules: W2 > W0, W3 > W1 and strong, W4 > W1 (no overlap)
+            if s2["price"] > s0["price"] and s3["price"] > s1["price"] and len3 >= len1 * 0.8 and s4["price"] > s1["price"]:
+                idx_s4 = s4["idx"]
+                candles_after_s4 = recent[idx_s4:]
+                floor_breached = any(c["low"] < s4["price"] * 0.99 for c in candles_after_s4)
+                swings_after_s4 = n_sw - 1 - (k + 4)
+
+                if not floor_breached and swings_after_s4 <= 1 and current_p >= s4["price"]:
+                    target5 = round(s4["price"] + max(len1, len3 * 0.618), 2)
+                    inval = round(s4["price"], 2)
+                    is_pushing = current_p >= s4["price"] * 1.02
+                    curr_w_str = "Wave (5) กำลังขยายตัวสู่เป้าหมาย" if is_pushing else "Wave (4) โซนฐานแนวรับสะสม"
+                    curr_badge = "Wave (5)" if is_pushing else "Wave (4)"
+
+                    pts = [
+                        {"wave": "(0)", "time": s0["time"], "price": s0["price"], "label": "Start Wave (0)"},
+                        {"wave": "(1)", "time": s1["time"], "price": s1["price"], "label": "Wave (1) Impulse"},
+                        {"wave": "(2)", "time": s2["time"], "price": s2["price"], "label": "Wave (2) Retrace"},
+                        {"wave": "(3)", "time": s3["time"], "price": s3["price"], "label": "Wave (3) Expansion"},
+                        {"wave": "(4)", "time": s4["time"], "price": s4["price"], "label": "Wave (4) Base Floor"},
+                        {"wave": "(5)", "time": current_t, "price": current_p, "label": f"{curr_badge} ปัจจุบัน"},
+                    ]
+                    clean_pts = []
+                    seen_t = set()
+                    for p in pts:
+                        if p["time"] not in seen_t:
+                            seen_t.add(p["time"])
+                            clean_pts.append(p)
+                        else:
+                            clean_pts[-1] = p
+
+                    lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                    return {
+                        "detected": True,
+                        "type": "Bullish Impulse (1-2-3-4-5)",
+                        "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                        "current_wave": curr_w_str,
+                        "current_wave_badge": curr_badge,
+                        "summary": f"เกิดโครงสร้างคลื่นขาขึ้น Bullish Impulse (1-2-3-4-5) โดย Wave (3) อยู่ที่ ${s3['price']:.2f} และ Wave (4) ฐานรับที่ ${s4['price']:.2f}",
+                        "points": clean_pts,
+                        "lines": lns,
+                        "target": target5,
+                        "invalidation": inval
+                    }
+
+    # 2. Completed Bullish Impulse (0)-(1)-(2)-(3)-(4)-(5)
+    if n_sw >= 6:
+        s0, s1, s2, s3, s4, s5 = best_swings[-6:]
+        if s0["type"] == "low" and s1["type"] == "high" and s2["type"] == "low" and s3["type"] == "high" and s4["type"] == "low" and s5["type"] == "high":
+            len1 = s1["price"] - s0["price"]
+            len3 = s3["price"] - s2["price"]
+            if s2["price"] > s0["price"] and s3["price"] > s1["price"] and s4["price"] > s1["price"] and s5["price"] > s3["price"] and len3 >= len1 * 0.8:
+                pts = [
+                    {"wave": "(0)", "time": s0["time"], "price": s0["price"], "label": "Start Wave (0)"},
+                    {"wave": "(1)", "time": s1["time"], "price": s1["price"], "label": "Wave (1) Impulse"},
+                    {"wave": "(2)", "time": s2["time"], "price": s2["price"], "label": "Wave (2) Retrace"},
+                    {"wave": "(3)", "time": s3["time"], "price": s3["price"], "label": "Wave (3) Expansion"},
+                    {"wave": "(4)", "time": s4["time"], "price": s4["price"], "label": "Wave (4) Base Floor"},
+                    {"wave": "(5)", "time": s5["time"], "price": s5["price"], "label": "Wave (5) Peak"},
+                ]
+                lns = [{"time": p["time"], "value": p["price"]} for p in pts]
+                return {
+                    "detected": True,
+                    "type": "Bullish Impulse Completed (1-2-3-4-5)",
+                    "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                    "current_wave": "Wave (5) Peak จบรอบคลื่นสมบูรณ์",
+                    "current_wave_badge": "Wave (5) Peak",
+                    "summary": f"คลื่นขาขึ้น Bullish Impulse (1-2-3-4-5) จบรอบสมบูรณ์ที่ยอดคลื่น (5) ระดับ ${s5['price']:.2f} กำลังเข้าสู่ช่วงพักฐาน Corrective Phase",
+                    "points": pts,
+                    "lines": lns,
+                    "target": round(s5["price"], 2),
+                    "invalidation": round(s4["price"], 2)
+                }
+
+    # 3. Emerging Bullish Impulse (0)-(1)-(2) -> developing Wave (3)
+    if n_sw >= 3:
+        for k in range(max(0, n_sw - 4), n_sw - 2):
+            s0, s1, s2 = best_swings[k:k + 3]
+            if s0["type"] == "low" and s1["type"] == "high" and s2["type"] == "low":
+                if s2["price"] > s0["price"] and s1["price"] > s0["price"] * 1.05:
+                    idx_s2 = s2["idx"]
+                    candles_after_s2 = recent[idx_s2:]
+                    floor_breached = any(c["low"] < s2["price"] * 0.99 for c in candles_after_s2)
+                    swings_after_s2 = n_sw - 1 - (k + 2)
+
+                    if not floor_breached and swings_after_s2 <= 1 and current_p >= s2["price"] * 1.01:
+                        len1 = s1["price"] - s0["price"]
+                        target3 = round(s2["price"] + len1 * 1.618, 2)
+                        inval = round(s2["price"], 2)
+
+                        pts = [
+                            {"wave": "(0)", "time": s0["time"], "price": s0["price"], "label": "Wave (0) Base"},
+                            {"wave": "(1)", "time": s1["time"], "price": s1["price"], "label": "Wave (1) Impulse"},
+                            {"wave": "(2)", "time": s2["time"], "price": s2["price"], "label": "Wave (2) Retrace Floor"},
+                            {"wave": "(3)", "time": current_t, "price": current_p, "label": "Wave (3) ปัจจุบัน"},
+                        ]
+                        clean_pts = []
+                        seen_t = set()
+                        for p in pts:
+                            if p["time"] not in seen_t:
+                                seen_t.add(p["time"])
+                                clean_pts.append(p)
+                            else:
+                                clean_pts[-1] = p
+
+                        lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                        return {
+                            "detected": True,
+                            "type": "Emerging Bullish Impulse (1-2-3)",
+                            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                            "current_wave": "Wave (3) Impulse กำลังดีดตัวขยายตัว",
+                            "current_wave_badge": "Wave (3)",
+                            "summary": f"เกิดโครงสร้างต้นรอบคลื่น Wave (1-2-3) โดย Wave (2) ยกฐานรับที่ ${s2['price']:.2f} และกำลังวิ่งขึ้นทดสอบเป้าหมาย Wave (3)",
+                            "points": clean_pts,
+                            "lines": lns,
+                            "target": target3,
+                            "invalidation": inval
+                        }
+
+    # 4. Clean Corrective Wave (A-B-C)
+    if n_sw >= 3:
+        for k in range(max(0, n_sw - 4), n_sw - 2):
+            s_top, sa, sb = best_swings[k:k + 3]
+            if s_top["type"] == "high" and sa["type"] == "low" and sb["type"] == "high":
+                if sb["price"] < s_top["price"] and sa["price"] < s_top["price"] * 0.95:
+                    idx_sb = sb["idx"]
+                    candles_after_sb = recent[idx_sb:]
+                    roof_breached = any(c["high"] > sb["price"] * 1.01 for c in candles_after_sb)
+                    swings_after_sb = n_sw - 1 - (k + 2)
+
+                    if not roof_breached and swings_after_sb <= 1 and current_p <= sb["price"]:
+                        len_a = s_top["price"] - sa["price"]
+                        target_c = round(max(0.01, sb["price"] - len_a * 1.0), 2)
+                        inval = round(sb["price"], 2)
+
+                        pts = [
+                            {"wave": "(5)", "time": s_top["time"], "price": s_top["price"], "label": "Wave (5) Cycle Peak"},
+                            {"wave": "(A)", "time": sa["time"], "price": sa["price"], "label": "Wave (A) Initial Drop"},
+                            {"wave": "(B)", "time": sb["time"], "price": sb["price"], "label": "Wave (B) Rebound High"},
+                            {"wave": "(C)", "time": current_t, "price": current_p, "label": "Wave (C) ปัจจุบัน"},
+                        ]
+                        clean_pts = []
+                        seen_t = set()
+                        for p in pts:
+                            if p["time"] not in seen_t:
+                                seen_t.add(p["time"])
+                                clean_pts.append(p)
+                            else:
+                                clean_pts[-1] = p
+
+                        lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                        return {
+                            "detected": True,
+                            "type": "Corrective Wave (A-B-C)",
+                            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                            "current_wave": "Corrective Wave (C) กำลังปรับฐานหาจุดสมดุล",
+                            "current_wave_badge": "Wave (C)",
+                            "summary": f"โครงสร้างคลื่นปรับฐาน Corrective (A-B-C) หลังยอดดอย ${s_top['price']:.2f} โดยมีรีบาวด์ Wave (B) ที่ ${sb['price']:.2f}",
+                            "points": clean_pts,
+                            "lines": lns,
+                            "target": target_c,
+                            "invalidation": inval
+                        }
+
+    # 5. Consolidation / Sideway (No valid unbroken wave)
+    return {
+        "detected": False,
+        "type": "No Clear Wave / Consolidation",
+        "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+        "current_wave": "ไม่มีโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์",
+        "current_wave_badge": "Consolidation",
+        "summary": "ไม่พบโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์ (ราคาอยู่ในสภาวะพักฐาน ปรับฐาน หรือสะสมพลังไซด์เวย์ แนะนำอ้างอิง Classical Chart Pattern หรือแนวรับต้าน EMA)",
+        "points": [],
+        "lines": [],
+        "target": None,
+        "invalidation": None
+    }
+
+
+def detect_earnings_history(candles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Approximates quarterly earnings reactions by taking the highest-volume candle
+    in each ~62-bar window. These are volume spikes, not confirmed announcement dates.
+    """
+    if not candles or len(candles) < 2:
+        return []
+
+    recent = candles[-750:] if len(candles) >= 750 else candles
+    events = []
+    q_len = 62 if len(recent) >= 62 else len(recent)
+    for start in range(0, len(recent), q_len):
+        chunk = recent[start:start + q_len]
+        if len(chunk) < min(20, q_len):
+            continue
+        max_c = max(chunk, key=lambda c: c.get("volume", 0))
+        idx = recent.index(max_c)
+        if idx > 0:
+            avg_vol = sum(c.get("volume", 0) for c in chunk) / len(chunk)
+            if max_c.get("volume", 0) >= avg_vol * 1.3:
+                prev_c = recent[idx - 1]
+                if prev_c.get("close", 0) > 0:
+                    pct = round(((max_c["close"] - prev_c["close"]) / prev_c["close"]) * 100, 1)
+                    events.append({
+                        "time": max_c["time"],
+                        "reaction_pct": pct,
+                        "text": f"📊 Vol {pct:+.1f}%",
+                        "color": "#10b981" if pct >= 0 else "#f43f5e",
+                        "position": "belowBar" if pct >= 0 else "aboveBar",
+                    })
+
+    events.sort(key=lambda x: x["time"])
+    return events
+
+
+def _calc_ema_series(values: List[float], period: int) -> List[float]:
+    if not values:
+        return []
+    k = 2.0 / (period + 1.0)
+    ema = [values[0]]
+    for i in range(1, len(values)):
+        ema.append(values[i] * k + ema[-1] * (1.0 - k))
+    return ema
+
+
+def compute_cdc_actionzone(candles: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Computes CDC ActionZone V3 2020 (by Uncle Chaloke) using EMA 12 and EMA 26.
+    4-Color Status System:
+    - Green (#22c55e): Bullish (EMA12 > EMA26) and Close > EMA12 (Strong Buy / Hold)
+    - Blue (#38bdf8): Bullish (EMA12 > EMA26) and Close <= EMA12 (Pullback / Buy on Dip)
+    - Orange (#f59e0b): Bearish (EMA12 < EMA26) and Close > EMA12 (Bearish Rebound)
+    - Red (#ef4444): Bearish (EMA12 < EMA26) and Close <= EMA12 (Strong Sell / Cash)
+    """
+    if not candles or len(candles) < 2:
+        return {
+            "status": "NEUTRAL",
+            "zone": "neutral",
+            "zone_th": "ข้อมูลไม่เพียงพอ",
+            "badge_color": "#94a3b8",
+            "signal": None,
+            "fast_ema12": 0.0,
+            "slow_ema26": 0.0,
+            "candle_colors": []
+        }
+
+    closes = [float(c["close"]) for c in candles]
+    ema12 = _calc_ema_series(closes, 12)
+    ema26 = _calc_ema_series(closes, 26)
+
+    candle_colors = []
+    zones = []
+
+    for i in range(len(candles)):
+        c = candles[i]
+        c_close = closes[i]
+        e12 = ema12[i]
+        e26 = ema26[i]
+
+        is_bull = e12 > e26
+        if is_bull:
+            if c_close > e12:
+                zone = "green"
+                color = "#22c55e"
+            else:
+                zone = "blue"
+                color = "#38bdf8"
+        else:
+            if c_close > e12:
+                zone = "orange"
+                color = "#f59e0b"
+            else:
+                zone = "red"
+                color = "#ef4444"
+
+        zones.append(zone)
+        candle_colors.append({
+            "time": c["time"],
+            "color": color,
+            "zone": zone,
+            "ema12": round(e12, 2),
+            "ema26": round(e26, 2)
+        })
+
+    last_zone = zones[-1]
+    last_e12 = round(ema12[-1], 2)
+    last_e26 = round(ema26[-1], 2)
+
+    if last_zone == "green":
+        status = "BULLISH"
+        zone_th = "โซนเขียว (ถือรันเทรนด์ / Buy & Hold)"
+        badge_color = "#22c55e"
+    elif last_zone == "blue":
+        status = "BULLISH_PULLBACK"
+        zone_th = "โซนฟ้า (ย่อตัวในขาขึ้น / Buy on Dip)"
+        badge_color = "#38bdf8"
+    elif last_zone == "orange":
+        status = "BEARISH_REBOUND"
+        zone_th = "โซนส้ม (รีบาวด์ในขาลง / อย่าเพิ่งรับ)"
+        badge_color = "#f59e0b"
+    else:
+        status = "BEARISH"
+        zone_th = "โซนแดง (ถือเงินสด / Sell & Cash)"
+        badge_color = "#ef4444"
+
+    signal = None
+    if len(zones) >= 2:
+        prev_bull = ema12[-2] > ema26[-2]
+        curr_bull = ema12[-1] > ema26[-1]
+        if not prev_bull and curr_bull:
+            signal = "BUY_GOLDEN_CROSS"
+        elif prev_bull and not curr_bull:
+            signal = "SELL_DEATH_CROSS"
+
+    return {
+        "status": status,
+        "zone": last_zone,
+        "zone_th": zone_th,
+        "badge_color": badge_color,
+        "signal": signal,
+        "fast_ema12": last_e12,
+        "slow_ema26": last_e26,
+        "candle_colors": candle_colors
+    }
+
+
+SUPER_INVESTORS_DATA: Dict[str, List[Dict[str, Any]]] = {
+    "LLY": [
+        {
+            "name": "Stanley Druckenmiller",
+            "fund": "Duquesne Family Office",
+            "icon": "🦅",
+            "shares_str": "650,000 หุ้น ($680M)",
+            "action": "TOP 5 HOLDING",
+            "action_color": "#38bdf8",
+            "summary": "ถือเป็น 1 ใน 5 อันดับแรกของพอร์ต มองเป็นหุ้นเทคโนโลยีชีวภาพที่มี Growth สูงจากยาลดความอ้วน GLP-1"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "1.2M หุ้น ($1.42B)",
+            "action": "BUY (+18%)",
+            "action_color": "#10b981",
+            "summary": "กองทุน Quant Hedge Fund อันดับ 1 ของโลก เพิ่มน้ำหนักการลงทุนอย่างต่อเนื่อง"
+        },
+        {
+            "name": "Ray Dalio",
+            "fund": "Bridgewater Associates",
+            "icon": "🌊",
+            "shares_str": "260,000 หุ้น ($310M)",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ถือครองในพอร์ต All-Weather มองกลุ่มสุขภาพขนาดใหญ่เป็นสินทรัพย์ต้านทานวัฏจักรเศรษฐกิจ"
+        },
+        {
+            "name": "Vanguard & BlackRock",
+            "fund": "Institutional Giants",
+            "icon": "🐋",
+            "shares_str": "สัดส่วนรวม 15.6% ($18.5B)",
+            "action": "CORE ACCUMULATE",
+            "action_color": "#818cf8",
+            "summary": "ผู้ถือหุ้นสถาบันรายใหญ่ที่สุด มีเม็ดเงินไหลเข้าสม่ำเสมอผ่านกองทุนดัชนี S&P 500 และ Healthcare ETFs"
+        }
+    ],
+    "NVDA": [
+        {
+            "name": "Stanley Druckenmiller",
+            "fund": "Duquesne Family Office",
+            "icon": "🦅",
+            "shares_str": "$820M (ต้นทุนต่ำ)",
+            "action": "TRIM PROFIT",
+            "action_color": "#facc15",
+            "summary": "เข้าซื้อตั้งแต่ยุคแรกและทำกำไรมหาศาล ปัจจุบันคงสถานะแกนนำ AI Hardware แต่ทยอยแบ่งขายล็อกกำไร"
+        },
+        {
+            "name": "Nancy Pelosi",
+            "fund": "US Congress Disclosures",
+            "icon": "🏛️",
+            "shares_str": "Call Options $5M+",
+            "action": "BULLISH CALLS",
+            "action_color": "#10b981",
+            "summary": "อดีตประธานสภาผู้แทนฯ สหรัฐ เข้าซื้อสัญญาสิทธิซื้อหุ้น (Call Options) ล่วงหน้าตามรอบการเติบโตของเซมิคอนดักเตอร์"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$3.2B (Top Holding)",
+            "action": "ACTIVE ACCUMULATE",
+            "action_color": "#10b981",
+            "summary": "ถือครองในฐานะหัวใจหลักของสภาพคล่องและโมเมนตัมตลาดหุ้นเทคโนโลยีสหรัฐ"
+        },
+        {
+            "name": "David Tepper",
+            "fund": "Appaloosa Management",
+            "icon": "🐎",
+            "shares_str": "$450M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ถือครองเกาะกระแสความต้องการชิป Blackwell และการขยายดาต้าเซ็นเตอร์ของกลุ่ม Hyperscalers"
+        }
+    ],
+    "AAPL": [
+        {
+            "name": "Warren Buffett",
+            "fund": "Berkshire Hathaway",
+            "icon": "🎩",
+            "shares_str": "300M หุ้น (~$70B)",
+            "action": "CORE ANCHOR (28%)",
+            "action_color": "#38bdf8",
+            "summary": "หุ้นอันดับ 1 ในพอร์ตลงทุนของบัฟเฟตต์ มองว่าเป็นสินค้าอุปโภคบริโภคระดับพรีเมียมที่มี Brand Loyalty และ Ecosystem แข็งแกร่งที่สุดในโลก"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$2.1B",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ถือครองสินทรัพย์สภาพคล่องสูงเพื่อเป็นแกนค้ำประกันพอร์ตฟอลิโอ"
+        },
+        {
+            "name": "Ray Dalio",
+            "fund": "Bridgewater Associates",
+            "icon": "🌊",
+            "shares_str": "$480M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "มอง Apple เป็นหุ้น Cash Cow ที่มีกระแสเงินสดอิสระมหาศาลและการซื้อหุ้นคืนสม่ำเสมอ"
+        }
+    ],
+    "MSFT": [
+        {
+            "name": "Bill Gates",
+            "fund": "Gates Foundation Trust",
+            "icon": "💻",
+            "shares_str": "$14.8B (33% ของพอร์ต)",
+            "action": "FOUNDATION CORE",
+            "action_color": "#38bdf8",
+            "summary": "สัดส่วนการถือครองหลักของมูลนิธิบิลและเมลินดา เกตส์ ขับเคลื่อนด้วยเงินปันผลและการเติบโตของ Azure"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$2.8B",
+            "action": "BUY (+12%)",
+            "action_color": "#10b981",
+            "summary": "เพิ่มสัดส่วนรับการนำ Generative AI เข้าไปผสานใน Microsoft 365 Copilot และบริการคลาวด์"
+        },
+        {
+            "name": "Stanley Druckenmiller",
+            "fund": "Duquesne Family Office",
+            "icon": "🦅",
+            "shares_str": "$520M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "เชื่อมั่นในความเป็นผู้นำด้านแพลตฟอร์มซอฟต์แวร์ระดับองค์กร"
+        }
+    ],
+    "AMZN": [
+        {
+            "name": "Warren Buffett",
+            "fund": "Berkshire Hathaway",
+            "icon": "🎩",
+            "shares_str": "10,000,000 หุ้น ($1.9B)",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ถือครองระยะยาวในฐานะผู้นำโครงสร้างพื้นฐานคลาวด์ระดับโลก (AWS) และอีคอมเมิร์ซ"
+        },
+        {
+            "name": "David Tepper",
+            "fund": "Appaloosa Management",
+            "icon": "🐎",
+            "shares_str": "$950M (Top 3 Holdings)",
+            "action": "CONVICTION BUY",
+            "action_color": "#10b981",
+            "summary": "เป็นหนึ่งในหุ้นที่เดวิด เทปเปอร์ มั่นใจสูงสุด โดยมองว่าอัตรากำไรจากการดำเนินงานของ AWS กำลังขยายตัว"
+        },
+        {
+            "name": "Chase Coleman",
+            "fund": "Tiger Global",
+            "icon": "🐯",
+            "shares_str": "$1.2B",
+            "action": "CORE POSITION",
+            "action_color": "#38bdf8",
+            "summary": "หุ้นหลักกลุ่ม Consumer Tech และ AI Infrastructure"
+        }
+    ],
+    "GOOGL": [
+        {
+            "name": "Bill Ackman",
+            "fund": "Pershing Square",
+            "icon": "💼",
+            "shares_str": "$2.1B (18% ของพอร์ต)",
+            "action": "TOP CONVICTION",
+            "action_color": "#10b981",
+            "summary": "เข้าซื้อก้อนใหญ่ช่วงตลาดกังวลเรื่อง AI แย่ง Search มองว่าคูเมือง (Moat) ของ Search และ YouTube ยังไร้คู่แข่ง"
+        },
+        {
+            "name": "David Tepper",
+            "fund": "Appaloosa Management",
+            "icon": "🐎",
+            "shares_str": "$880M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ชอบความแข็งแกร่งของงบการเงินและศักยภาพของ Google Cloud"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$2.2B",
+            "action": "BUY",
+            "action_color": "#10b981",
+            "summary": "เพิ่มสถานะเพื่อเกาะกระแสการเติบโตของโมเดล Gemini และฮาร์ดแวร์ TPU"
+        }
+    ],
+    "PLTR": [
+        {
+            "name": "Peter Thiel",
+            "fund": "Founders Fund / Strategic Whale",
+            "icon": "⚡",
+            "shares_str": "110M หุ้น (ผู้ร่วมก่อตั้ง)",
+            "action": "CO-FOUNDER ANCHOR",
+            "action_color": "#38bdf8",
+            "summary": "เสาหลักแห่ง Silicon Valley ผู้ร่วมก่อตั้ง Palantir และมีวิสัยทัศน์ด้านซอฟต์แวร์ความมั่นคงระดับชาติ"
+        },
+        {
+            "name": "Cathie Wood",
+            "fund": "ARK Invest",
+            "icon": "🚀",
+            "shares_str": "ถือใน ARKK & ARKW",
+            "action": "HIGH CONVICTION",
+            "action_color": "#10b981",
+            "summary": "มอง AIP (Artificial Intelligence Platform) เป็นซอฟต์แวร์ระดับปฏิวัติอุตสาหกรรมองค์กรเอกชนและกองทัพ"
+        },
+        {
+            "name": "Nancy Pelosi",
+            "fund": "US Congress Disclosures",
+            "icon": "🏛️",
+            "shares_str": "รายงานการถือครอง",
+            "action": "DISCLOSED POSITION",
+            "action_color": "#818cf8",
+            "summary": "มีรายงานการซื้อขายหุ้นเทคโนโลยีความมั่นคงและการป้องกันประเทศในสภาคองเกรส"
+        }
+    ],
+    "CRWD": [
+        {
+            "name": "Cathie Wood",
+            "fund": "ARK Invest",
+            "icon": "🚀",
+            "shares_str": "เพิ่ม 450,000 หุ้น",
+            "action": "DIP BUYER",
+            "action_color": "#10b981",
+            "summary": "เข้าช้อนซื้อทันทีช่วงราคาดิ่งจากเหตุการณ์ Windows Outage มองคูเมืองของแพลตฟอร์ม Falcon ยังยากจะหาใครแทน"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$420M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ถือครองในฐานะผู้นำตลาด Endpoint Security และ Cloud Workload Protection"
+        }
+    ],
+    "ISRG": [
+        {
+            "name": "Terry Smith",
+            "fund": "Fundsmith",
+            "icon": "🇬🇧",
+            "shares_str": "Top 10 Holding",
+            "action": "LONG COMPOUNDER",
+            "action_color": "#38bdf8",
+            "summary": "วอร์เรน บัฟเฟตต์ แห่งเกาะอังกฤษ เลือกลงทุนใน Intuitive Surgical จากโมเดลธุรกิจขายใบมีดและอุปกรณ์ผ่าตัดสิ้นเปลือง (Razor-and-Blade)"
+        },
+        {
+            "name": "Vanguard & BlackRock",
+            "fund": "Institutional Whales",
+            "icon": "🐋",
+            "shares_str": "รวมกว่า 16.5%",
+            "action": "PASSIVE ACCUMULATE",
+            "action_color": "#818cf8",
+            "summary": "ถือครองระยะยาวในฐานะผู้นำหุ่นยนต์ผ่าตัด Da Vinci ที่มีการใช้งานเพิ่มขึ้นทั่วโลก"
+        }
+    ],
+    "BAC": [
+        {
+            "name": "Warren Buffett",
+            "fund": "Berkshire Hathaway",
+            "icon": "🎩",
+            "shares_str": "> 10% ของบริษัท",
+            "action": "FAVORITE BANK",
+            "action_color": "#38bdf8",
+            "summary": "ธนาคารพาณิชย์ที่บัฟเฟตต์ชื่นชมและถือครองยาวนานที่สุด ให้ความไว้วางใจในการบริหารของ Brian Moynihan"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$850M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ถือครองรับประโยชน์จากโครงสร้างอัตราดอกเบี้ยและค่าธรรมเนียมวาณิชธนกิจ"
+        }
+    ],
+    "C": [
+        {
+            "name": "Warren Buffett",
+            "fund": "Berkshire Hathaway",
+            "icon": "🎩",
+            "shares_str": "55M หุ้น (~$3.2B)",
+            "action": "TURNAROUND BET",
+            "action_color": "#38bdf8",
+            "summary": "เข้าซื้อช่วงราคาเทรดต่ำกว่ามูลค่าทางบัญชี (Price-to-Book < 1.0) ดักการฟื้นตัวจากการปรับโครงสร้างของ Jane Fraser"
+        },
+        {
+            "name": "David Tepper",
+            "fund": "Appaloosa Management",
+            "icon": "🐎",
+            "shares_str": "$320M",
+            "action": "VALUE HOLD",
+            "action_color": "#10b981",
+            "summary": "หุ้นกลุ่มการเงินสาย Deep Value ที่มีอัปไซด์สูงเมื่อเศรษฐกิจฟื้นตัว"
+        }
+    ],
+    "JPM": [
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$850M",
+            "action": "LONG CONVICTION",
+            "action_color": "#38bdf8",
+            "summary": "ธนาคารที่ทรงอิทธิพลและมีงบดุลแข็งแกร่งที่สุดในสหรัฐ (Fortress Balance Sheet)"
+        },
+        {
+            "name": "Vanguard & BlackRock",
+            "fund": "Institutional Giants",
+            "icon": "🐋",
+            "shares_str": "รวม 22%",
+            "action": "CORE FINANCIAL",
+            "action_color": "#818cf8",
+            "summary": "แกนหลักของกลุ่มการเงินในทุกพอร์ตฟอลิโอสถาบัน"
+        }
+    ],
+    "VRT": [
+        {
+            "name": "Stanley Druckenmiller",
+            "fund": "Duquesne Family Office",
+            "icon": "🦅",
+            "shares_str": "ถือครองสัดส่วนสำคัญ",
+            "action": "AI INFRASTRUCTURE",
+            "action_color": "#10b981",
+            "summary": "เลือกลงทุนใน Vertiv เพื่อเกาะกระแสระบบระบายความร้อนดาต้าเซ็นเตอร์ด้วยของเหลว (Liquid Cooling) ที่ชิป AI รุ่นใหม่จำเป็นต้องใช้"
+        },
+        {
+            "name": "Chase Coleman",
+            "fund": "Tiger Global",
+            "icon": "🐯",
+            "shares_str": "$650M",
+            "action": "BUY (+25%)",
+            "action_color": "#10b981",
+            "summary": "หนึ่งในหุ้นโครงสร้างพื้นฐาน AI ที่สร้างผลตอบแทนโดดเด่นที่สุดในพอร์ต"
+        }
+    ],
+    "NOW": [
+        {
+            "name": "Chase Coleman",
+            "fund": "Tiger Global",
+            "icon": "🐯",
+            "shares_str": "$1.1B (Top SaaS)",
+            "action": "TOP 5 HOLDING",
+            "action_color": "#38bdf8",
+            "summary": "หุ้น Enterprise Software อันดับ 1 ของพอร์ต มีอัตราการต่อสัญญาและขยายการใช้งานสูงเป็นพิเศษ"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$780M",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "ผู้ให้บริการระบบดิจิทัลเวิร์กโฟลว์แก่องค์กรขนาดใหญ่ระดับ Fortune 500"
+        }
+    ],
+    "ARM": [
+        {
+            "name": "Masayoshi Son",
+            "fund": "SoftBank Group",
+            "icon": "📱",
+            "shares_str": "90% ของทั้งบริษัท",
+            "action": "MAJORITY OWNER",
+            "action_color": "#a78bfa",
+            "summary": "วาฬยักษ์ใหญ่ตัวจริง ถือครอง 90% ของบริษัท คุมสถาปัตยกรรมชิปสมาร์ทโฟน 99% ของโลกและกำลังขยายเข้าสู่ดาต้าเซ็นเตอร์"
+        },
+        {
+            "name": "Cathie Wood",
+            "fund": "ARK Invest",
+            "icon": "🚀",
+            "shares_str": "ถือใน ARKW & ARKQ",
+            "action": "EDGE AI BET",
+            "action_color": "#10b981",
+            "summary": "มองว่าการประมวลผล AI บนสมาร์ทโฟนและอุปกรณ์พกพาจำเป็นต้องใช้สถาปัตยกรรมประหยัดพลังงานของ Arm"
+        }
+    ],
+    "MU": [
+        {
+            "name": "David Tepper",
+            "fund": "Appaloosa Management",
+            "icon": "🐎",
+            "shares_str": "$620M",
+            "action": "CYCLICAL LEADER",
+            "action_color": "#10b981",
+            "summary": "เดิมพันรอบวัฏจักรชิปหน่วยความจำ HBM (High Bandwidth Memory) ที่กำลังขาดแคลนในตลาด AI"
+        },
+        {
+            "name": "Stanley Druckenmiller",
+            "fund": "Duquesne Family Office",
+            "icon": "🦅",
+            "shares_str": "ถือครองตามรอบวัฏจักร",
+            "action": "MEMORY SUPERCYCLE",
+            "action_color": "#38bdf8",
+            "summary": "เล่นรอบการฟื้นตัวของราคาชิป DRAM และ NAND"
+        }
+    ],
+    "VST": [
+        {
+            "name": "David Tepper",
+            "fund": "Appaloosa Management",
+            "icon": "🐎",
+            "shares_str": "$480M",
+            "action": "AI POWER PLAY",
+            "action_color": "#10b981",
+            "summary": "ลงทุนใน Vistra เพื่อรับประโยชน์จากความต้องการพลังงานไฟฟ้ามหาศาลของดาต้าเซ็นเตอร์ AI และโรงไฟฟ้านิวเคลียร์"
+        },
+        {
+            "name": "Dan Loeb",
+            "fund": "Third Point",
+            "icon": "⚡",
+            "shares_str": "Top 10 Holding",
+            "action": "NUCLEAR CONVICTION",
+            "action_color": "#10b981",
+            "summary": "มองการทำสัญญาขายไฟฟ้าระยะยาวกับบริษัทเทคโนโลยียักษ์ใหญ่เป็นแหล่งสร้างกระแสเงินสดที่เติบโตสูง"
+        }
+    ],
+    "APP": [
+        {
+            "name": "Steve Cohen",
+            "fund": "Point72 Asset Management",
+            "icon": "🎯",
+            "shares_str": "ถือครองสัดส่วนหลัก",
+            "action": "AI ADVERTISING",
+            "action_color": "#10b981",
+            "summary": "ได้รับแรงขับเคลื่อนจากโมเดล AI AXON 2.0 ในการจับคู่โฆษณาเกมและอีคอมเมิร์ซที่สร้างรายได้โตระเบิด"
+        },
+        {
+            "name": "Ken Griffin",
+            "fund": "Citadel Advisors",
+            "icon": "🏰",
+            "shares_str": "$350M",
+            "action": "BUY",
+            "action_color": "#10b981",
+            "summary": "หนึ่งในหุ้นซอฟต์แวร์ที่ทำผลงานราคาพุ่งแรงที่สุดแห่งปี"
+        }
+    ],
+    "ABNB": [
+        {
+            "name": "Chase Coleman",
+            "fund": "Tiger Global",
+            "icon": "🐯",
+            "shares_str": "$580M",
+            "action": "TRAVEL COMPOUNDER",
+            "action_color": "#38bdf8",
+            "summary": "แพลตฟอร์มที่พักระดับโลกที่ไร้ต้นทุนสินทรัพย์ (Asset-Light) และมีกระแสเงินสดอิสระสูง"
+        },
+        {
+            "name": "Baillie Gifford",
+            "fund": "Scottish Mortgage",
+            "icon": "🏰",
+            "shares_str": "ถือครองระยะยาว",
+            "action": "HOLD",
+            "action_color": "#38bdf8",
+            "summary": "เชื่อมั่นในการขยายตัวของเทรนด์การทำงานทางไกลและการท่องเที่ยวระยะยาว"
+        }
+    ],
+    "MNST": [
+        {
+            "name": "Warren Buffett",
+            "fund": "Berkshire Hathaway (via Coca-Cola)",
+            "icon": "🎩",
+            "shares_str": "พันธมิตรโคคา-โคล่า (19.5%)",
+            "action": "BEVERAGE MOAT",
+            "action_color": "#38bdf8",
+            "summary": "ได้รับประโยชน์จากเครือข่ายกระจายสินค้าทั่วโลกของ Coca-Cola และมีอัตรากำไรขั้นต้นสูงกว่า 50%"
+        },
+        {
+            "name": "Vanguard & BlackRock",
+            "fund": "Institutional Whales",
+            "icon": "🐋",
+            "shares_str": "รวม 17.5%",
+            "action": "DEFENSIVE COMPOUND",
+            "action_color": "#818cf8",
+            "summary": "หุ้นเครื่องดื่มชูกำลังที่มีสถิติผลตอบแทนทบต้นชนะตลาดมาอย่างต่อเนื่อง"
+        }
+    ],
+}
+
+
+SUPER_INVESTORS_AS_OF = "ข้อมูลรวบรวมเอง ยังไม่ได้ยืนยันกับ SEC 13F ล่าสุด ใช้เป็นข้อมูลอ้างอิงเท่านั้น"
+
+
+def get_super_investors(ticker: str) -> List[Dict[str, Any]]:
+    """
+    Returns curated super investors, famous billionaires, and notable whales holding the stock.
+    """
+    return [{**w, "as_of": SUPER_INVESTORS_AS_OF} for w in _curated_super_investors(ticker)]
+
+
+def _curated_super_investors(ticker: str) -> List[Dict[str, Any]]:
+    if ticker in SUPER_INVESTORS_DATA:
+        return SUPER_INVESTORS_DATA[ticker]
+
+    return [
+        {
+            "name": "Vanguard Group",
+            "fund": "Passive & Index Whales",
+            "icon": "🐋",
+            "shares_str": "ผู้ถือหุ้นสถาบันรายใหญ่ (~8-10%)",
+            "action": "PASSIVE HOLD",
+            "action_color": "#38bdf8",
+            "summary": f"ถือครองหุ้น {ticker} ผ่านกองทุนดัชนีชั้นนำระดับโลกและ ETF อิงดัชนี"
+        },
+        {
+            "name": "BlackRock (iShares)",
+            "fund": "Institutional Asset Management",
+            "icon": "🏰",
+            "shares_str": "ผู้ถือหุ้นสถาบันรายใหญ่ (~6-8%)",
+            "action": "INDEX FLOW",
+            "action_color": "#818cf8",
+            "summary": f"ผู้จัดการกองทุนที่ใหญ่ที่สุดในโลก ถือครองหุ้น {ticker} เป็นสินทรัพย์อ้างอิงของสถาบันทั่วโลก"
+        },
+        {
+            "name": "State Street Global Advisors",
+            "fund": "SPDR ETF Whales",
+            "icon": "🌐",
+            "shares_str": "สถาบันชั้นนำ (~4-5%)",
+            "action": "ACCUMULATE",
+            "action_color": "#10b981",
+            "summary": f"ถือครองกระจายความเสี่ยงเพื่อสะท้อนผลการดำเนินงานของกลุ่มอุตสาหกรรมในตลาดหุ้นสหรัฐ"
+        }
+    ]
 
 
 def compute_ai_confluence_signals(
@@ -494,7 +1576,10 @@ def compute_ai_confluence_signals(
     current_st_trend: str,
     current_rsi: float,
     current_macd_hist: float,
-    atr_val: float
+    atr_val: float,
+    cdc_zone: Optional[str] = None,
+    elliott_wave: Optional[Dict[str, Any]] = None,
+    pivots: Optional[Dict[str, Any]] = None
 ) -> List[Dict[str, Any]]:
     """
     AI Multi-Technical Confluence Decision Engine.
@@ -731,6 +1816,36 @@ def compute_ai_confluence_signals(
     if pattern and pattern.get("target") and pattern.get("upside_pct", 0) > 5:
         curr_score += 1
         curr_reasons.append(f"เป้าหมาย Pattern: โครงสร้าง {pattern['name']} เปิด Upside +{pattern.get('upside_pct', 0)}%")
+
+    if cdc_zone == "green":
+        curr_score += 1
+        curr_reasons.append("สัญญาณ CDC ActionZone: อยู่ใน โซนเขียว (Bullish Trend / ถือรันเทรนด์ ห้ามขายหมู)")
+    elif cdc_zone == "blue":
+        curr_score += 1
+        curr_reasons.append("สัญญาณ CDC ActionZone: โซนฟ้า (Bullish Pullback ย่อตัวทดสอบแนวรับเพื่อไปต่อ)")
+    elif cdc_zone == "orange":
+        curr_reasons.append("สัญญาณ CDC ActionZone: โซนส้ม (Bearish Rebound ระวังเด้งเพื่อลงต่อ)")
+    elif cdc_zone == "red":
+        curr_reasons.append("สัญญาณ CDC ActionZone: โซนแดง (Bearish Trend แนะนำถือเงินสด)")
+
+    if elliott_wave and elliott_wave.get("detected"):
+        ew_type = elliott_wave.get("type", "")
+        ew_target = elliott_wave.get("target") or 0.0
+        if ew_type in BULLISH_DEVELOPING_WAVE_TYPES:
+            curr_score += 1
+            curr_reasons.append(f"โครงสร้าง Elliott Wave: กำลังเคลื่อนที่ใน {elliott_wave.get('current_wave', 'Impulse Wave')} สู่เป้าหมาย ${ew_target:.2f}")
+        else:
+            curr_reasons.append(f"คำเตือน Elliott Wave: {elliott_wave.get('current_wave', ew_type)} (ไม่นับเป็นสัญญาณซื้อ)")
+
+    if pivots:
+        p_r1 = pivots.get("r1", 0.0)
+        p_s1 = pivots.get("s1", 0.0)
+        if p_r1 > 0 and curr_close >= p_r1:
+            curr_score += 1
+            curr_reasons.append(f"ระดับราคา Pivot: ยืนเหนือแนวต้าน R1 (${p_r1:.2f}) เปลี่ยนเป็นแนวรับใหม่")
+        elif p_s1 > 0 and p_s1 <= curr_close <= p_s1 * 1.035:
+            curr_score += 1
+            curr_reasons.append(f"ระดับราคา Pivot: ดีดตัวทดสอบแนวรับสำคัญ S1 (${p_s1:.2f})")
 
     curr_score = min(5, max(1, curr_score))
 
@@ -1040,7 +2155,14 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     # 15. Classical Chart Patterns detection
     pattern = detect_chart_patterns(candles)
 
-    # 16. AI Multi-Technical Confluence Decision Engine
+    # 16. Elliott Wave Impulse Detection (Intermediate Cycle & All-Time Macro)
+    elliott_wave = detect_elliott_wave(candles, is_macro=False)
+    elliott_wave_macro = detect_elliott_wave(candles, is_macro=True)
+
+    # 17. CDC ActionZone V3 2020 (Uncle Chaloke)
+    cdc_actionzone = compute_cdc_actionzone(candles)
+
+    # 18. AI Multi-Technical Confluence Decision Engine
     ai_signals = compute_ai_confluence_signals(
         candles=candles,
         fibo_levels=fibo_levels,
@@ -1049,7 +2171,10 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         current_st_trend="BULLISH" if in_uptrend else "BEARISH",
         current_rsi=round(rsi_val, 1),
         current_macd_hist=round(hist, 2),
-        atr_val=atr14_val
+        atr_val=atr14_val,
+        cdc_zone=cdc_actionzone["zone"],
+        elliott_wave=elliott_wave,
+        pivots={"pivot": p_pivot, "r1": r1, "s1": s1, "r2": r2, "s2": s2}
     )
 
     return {
@@ -1112,7 +2237,11 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         },
         "latest_rsi": round(rsi_val, 1),
         "pattern": pattern,
-        "ai_signals": ai_signals
+        "elliott_wave": elliott_wave,
+        "elliott_wave_macro": elliott_wave_macro,
+        "ai_signals": ai_signals,
+        "earnings_history": detect_earnings_history(candles),
+        "cdc_actionzone": cdc_actionzone
     }
 
 
@@ -1132,6 +2261,10 @@ def save_candles_cache(cache: Dict[str, Any]):
         json.dump(cache, f, ensure_ascii=False)
 
 
+# Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
+INDICATOR_SCHEMA_VERSION = 2
+
+
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
     """
     Load or fetch chart payloads for all given tickers.
@@ -1148,11 +2281,8 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
             or not entry
             or (now_ts - entry.get("timestamp", 0) > CACHE_TTL_SECONDS)
             or not entry.get("candles")
-            or "inception_date" not in entry
-            or "ath" not in entry
             or not entry.get("full_history")
-            or "ai_signals" not in entry
-            or (entry.get("pattern") and "psychology" not in entry["pattern"])
+            or entry.get("schema_version") != INDICATOR_SCHEMA_VERSION
         ):
             tickers_to_fetch.append(t)
 
@@ -1175,6 +2305,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
                 chart_data = compute_fibo_and_indicators(candles)
                 chart_data["timestamp"] = fetched_ts
                 chart_data["full_history"] = True
+                chart_data["schema_version"] = INDICATOR_SCHEMA_VERSION
                 return t, chart_data
             except Exception as e:
                 return t, None
@@ -1225,5 +2356,10 @@ def compact_charts_for_page(cache: Dict[str, Any], tickers: Iterable[str]) -> Di
                 m["volume"] += c["volume"]
             else:
                 monthly.append(dict(c))
-        out[t] = {**entry, "candles": monthly + candles[cut:]}
+        entry_copy = dict(entry)
+        if "cdc_actionzone" in entry_copy and isinstance(entry_copy["cdc_actionzone"], dict):
+            cdc = dict(entry_copy["cdc_actionzone"])
+            cdc.pop("candle_colors", None)
+            entry_copy["cdc_actionzone"] = cdc
+        out[t] = {**entry_copy, "candles": monthly + candles[cut:]}
     return out

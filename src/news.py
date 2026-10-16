@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 CACHE_FILE = Path(__file__).resolve().parent.parent / "data" / ".news_cache.json"
 CACHE_TTL_SECONDS = 1800  # 30 minutes
@@ -41,7 +41,9 @@ BEARISH_KEYWORDS = {
     "delays", "delayed", "tumble", "tumbles", "tumbled", "plunge", "plunges", "plunged",
     "sink", "sinks", "sank", "headwind", "struggle", "struggles", "struggling", "underperform",
     "penalty", "record low", "record lows", "52-week low", "dip", "pullback", "narrow range", "selloff",
-    "reject", "rejects", "rejected", "rejection", "declines to approve"
+    "reject", "rejects", "rejected", "rejection", "declines to approve", "shares lower", "trades lower", "trading lower", "moves lower",
+    "closes lower", "closed lower", "slump", "slumps",
+    "retreat", "retreats", "crash", "plummets"
 }
 
 BULLISH_KEYWORDS = {
@@ -90,11 +92,12 @@ def _get_from_cache(ticker: str, max_items: int) -> Optional[List[Dict[str, str]
         return articles
 
 
-def _update_cache(ticker: str, articles: List[Dict[str, str]], max_items: int) -> None:
+def _update_cache(ticker: str, articles: List[Dict[str, str]], max_items: int, keep_timestamp: bool = False) -> None:
     with _CACHE_LOCK:
         cache = _load_cache()
+        cached_at = cache.get(ticker, {}).get("cached_at") if keep_timestamp else None
         cache[ticker] = {
-            "cached_at": time.time(),
+            "cached_at": cached_at or time.time(),
             "max_items": max_items,
             "articles": articles
         }
@@ -123,9 +126,11 @@ def classify_sentiment(title: str) -> str:
     """
     Classify a headline as 'bullish', 'bearish', or 'neutral' using whole-word regex matching.
     """
-    title = _NEUTRAL_PHRASE_REGEX.sub(" ", title)
-    is_bear = bool(_BEAR_REGEX.search(title))
-    is_bull = bool(_BULL_REGEX.search(title) or _AI_REGEX.search(title))
+    title_clean = _NEUTRAL_PHRASE_REGEX.sub(" ", title)
+    is_bear = bool(_BEAR_REGEX.search(title_clean))
+    is_bull = bool(_BULL_REGEX.search(title_clean))
+    if not is_bear and not is_bull and _AI_REGEX.search(title_clean):
+        is_bull = True
 
     if is_bear and not is_bull:
         return "bearish"
@@ -136,6 +141,161 @@ def classify_sentiment(title: str) -> str:
     return "neutral"
 
 
+def translate_texts_to_thai(texts: List[str]) -> List[str]:
+    """Translates headlines to Thai in one Google Translate request. Returns the originals on any failure."""
+    if not texts:
+        return []
+    joined = "\n".join(t.replace("\n", " ") for t in texts)
+    try:
+        import http.client
+        conn = http.client.HTTPSConnection("translate.googleapis.com", timeout=3.5)
+        path = f"/translate_a/single?client=gtx&sl=en&tl=th&dt=t&q={urllib.parse.quote(joined)}"
+        conn.request("GET", path, headers={"User-Agent": "Mozilla/5.0"})
+        resp = conn.getresponse()
+        body = resp.read() if resp.status == 200 else b""
+        conn.close()
+        if body:
+            data = json.loads(body.decode("utf-8"))
+            translated = "".join(part[0] for part in data[0] if part[0]).split("\n")
+            if len(translated) == len(texts):
+                return [th.strip() or en for th, en in zip(translated, texts)]
+    except Exception:
+        pass
+    return list(texts)
+
+
+def translate_text_to_thai(text: str) -> str:
+    """Translates a single headline to Thai with fallback to the original text."""
+    return translate_texts_to_thai([text])[0] if text else ""
+
+
+def _enrich_articles(articles: List[Dict[str, str]], ticker: str) -> bool:
+    """Adds Thai title and synthesized guidance to articles missing them. Returns True if any changed."""
+    missing = [a for a in articles if "summary_th" not in a or "title_th" not in a]
+    if not missing:
+        return False
+    need_translation = [a for a in missing if not a.get("title_th")]
+    for a, th in zip(need_translation, translate_texts_to_thai([a.get("title", "") for a in need_translation])):
+        a["title_th"] = th
+    for a in missing:
+        syn = synthesize_news_summary(a.get("title", ""), a.get("title_th", ""), a.get("source", "News"), ticker, a.get("sentiment", "neutral"))
+        for key in ("title_th", "summary_th", "impact_th", "action_th", "topic"):
+            a[key] = syn[key]
+    return True
+
+
+_TOPIC_RULES = [
+    (("beat", "beats", "earnings", "q1", "q2", "q3", "q4", "revenue", "profit", "miss", "misses", "estimate", "estimates", "results"),
+     "รายงานผลประกอบการและตัวเลขทางการเงิน",
+     "การรายงานงบการเงินและตัวเลขกำไรต่อหุ้น (EPS) เทียบกับที่นักวิเคราะห์ Wall Street คาดการณ์"),
+    (("underpricing", "undervalued", "overvalued", "valuation", "cheap", "fair value", "discount"),
+     "การประเมินมูลค่าหุ้น (Stock Valuation & Fair Value)",
+     "การเปรียบเทียบราคาตลาดกับมูลค่าพื้นฐานที่แท้จริง (Intrinsic Value) ของบริษัท"),
+    (("ai", "artificial intelligence", "nvidia", "datacenter", "data center", "cooling", "chip", "chips", "semiconductor", "cloud"),
+     "เทคโนโลยี AI และการขยายโครงสร้างพื้นฐานดาต้าเซ็นเตอร์",
+     "คลื่นการลงทุนโครงสร้างพื้นฐานระบบประมวลผล AI และชิปประมวลผลยุคใหม่"),
+    (("upgrade", "upgrades", "downgrade", "downgrades", "price target", "analyst", "analysts", "buy rating", "outperform", "wall street"),
+     "มุมมองและอันดับความน่าเชื่อถือจากนักวิเคราะห์ Wall Street",
+     "การปรับเป้าหมายราคาและคำแนะนำการลงทุนของสถาบันการเงินชั้นนำ"),
+    (("fda", "drug", "drugs", "trial", "trials", "approval", "treatment", "patent", "clinical", "mounjaro", "zepbound"),
+     "การอนุมัติยา นวัตกรรมชีวภาพ และการทดลองทางคลินิก",
+     "ความคืบหน้าของยารักษาโรคสำคัญและสิทธิบัตรยาที่มีตลาดรองรับขนาดใหญ่"),
+    (("dividend", "dividends", "buyback", "buybacks", "cash flow", "payout"),
+     "ผลตอบแทนเงินปันผลและการซื้อหุ้นคืน",
+     "ความแข็งแกร่งของกระแสเงินสดอิสระ (FCF) และการส่งมอบผลตอบแทนสู่ผู้ถือหุ้น"),
+    (("lawsuit", "antitrust", "probe", "sec", "investigation", "tariff", "tariffs", "dispute"),
+     "ประเด็นกฎหมาย นโยบายภาษีศุลกากร และการกำกับดูแล",
+     "ความเสี่ยงด้านกฎหมายการค้า การแข่งขันทางการค้า และการตรวจสอบของหน่วยงานรัฐ"),
+    (("etf", "etfs", "index", "s&p 500", "spy", "voo", "fund", "funds"),
+     "กระแสเงินทุนดัชนีและการลงทุนสถาบัน",
+     "การไหลเข้าออกของเม็ดเงินกองทุนดัชนี Passive และการปรับสมดุลพอร์ตของสถาบัน"),
+]
+_TOPIC_REGEXES = [
+    (re.compile(r'(?<!\w)(' + '|'.join(re.escape(k) for k in keys) + r')(?!\w)', re.IGNORECASE), topic, context)
+    for keys, topic, context in _TOPIC_RULES
+]
+
+
+def classify_topic(title: str) -> Tuple[str, str]:
+    """Returns (topic, context) for a headline using whole-word keyword matching."""
+    for regex, topic, context in _TOPIC_REGEXES:
+        if regex.search(title):
+            return topic, context
+    return "ผลการดำเนินงานและทิศทางธุรกิจ", "การดำเนินงานตามแผนยุทธศาสตร์และการแข่งขันในอุตสาหกรรม"
+
+
+def synthesize_news_summary(title_en: str, title_th: str, source: str, ticker: str, sentiment: str) -> Dict[str, str]:
+    """Generates detailed Thai financial summary, market impact, and actionable strategy."""
+    topic, specific_context = classify_topic(title_en)
+
+    clean_src = source or "สำนักข่าวการเงินต่างประเทศ"
+    th_title_clean = title_th or title_en
+
+    if sentiment == "bullish":
+        summary_th = (
+            f"• สำนักข่าว {clean_src} รายงานข่าวเชิงบวกต่อ {ticker} ในประเด็น '{th_title_clean}'.\n"
+            f"• บริบทและเนื้อหาสำคัญ: ข่าวนี้เกี่ยวข้องกับ {specific_context} ซึ่งสะท้อนโมเมนตัมธุรกิจที่ขยายตัวได้ดีกว่าค่าเฉลี่ยอุตสาหกรรม.\n"
+            f"• นัยต่อปัจจัยพื้นฐาน: สนับสนุนการเติบโตของรายได้ (Top-line Growth) และช่วยรักษาอัตรากำไรขั้นต้นให้อยู่ในระดับสูง.\n"
+            f"• พฤติกรรมเม็ดเงินสถาบัน: เพิ่มความน่าสนใจให้แก่กองทุนสถาบันในการพิจารณาเพิ่มน้ำหนักการลงทุน (Accumulation) ในช่วงที่ราคาพักตัว."
+        )
+        impact_th = (
+            f"🟢 เชิงบวกต่อราคาหุ้น (Bullish Catalyst): ข่าวนี้เป็นปัจจัยขับเคลื่อนเชิงจิตวิทยาและปัจจัยพื้นฐาน ช่วยหนุนโมเมนตัมราคาให้มีโอกาสทดสอบแนวต้านถัดไป "
+            f"และลดโอกาสการปรับฐานลึกในระยะสั้น."
+        )
+        action_th = (
+            f"💡 แผนกลยุทธ์การเทรด: หากราคาหุ้นย่อตัวลงมาทดสอบแนวรับสำคัญ เช่น เส้นค่าเฉลี่ย EMA 21/50 หรือแนวรับ Fibo 61.8% ถือเป็นจังหวะทยอยสะสม (DCA) "
+            f"ไม่แนะนำให้ไล่ราคาเมื่อแท่งเทียนอยู่ห่างจากแนวรับเกิน 1.5 ATR."
+        )
+    elif sentiment == "bearish":
+        summary_th = (
+            f"• สำนักข่าว {clean_src} รายงานปัจจัยกดดันต่อ {ticker} ในประเด็น '{th_title_clean}'.\n"
+            f"• บริบทและเนื้อหาสำคัญ: ข่าวนี้ระบุถึงประเด็น {specific_context} ที่อาจก่อให้เกิดอุปสรรคชั่วคราวต่อการดำเนินงาน.\n"
+            f"• นัยต่อปัจจัยพื้นฐาน: ตลาดมีความกังวลต่อแรงกดดันด้านต้นทุน การชะลอตัวของคำสั่งซื้อ หรือความเสี่ยงด้านกฎระเบียบที่อาจกระทบต่อผลกำไร.\n"
+            f"• พฤติกรรมเม็ดเงินสถาบัน: มีแนวโน้มที่ผู้จัดการกองทุนจะชะลอการเข้าซื้อเพื่อประเมินสถานการณ์ หรือทยอยขายทำกำไรลดความเสี่ยงบางส่วน."
+        )
+        impact_th = (
+            f"🔴 เชิงลบต่อราคาหุ้น (Bearish Risk): อาจสร้างแรงกระเพื่อมเชิงลบในระยะสั้น ส่งผลให้ราคาหุ้นเผชิญแรงขายทำกำไรหรือพักฐานลงมาทดสอบแนวรับล่าง."
+        )
+        action_th = (
+            f"💡 แผนกลยุทธ์การเทรด: ชะลอการเข้าซื้อก้อนใหญ่ (Wait & See) ควรรอให้แรงขายชะลอตัวและราคาสร้างฐานแนวรับที่มั่นคง "
+            f"พร้อมตั้งระดับ Stop Loss หรือจุด Invalidation ตามกรอบทางเทคนิคอย่างเคร่งครัด."
+        )
+    elif sentiment == "mixed":
+        summary_th = (
+            f"• สำนักข่าว {clean_src} รายงานข้อมูลเชิงเปรียบเทียบสองมุมมองต่อ {ticker} ในประเด็น '{th_title_clean}'.\n"
+            f"• บริบทและเนื้อหาสำคัญ: ครอบคลุมประเด็น {specific_context} ซึ่งมีทั้งปัจจัยหนุนการเติบโตและปัจจัยความไม่แน่นอนที่ต้องเฝ้าระวัง.\n"
+            f"• นัยต่อปัจจัยพื้นฐาน: ศักยภาพการเติบโตระยะยาวยังคงแข็งแกร่ง แต่มูลค่าหุ้นในระยะสั้นเริ่มสะท้อนความคาดหวังไปค่อนข้างมาก.\n"
+            f"• พฤติกรรมเม็ดเงินสถาบัน: กองทุนมีแนวโน้มรอดูรายงานผลประกอบการและตัวเลขเศรษฐกิจเพิ่มเติมก่อนตัดสินใจเข้าสถานะใหญ่."
+        )
+        impact_th = (
+            f"🟡 ผสมผสานสองด้าน (Mixed / Neutral Volatility): คาดว่าราคาหุ้นจะแกว่งตัวในกรอบ Sideways เพื่อสร้างฐานราคาใหม่."
+        )
+        action_th = (
+            f"💡 แผนกลยุทธ์การเทรด: เน้นการเทรดตามกรอบแนวรับแนวต้าน (Range Trading) แบ่งไม้ซื้อสะสมที่กรอบล่าง และขายทำกำไรบางส่วนที่กรอบบน."
+        )
+    else:
+        summary_th = (
+            f"• สำนักข่าว {clean_src} รายงานสถานการณ์ทั่วไปของ {ticker} ในประเด็น '{th_title_clean}'.\n"
+            f"• บริบทและเนื้อหาสำคัญ: ติดตามพัฒนาการในหมวด {specific_context} ซึ่งเป็นการดำเนินงานตามแผนธุรกิจปกติ.\n"
+            f"• นัยต่อปัจจัยพื้นฐาน: โครงสร้างพื้นฐานของธุรกิจยังคงดำเนินไปอย่างมีเสถียรภาพ ไม่พบการเปลี่ยนแปลงเชิงโครงสร้างที่มีนัยสำคัญ.\n"
+            f"• พฤติกรรมเม็ดเงินสถาบัน: ปริมาณการซื้อขายยังคงเคลื่อนไหวตามสภาวะตลาดโดยรวม."
+        )
+        impact_th = (
+            f"⚪ เป็นกลาง (Neutral Stance): ไม่ได้สร้างแรงกระตุ้นรุนแรงต่อทิศทางราคา ทิศทางยังคงเคลื่อนไหวตามกรอบเทคนิคและเส้นแนวโน้มเดิม."
+        )
+        action_th = (
+            f"💡 แผนกลยุทธ์การเทรด: อ้างอิงสัญญาณเทคนิคจากเส้นค่าเฉลี่ย EMA และระดับ Pivot Points ในการตัดสินใจลงทุนตามรอบปกติ."
+        )
+
+    return {
+        "title_th": title_th or title_en,
+        "summary_th": summary_th,
+        "impact_th": impact_th,
+        "action_th": action_th,
+        "topic": topic
+    }
+
+
 def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[Dict[str, str]]:
     """
     Fetch the latest market news and catalysts for a specific stock ticker with sentiment tags.
@@ -143,6 +303,8 @@ def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[
     clean_ticker = ticker.strip().upper()
     cached = _get_from_cache(clean_ticker, max_items)
     if cached is not None:
+        if _enrich_articles(cached, clean_ticker):
+            _update_cache(clean_ticker, cached, max_items, keep_timestamp=True)
         return cached[:max_items]
 
     search_query = TICKER_SEARCH_MAP.get(clean_ticker, f"{clean_ticker} stock")
@@ -186,6 +348,7 @@ def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[
                     "sentiment": sentiment
                 })
 
+        _enrich_articles(articles, clean_ticker)
         _update_cache(clean_ticker, articles, max_items)
 
     except Exception:

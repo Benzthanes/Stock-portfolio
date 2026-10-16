@@ -117,5 +117,48 @@ class OutlookTest(unittest.TestCase):
         self.assertNotIn("วัน", get_forward_outlook("NOK", {}, {}, None)["catalyst_timeline"][0]["period"])
 
 
+class LowerKeywordTest(unittest.TestCase):
+    def test_price_cut_and_rate_cut_are_not_bearish(self):
+        self.assertEqual(news.classify_sentiment("Apple to lower iPhone prices in China"), "neutral")
+        self.assertEqual(news.classify_sentiment("Fed expected to lower rates, stocks rally"), "bullish")
+
+    def test_shares_lower_is_bearish(self):
+        self.assertEqual(news.classify_sentiment("Tesla shares lower after delivery report"), "bearish")
+
+
+class TopicTest(unittest.TestCase):
+    def test_substrings_do_not_trigger_topics(self):
+        default_topic = "ผลการดำเนินงานและทิศทางธุรกิจ"
+        self.assertEqual(news.classify_topic("Analysts said retail demand steady")[0], "มุมมองและอันดับความน่าเชื่อถือจากนักวิเคราะห์ Wall Street")
+        self.assertEqual(news.classify_topic("CEO said retail sector demand holds")[0], default_topic)
+        self.assertEqual(news.classify_topic("Fundamental shift in second half")[0], default_topic)
+
+    def test_whole_word_ai_topic(self):
+        self.assertEqual(news.classify_topic("Microsoft expands AI datacenter push")[0], "เทคโนโลยี AI และการขยายโครงสร้างพื้นฐานดาต้าเซ็นเตอร์")
+
+
+class TranslateBatchTest(unittest.TestCase):
+    def test_falls_back_to_originals_on_network_error(self):
+        with mock.patch("http.client.HTTPSConnection", side_effect=OSError("blocked")) as conn:
+            self.assertEqual(news.translate_texts_to_thai(["A", "B", "C"]), ["A", "B", "C"])
+            self.assertEqual(conn.call_count, 1)
+
+    def test_cache_backfill_is_persisted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cache_file = Path(tmp) / "news_cache.json"
+            import time as _time
+            cached_at = _time.time() - 60
+            cache_file.write_text(json.dumps({"AAA": {"cached_at": cached_at, "max_items": 4, "articles": [
+                {"title": "Old headline", "source": "X", "sentiment": "neutral"}
+            ]}}), encoding="utf-8")
+            with mock.patch.object(news, "CACHE_FILE", cache_file), \
+                    mock.patch.object(news, "translate_texts_to_thai", side_effect=lambda ts: ["หัวข้อเก่า" for _ in ts]):
+                articles = news.fetch_stock_news("AAA", max_items=4)
+            saved = json.loads(cache_file.read_text(encoding="utf-8"))["AAA"]
+            self.assertEqual(articles[0]["title_th"], "หัวข้อเก่า")
+            self.assertEqual(saved["articles"][0]["title_th"], "หัวข้อเก่า")
+            self.assertEqual(saved["cached_at"], cached_at)
+
+
 if __name__ == "__main__":
     unittest.main()
