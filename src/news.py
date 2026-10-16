@@ -5,21 +5,24 @@ Includes sentiment classification (Bullish vs Bearish), parallel batch fetching,
 """
 
 import json
+import os
 import re
+import sys
+import tempfile
 import threading
 import time
-import urllib.request
+import urllib.parse
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from src.http import HttpError, http_get
+
 CACHE_FILE = Path(__file__).resolve().parent.parent / "data" / ".news_cache.json"
 CACHE_TTL_SECONDS = 1800  # 30 minutes
 _CACHE_LOCK = threading.Lock()
-
-import urllib.parse
 
 TICKER_SEARCH_MAP = {
     "APP": "AppLovin stock OR advertising",
@@ -43,7 +46,8 @@ BEARISH_KEYWORDS = {
     "penalty", "record low", "record lows", "52-week low", "dip", "pullback", "narrow range", "selloff",
     "reject", "rejects", "rejected", "rejection", "declines to approve", "shares lower", "trades lower", "trading lower", "moves lower",
     "closes lower", "closed lower", "slump", "slumps",
-    "retreat", "retreats", "crash", "plummets"
+    "retreat", "retreats", "crash", "plummets",
+    "fear", "fears", "bubble", "charges", "charged", "sued", "recall", "layoffs", "cuts guidance"
 }
 
 BULLISH_KEYWORDS = {
@@ -57,7 +61,6 @@ BULLISH_KEYWORDS = {
 
 _BEAR_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BEARISH_KEYWORDS) + r')\b', re.IGNORECASE)
 _BULL_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BULLISH_KEYWORDS) + r')\b(?!\s+lows?\b)', re.IGNORECASE)
-_AI_REGEX = re.compile(r'\b(ai|artificial intelligence)\b', re.IGNORECASE)
 _NEUTRAL_PHRASE_REGEX = re.compile(r'\bweight[- ]loss\b', re.IGNORECASE)
 
 
@@ -75,9 +78,16 @@ def _load_cache() -> Dict[str, Any]:
 def _save_cache(cache: Dict[str, Any]) -> None:
     try:
         CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
-        CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+        fd, tmp = tempfile.mkstemp(dir=CACHE_FILE.parent, prefix=CACHE_FILE.name, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(cache, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, CACHE_FILE)
+        except BaseException:
+            os.unlink(tmp)
+            raise
+    except Exception as e:
+        print(f"[news] cache write failed: {e}", file=sys.stderr)
 
 
 def _get_from_cache(ticker: str, max_items: int) -> Optional[List[Dict[str, str]]]:
@@ -129,8 +139,6 @@ def classify_sentiment(title: str) -> str:
     title_clean = _NEUTRAL_PHRASE_REGEX.sub(" ", title)
     is_bear = bool(_BEAR_REGEX.search(title_clean))
     is_bull = bool(_BULL_REGEX.search(title_clean))
-    if not is_bear and not is_bull and _AI_REGEX.search(title_clean):
-        is_bull = True
 
     if is_bear and not is_bull:
         return "bearish"
@@ -147,13 +155,8 @@ def translate_texts_to_thai(texts: List[str]) -> List[str]:
         return []
     joined = "\n".join(t.replace("\n", " ") for t in texts)
     try:
-        import http.client
-        conn = http.client.HTTPSConnection("translate.googleapis.com", timeout=3.5)
-        path = f"/translate_a/single?client=gtx&sl=en&tl=th&dt=t&q={urllib.parse.quote(joined)}"
-        conn.request("GET", path, headers={"User-Agent": "Mozilla/5.0"})
-        resp = conn.getresponse()
-        body = resp.read() if resp.status == 200 else b""
-        conn.close()
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=th&dt=t&q={urllib.parse.quote(joined)}"
+        body = http_get(url, timeout=3.5, retries=1)
         if body:
             data = json.loads(body.decode("utf-8"))
             translated = "".join(part[0] for part in data[0] if part[0]).split("\n")
@@ -296,16 +299,17 @@ def synthesize_news_summary(title_en: str, title_th: str, source: str, ticker: s
     }
 
 
-def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[Dict[str, str]]:
+def fetch_stock_news_with_status(ticker: str, max_items: int = 4, timeout: int = 6) -> Tuple[List[Dict[str, str]], bool]:
     """
-    Fetch the latest market news and catalysts for a specific stock ticker with sentiment tags.
+    Fetch the latest news for a ticker. Returns (articles, fetch_ok); fetch_ok is False when the
+    feed could not be retrieved or parsed, so callers can tell "no news" from "fetch failed".
     """
     clean_ticker = ticker.strip().upper()
     cached = _get_from_cache(clean_ticker, max_items)
     if cached is not None:
         if _enrich_articles(cached, clean_ticker):
             _update_cache(clean_ticker, cached, max_items, keep_timestamp=True)
-        return cached[:max_items]
+        return cached[:max_items], True
 
     search_query = TICKER_SEARCH_MAP.get(clean_ticker, f"{clean_ticker} stock")
     encoded_q = urllib.parse.quote(search_query)
@@ -314,54 +318,50 @@ def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
-    req = urllib.request.Request(url, headers=headers)
-    articles: List[Dict[str, str]] = []
-
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            content = resp.read()
-            tree = ET.fromstring(content)
-            items = tree.findall(".//item")
+        tree = ET.fromstring(http_get(url, headers=headers, timeout=timeout))
+    except (HttpError, ET.ParseError) as e:
+        print(f"[news] {clean_ticker}: fetch failed: {e}", file=sys.stderr)
+        return [], False
 
-            for item in items[:max_items]:
-                raw_title = item.find("title").text if item.find("title") is not None else ""
-                link = item.find("link").text if item.find("link") is not None else ""
-                pub_date = item.find("pubDate").text if item.find("pubDate") is not None else ""
+    articles: List[Dict[str, str]] = []
+    for item in tree.findall(".//item")[:max_items]:
+        raw_title = item.find("title").text if item.find("title") is not None else ""
+        link = item.find("link").text if item.find("link") is not None else ""
+        pub_date = item.find("pubDate").text if item.find("pubDate") is not None else ""
 
-                # Extract title and source (format: "Headline - Source Name")
-                title = raw_title
-                source = "News"
-                if " - " in raw_title:
-                    parts = raw_title.rsplit(" - ", 1)
-                    title = parts[0].strip()
-                    source = parts[1].strip()
+        title = raw_title or ""
+        source = "News"
+        if " - " in title:
+            parts = title.rsplit(" - ", 1)
+            title = parts[0].strip()
+            source = parts[1].strip()
 
-                title = re.sub(r"<[^>]+>", "", title).strip()
-                sentiment = classify_sentiment(title)
+        title = re.sub(r"<[^>]+>", "", title).strip()
+        articles.append({
+            "title": title,
+            "source": source,
+            "link": link or "",
+            "published": _format_relative_time(pub_date or ""),
+            "raw_date": pub_date or "",
+            "sentiment": classify_sentiment(title)
+        })
 
-                articles.append({
-                    "title": title,
-                    "source": source,
-                    "link": link,
-                    "published": _format_relative_time(pub_date),
-                    "raw_date": pub_date,
-                    "sentiment": sentiment
-                })
+    _enrich_articles(articles, clean_ticker)
+    _update_cache(clean_ticker, articles, max_items)
+    return articles[:max_items], True
 
-        _enrich_articles(articles, clean_ticker)
-        _update_cache(clean_ticker, articles, max_items)
 
-    except Exception:
-        return []
-
-    return articles[:max_items]
+def fetch_stock_news(ticker: str, max_items: int = 4, timeout: int = 6) -> List[Dict[str, str]]:
+    """Fetch the latest news for a ticker. Returns [] both when there is no news and when the fetch fails."""
+    return fetch_stock_news_with_status(ticker, max_items, timeout)[0]
 
 
 def get_catalyst_breakdown(ticker: str, max_items: int = 4) -> Dict[str, Any]:
     """
     Get news categorized into Bullish Catalysts, Bearish Risks, and All items.
     """
-    articles = fetch_stock_news(ticker, max_items=max_items)
+    articles, fetch_ok = fetch_stock_news_with_status(ticker, max_items=max_items)
     for a in articles:
         if "sentiment" not in a:
             a["sentiment"] = classify_sentiment(a.get("title", ""))
@@ -375,7 +375,8 @@ def get_catalyst_breakdown(ticker: str, max_items: int = 4) -> Dict[str, Any]:
         "bullish": bullish,
         "bearish": bearish,
         "neutral": neutral_or_mixed,
-        "all": articles
+        "all": articles,
+        "fetch_ok": fetch_ok
     }
 
 
@@ -413,5 +414,5 @@ def fetch_batch_catalysts(tickers: List[str], max_items: int = 4, max_workers: i
             try:
                 results[t] = future.result()
             except Exception:
-                results[t] = {"ticker": t, "bullish": [], "bearish": [], "neutral": [], "all": []}
+                results[t] = {"ticker": t, "bullish": [], "bearish": [], "neutral": [], "all": [], "fetch_ok": False}
     return results

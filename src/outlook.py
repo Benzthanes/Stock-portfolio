@@ -5,7 +5,26 @@ Provides secular growth theses, forward drivers, catalyst timelines,
 Wall Street consensus analysis, and risk guards for US stocks.
 """
 
+from html import escape
 from typing import Dict, Any, Optional, List
+
+from src.fmt import money, pct, num
+
+CURATED_AS_OF = "2026-10-17"
+
+
+def _rec_count(data: Dict[str, Any], key: str) -> Optional[int]:
+    v = data.get(f"rec_{key}", data.get(f"recommendation_{key}"))
+    return int(v) if v is not None else None
+
+
+def broker_consensus(data: Dict[str, Any]) -> str:
+    """Live analyst vote phrase, or "" when TradingView has no recommendation counts."""
+    b, h, s = (_rec_count(data, k) for k in ("buy", "hold", "sell"))
+    if b is None and h is None and s is None:
+        return ""
+    b, h, s = b or 0, h or 0, s or 0
+    return f"โบรกเกอร์ {b + h + s} แห่ง (Buy {b} / Hold {h} / Sell {s}) "
 
 
 def get_forward_outlook(
@@ -14,7 +33,8 @@ def get_forward_outlook(
     fundamentals: Optional[Dict[str, Any]] = None,
     days_to_earnings: Optional[float] = None,
     avg_cost: Optional[float] = None,
-    close: Optional[float] = None
+    close: Optional[float] = None,
+    currency: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Build in-depth forward-looking fundamental thesis, secular tailwinds,
@@ -30,16 +50,28 @@ def get_forward_outlook(
     t_avg = data.get("price_target_average") or 0.0
     t_low = data.get("price_target_low") or 0.0
     t_high = data.get("price_target_high") or 0.0
-    upside_avg = round(((t_avg - close_price) / close_price * 100), 1) if (t_avg and close_price > 0) else 0.0
-    upside_cost = round(((t_avg - cost_price) / cost_price * 100), 1) if (t_avg and cost_price > 0) else 0.0
+    upside_avg = round(((t_avg - close_price) / close_price * 100), 1) if (t_avg and close_price > 0) else None
+    upside_cost = round(((t_avg - cost_price) / cost_price * 100), 1) if (t_avg and cost_price > 0) else None
+    ccy = (currency or data.get("currency") or ("THB" if data.get("exchange") == "SET" else "USD")).upper()
+
+    def m(v: Optional[float]) -> str:
+        return money(v, ccy) if v else "-"
+
+    up_s = pct(upside_avg)
+    consensus = broker_consensus(data)
+    if t_low and cost_price > 0:
+        gap = t_low - cost_price
+        low_vs_cost = f" ซึ่ง{'สูง' if gap >= 0 else 'ต่ำ'}กว่าต้นทุนของคุณ ({m(cost_price)}) อยู่ {money(abs(gap), ccy)}"
+    else:
+        low_vs_cost = ""
 
     rsi = data.get("RSI")
     sma20 = data.get("SMA20")
     sma200 = data.get("SMA200")
     net_g_live = fundamentals.get("net_inc_growth_yoy")
     rev_g_live = fundamentals.get("rev_growth_yoy")
-    net_g_str = f"{net_g_live:+.1f}%" if net_g_live is not None else "-"
-    rev_g_str = f"{rev_g_live:+.1f}%" if rev_g_live is not None else "-"
+    net_g_str = pct(net_g_live)
+    rev_g_str = pct(rev_g_live)
     has_earnings_date = days_to_earnings is not None and days_to_earnings >= 0
     earnings_period = f"ระยะประชิด ({days_to_earnings:.1f} วัน)" if has_earnings_date else "รอบประกาศงบถัดไป"
     if has_earnings_date and days_to_earnings <= 14:
@@ -69,7 +101,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "รายงานผลประกอบการไตรมาสใหม่และ Guidance ปี 2027 ที่สะท้อนยอดขาย Blackwell เต็มไตรมาส"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การเปิดตัวสถาปัตยกรรม Rubin เจเนอเรชันถัดไป (ชิป 3nm และหน่วยความจำ HBM4)"}
             ],
-            "wall_street_verdict": f"โบรกเกอร์ 50+ แห่งแนะนำ 'Strong Buy' เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%) สะท้อนความเชื่อมั่นว่าการปฏิวัติ AI ยังอยู่ในช่วงเริ่มต้น",
+            "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s}) สะท้อนความเชื่อมั่นว่าการปฏิวัติ AI ยังอยู่ในช่วงเริ่มต้น",
             "tailored_roadmap": "ถือครองในฐานะ Core Growth Holding สูงสุดของพอร์ต. ให้รันเทรนด์ตามเส้นค่าเฉลี่ย EMA 20 และ EMA 50 โดยไม่ต้องกังวลความผันผวนระยะสั้น",
             "invalidation_risk": "ความเสี่ยงการคุมเข้มการส่งออกชิปเพิ่มเติมจากรัฐบาลสหรัฐฯ หรือปัญหาคอขวดซัพพลายเชนบรรจุภัณฑ์ CoWoS-L ของ TSMC"
         },
@@ -92,7 +124,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "การขออนุมัติใช้งานระบบ FSD แบบไร้การควบคุมในตลาดยุโรปและประเทศจีน"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การเริ่มสายการผลิตรถยนต์โมเดลราคาเข้าถึงง่าย ($25,000 Model) และเปิดโรงงาน Megafactory แห่งใหม่"}
             ],
-            "wall_street_verdict": f"เป้าหมายเฉลี่ยสถาบันอยู่ที่ ${t_avg:.2f} (Upside {upside_avg:+.1f}%) โดยมีเป้าหมายสูงสุดจากนักวิเคราะห์สายเทคโนโลยีถึง ${t_high:.2f}",
+            "wall_street_verdict": f"เป้าหมายเฉลี่ยสถาบันอยู่ที่ {m(t_avg)} (Upside {up_s}) โดยมีเป้าหมายสูงสุดจากนักวิเคราะห์สายเทคโนโลยีถึง {m(t_high)}",
             "tailored_roadmap": "ถือครองตามสัดส่วนการลงทุนเพื่อดักการปลดล็อกมูลค่าจาก AI Ecosystem. ตั้งจุด Stop-Loss หากหลุดแนวรับโครงสร้างหลัก",
             "invalidation_risk": "ความล่าช้าในการขอใบอนุญาต Robotaxi เชิงพาณิชย์ หรือการชะลอตัวของยอดขายรถยนต์ในตลาดจีนเกินคาดการณ์"
         },
@@ -115,7 +147,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "การเปิดตัวฟีเจอร์ Autonomous AI Agents ใน Microsoft Copilot Studio สำหรับงานออฟฟิศอัตโนมัติ"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การขยายตัวของดาต้าเซ็นเตอร์ AI ภูมิภาคใหม่เพื่อปลดล็อกขีดจำกัดกำลังประมวลผล"}
             ],
-            "wall_street_verdict": f"สถาบันมากกว่า 95% แนะนำ 'Buy' เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%) ได้รับการจัดอันดับเป็นหุ้นหลุมหลบภัย AI ที่ปลอดภัยที่สุด",
+            "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s}) ได้รับการจัดอันดับเป็นหุ้นหลุมหลบภัย AI ที่ปลอดภัยที่สุด",
             "tailored_roadmap": "หุ้นเกรด AAA เหมาะเป็นเสาหลักพอร์ตความมั่งคั่ง. ใช้กลยุทธ์ถือยาวรับการเติบโตและเงินปันผลสม่ำเสมอ",
             "invalidation_risk": "การชะลอตัวของอัตราการเติบโตของ Azure ลงต่ำกว่า 25% หรือการถูกตรวจสอบด้านการผูกขาดเทคโนโลยี AI ในยุโรป"
         },
@@ -138,7 +170,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "การปล่อยอัปเดตฟังก์ชัน Apple Intelligence เวอร์ชันภาษาต่างประเทศและในตลาดจีน"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การเปิดตัวผลิตภัณฑ์เจเนอเรชันใหม่และชิปประมวลผล Apple Silicon M5"}
             ],
-            "wall_street_verdict": f"เป้าหมายเฉลี่ยของวอลล์สตรีทอยู่ที่ ${t_avg:.2f} (Upside {upside_avg:+.1f}%) สถาบันมองว่าฐานผู้ใช้ที่เหนียวแน่นจะสร้างกระแสเงินสดต่อเนื่อง",
+            "wall_street_verdict": f"เป้าหมายเฉลี่ยของวอลล์สตรีทอยู่ที่ {m(t_avg)} (Upside {up_s}) สถาบันมองว่าฐานผู้ใช้ที่เหนียวแน่นจะสร้างกระแสเงินสดต่อเนื่อง",
             "tailored_roadmap": "ถือครองเพื่อรับกระแสเงินสดและการซื้อหุ้นคืนที่สม่ำเสมอ. เฝ้าระวังแนวรับเส้น 200 วันสำหรับการทยอยสะสม",
             "invalidation_risk": "ยอดขาย iPhone ในจีนทรุดตัวเกินคาดการณ์ หรือคำสั่งศาลที่บังคับให้เปลี่ยนแปลงโครงสร้างรายได้ค่าธรรมเนียม App Store"
         },
@@ -161,7 +193,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "รายงานผลประกอบการไตรมาส 4: ตัวชี้ขาดการเร่งตัวของรายได้ AWS และอัตรากำไรของธุรกิจโฆษณา"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การเริ่มยิงกลุ่มดาวเทียมอินเทอร์เน็ตบรอดแบนด์ Project Kuiper เข้าสู่วงโคจรเชิงพาณิชย์"}
             ],
-            "wall_street_verdict": f"โบรกเกอร์วอลล์สตรีทมากกว่า 98% แนะนำ 'Strong Buy' เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%)",
+            "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s})",
             "tailored_roadmap": "หุ้น Growth เกรดพรีเมียมที่รายได้กระจายตัวดีมาก. แนะนำถือตามแนวโน้มขาขึ้นเพื่อรอรับผลตอบแทนจากโครงสร้างกำไรขยายตัว",
             "invalidation_risk": "การชะลอตัวของอัตรากำไรขั้นต้น AWS หรือผลกระทบจากข้อพิพาทด้านแรงงานในระบบขนส่งโลจิสติกส์"
         },
@@ -184,7 +216,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "การเปิดตัวโมเดลโฆษณาเจนเนอเรชันถัดไปและการปรับประมาณการกำไรขึ้นจากโบรกเกอร์วอลล์สตรีท"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การขยายตลาดสู่ผู้ค้าปลีกระดับโลก (Shopify / Global Brands Integration)"}
             ],
-            "wall_street_verdict": f"โบรกเกอร์ 28 แห่งพร้อมใจแนะนำ 'Buy' (0 Sell)! เป้าหมายเฉลี่ยสูงถึง ${t_avg:.2f} (Upside {upside_avg:+.1f}%) และเป้าหมายต่ำสุดยังอยู่ที่ ${t_low:.2f} ซึ่งสูงกว่าต้นทุนของคุณ (${cost_price:.2f}) ถึง ${t_low - cost_price:.2f} เหรียญ!" if cost_price > 0 else f"โบรกเกอร์ 28 แห่งพร้อมใจแนะนำ 'Buy' (0 Sell)! เป้าหมายเฉลี่ยสูงถึง ${t_avg:.2f} (Upside {upside_avg:+.1f}%)",
+            "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s}) และเป้าหมายต่ำสุดอยู่ที่ {m(t_low)}{low_vs_cost}",
             "tailored_roadmap": earnings_note + "หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับสำคัญแล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่",
             "invalidation_risk": "จุดยอมจำนนคือการหลุดเส้น Stop-Loss หรือหากตัวเลขอัตรากำไร AXON ชะลอตัวลงต่ำกว่า 20% อย่างมีนัยสำคัญ"
         },
@@ -207,7 +239,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 1-3 เดือน", "event": "การทยอยส่งมอบแร็ค NVIDIA GB200 ให้กับลูกค้าระดับ Tier-1 Hyperscalers ทั่วโลก"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การเปิดโรงงานขยายกำลังการผลิต Liquid Cooling เฟสใหม่เพื่อรองรับอุปสงค์ที่ล้นมือ"}
             ],
-            "wall_street_verdict": f"โบรกเกอร์ 27 แห่งแนะนำ 'Buy' เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}% จากราคาปัจจุบัน และสูงกว่าต้นทุนของคุณ {upside_cost:+.1f}%)" if cost_price > 0 else f"โบรกเกอร์ 27 แห่งแนะนำ 'Buy' เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%)",
+            "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s} จากราคาปัจจุบัน และเทียบต้นทุนของคุณ {pct(upside_cost)})" if cost_price > 0 else f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s})",
             "tailored_roadmap": earnings_note + "ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก",
             "invalidation_risk": "หากประกาศงบแล้วพบว่าปัญหา Supply Chain คอขวดรุนแรงจนยกเลิกออเดอร์ หรือราคาปิดหลุดแนวรับ Stop-Loss ให้พิจารณาลดสัดส่วนเพื่อถือเงินสด"
         },
@@ -226,11 +258,11 @@ def get_forward_outlook(
                 (f"ดัชนี RSI รายวันอยู่ที่ระดับ {rsi:.2f}" + (" ซึ่งเป็นโซน Extreme Oversold (ขายมากเกินไปอย่างผิดปกติในเชิงสถิติ)" if rsi < 30 else "")) if rsi is not None else "แรงขายทางเทคนิคกดดันราคาในระยะสั้น"
             ],
             "catalyst_timeline": [
-                {"period": "ระยะประชิด (0-14 วัน)", "event": "แรงซื้อดักเด้งทางเทคนิค (Mean Reversion) เพื่อกลับไปทดสอบเส้น SMA 20" + (f" ที่ ${sma20:.2f}" if sma20 else "")},
+                {"period": "ระยะประชิด (0-14 วัน)", "event": "แรงซื้อดักเด้งทางเทคนิค (Mean Reversion) เพื่อกลับไปทดสอบเส้น SMA 20" + (f" ที่ {m(sma20)}" if sma20 else "")},
                 {"period": "ระยะ 1-3 เดือน", "event": "การประชุม Fed FOMC รอบใหม่ และการส่งสัญญาณการฟื้นตัวของสินเชื่อเชิงพาณิชย์"},
                 {"period": "ระยะ 6-12 เดือน", "event": "การกลับมาของกิจกรรมซื้อหุ้นคืน (Share Repurchase Program) หลังเงินกองทุน Tier 1 แข็งแกร่งเกินเกณฑ์"}
             ],
-            "wall_street_verdict": f"สถาบัน 25 แห่งไม่มีคำแนะนำ 'Sell' เลยแม้แต่รายเดียว! เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ ${t_low:.2f} (สูงกว่าต้นทุนของคุณ ${cost_price:.2f} แล้ว!) เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%)" if cost_price > 0 else f"สถาบัน 25 แห่งไม่มีคำแนะนำ 'Sell' เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%)",
+            "wall_street_verdict": f"{consensus}เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ {m(t_low)}{low_vs_cost} เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s})",
             "tailored_roadmap": earnings_note + "เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ",
             "invalidation_risk": "หากราคาปิดหลุดแนวรับ Stop-Loss และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง"
         },
@@ -253,29 +285,34 @@ def get_forward_outlook(
                 {"period": "ระยะกลาง (1-3 เดือน)", "event": "กระบวนการปิดดีลควบรวม Infinera และการเริ่มส่งมอบอุปกรณ์ชิปเครือข่ายซิลิคอนโฟโตนิกส์"},
                 {"period": "ระยะ 6-12 เดือน", "event": "รอบการอัปเกรด 5G-Advanced และการเบิกจ่ายงบประมาณเครือข่ายแสงของคลาวด์ไฮเปอร์สเกลเลอร์"}
             ],
-            "wall_street_verdict": f"สถาบัน 27 แห่งให้เป้าหมายเฉลี่ย ${t_avg:.2f} (Upside {upside_avg:+.1f}%) โดยเป้าหมายต่ำสุดอยู่ที่ ${t_low:.2f} และสูงสุดที่ ${t_high:.2f}",
-            "tailored_roadmap": f"กำไรสุทธิ YoY {net_g_str}. " + earnings_note + "ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน" + (f" (${sma200:.2f})" if sma200 else "") + " ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน" + (f" ${cost_price:.2f}" if cost_price > 0 else ""),
+            "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s}) โดยเป้าหมายต่ำสุดอยู่ที่ {m(t_low)} และสูงสุดที่ {m(t_high)}",
+            "tailored_roadmap": f"กำไรสุทธิ YoY {net_g_str}. " + earnings_note + "ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน" + (f" ({m(sma200)})" if sma200 else "") + " ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน" + (f" {m(cost_price)}" if cost_price > 0 else ""),
             "invalidation_risk": "หากงบ Q3 ชะลอตัวลงเกินคาดและราคาหลุดจุดตัดขาดทุน (หลุดแนวรับโครงสร้างหลัก) ต้องพิจารณา Cut Loss เพื่อปกป้องเงินต้นส่วนใหญ่"
         }
     }
 
     if t in curated:
-        return curated[t]
+        out = dict(curated[t])
+        out["thesis_title"] = f"{out['thesis_title']} (ข้อมูลอ้างอิงเขียนเอง อัปเดตล่าสุด {CURATED_AS_OF})"
+        out["curated_as_of"] = CURATED_AS_OF
+        return out
 
-    # Dynamic Fallback
-    sec = data.get("sector") or "ธุรกิจทั่วไป"
-    ind = data.get("industry") or "อุตสาหกรรม"
-    rev_g = fundamentals.get("rev_growth_yoy") or 0.0
-    net_g = fundamentals.get("net_inc_growth_yoy") or 0.0
-    pe = fundamentals.get("pe") or 0.0
-    peg = fundamentals.get("peg") or 0.0
+    sec = escape(str(data.get("sector") or "ธุรกิจทั่วไป"))
+    ind = escape(str(data.get("industry") or "อุตสาหกรรม"))
+    t_html = escape(t)
+    rev_g = pct(fundamentals.get("rev_growth_yoy"))
+    net_g = pct(fundamentals.get("net_inc_growth_yoy"))
+    pe = fundamentals.get("pe")
+    peg = fundamentals.get("peg")
+    pe_s = f"{pe:.1f}x" if pe is not None else "-"
+    peg_s = f"{peg:.2f} เท่า" if peg is not None else "-"
 
     return {
-        "thesis_title": f"การวิเคราะห์เจาะลึกศักยภาพการเติบโต {t} ในกลุ่ม {sec} ({ind})",
+        "thesis_title": f"การวิเคราะห์เจาะลึกศักยภาพการเติบโต {t_html} ในกลุ่ม {sec} ({ind})",
         "quality_badge": fundamentals.get("quality_tier", "🟡 Market Leader"),
         "future_growth_drivers": [
-            f"การขยายตัวของรายได้ระดับ {rev_g:+.1f}% YoY และความสามารถในการทำกำไรสุทธิ {net_g:+.1f}% YoY",
-            f"อัตราการประเมินมูลค่า P/E {pe:.1f}x และค่า PEG {peg:.2f} เท่า สะท้อนระดับราคาต่อการเติบโต",
+            f"การขยายตัวของรายได้ระดับ {rev_g} YoY และความสามารถในการทำกำไรสุทธิ {net_g} YoY",
+            f"อัตราการประเมินมูลค่า P/E {pe_s} และค่า PEG {peg_s} สะท้อนระดับราคาต่อการเติบโต",
             f"ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม {ind}",
             "การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ"
         ],
@@ -289,7 +326,7 @@ def get_forward_outlook(
             {"period": "ระยะ 1-3 เดือน", "event": "การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท"},
             {"period": "ระยะ 6-12 เดือน", "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"}
         ],
-        "wall_street_verdict": f"ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ ${t_avg:.2f} (Upside {upside_avg:+.1f}%)" if t_avg else "ยังไม่มีการตั้งราคาเป้าหมายจากสถาบัน",
+        "wall_street_verdict": f"{consensus}ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ {m(t_avg)} (Upside {up_s})" if t_avg else f"{consensus}ยังไม่มีการตั้งราคาเป้าหมายจากสถาบัน",
         "tailored_roadmap": "ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
         "invalidation_risk": "การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%"
     }

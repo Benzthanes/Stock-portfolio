@@ -1,4 +1,4 @@
-"""Shared top navigation bar linking the six generated reports in reports/."""
+"""Shared top navigation bar linking the generated reports in reports/."""
 
 from datetime import datetime
 from typing import Optional
@@ -10,6 +10,8 @@ PAGES = (
     ("dip_sim", "portfolio_dip_sim.html", "Dip จำลอง"),
     ("ledger", "trades_ledger.html", "รายการซื้อขายทั้งหมด"),
     ("chart", "stock_chart.html", "กราฟ"),
+    ("set_review", "portfolio_set_review.html", "หุ้นไทย สุขภาพพอร์ต"),
+    ("set_recovery", "portfolio_set_recovery.html", "หุ้นไทย แก้ดอย"),
 )
 
 _STYLE = """<style>

@@ -11,7 +11,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -21,9 +21,22 @@ from src.screener import evaluate_stock
 from src.news import fetch_batch_news, fetch_batch_catalysts
 from src.profiles import get_business_summary
 from src.outlook import get_forward_outlook
+from src.fx import resolve_usdthb
 
 
 DEFAULT_PORTFOLIO_PATH = Path(__file__).resolve().parent.parent / "data" / "portfolio.json"
+
+
+def cost_basis(holding: Dict[str, Any], base_currency: str) -> Tuple[float, float]:
+    """(avg_cost, total_cost) of a holding in the portfolio's base currency."""
+    shares = float(holding.get("shares", 0.0))
+    if str(base_currency).upper() == "THB":
+        avg = float(holding.get("avg_cost_thb") or holding.get("avg_cost") or 0.0)
+        total = holding.get("total_cost_thb")
+    else:
+        avg = float(holding.get("avg_cost_usd") or holding.get("avg_cost") or 0.0)
+        total = holding.get("total_cost_usd")
+    return avg, float(total) if total is not None else shares * avg
 
 
 def load_portfolio(file_path: Optional[str] = None) -> Dict[str, Any]:
@@ -322,7 +335,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
     Fetch live TradingView market data, fundamentals, and news to compute portfolio metrics.
     """
     holdings = portfolio_data.get("holdings", [])
-    fx_rate = float(portfolio_data.get("fx_rate_usd_thb", 33.62))
+    fx_rate = resolve_usdthb(portfolio_data.get("fx_rate_usd_thb"))
     portfolio_name = portfolio_data.get("portfolio_name", "My Portfolio")
     broker = portfolio_data.get("broker", "InnovestX")
     base_currency = str(portfolio_data.get("base_currency", "USD")).upper()
@@ -350,58 +363,58 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
     total_market_val_thb = 0.0
     total_daily_change_usd = 0.0
     total_daily_change_thb = 0.0
+    unpriced_cost_usd = 0.0
+    unpriced_cost_thb = 0.0
+    price_missing_tickers: List[str] = []
 
     for h in holdings:
         ticker = h["ticker"].upper()
         shares = float(h.get("shares", 0.0))
         live_row = live_dict.get(ticker, {})
-        data_missing = not bool(live_row.get("close"))
+        price_missing = not bool(live_row.get("close"))
+        change_pct = float(live_row.get("change") or 0.0)
+        close_price = None if price_missing else float(live_row["close"])
+        avg_cost, cost_base = cost_basis(h, base_currency)
 
         if base_currency == "THB":
-            avg_cost_thb = float(h.get("avg_cost_thb") or h.get("avg_cost", h.get("avg_cost_usd", 0.0)))
-            cost_thb = float(h.get("total_cost_thb") or (shares * avg_cost_thb))
+            avg_cost_thb, cost_thb = avg_cost, cost_base
             avg_cost_usd = avg_cost_thb / fx_rate if fx_rate > 0 else 0.0
             cost_usd = cost_thb / fx_rate if fx_rate > 0 else 0.0
-
-            close_price = float(live_row.get("close") or avg_cost_thb)
-            change_pct = float(live_row.get("change") or 0.0)
-
-            current_val_thb = shares * close_price
-            current_val_usd = current_val_thb / fx_rate if fx_rate > 0 else 0.0
-
-            unrealized_pl_thb = current_val_thb - cost_thb
-            unrealized_pl_usd = unrealized_pl_thb / fx_rate if fx_rate > 0 else 0.0
-            unrealized_pl_pct = (unrealized_pl_thb / cost_thb * 100.0) if cost_thb > 0 else 0.0
-
-            prev_val_thb = current_val_thb / (1.0 + (change_pct / 100.0)) if (1.0 + (change_pct / 100.0)) != 0 else current_val_thb
-            daily_diff_thb = current_val_thb - prev_val_thb
-            daily_diff_usd = daily_diff_thb / fx_rate if fx_rate > 0 else 0.0
         else:
-            avg_cost_usd = float(h.get("avg_cost_usd") or h.get("avg_cost", 0.0))
-            cost_usd = float(h.get("total_cost_usd", shares * avg_cost_usd))
+            avg_cost_usd, cost_usd = avg_cost, cost_base
             cost_thb = float(h.get("cost_thb") or (cost_usd * fx_rate))
-            avg_cost_thb = avg_cost_usd * fx_rate
+            avg_cost_thb = cost_thb / shares if shares > 0 else avg_cost_usd * fx_rate
 
-            close_price = float(live_row.get("close") or avg_cost_usd)
-            change_pct = float(live_row.get("change") or 0.0)
-
-            current_val_usd = shares * close_price
-            current_val_thb = current_val_usd * fx_rate
-
+        current_val_usd = current_val_thb = None
+        unrealized_pl_usd = unrealized_pl_thb = unrealized_pl_pct = None
+        daily_diff_usd = daily_diff_thb = None
+        if not price_missing:
+            if base_currency == "THB":
+                current_val_thb = shares * close_price
+                current_val_usd = current_val_thb / fx_rate if fx_rate > 0 else 0.0
+            else:
+                current_val_usd = shares * close_price
+                current_val_thb = current_val_usd * fx_rate
             unrealized_pl_usd = current_val_usd - cost_usd
-            unrealized_pl_thb = unrealized_pl_usd * fx_rate
-            unrealized_pl_pct = (unrealized_pl_usd / cost_usd * 100.0) if cost_usd > 0 else 0.0
+            unrealized_pl_thb = current_val_thb - cost_thb
+            base_pl, base_cost = (unrealized_pl_thb, cost_thb) if base_currency == "THB" else (unrealized_pl_usd, cost_usd)
+            unrealized_pl_pct = (base_pl / base_cost * 100.0) if base_cost > 0 else 0.0
+            growth = 1.0 + (change_pct / 100.0)
+            daily_diff_usd = current_val_usd - (current_val_usd / growth if growth != 0 else current_val_usd)
+            daily_diff_thb = current_val_thb - (current_val_thb / growth if growth != 0 else current_val_thb)
 
-            prev_val_usd = current_val_usd / (1.0 + (change_pct / 100.0)) if (1.0 + (change_pct / 100.0)) != 0 else current_val_usd
-            daily_diff_usd = current_val_usd - prev_val_usd
-            daily_diff_thb = daily_diff_usd * fx_rate
-
-        total_cost_usd += cost_usd
-        total_cost_thb += cost_thb
-        total_market_val_usd += current_val_usd
-        total_market_val_thb += current_val_thb
-        total_daily_change_usd += daily_diff_usd
-        total_daily_change_thb += daily_diff_thb
+        # Unpriced holdings stay out of every total so total P&L never counts them as a fake 0%; their cost is reported separately.
+        if price_missing:
+            price_missing_tickers.append(ticker)
+            unpriced_cost_usd += cost_usd
+            unpriced_cost_thb += cost_thb
+        else:
+            total_cost_usd += cost_usd
+            total_cost_thb += cost_thb
+            total_market_val_usd += current_val_usd
+            total_market_val_thb += current_val_thb
+            total_daily_change_usd += daily_diff_usd
+            total_daily_change_thb += daily_diff_thb
 
         # Technical evaluation via screener engine
         eval_result = evaluate_stock(live_row) if live_row else {}
@@ -421,55 +434,59 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         rec_buy = live_row.get("recommendation_buy")
         rec_hold = live_row.get("recommendation_hold")
         rec_sell = live_row.get("recommendation_sell")
-        target_upside = round(((target_avg - close_price) / close_price * 100.0), 1) if (target_avg and close_price > 0) else None
+        target_upside = round(((target_avg - close_price) / close_price * 100.0), 1) if (target_avg and close_price) else None
 
         biz_summary = get_business_summary(ticker, live_row.get("sector", ""), live_row.get("industry", ""))
 
         # Key Support & Resistance calculation
-        sma20 = live_row.get("SMA20") or 0.0
-        sma50 = live_row.get("SMA50") or 0.0
-        sma200 = live_row.get("SMA200") or 0.0
-        bb_lower = live_row.get("BB.lower") or 0.0
-        bb_upper = live_row.get("BB.upper") or 0.0
-        atr = live_row.get("ATR") or (close_price * 0.03)
-        sl_calc = eval_result.get("stop_loss") or round(close_price - (1.5 * atr), 2)
-        tp_calc = eval_result.get("take_profit") or round(close_price * 1.08, 2)
+        key_support = key_resistance = sl_calc = tp_calc = None
+        support_desc = resistance_desc = "-"
+        if not price_missing:
+            sma20 = live_row.get("SMA20") or 0.0
+            sma50 = live_row.get("SMA50") or 0.0
+            sma200 = live_row.get("SMA200") or 0.0
+            bb_lower = live_row.get("BB.lower") or 0.0
+            bb_upper = live_row.get("BB.upper") or 0.0
+            atr = live_row.get("ATR") or (close_price * 0.03)
+            sl_calc = eval_result.get("stop_loss") or round(close_price - (1.5 * atr), 2)
+            tp_calc = eval_result.get("take_profit") or round(close_price * 1.08, 2)
 
-        if eval_result.get("key_support"):
-            key_support = eval_result["key_support"]
-            support_desc = eval_result.get("support_desc", "แนวรับทางเทคนิค")
-        elif sma200 > 0 and abs(close_price - sma200) / close_price <= 0.08:
-            key_support = round(sma200, 2)
-            support_desc = "เส้น 200 วัน (SMA 200)"
-        elif bb_lower > 0 and bb_lower < close_price:
-            key_support = round(bb_lower, 2)
-            support_desc = "ขอบล่าง Bollinger Band"
-        else:
-            key_support = round(sl_calc, 2)
-            support_desc = "แนวรับความผันผวน 1.5 ATR"
+            if eval_result.get("key_support"):
+                key_support = eval_result["key_support"]
+                support_desc = eval_result.get("support_desc", "แนวรับทางเทคนิค")
+            elif sma200 > 0 and abs(close_price - sma200) / close_price <= 0.08:
+                key_support = round(sma200, 2)
+                support_desc = "เส้น 200 วัน (SMA 200)"
+            elif bb_lower > 0 and bb_lower < close_price:
+                key_support = round(bb_lower, 2)
+                support_desc = "ขอบล่าง Bollinger Band"
+            else:
+                key_support = round(sl_calc, 2)
+                support_desc = "แนวรับความผันผวน 1.5 ATR"
 
-        if eval_result.get("key_resistance"):
-            key_resistance = eval_result["key_resistance"]
-            resistance_desc = eval_result.get("resistance_desc", "แนวต้านทางเทคนิค")
-        elif sma20 > 0 and sma20 > close_price:
-            key_resistance = round(sma20, 2)
-            resistance_desc = "เส้น 20 วัน (SMA 20)"
-        elif sma50 > 0 and sma50 > close_price:
-            key_resistance = round(sma50, 2)
-            resistance_desc = "เส้น 50 วัน (SMA 50)"
-        elif bb_upper > 0 and bb_upper > close_price:
-            key_resistance = round(bb_upper, 2)
-            resistance_desc = "ขอบบน Bollinger Band"
-        elif target_avg and target_avg > close_price:
-            key_resistance = round(target_avg, 2)
-            resistance_desc = "ราคาเป้าหมายเฉลี่ยสถาบัน"
-        else:
-            key_resistance = round(tp_calc, 2)
-            resistance_desc = "เป้าหมายรีบาวด์ Take-Profit"
+            if eval_result.get("key_resistance"):
+                key_resistance = eval_result["key_resistance"]
+                resistance_desc = eval_result.get("resistance_desc", "แนวต้านทางเทคนิค")
+            elif sma20 > 0 and sma20 > close_price:
+                key_resistance = round(sma20, 2)
+                resistance_desc = "เส้น 20 วัน (SMA 20)"
+            elif sma50 > 0 and sma50 > close_price:
+                key_resistance = round(sma50, 2)
+                resistance_desc = "เส้น 50 วัน (SMA 50)"
+            elif bb_upper > 0 and bb_upper > close_price:
+                key_resistance = round(bb_upper, 2)
+                resistance_desc = "ขอบบน Bollinger Band"
+            elif target_avg and target_avg > close_price:
+                key_resistance = round(target_avg, 2)
+                resistance_desc = "ราคาเป้าหมายเฉลี่ยสถาบัน"
+            else:
+                key_resistance = round(tp_calc, 2)
+                resistance_desc = "เป้าหมายรีบาวด์ Take-Profit"
 
         positions.append({
             "ticker": ticker,
-            "data_missing": data_missing,
+            "data_missing": price_missing,
+            "price_missing": price_missing,
             "name": h.get("name", live_row.get("description", ticker)),
             "business_summary": biz_summary,
             "exchange": h.get("exchange", "NASDAQ"),
@@ -532,7 +549,10 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
 
     # Calculate portfolio weights and flags
     for pos in positions:
-        weight_pct = (pos["current_val_usd"] / total_market_val_usd * 100.0) if total_market_val_usd > 0 else 0.0
+        if pos["price_missing"]:
+            weight_pct = 0.0
+        else:
+            weight_pct = (pos["current_val_usd"] / total_market_val_usd * 100.0) if total_market_val_usd > 0 else 0.0
         pos["weight_pct"] = weight_pct
 
         alerts = []
@@ -543,7 +563,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         elif weight_pct >= 25.0:
             alerts.append(f"⚠️ Heavy Allocation ({weight_pct:.1f}%)")
 
-        if pos["unrealized_pl_pct"] <= -10.0:
+        if pos["unrealized_pl_pct"] is not None and pos["unrealized_pl_pct"] <= -10.0:
             alerts.append(f"🔻 Drawdown ({pos['unrealized_pl_pct']:.1f}%)")
 
         if pos.get("is_earnings_near"):
@@ -568,7 +588,8 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         )
 
     # Sort positions by weight descending
-    positions.sort(key=lambda x: x["current_val_usd"], reverse=True)
+    positions.sort(key=lambda x: x["current_val_usd"] if x["current_val_usd"] is not None else -1.0, reverse=True)
+    priced = [p for p in positions if not p["price_missing"]]
 
     total_pl_usd = total_market_val_usd - total_cost_usd
     total_pl_thb = total_market_val_thb - total_cost_thb
@@ -601,11 +622,11 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
     # Opportunities: stocks with low RSI or in Value Zone
     dip_opportunities = [
         p for p in positions
-        if (p["rsi"] is not None and p["rsi"] <= 35) or p["in_value_zone"] or (p["score"] >= 3.0)
+        if not p["price_missing"] and ((p["rsi"] is not None and p["rsi"] <= 35) or p["in_value_zone"] or (p["score"] >= 3.0))
     ]
 
-    best_pos = max(positions, key=lambda x: x["unrealized_pl_pct"]) if positions else None
-    worst_pos = min(positions, key=lambda x: x["unrealized_pl_pct"]) if positions else None
+    best_pos = max(priced, key=lambda x: x["unrealized_pl_pct"]) if priced else None
+    worst_pos = min(priced, key=lambda x: x["unrealized_pl_pct"]) if priced else None
 
     # Sector distribution
     sector_distribution = {}
@@ -650,7 +671,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         health_score += 5.0
 
     # 4. Severe underwater penalty
-    severe_losers = [p for p in positions if p["unrealized_pl_pct"] <= -20.0]
+    severe_losers = [p for p in priced if p["unrealized_pl_pct"] <= -20.0]
     if severe_losers:
         health_score -= (len(severe_losers) * 4.0)
 
@@ -690,7 +711,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
     buy_candidates = []
     forbidden_buys = []
     
-    for p in positions:
+    for p in priced:
         t = p["ticker"]
         w = p["weight_pct"]
         is_earn = p.get("is_earnings_near", False)
@@ -759,6 +780,9 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         "total_daily_change_usd": total_daily_change_usd,
         "total_daily_change_thb": total_daily_change_thb,
         "total_daily_change_pct": total_daily_change_pct,
+        "price_missing_tickers": price_missing_tickers,
+        "unpriced_cost_usd": unpriced_cost_usd,
+        "unpriced_cost_thb": unpriced_cost_thb,
         "hhi": hhi,
         "concentration_level": concentration_level,
         "health_score": round(health_score, 1),
@@ -967,12 +991,14 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
         r = p.get("rating", {})
         stars = r.get("stars_str", "⭐")
         avg_c = f"${p['avg_cost_usd']:,.2f}"
-        price = f"${p['close_price']:,.2f}"
-        supp_res = f"รับ ${p['key_support']:.2f}<br>ต้าน ${p['key_resistance']:.2f}"
-        val_str = f"${p['current_val_usd']:,.2f}<br>฿{p['current_val_thb']:,.0f}"
-
-        pl_color = "+" if p['unrealized_pl_usd'] >= 0 else ""
-        pl_str = f"**{pl_color}{p['unrealized_pl_pct']:.2f}%**<br>({pl_color}${p['unrealized_pl_usd']:,.2f})"
+        if p.get("price_missing"):
+            price = supp_res = val_str = pl_str = "n/a"
+        else:
+            price = f"${p['close_price']:,.2f}"
+            supp_res = f"รับ ${p['key_support']:.2f}<br>ต้าน ${p['key_resistance']:.2f}"
+            val_str = f"${p['current_val_usd']:,.2f}<br>฿{p['current_val_thb']:,.0f}"
+            pl_color = "+" if p['unrealized_pl_usd'] >= 0 else ""
+            pl_str = f"**{pl_color}{p['unrealized_pl_pct']:.2f}%**<br>({pl_color}${p['unrealized_pl_usd']:,.2f})"
 
         day_c = "+" if p['change_pct'] >= 0 else ""
         day_str = f"{day_c}{p['change_pct']:.2f}%"
@@ -1100,6 +1126,10 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
                 lines.append(f"- **[{b['source']}]** {title_link} *({b['published']})*")
         else:
             lines.append("- ไม่มีข่าวร้ายรุนแรงในระยะสั้น.")
+
+        if p.get("price_missing"):
+            lines.append("- ⚠️ ไม่มีราคาตลาดล่าสุด (price missing) จึงไม่คำนวณกำไรขาดทุนและแนวรับแนวต้าน.\n")
+            continue
 
         if p.get("price_target_average"):
             b_cnt = p.get('rec_buy') or 0

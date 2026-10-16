@@ -6,15 +6,21 @@ SMA 50, SMA 200, and Volume profiles for automated programmatic charting.
 """
 
 import json
+import os
+import sys
+import tempfile
 import time
-import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from src.http import http_get
+
 CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.json"
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
+PATTERN_WIN_RATE_NOTE = "ไม่มีสถิติยืนยัน (heuristic)"
+ANCHOR_BARS = 504
 
 
 def _round_price(x: float) -> float:
@@ -28,49 +34,42 @@ def fetch_ticker_candles(ticker: str) -> List[Dict[str, Any]]:
     """
     clean_ticker = ticker.replace(".", "-").upper().strip()
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{clean_ticker}?period1=0&period2=9999999999&interval=1d"
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-        }
-    )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-        res = data.get("chart", {}).get("result", [])
-        if not res:
-            return []
-        chart_res = res[0]
-        timestamps = chart_res.get("timestamp", [])
-        quote = chart_res.get("indicators", {}).get("quote", [{}])[0]
-        opens = quote.get("open", [])
-        highs = quote.get("high", [])
-        lows = quote.get("low", [])
-        closes = quote.get("close", [])
-        volumes = quote.get("volume", [])
+    data = json.loads(http_get(url, timeout=10).decode("utf-8"))
+    res = data.get("chart", {}).get("result", [])
+    if not res:
+        return []
+    chart_res = res[0]
+    timestamps = chart_res.get("timestamp", [])
+    quote = chart_res.get("indicators", {}).get("quote", [{}])[0]
+    opens = quote.get("open", [])
+    highs = quote.get("high", [])
+    lows = quote.get("low", [])
+    closes = quote.get("close", [])
+    volumes = quote.get("volume", [])
 
-        candles = []
-        for i in range(len(timestamps)):
-            if (
-                i >= len(opens)
-                or i >= len(highs)
-                or i >= len(lows)
-                or i >= len(closes)
-            ):
-                continue
-            o, h, l, c = opens[i], highs[i], lows[i], closes[i]
-            if None in (o, h, l, c):
-                continue
-            v = volumes[i] if (i < len(volumes) and volumes[i] is not None) else 0
-            t_str = datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d")
-            candles.append({
-                "time": t_str,
-                "open": _round_price(o),
-                "high": _round_price(h),
-                "low": _round_price(l),
-                "close": _round_price(c),
-                "volume": int(v)
-            })
-        return candles
+    candles = []
+    for i in range(len(timestamps)):
+        if (
+            i >= len(opens)
+            or i >= len(highs)
+            or i >= len(lows)
+            or i >= len(closes)
+        ):
+            continue
+        o, h, l, c = opens[i], highs[i], lows[i], closes[i]
+        if None in (o, h, l, c):
+            continue
+        v = volumes[i] if (i < len(volumes) and volumes[i] is not None) else 0
+        t_str = datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d")
+        candles.append({
+            "time": t_str,
+            "open": _round_price(o),
+            "high": _round_price(h),
+            "low": _round_price(l),
+            "close": _round_price(c),
+            "volume": int(v)
+        })
+    return candles
 
 
 def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -131,7 +130,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                         "structure": f"ไหล่ซ้าย (${p1['price']:.2f}) • หัว (${p2['price']:.2f}) • ไหล่ขวา (${p3['price']:.2f}) • Neckline รับสำคัญ (${neck_val:.2f})",
                         "action_plan": f"หากราคาหลุดเส้น Neckline ${neck_val:.2f} ให้ขายตัดขาดทุนหรือขายทำกำไรปกป้องเงินทุน (Exit/Trim) เป้าหมายลงสู่ ${target:.2f}",
                         "invalidation": f"รูปแบบจะล้มเหลว (Invalidated) ทันทีหากราคากลับขึ้นมายืนเหนือจุดสูงสุดของไหล่ขวา ${p3['price']:.2f}",
-                        "win_rate": "71% (Bulkowski Classical Chart Pattern Database)",
+                        "win_rate": PATTERN_WIN_RATE_NOTE,
                         "target_calc": f"วัดความสูงจาก Head (${p2['price']:.2f}) ถึง Neckline (${neck_val:.2f}) รวม {head_h:.2f} แล้วลบลงมาจาก Neckline",
                         "key_points": [
                             {"name": "Left Shoulder", "time": p1["time"], "price": p1["price"], "role": "start"},
@@ -173,7 +172,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                         "structure": f"ไหล่ซ้าย (${t1['price']:.2f}) • หัวลึกสุด (${t2['price']:.2f}) • ไหล่ขวายกฐาน (${t3['price']:.2f}) • Neckline ต้าน (${neck_val:.2f})",
                         "action_plan": f"เข้าซื้อสะสม (BUY/DCA) เมื่อราคาทะลุ Neckline ${neck_val:.2f} พร้อม Volume หนาแน่น ตั้งเป้าหมายทำกำไรที่ ${target:.2f}",
                         "invalidation": f"รูปแบบจะล้มเหลวหากราคาหลุดจุดต่ำสุดของไหล่ขวา ${t3['price']:.2f}",
-                        "win_rate": "78% (หนึ่งในรูปแบบกลับตัวเป็นกระทิงที่แม่นยำที่สุดในตลาดหุ้น)",
+                        "win_rate": PATTERN_WIN_RATE_NOTE,
                         "target_calc": f"วัดระยะลึกจาก Neckline (${neck_val:.2f}) ลงไปถึง Head (${t2['price']:.2f}) รวม {head_h:.2f} แล้วบวกขึ้นจาก Neckline",
                         "key_points": [
                             {"name": "Left Shoulder", "time": t1["time"], "price": t1["price"], "role": "start"},
@@ -214,7 +213,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "structure": f"ฐานแนวรับ 3 ครั้งเฉลี่ย ${avg_bottom:.2f} • Neckline แนวต้านเบรกเอาท์ ${neck_p:.2f}",
                     "action_plan": f"ซื้อสะสมใกล้โซนฐาน ${avg_bottom:.2f} หรือ Follow Buy เมื่อปิดเบรก Neckline ${neck_p:.2f} เป้าหมาย ${target:.2f}",
                     "invalidation": f"Stop Loss ทันทีหากราคาปิดหลุดฐานต่ำสุด ${min(t1['price'], t2['price'], t3['price']):.2f}",
-                    "win_rate": "74% (Thomas Bulkowski)",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดความสูงจากฐาน ${avg_bottom:.2f} ถึงยอด Neckline ${neck_p:.2f} แล้วนำไปบวกเพิ่มจากยอด Neckline",
                     "key_points": [
                         {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
@@ -252,7 +251,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "structure": f"ฐานแรก (${t1['price']:.2f}) • ยอดกลาง Neckline (${neck_p['price']:.2f}) • ฐานที่สอง (${t2['price']:.2f})",
                     "action_plan": f"เข้าซื้อเมื่อแท่งเทียนปิดทะลุ Neckline ${neck_p['price']:.2f} ด้วย Volume หนาแน่น เป้าหมาย ${target:.2f}",
                     "invalidation": f"รูปแบบจะล้มเหลวหากราคาปิดหลุดต่ำกว่าฐานที่ 2 (${t2['price']:.2f})",
-                    "win_rate": "72% (รูปแบบยอดนิยมความแม่นยำสูง)",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดส่วนสูงฐานคู่ถึงยอดกลาง (${neck_p['price'] - min(t1['price'], t2['price']):.2f}) บวกเพิ่มจากยอด Neckline",
                     "key_points": [
                         {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
@@ -288,7 +287,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "structure": f"ยอดแรก (${p1['price']:.2f}) • ฐานรับกลาง Neckline (${neck_t['price']:.2f}) • ยอดที่สอง (${p2['price']:.2f})",
                     "action_plan": f"ขายทำกำไร (Trim/TP) หรือตั้ง Stop Loss เมื่อราคาหลุด Neckline ${neck_t['price']:.2f} เป้าหมายขาลง ${target:.2f}",
                     "invalidation": f"รูปแบบล้มเหลวหากราคาเบรกทะลุยอดสูงสุด ${max(p1['price'], p2['price']):.2f}",
-                    "win_rate": "69% (Thomas Bulkowski)",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดส่วนสูงของยอดคู่แล้วหักลบออกจาก Neckline ${neck_t['price']:.2f}",
                     "key_points": [
                         {"name": "Peak 1", "time": p1["time"], "price": p1["price"], "role": "start"},
@@ -342,7 +341,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "structure": f"เสาธงสูง {pole_gain*100:.1f}% (${pole_base:.2f} ถึง ${pole_peak:.2f}) • กรอบธงสะสม (${flag_low:.2f} ถึง ${flag_high:.2f})",
                     "action_plan": f"เข้าซื้อทันทีที่ราคาเบรกทะลุกรอบบน ${flag_high:.2f} หรือซื้อสะสมแถวกรอบล่าง ${flag_low:.2f} เป้าหมาย ${target:.2f}",
                     "invalidation": f"รูปแบบเสียทรงหากราคาหลุดต่ำกว่ากรอบล่าง ${flag_low:.2f}",
-                    "win_rate": "70% (Bullish Continuation Pattern)",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดความสูงของเสาธง ({pole_peak - pole_base:.2f}) แล้วนำไปทาบต่อจากจุดเบรกเอาท์ของกรอบธง",
                     "key_points": kp,
                     "lines": [
@@ -384,7 +383,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "structure": f"แนวต้านแนวนอน (${p2['price']:.2f}) • แนวรับเฉียงขึ้นยกฐานจาก ${t1['price']:.2f} มาที่ ${t2['price']:.2f}",
                 "action_plan": f"ดักซื้อสะสมเมื่อราคาลงแตะแนวรับเฉียงขึ้น หรือเคาะซื้อ Follow Buy เมื่อปิดเหนือ ${p2['price']:.2f} เป้าหมาย ${target:.2f}",
                 "invalidation": f"รูปแบบเสียทรงหากราคาหลุดแนวรับเฉียงขึ้น",
-                "win_rate": "73% (มีโอกาสเบรกขึ้นสูงกว่าลง 3 ต่อ 1)",
+                "win_rate": PATTERN_WIN_RATE_NOTE,
                 "target_calc": f"วัดความกว้างของสามเหลี่ยมที่ฐานแรก (${p2['price'] - t1['price']:.2f}) บวกเพิ่มจากจุดต้าน ${p2['price']:.2f}",
                 "key_points": kp,
                 "lines": [
@@ -417,7 +416,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "structure": f"แนวรับแบนราบ (${t2['price']:.2f}) • แนวต้านเฉียงกดต่ำลงต่อเนื่อง",
                 "action_plan": f"ระมัดระวังแรงเทขาย หากหลุดแนวรับ ${t2['price']:.2f} ให้ขายตัดขาดทุนทันที เป้าหมายขาลง ${target:.2f}",
                 "invalidation": f"รูปแบบล้มเหลวหากเบรกทะลุเส้นแนวต้านเฉียงกดขึ้นไปได้",
-                "win_rate": "68% (Bearish Continuation Pattern)",
+                "win_rate": PATTERN_WIN_RATE_NOTE,
                 "target_calc": f"วัดความสูงสามเหลี่ยมแล้วหักลบออกจากแนวรับ ${t2['price']:.2f}",
                 "key_points": kp,
                 "lines": [
@@ -451,7 +450,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "structure": f"กรอบราคาขยายกว้างออกทั้งสองฝั่ง ระหว่างแนวรับ ${t2['price']:.2f} ถึงแนวต้าน ${p2['price']:.2f}",
                 "action_plan": "เน้น Swing Trade ตามกรอบ หรือรอให้ราคากลับเข้าสู่การบีบอัดก่อนเข้าสถานะใหญ่",
                 "invalidation": "ผันผวนรุนแรง ควรวาง Stop Loss กว้าง 2.0 ATR",
-                "win_rate": "55% (ความผันผวนสูง ควรรอการยืนยัน)",
+                "win_rate": PATTERN_WIN_RATE_NOTE,
                 "target_calc": f"เป้าหมายสวิงที่ ${target:.2f}",
                 "key_points": kp,
                 "lines": [
@@ -485,7 +484,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "structure": f"กรอบแนวต้านเฉียงลงและแนวรับเฉียงขึ้น บีบแคบเข้ามาที่โซน ${t2['price']:.2f} - ${p2['price']:.2f}",
                 "action_plan": f"รอการ Breakout ชัดเจนฝั่งใดฝั่งหนึ่ง หากทะลุขึ้นเป้าหมายแรกอยู่ที่ ${target:.2f}",
                 "invalidation": "หากราคาสวิงตัดไปมาโดยไร้ Volume ถือเป็น False Breakout",
-                "win_rate": "65% (เตรียมระเบิดเทรนด์ตามทิศทางเบรก)",
+                "win_rate": PATTERN_WIN_RATE_NOTE,
                 "target_calc": f"วัดความกว้างสูงสุดของสามเหลี่ยม ({p1['price'] - t1['price']:.2f}) นำไปทาบจากจุดเบรก",
                 "key_points": kp,
                 "lines": [
@@ -518,7 +517,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "structure": f"แนวต้านและแนวรับเฉียงลงทั้งคู่แต่ลู่เข้าหากัน ปลายลิ่มบีบแคบใกล้ ${current_price:.2f}",
                 "action_plan": f"เข้าซื้อสะสมในปลายลิ่ม หรือเคาะซื้อเมื่อทะลุกรอบบน ${p2['price']:.2f} เป้าหมายยอดลิ่มเดิมที่ ${target:.2f}",
                 "invalidation": f"รูปแบบเสียทรงหากราคาหลุดเส้นรับล่างของลิ่ม",
-                "win_rate": "74% (หนึ่งในรูปแบบกลับตัวยอดเยี่ยมของสถาบัน)",
+                "win_rate": PATTERN_WIN_RATE_NOTE,
                 "target_calc": f"เป้าหมายเชิงเทคนิคคือจุดเริ่มต้นของลิ่มที่ ${p1['price']:.2f}",
                 "key_points": kp,
                 "lines": [
@@ -551,7 +550,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 "structure": f"กรอบแนวรับแนวต้านขนานกันเฉียงขึ้น ยอดล่าสุดอยู่ที่ ${p2['price']:.2f} ฐานล่าสุดอยู่ที่ ${t2['price']:.2f}",
                 "action_plan": f"เข้าซื้อทุกครั้งที่ราคาย่อตัวลงมาทดสอบกรอบล่างของ Channel และขายทำกำไรบางส่วนที่กรอบบน เป้าหมาย ${target:.2f}",
                 "invalidation": f"ระวังหากราคาหลุดกรอบล่าง Channel อาจเข้าสู่ช่วงการพักฐานใหญ่",
-                "win_rate": "76% (Trend Following Setup)",
+                "win_rate": PATTERN_WIN_RATE_NOTE,
                 "target_calc": f"เป้าหมายแนวต้านกรอบบนคำนวณที่ ${target:.2f}",
                 "key_points": kp,
                 "lines": [
@@ -591,7 +590,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             "structure": f"กรอบแนวรับ ${recent_low:.2f} และแนวต้าน ${recent_high:.2f}",
             "action_plan": f"ตั้งรับใกล้แนวรับ ${recent_low:.2f} หรือ Follow Buy เมื่อเบรกทะลุกรอบบน ${recent_high:.2f} เป้าหมาย ${target:.2f}",
             "invalidation": f"Stop Loss หากราคาปิดหลุดแนวรับ ${recent_low:.2f}",
-            "win_rate": "60% (Range Trading Strategy)",
+            "win_rate": PATTERN_WIN_RATE_NOTE,
             "target_calc": f"ความสูงของกรอบบวกเพิ่มจากแนวต้านเป้าหมาย ${target:.2f}",
             "key_points": kp,
             "lines": [
@@ -1660,7 +1659,7 @@ def compute_ai_confluence_signals(
                 reasons.append(f"โซนราคาคุณค่า: เด้งทดสอบแนวรับ Fibonacci 50.0% (${f500:.2f})")
             elif poc_price > 0 and abs(c_low - poc_price) / poc_price <= 0.035:
                 score += 1
-                reasons.append(f"โซนราคาคุณค่า: ทดสอบ Inception POC โซนสะสมวอลุ่มหนาแน่น (${poc_price:.2f})")
+                reasons.append(f"โซนราคาคุณค่า: ทดสอบ POC 2 ปี โซนสะสมวอลุ่มหนาแน่น (${poc_price:.2f})")
 
             # Factor 2: Momentum / RSI Hook
             if c_rsi <= 38:
@@ -1905,10 +1904,25 @@ def compute_ai_confluence_signals(
     return historical_signals
 
 
+def _previous_month_hlc(candles: List[Dict[str, Any]]) -> tuple:
+    y, m = int(candles[-1]["time"][:4]), int(candles[-1]["time"][5:7])
+    prev_key = f"{y - 1}-12" if m == 1 else f"{y}-{m - 1:02d}"
+    month = [c for c in candles if c["time"][:7] == prev_key]
+    if not month:
+        cur_key = candles[-1]["time"][:7]
+        earlier = [c for c in candles if c["time"][:7] < cur_key]
+        if earlier:
+            last_key = earlier[-1]["time"][:7]
+            month = [c for c in earlier if c["time"][:7] == last_key]
+        else:
+            month = candles
+    return max(c["high"] for c in month), min(c["low"] for c in month), month[-1]["close"]
+
+
 def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Compute Inception High/Low (ATH/ATL), Fibonacci retracement levels from inception,
-    Inception-anchored VWAP, Volume Profile POC from inception, Moving Averages from inception,
+    Compute Inception High/Low (ATH/ATL), Fibonacci retracements (52W cycle and 2Y macro),
+    VWAP and Volume Profile POC anchored to the last ANCHOR_BARS daily bars, Moving Averages,
     SuperTrend, Parabolic SAR, Golden/Death cross, Oscillators, and Classical Chart Patterns.
     """
     if not candles or len(candles) < 5:
@@ -1939,16 +1953,19 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     ath_time = candles[ath_idx]["time"]
     atl_time = candles[atl_idx]["time"]
 
-    # 2. Inception & 52-Week Cycle Fibonacci Retracements
-    diff_all = ath_val - atl_val
+    # 2. 2Y Macro & 52-Week Cycle Fibonacci Retracements
+    a0 = max(0, n - ANCHOR_BARS)
+    macro_hi = max(highs[a0:])
+    macro_lo = min(lows[a0:])
+    diff_macro = macro_hi - macro_lo
     fibo_macro = {
-        "0.0": round(ath_val, 2),
-        "23.6": round(ath_val - 0.236 * diff_all, 2),
-        "38.2": round(ath_val - 0.382 * diff_all, 2),
-        "50.0": round(ath_val - 0.500 * diff_all, 2),
-        "61.8": round(ath_val - 0.618 * diff_all, 2),
-        "78.6": round(ath_val - 0.786 * diff_all, 2),
-        "100.0": round(atl_val, 2)
+        "0.0": round(macro_hi, 2),
+        "23.6": round(macro_hi - 0.236 * diff_macro, 2),
+        "38.2": round(macro_hi - 0.382 * diff_macro, 2),
+        "50.0": round(macro_hi - 0.500 * diff_macro, 2),
+        "61.8": round(macro_hi - 0.618 * diff_macro, 2),
+        "78.6": round(macro_hi - 0.786 * diff_macro, 2),
+        "100.0": round(macro_lo, 2)
     }
 
     recent_252_highs = highs[-252:] if len(highs) >= 252 else highs
@@ -1968,50 +1985,44 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     # fibo_levels defaults to active swing cycle for high relevance to current price
     fibo_levels = fibo_cycle
 
-    # 3. SuperTrend (10, 3) across all bars from inception
+    # 3. SuperTrend (10, 3) with Wilder RMA ATR, matching TradingView ta.supertrend
     tr_list = []
-    atr10 = []
     for i in range(n):
         if i == 0:
             tr_list.append(highs[i] - lows[i])
         else:
             tr_list.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
-        if i >= 9:
-            atr10.append(sum(tr_list[i - 9 : i + 1]) / 10.0)
-        else:
-            atr10.append(tr_list[-1])
+    st_period = min(10, n)
+    atr10: List[Optional[float]] = [None] * n
+    atr10[st_period - 1] = sum(tr_list[:st_period]) / st_period
+    for i in range(st_period, n):
+        atr10[i] = (atr10[i - 1] * (st_period - 1) + tr_list[i]) / st_period
 
     upper_band = 0.0
     lower_band = 0.0
-    in_uptrend = True
-    last_st_val = closes[-1]
-    for i in range(n):
+    in_uptrend = False
+    for i in range(st_period - 1, n):
         hl2 = (highs[i] + lows[i]) / 2.0
         basic_upper = hl2 + 3.0 * atr10[i]
         basic_lower = hl2 - 3.0 * atr10[i]
-        if i == 0:
-            upper_band = basic_upper
-            lower_band = basic_lower
-        else:
-            if basic_lower > lower_band or closes[i - 1] < lower_band:
-                lower_band = basic_lower
-            if basic_upper < upper_band or closes[i - 1] > upper_band:
-                upper_band = basic_upper
-
+        if i == st_period - 1:
+            upper_band, lower_band = basic_upper, basic_lower
+            in_uptrend = False
+            continue
+        prev_upper, prev_lower = upper_band, lower_band
+        lower_band = basic_lower if (basic_lower > prev_lower or closes[i - 1] < prev_lower) else prev_lower
+        upper_band = basic_upper if (basic_upper < prev_upper or closes[i - 1] > prev_upper) else prev_upper
         if in_uptrend:
-            if closes[i] < lower_band:
-                in_uptrend = False
+            in_uptrend = closes[i] >= lower_band
         else:
-            if closes[i] > upper_band:
-                in_uptrend = True
+            in_uptrend = closes[i] > upper_band
+    last_st_val = lower_band if in_uptrend else upper_band
 
-        last_st_val = lower_band if in_uptrend else upper_band
-
-    # 4. Inception-Anchored VWAP (calculated from day 1 of entering the market)
+    # 4. VWAP anchored to the last ANCHOR_BARS daily bars
     cum_vol = 0
     cum_tp_vol = 0
     vwap_val = closes[-1]
-    for i in range(n):
+    for i in range(a0, n):
         tp = (highs[i] + lows[i] + closes[i]) / 3.0
         v = volumes[i]
         cum_vol += v
@@ -2019,13 +2030,13 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     if cum_vol > 0:
         vwap_val = cum_tp_vol / cum_vol
 
-    # 5. Inception Volume Profile POC (calculated across all volume since entering the market)
-    p_min = atl_val
-    p_max = ath_val
+    # 5. Volume Profile POC over the last ANCHOR_BARS daily bars
+    p_min = macro_lo
+    p_max = macro_hi
     buckets = 50
     bucket_size = (p_max - p_min) / buckets if p_max > p_min else 1.0
     vol_bins = [0] * buckets
-    for i in range(n):
+    for i in range(a0, n):
         b_idx = min(buckets - 1, max(0, int((closes[i] - p_min) / max(1e-6, bucket_size))))
         vol_bins[b_idx] += volumes[i]
     poc_idx = vol_bins.index(max(vol_bins))
@@ -2085,15 +2096,14 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     w52_high = round(max(highs[-252:]), 2)
     w52_low = round(min(lows[-252:]), 2)
 
-    # 10. Pivot Points (Classic) from recent 22 bars
-    m_high = max(highs[-22:])
-    m_low = min(lows[-22:])
-    m_close = closes[-1]
-    p_pivot = round((m_high + m_low + m_close) / 3.0, 2)
-    r1 = round(2.0 * p_pivot - m_low, 2)
-    s1 = round(2.0 * p_pivot - m_high, 2)
-    r2 = round(p_pivot + (m_high - m_low), 2)
-    s2 = round(p_pivot - (m_high - m_low), 2)
+    # 10. Classic Pivot Points from the previous completed calendar month's H/L/C
+    m_high, m_low, m_close = _previous_month_hlc(candles)
+    p_raw = (m_high + m_low + m_close) / 3.0
+    p_pivot = round(p_raw, 2)
+    r1 = round(2.0 * p_raw - m_low, 2)
+    s1 = round(2.0 * p_raw - m_high, 2)
+    r2 = round(p_raw + (m_high - m_low), 2)
+    s2 = round(p_raw - (m_high - m_low), 2)
 
     # 11. Golden / Death Cross
     sma50_last = sum(closes[-50:]) / 50.0 if len(closes) >= 50 else closes[-1]
@@ -2140,7 +2150,7 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         sar_status = f"{'BULLISH 🟢' if is_long else 'BEARISH 🔴'} (${last_sar_val:.2f})"
 
     # 13. ATR (14) Volatility
-    atr14_val = atr10[-1] if len(atr10) > 0 else 0.0
+    atr14_val = round(atr10[-1], 2)
     if n >= 14:
         atr14 = sum(tr_list[:14]) / 14.0
         for tr in tr_list[14:]:
@@ -2191,6 +2201,7 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         "volume_profile": {
             "poc": poc_price
         },
+        "anchor_2y": {"time": candles[a0]["time"], "bars": n - a0},
         "supertrend": {
             "trend": "BULLISH" if in_uptrend else "BEARISH",
             "last_value": round(last_st_val, 2)
@@ -2255,14 +2266,28 @@ def load_candles_cache() -> Dict[str, Any]:
         return {}
 
 
+def _strip_candle_colors(entry: Dict[str, Any]) -> Dict[str, Any]:
+    cdc = entry.get("cdc_actionzone")
+    if isinstance(cdc, dict) and "candle_colors" in cdc:
+        entry = {**entry, "cdc_actionzone": {k: v for k, v in cdc.items() if k != "candle_colors"}}
+    return entry
+
+
 def save_candles_cache(cache: Dict[str, Any]):
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(CACHE_PATH, "w", encoding="utf-8") as f:
-        json.dump(cache, f, ensure_ascii=False)
+    slim = {t: _strip_candle_colors(e) if isinstance(e, dict) else e for t, e in cache.items()}
+    fd, tmp = tempfile.mkstemp(dir=CACHE_PATH.parent, prefix=CACHE_PATH.name, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(slim, f, ensure_ascii=False)
+        os.replace(tmp, CACHE_PATH)
+    except BaseException:
+        os.unlink(tmp)
+        raise
 
 
 # Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 2
+INDICATOR_SCHEMA_VERSION = 3
 
 
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
@@ -2302,12 +2327,15 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
                 else:
                     candles = fetch_ticker_candles(t)
                     fetched_ts = now_ts
+                if not candles:
+                    raise ValueError("no candles returned")
                 chart_data = compute_fibo_and_indicators(candles)
                 chart_data["timestamp"] = fetched_ts
                 chart_data["full_history"] = True
                 chart_data["schema_version"] = INDICATOR_SCHEMA_VERSION
                 return t, chart_data
             except Exception as e:
+                print(f"[chart_data] {t}: refresh failed, keeping cached data: {type(e).__name__}: {e}", file=sys.stderr)
                 return t, None
 
         with ThreadPoolExecutor(max_workers=10) as executor:
@@ -2316,6 +2344,8 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
         for t, data in results:
             if data and data.get("candles"):
                 cache[t] = data
+            elif cache.get(t):
+                cache[t] = {**cache[t], "stale": True}
 
         save_candles_cache(cache)
 
@@ -2356,10 +2386,6 @@ def compact_charts_for_page(cache: Dict[str, Any], tickers: Iterable[str]) -> Di
                 m["volume"] += c["volume"]
             else:
                 monthly.append(dict(c))
-        entry_copy = dict(entry)
-        if "cdc_actionzone" in entry_copy and isinstance(entry_copy["cdc_actionzone"], dict):
-            cdc = dict(entry_copy["cdc_actionzone"])
-            cdc.pop("candle_colors", None)
-            entry_copy["cdc_actionzone"] = cdc
+        entry_copy = _strip_candle_colors(entry)
         out[t] = {**entry_copy, "candles": monthly + candles[cut:]}
     return out

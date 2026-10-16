@@ -7,6 +7,7 @@ Fetches live TradingView data, evaluates TP/SL status, and produces an interacti
 
 import argparse
 import json
+from html import escape
 import math
 import sys
 from datetime import datetime
@@ -19,23 +20,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.tradingview import fetch_screener_data
 from src.screener import FALLBACK_SL_RATIO, atr_stop_loss, evaluate_stock
 from src.outlook import get_forward_outlook
-from src.html_report import get_chart_modal_component
+from src.fmt import money, pct
+from src.fx import resolve_usdthb
+from src.html_report import get_chart_modal_component, _make_chart_onclick
 from src.nav import nav_bar_html
+
+NA = "n/a"
 
 
 def _make_dip_chart_onclick(p: Dict[str, Any]) -> str:
-    ticker = p.get("ticker", "")
-    exchange = p.get("exchange", "NASDAQ")
-    name = (p.get("name") or ticker).replace("'", "\\'")
-    sector = (p.get("business") or "").replace("'", "\\'")
-    cost = p.get("buy_price_usd", 0.0)
-    price = p.get("close_price", 0.0)
-    supp = p.get("sma200", 0.0) or 0.0
-    res = p.get("take_profit_usd", 0.0)
-    sl = p.get("stop_loss_usd", 0.0)
-    tp = p.get("take_profit_usd", 0.0)
-    target = p.get("target_avg", 0.0) or 0.0
-    return f"openChartModal('{ticker}', '{exchange}', '{name}', '{sector}', {cost}, {price}, {supp}, {res}, {sl}, {tp}, {target})"
+    return _make_chart_onclick({
+        "ticker": p.get("ticker", ""),
+        "exchange": p.get("exchange", "NASDAQ"),
+        "name": p.get("name"),
+        "sector": p.get("business") or "",
+        "avg_cost_usd": p.get("buy_price_usd", 0.0),
+        "close_price": p.get("close_price") or 0.0,
+        "key_support": p.get("sma200") or 0.0,
+        "key_resistance": p.get("take_profit_usd", 0.0),
+        "stop_loss": p.get("stop_loss_usd", 0.0),
+        "take_profit": p.get("take_profit_usd", 0.0),
+        "price_target_average": p.get("target_avg") or 0.0,
+    })
 
 
 DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "portfolio_dip_sim.json"
@@ -57,7 +63,7 @@ def save_simulation_data(data: Dict[str, Any]):
 def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
     holdings = sim_data.get("holdings", [])
     closed_trades = sim_data.get("closed_trades", [])
-    fx_rate = float(sim_data.get("fx_rate_usd_thb", 33.62))
+    fx_rate = resolve_usdthb(sim_data.get("fx_rate_usd_thb"))
 
     symbols_to_fetch = [f"{h.get('exchange', 'NASDAQ')}:{h['ticker']}" for h in holdings]
     live_rows = fetch_screener_data(symbols_to_fetch)
@@ -72,6 +78,7 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
     hit_tp_count = 0
     hit_sl_count = 0
     in_profit_count = 0
+    price_missing_tickers: List[str] = []
 
     for h in holdings:
         ticker = h["ticker"]
@@ -83,25 +90,33 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
         tp_price = float(h.get("take_profit_usd", buy_price * 1.08))
 
         live_row = live_dict.get(ticker, {})
-        close_price = live_row.get("close") or buy_price
+        close_price = live_row.get("close") or None
+        price_missing = close_price is None
         day_chg_pct = live_row.get("change") or 0.0
         rsi = live_row.get("RSI")
         sma200 = live_row.get("SMA200")
         target_avg = live_row.get("price_target_average")
 
-        current_val_usd = shares * close_price
-        current_val_thb = current_val_usd * fx_rate
-        unrealized_pl_usd = current_val_usd - cap_usd
-        unrealized_pl_thb = current_val_thb - cap_thb
-        unrealized_pl_pct = (unrealized_pl_usd / cap_usd * 100.0) if cap_usd > 0 else 0.0
+        if price_missing:
+            price_missing_tickers.append(ticker)
+            current_val_usd = current_val_thb = None
+            unrealized_pl_usd = unrealized_pl_thb = unrealized_pl_pct = None
+            progress_pct = dist_to_tp_pct = dist_to_sl_pct = None
+        else:
+            current_val_usd = shares * close_price
+            current_val_thb = current_val_usd * fx_rate
+            unrealized_pl_usd = current_val_usd - cap_usd
+            unrealized_pl_thb = current_val_thb - cap_thb
+            unrealized_pl_pct = (unrealized_pl_usd / cap_usd * 100.0) if cap_usd > 0 else 0.0
+            tp_span = max(tp_price - sl_price, 0.01)
+            progress_pct = round(max(0.0, min(100.0, (close_price - sl_price) / tp_span * 100.0)), 1)
+            dist_to_tp_pct = round((tp_price - close_price) / close_price * 100.0, 1)
+            dist_to_sl_pct = round((close_price - sl_price) / close_price * 100.0, 1)
 
-        # TP / SL progress
-        tp_span = max(tp_price - sl_price, 0.01)
-        progress_pct = max(0.0, min(100.0, (close_price - sl_price) / tp_span * 100.0))
-        dist_to_tp_pct = ((tp_price - close_price) / close_price * 100.0) if close_price > 0 else 0.0
-        dist_to_sl_pct = ((close_price - sl_price) / close_price * 100.0) if close_price > 0 else 0.0
-
-        if close_price >= tp_price:
+        if price_missing:
+            status = "⚠️ ไม่ได้ราคา (ไม่รวมในยอดรวม)"
+            status_cls = "badge-warning"
+        elif close_price >= tp_price:
             status = "🎯 ถึงเป้าทำกำไร (Hit TP)"
             status_cls = "badge-success"
             hit_tp_count += 1
@@ -117,10 +132,11 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
             status = "🟡 พักตัวรอดีด (Pullback)"
             status_cls = "badge-warning"
 
-        total_capital_thb += cap_thb
-        total_capital_usd += cap_usd
-        total_current_val_thb += current_val_thb
-        total_current_val_usd += current_val_usd
+        if not price_missing:
+            total_capital_thb += cap_thb
+            total_capital_usd += cap_usd
+            total_current_val_thb += current_val_thb
+            total_current_val_usd += current_val_usd
 
         # Forward Outlook
         fo = get_forward_outlook(
@@ -146,6 +162,7 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
             "buy_price_usd": buy_price,
             "shares": shares,
             "close_price": close_price,
+            "price_missing": price_missing,
             "day_chg_pct": day_chg_pct,
             "rsi": round(rsi, 1) if rsi is not None else None,
             "sma200": round(sma200, 2) if sma200 else None,
@@ -157,9 +174,9 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
             "unrealized_pl_pct": unrealized_pl_pct,
             "stop_loss_usd": sl_price,
             "take_profit_usd": tp_price,
-            "progress_pct": round(progress_pct, 1),
-            "dist_to_tp_pct": round(dist_to_tp_pct, 1),
-            "dist_to_sl_pct": round(dist_to_sl_pct, 1),
+            "progress_pct": progress_pct,
+            "dist_to_tp_pct": dist_to_tp_pct,
+            "dist_to_sl_pct": dist_to_sl_pct,
             "status": status,
             "status_cls": status_cls,
             "strategy_tier": h.get("strategy_tier", "⭐⭐ Good Setup"),
@@ -187,6 +204,7 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
         "total_pl_thb": total_pl_thb,
         "total_pl_pct": total_pl_pct,
         "holdings_count": len(analyzed_positions),
+        "price_missing_tickers": price_missing_tickers,
         "hit_tp_count": hit_tp_count,
         "hit_sl_count": hit_sl_count,
         "in_profit_count": in_profit_count,
@@ -202,7 +220,10 @@ def generate_html_report(data: Dict[str, Any]) -> str:
     total_pl_usd = data["total_pl_usd"]
     total_pl_pct = data["total_pl_pct"]
     pl_color = "#10b981" if total_pl_thb >= 0 else "#f43f5e"
-    pl_sign = "+" if total_pl_thb >= 0 else ""
+    missing_tickers = data.get("price_missing_tickers") or []
+    missing_note = (
+        f'<div class="kpi-subtext" style="color: #fbbf24;">⚠️ ไม่ได้ราคา {escape(", ".join(missing_tickers))} (ไม่รวมในยอดรวม)</div>'
+    ) if missing_tickers else ""
 
     # Generate table rows
     rows_html = ""
@@ -210,54 +231,56 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         p_pl_usd = p["unrealized_pl_usd"]
         p_pl_thb = p["unrealized_pl_thb"]
         p_pl_pct = p["unrealized_pl_pct"]
-        c = "#10b981" if p_pl_usd >= 0 else "#f43f5e"
-        s = "+" if p_pl_usd >= 0 else ""
+        c = "#94a3b8" if p_pl_usd is None else ("#10b981" if p_pl_usd >= 0 else "#f43f5e")
         day_c = "#10b981" if p["day_chg_pct"] >= 0 else "#f43f5e"
-        day_s = "+" if p["day_chg_pct"] >= 0 else ""
+        e_ticker = escape(str(p['ticker']))
+        e_name = escape(str(p['name']))
+        e_business = escape(str(p['business']))
+        tp_note = f"อีก {pct(p['dist_to_tp_pct'])} ถึงเป้า TP" if p['dist_to_tp_pct'] is not None else "ไม่ได้ราคา"
 
         onclick_js = _make_dip_chart_onclick(p)
 
         rows_html += f"""
         <tr>
             <td>
-                <span class="ticker-link clickable-ticker" onclick="{onclick_js}" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{p['ticker']} 📈</span>
-                <div class="text-muted small">{p['exchange']}</div>
+                <span class="ticker-link clickable-ticker" onclick="{onclick_js}" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{e_ticker} 📈</span>
+                <div class="text-muted small">{escape(str(p['exchange']))}</div>
             </td>
             <td>
-                <div style="font-weight: 600;">{p['name']}</div>
-                <div class="text-muted small">{p['business']}</div>
+                <div style="font-weight: 600;">{e_name}</div>
+                <div class="text-muted small">{e_business}</div>
             </td>
-            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">{p['entry_date']}</td>
+            <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">{escape(str(p['entry_date']))}</td>
             <td style="text-align: right; font-weight: 600;">
-                <div>${p['buy_price_usd']:,.2f}</div>
+                <div>{money(p['buy_price_usd'])}</div>
                 <div class="text-muted small">{p['shares']:.4f} หุ้น</div>
             </td>
             <td style="text-align: right; font-weight: 700;">
-                <div>${p['close_price']:,.2f}</div>
-                <div style="color: {day_c}; font-size: 0.80rem;">{day_s}{p['day_chg_pct']:.2f}%</div>
+                <div>{money(p['close_price'], na=NA)}</div>
+                <div style="color: {day_c}; font-size: 0.80rem;">{pct(p['day_chg_pct'], digits=2)}</div>
             </td>
             <td style="text-align: right;">
-                <div>฿{p['capital_thb']:,.0f}</div>
-                <div class="text-muted small">${p['capital_usd']:,.2f}</div>
+                <div>{money(p['capital_thb'], 'THB', digits=0)}</div>
+                <div class="text-muted small">{money(p['capital_usd'])}</div>
             </td>
             <td style="text-align: right;">
-                <div style="font-weight: 600;">฿{p['current_val_thb']:,.0f}</div>
-                <div class="text-muted small">${p['current_val_usd']:,.2f}</div>
+                <div style="font-weight: 600;">{money(p['current_val_thb'], 'THB', digits=0, na=NA)}</div>
+                <div class="text-muted small">{money(p['current_val_usd'], na=NA)}</div>
             </td>
             <td style="text-align: right; color: {c}; font-weight: 700;">
-                <div>{s}{p_pl_pct:.2f}%</div>
-                <div style="font-size: 0.82rem;">{s}฿{p_pl_thb:,.2f} ({s}${p_pl_usd:,.2f})</div>
+                <div>{pct(p_pl_pct, digits=2, na=NA)}</div>
+                <div style="font-size: 0.82rem;">{money(p_pl_thb, 'THB', signed=True, na=NA)} ({money(p_pl_usd, signed=True, na=NA)})</div>
             </td>
             <td>
                 <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px;">
-                    <span style="color: #f43f5e;">SL: ${p['stop_loss_usd']:,.2f}</span>
-                    <span style="color: #10b981;">TP: ${p['take_profit_usd']:,.2f}</span>
+                    <span style="color: #f43f5e;">SL: {money(p['stop_loss_usd'])}</span>
+                    <span style="color: #10b981;">TP: {money(p['take_profit_usd'])}</span>
                 </div>
                 <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" style="width: {p['progress_pct']}%;"></div>
+                    <div class="progress-bar-fill" style="width: {p['progress_pct'] or 0}%;"></div>
                 </div>
                 <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
-                    อีก {p['dist_to_tp_pct']:+.1f}% ถึงเป้า TP
+                    {tp_note}
                 </div>
             </td>
             <td style="text-align: center;">
@@ -272,8 +295,8 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         p_pl_usd = p["unrealized_pl_usd"]
         p_pl_thb = p["unrealized_pl_thb"]
         p_pl_pct = p["unrealized_pl_pct"]
-        c = "#10b981" if p_pl_usd >= 0 else "#f43f5e"
-        s = "+" if p_pl_usd >= 0 else ""
+        c = "#94a3b8" if p_pl_usd is None else ("#10b981" if p_pl_usd >= 0 else "#f43f5e")
+        fo = p.get('forward_outlook', {})
 
         onclick_js = _make_dip_chart_onclick(p)
 
@@ -281,8 +304,8 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         <div class="card card-item">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                 <div>
-                    <span class="ticker-badge clickable-ticker" onclick="{onclick_js}" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{p['ticker']} 📈</span>
-                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">{p['name']}</span>
+                    <span class="ticker-badge clickable-ticker" onclick="{onclick_js}" style="cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{escape(str(p['ticker']))} 📈</span>
+                    <span style="font-size: 0.95rem; font-weight: 700; margin-left: 8px;">{escape(str(p['name']))}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="badge {p['status_cls']}">{p['status']}</span>
@@ -290,39 +313,39 @@ def generate_html_report(data: Dict[str, Any]) -> str:
                 </div>
             </div>
             <div style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px;">
-                {p['business']}
+                {escape(str(p['business']))}
             </div>
             <div class="metric-grid">
                 <div class="metric-box">
                     <div class="metric-lbl">ทุนจำลอง (THB)</div>
-                    <div class="metric-val">฿{p['capital_thb']:,.0f}</div>
+                    <div class="metric-val">{money(p['capital_thb'], 'THB', digits=0)}</div>
                 </div>
                 <div class="metric-box">
                     <div class="metric-lbl">ต้นทุนเข้าซื้อ</div>
-                    <div class="metric-val">${p['buy_price_usd']:,.2f}</div>
+                    <div class="metric-val">{money(p['buy_price_usd'])}</div>
                 </div>
                 <div class="metric-box">
                     <div class="metric-lbl">ราคาตลาดสด</div>
-                    <div class="metric-val">${p['close_price']:,.2f}</div>
+                    <div class="metric-val">{money(p['close_price'], na=NA)}</div>
                 </div>
                 <div class="metric-box">
                     <div class="metric-lbl">กำไร/ขาดทุน</div>
-                    <div class="metric-val" style="color: {c};">{s}{p_pl_pct:.2f}% ({s}฿{p_pl_thb:,.1f})</div>
+                    <div class="metric-val" style="color: {c};">{pct(p_pl_pct, digits=2, na=NA)} ({money(p_pl_thb, 'THB', signed=True, digits=1, na=NA)})</div>
                 </div>
             </div>
             <div style="margin-top: 10px; background: rgba(59, 130, 246, 0.06); border-left: 3px solid var(--blue); padding: 8px 12px; border-radius: 4px;">
-                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต ({p.get('forward_outlook', {}).get('quality_badge', '🔵 Strategic Dip Pick')}):</div>
-                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">{p.get('forward_outlook', {}).get('thesis_title', '-')}</div>
+                <div style="font-size: 0.75rem; color: #60a5fa; font-weight: 700; margin-bottom: 2px;">🔭 วิสัยทัศน์ & ธีมการเติบโต ({fo.get('quality_badge', '🔵 Strategic Dip Pick')}):</div>
+                <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.35;">{fo.get('thesis_title', '-')}</div>
             </div>
             <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
                     🎯 กลยุทธ์ช้อนซื้อ: {p['strategy_tier']}
                 </div>
                 <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
-                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> {p['setup_reason']}
+                    💡 <strong>เหตุผลที่เข้าซื้อ:</strong> {escape(str(p['setup_reason']))}
                 </div>
                 <div style="font-size: 0.80rem; color: var(--text-muted);">
-                    🛡️ จุดตัดขาดทุน SL: <strong>${p['stop_loss_usd']:,.2f}</strong> | 🎯 จุดทำกำไร TP: <strong>${p['take_profit_usd']:,.2f}</strong>
+                    🛡️ จุดตัดขาดทุน SL: <strong>{money(p['stop_loss_usd'])}</strong> | 🎯 จุดทำกำไร TP: <strong>{money(p['take_profit_usd'])}</strong>
                 </div>
             </div>
         </div>
@@ -335,27 +358,37 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         r_pl_t = t.get("realized_pl_thb", 0.0)
         r_pl_pct = t.get("realized_pl_pct", 0.0)
         c = "#10b981" if r_pl_u >= 0 else "#f43f5e"
-        s = "+" if r_pl_u >= 0 else ""
-        t_name_js = (t.get('name') or t['ticker']).replace("'", "\\'")
-        t_click_js = f"openChartModal('{t['ticker']}', '{t.get('exchange', 'NYSE')}', '{t_name_js}', 'Closed Position', {t.get('buy_price_usd', 0)}, {t.get('exit_price_usd', 0)}, 0, 0, {t.get('exit_price_usd', 0)}, 0, 0)"
+        t_click_js = _make_chart_onclick({
+            "ticker": t['ticker'],
+            "exchange": t.get('exchange', 'NYSE'),
+            "name": t.get('name'),
+            "sector": "Closed Position",
+            "avg_cost_usd": t.get('buy_price_usd', 0),
+            "close_price": t.get('exit_price_usd', 0),
+            "key_support": 0,
+            "key_resistance": 0,
+            "stop_loss": t.get('exit_price_usd', 0),
+            "take_profit": 0,
+            "price_target_average": 0,
+        })
 
         closed_rows_html += f"""
         <tr>
             <td style="font-weight: 700; color: #fff; font-family: 'Inter', sans-serif;">
-                <span class="clickable-ticker" onclick=\"{t_click_js}\" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">{t['ticker']} 📈</span>
+                <span class="clickable-ticker" onclick="{t_click_js}" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">{escape(str(t['ticker']))} 📈</span>
             </td>
             <td>
-                <div style="font-weight: 600;">{t['name']}</div>
-                <div class="text-muted small">{t.get('exit_reason', '-')}</div>
+                <div style="font-weight: 600;">{escape(str(t.get('name') or t['ticker']))}</div>
+                <div class="text-muted small">{escape(str(t.get('exit_reason', '-')))}</div>
             </td>
             <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">{t.get('entry_date', '-')}</td>
             <td style="text-align: center; color: var(--rose); font-size: 0.85rem; font-weight: 600;">{t.get('exit_date', '-')} ({t.get('holding_days', '-')} วัน)</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('buy_price_usd', 0):,.2f}</td>
-            <td style="text-align: right; font-weight: 600; color: var(--rose); font-family: 'Inter', sans-serif;">${t.get('exit_price_usd', 0):,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">฿{t.get('capital_thb', 0):,.0f}</td>
-            <td style="text-align: right; font-weight: 600; font-family: 'Inter', sans-serif;">฿{t.get('net_revenue_thb', 0):,.0f}</td>
-            <td style="text-align: right; color: {c}; font-weight: 700; font-family: 'Inter', sans-serif;">{s}฿{r_pl_t:,.2f} ({s}${r_pl_u:,.2f})</td>
-            <td style="text-align: right; color: {c}; font-weight: 700; font-family: 'Inter', sans-serif;">{s}{r_pl_pct:.2f}%</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('buy_price_usd', 0))}</td>
+            <td style="text-align: right; font-weight: 600; color: var(--rose); font-family: 'Inter', sans-serif;">{money(t.get('exit_price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('capital_thb', 0), 'THB', digits=0)}</td>
+            <td style="text-align: right; font-weight: 600; font-family: 'Inter', sans-serif;">{money(t.get('net_revenue_thb', 0), 'THB', digits=0)}</td>
+            <td style="text-align: right; color: {c}; font-weight: 700; font-family: 'Inter', sans-serif;">{money(r_pl_t, 'THB', signed=True)} ({money(r_pl_u, signed=True)})</td>
+            <td style="text-align: right; color: {c}; font-weight: 700; font-family: 'Inter', sans-serif;">{pct(r_pl_pct, digits=2)}</td>
             <td style="text-align: center;"><span class="badge badge-danger">ตัดขาดทุนตาม SL</span></td>
         </tr>
         """
@@ -365,7 +398,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{data['portfolio_name']} (ตัวละ ฿10,000)</title>
+    <title>{escape(str(data['portfolio_name']))} (ตัวละ ฿10,000)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -479,10 +512,10 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         <div class="header">
             <div>
                 <h1 style="font-size: 1.75rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
-                    <span>🧪</span> {data['portfolio_name']}
+                    <span>🧪</span> {escape(str(data['portfolio_name']))}
                 </h1>
                 <div style="color: var(--text-secondary); margin-top: 4px; font-size: 0.92rem;">
-                    {data['description']} | เงินลงทุนจำลองคงที่ตัวละ <strong>฿10,000.00 THB</strong>
+                    {escape(str(data['description']))} | เงินลงทุนจำลองคงที่ตัวละ <strong>฿10,000.00 THB</strong>
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
@@ -494,18 +527,19 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         <div class="grid-4-cols">
             <div class="card" style="border-left: 4px solid var(--blue);">
                 <div class="kpi-label">เงินทุนจำลองรวม (Total Capital)</div>
-                <div class="kpi-value">฿{data['total_capital_thb']:,.2f}</div>
-                <div class="kpi-subtext">~${data['total_capital_usd']:,.2f} USD ({data['holdings_count']} หุ้น x ฿10,000)</div>
+                <div class="kpi-value">{money(data['total_capital_thb'], 'THB')}</div>
+                <div class="kpi-subtext">~{money(data['total_capital_usd'])} USD ({data['holdings_count']} หุ้น x ฿10,000)</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--cyan);">
                 <div class="kpi-label">มูลค่าพอร์ตจำลองปัจจุบัน (Simulated NAV)</div>
-                <div class="kpi-value">฿{data['total_current_val_thb']:,.2f}</div>
-                <div class="kpi-subtext">~${data['total_current_val_usd']:,.2f} USD</div>
+                <div class="kpi-value">{money(data['total_current_val_thb'], 'THB')}</div>
+                <div class="kpi-subtext">~{money(data['total_current_val_usd'])} USD</div>
+                {missing_note}
             </div>
             <div class="card" style="border-left: 4px solid {pl_color};">
                 <div class="kpi-label">กำไร/ขาดทุนจำลองรวม (Simulated P/L)</div>
-                <div class="kpi-value" style="color: {pl_color};">{pl_sign}฿{total_pl_thb:,.2f}</div>
-                <div class="kpi-subtext" style="color: {pl_color}; font-weight: 700;">{pl_sign}{total_pl_pct:.2f}% ({pl_sign}${total_pl_usd:,.2f} USD)</div>
+                <div class="kpi-value" style="color: {pl_color};">{money(total_pl_thb, 'THB', signed=True)}</div>
+                <div class="kpi-subtext" style="color: {pl_color}; font-weight: 700;">{pct(total_pl_pct, digits=2)} ({money(total_pl_usd, signed=True)} USD)</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--purple);">
                 <div class="kpi-label">สถานะการเทรดจำลอง (Trade Progress)</div>
@@ -612,7 +646,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
 def add_sim_holding(ticker: str, capital_thb: float = 10000.0, notes: str = "") -> Dict[str, Any]:
     ticker = ticker.upper().strip()
     sim_data = load_simulation_data()
-    fx_rate = float(sim_data.get("fx_rate_usd_thb", 33.62))
+    fx_rate = resolve_usdthb(sim_data.get("fx_rate_usd_thb"))
 
     from src.universe import resolve_custom_tickers
     from src.profiles import get_business_summary
@@ -644,7 +678,7 @@ def add_sim_holding(ticker: str, capital_thb: float = 10000.0, notes: str = "") 
 
     rsi = live_row.get("RSI")
     rsi_str = f"Daily RSI {rsi:.1f}" if rsi is not None else "Dip Setup"
-    setup_reason = f"{rsi_str} + ซื้อที่ราคาตลาด ${close_price:,.2f}"
+    setup_reason = f"{rsi_str} + ซื้อที่ราคาตลาด {money(close_price)}"
 
     new_holding = {
         "id": f"dip-{int(datetime.now().timestamp())}",
@@ -661,7 +695,7 @@ def add_sim_holding(ticker: str, capital_thb: float = 10000.0, notes: str = "") 
         "take_profit_usd": tp_price,
         "strategy_tier": "⭐⭐⭐ Manual Dip Pick",
         "setup_reason": setup_reason,
-        "notes": notes or f"เลือกช้อนซื้อจำลองตัวละ ฿{capital_thb:,.0f}"
+        "notes": notes or f"เลือกช้อนซื้อจำลองตัวละ {money(capital_thb, 'THB', digits=0)}"
     }
 
     sim_data["holdings"] = [h for h in sim_data.get("holdings", []) if h.get("ticker") != ticker]
@@ -713,10 +747,10 @@ def main():
             h = add_sim_holding(args.buy, args.capital, args.notes)
             print(f"เข้าซื้อจำลอง {h['ticker']} เรียบร้อย!")
             print(f"  - ชื่อบริษัท : {h['name']} ({h['business']})")
-            print(f"  - ราคาเข้าซื้อ: ${h['buy_price_usd']:,.2f} USD")
-            print(f"  - จำนวนหุ้น : {h['shares']:.4f} หุ้น (งบ ฿{h['capital_thb']:,.0f} ~ ${h['capital_usd']:,.2f})")
-            print(f"  - จุดตัดขาดทุน SL : ${h['stop_loss_usd']:,.2f} USD")
-            print(f"  - จุดทำกำไร TP  : ${h['take_profit_usd']:,.2f} USD")
+            print(f"  - ราคาเข้าซื้อ: {money(h['buy_price_usd'])} USD")
+            print(f"  - จำนวนหุ้น : {h['shares']:.4f} หุ้น (งบ {money(h['capital_thb'], 'THB', digits=0)} ~ {money(h['capital_usd'])})")
+            print(f"  - จุดตัดขาดทุน SL : {money(h['stop_loss_usd'])} USD")
+            print(f"  - จุดทำกำไร TP  : {money(h['take_profit_usd'])} USD")
         except Exception as e:
             print(f"เกิดข้อผิดพลาดในการซื้อจำลอง {args.buy}: {e}", file=sys.stderr)
             sys.exit(1)
@@ -737,10 +771,9 @@ def main():
     print(f" SIMULATED DIP PORTFOLIO REPORT GENERATED")
     print(f"==========================================================================")
     print(f"Holdings Count       : {analyzed['holdings_count']} stocks")
-    print(f"Total Capital (THB)  : ฿{analyzed['total_capital_thb']:,.2f} (${analyzed['total_capital_usd']:,.2f} USD)")
-    print(f"Current Value (THB)  : ฿{analyzed['total_current_val_thb']:,.2f} (${analyzed['total_current_val_usd']:,.2f} USD)")
-    pl_sign = "+" if analyzed['total_pl_thb'] >= 0 else ""
-    print(f"Simulated P/L        : {pl_sign}฿{analyzed['total_pl_thb']:,.2f} ({pl_sign}{analyzed['total_pl_pct']:.2f}%)")
+    print(f"Total Capital (THB)  : {money(analyzed['total_capital_thb'], 'THB')} ({money(analyzed['total_capital_usd'])} USD)")
+    print(f"Current Value (THB)  : {money(analyzed['total_current_val_thb'], 'THB')} ({money(analyzed['total_current_val_usd'])} USD)")
+    print(f"Simulated P/L        : {money(analyzed['total_pl_thb'], 'THB', signed=True)} ({pct(analyzed['total_pl_pct'], digits=2)})")
     print(f"HTML Dashboard       : {out_path.resolve()}")
     print(f"==========================================================================")
 

@@ -12,7 +12,7 @@ FIXED = datetime(2026, 10, 15, 9, 5)
 
 
 class NavBarTest(unittest.TestCase):
-    def test_links_all_six_reports_in_order(self):
+    def test_links_all_reports_in_order(self):
         html = nav_bar_html("master", FIXED)
         self.assertEqual(
             re.findall(r'href="([^"]+)"', html),
@@ -23,6 +23,8 @@ class NavBarTest(unittest.TestCase):
                 "portfolio_dip_sim.html",
                 "trades_ledger.html",
                 "stock_chart.html",
+                "portfolio_set_review.html",
+                "portfolio_set_recovery.html",
             ],
         )
 
@@ -42,12 +44,12 @@ class NavBarTest(unittest.TestCase):
         html = nav_bar_html("review", FIXED)
         self.assertEqual(
             re.findall(r'class="rnav-link[^"]*"[^>]*>([^<]+)</a>', html),
-            ["ภาพรวม", "สุขภาพพอร์ต", "แก้ดอย", "Dip จำลอง", "รายการซื้อขายทั้งหมด", "กราฟ"],
+            ["ภาพรวม", "สุขภาพพอร์ต", "แก้ดอย", "Dip จำลอง", "รายการซื้อขายทั้งหมด", "กราฟ", "หุ้นไทย สุขภาพพอร์ต", "หุ้นไทย แก้ดอย"],
         )
 
     def test_unknown_page_rejected(self):
         with self.assertRaises(ValueError):
-            nav_bar_html("set_recovery", FIXED)
+            nav_bar_html("no_such_page", FIXED)
 
 
 if __name__ == "__main__":

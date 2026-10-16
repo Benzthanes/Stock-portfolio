@@ -6,6 +6,7 @@ Tracks holdings in data/portfolio.json against live market data from TradingView
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -18,84 +19,118 @@ from src.trades import load_trades, generate_trades_markdown, generate_trades_ht
 
 
 
-def run_all_reports():
-    reports_dir = Path("reports")
-    reports_dir.mkdir(parents=True, exist_ok=True)
+def _report_failure(failures, step, exc):
+    """Log a failed step to stderr (and as a GitHub Actions warning) and keep going."""
+    failures.append(step)
+    msg = f"{step} failed: {type(exc).__name__}: {exc}"
+    print(f"⚠️ {msg}", file=sys.stderr, flush=True)
+    if os.environ.get("GITHUB_ACTIONS"):
+        print(f"::warning title=portfolio --all::{msg}", flush=True)
 
-    print("📊 [0/6] กำลังอัปเดตข้อมูลแท่งเทียนย้อนหลังและคำนวณ Fibonacci อัจฉริยะ...", flush=True)
-    try:
-        from src.chart_data import get_all_charts_payload
-        p_path = Path("data/portfolio.json")
-        t_path = Path("data/trades.json")
-        d_path = Path("data/portfolio_dip_sim.json")
-        p_data = json.loads(p_path.read_text(encoding="utf-8")) if p_path.exists() else {}
-        t_data = json.loads(t_path.read_text(encoding="utf-8")) if t_path.exists() else {}
-        d_data = json.loads(d_path.read_text(encoding="utf-8")) if d_path.exists() else {}
-        all_t = set(
-            [h["ticker"] for h in p_data.get("holdings", [])]
-            + [t["ticker"] for t in t_data.get("trades", [])]
-            + [h["ticker"] for h in d_data.get("holdings", [])]
-            + [c["ticker"] for c in d_data.get("closed_trades", [])]
-        )
-        get_all_charts_payload(list(all_t))
-    except Exception as e:
-        print(f"⚠️ เกิดข้อผิดพลาดในการโหลดแท่งเทียน: {e}", flush=True)
 
-    print("🚀 [1/6] กำลังอัปเดต Master Wealth Dashboard (KKP + Dime!)...", flush=True)
+def _refresh_charts():
+    from src.chart_data import get_all_charts_payload
+    p_path = Path("data/portfolio.json")
+    t_path = Path("data/trades.json")
+    d_path = Path("data/portfolio_dip_sim.json")
+    p_data = json.loads(p_path.read_text(encoding="utf-8")) if p_path.exists() else {}
+    t_data = json.loads(t_path.read_text(encoding="utf-8")) if t_path.exists() else {}
+    d_data = json.loads(d_path.read_text(encoding="utf-8")) if d_path.exists() else {}
+    all_t = set(
+        [h["ticker"] for h in p_data.get("holdings", [])]
+        + [t["ticker"] for t in t_data.get("trades", [])]
+        + [h["ticker"] for h in d_data.get("holdings", [])]
+        + [c["ticker"] for c in d_data.get("closed_trades", [])]
+    )
+    get_all_charts_payload(list(all_t))
+
+
+def _master_report(reports_dir):
     from scripts.generate_master_report import generate_master_dashboard_data, generate_master_dashboard_html
     master_data = generate_master_dashboard_data()
     master_html = generate_master_dashboard_html(master_data)
     (reports_dir / "portfolio_master.html").write_text(master_html, encoding="utf-8")
     Path("data/account_summary.json").write_text(json.dumps(master_data, indent=2, ensure_ascii=False), encoding="utf-8")
-    from scripts.sync_skill_numbers import sync_skill_numbers
-    sync_skill_numbers(master_data)
+    return master_data
 
-    print("🏥 [2/6] กำลังอัปเดต Portfolio Health Review (พอร์ตจริง)...", flush=True)
+
+def _review_report(reports_dir):
     portfolio_data = load_portfolio()
     summary = analyze_portfolio(portfolio_data)
-    review_html = generate_portfolio_html(summary)
-    (reports_dir / "portfolio_review.html").write_text(review_html, encoding="utf-8")
+    (reports_dir / "portfolio_review.html").write_text(generate_portfolio_html(summary), encoding="utf-8")
 
-    print("🛟 [3/6] กำลังอัปเดต Drawdown Recovery Strategy (แผนแก้ดอย 360 องศา)...", flush=True)
+
+def _recovery_report(reports_dir):
     from recovery import analyze_all_underwater
     from src.html_report import generate_recovery_html
     rec_summary = analyze_all_underwater()
-    rec_html = generate_recovery_html(rec_summary)
-    (reports_dir / "portfolio_recovery.html").write_text(rec_html, encoding="utf-8")
+    (reports_dir / "portfolio_recovery.html").write_text(generate_recovery_html(rec_summary), encoding="utf-8")
 
-    print("🎯 [4/6] กำลังอัปเดต Simulated Dip Portfolio (พอร์ตจำลองช้อนซื้อ)...", flush=True)
+
+def _dip_report(reports_dir):
     from scripts.generate_dip_sim_report import load_simulation_data, analyze_simulation, generate_html_report as generate_dip_html
-    sim_data = load_simulation_data()
-    sim_summary = analyze_simulation(sim_data)
-    dip_html = generate_dip_html(sim_summary)
-    (reports_dir / "portfolio_dip_sim.html").write_text(dip_html, encoding="utf-8")
+    sim_summary = analyze_simulation(load_simulation_data())
+    (reports_dir / "portfolio_dip_sim.html").write_text(generate_dip_html(sim_summary), encoding="utf-8")
 
-    print("📈 [5/6] กำลังอัปเดต Complete Trading Ledger (รายการซื้อขายทั้งหมด)...", flush=True)
+
+def _ledger_report(reports_dir, master_data):
     from scripts.generate_master_report import generate_master_ledger_html
-    trades_html = generate_master_ledger_html(master_data)
-    (reports_dir / "trades_ledger.html").write_text(trades_html, encoding="utf-8")
+    (reports_dir / "trades_ledger.html").write_text(generate_master_ledger_html(master_data), encoding="utf-8")
 
-    print("🚀 [6/6] กำลังสร้าง Dedicated Stock Chart Page (หน้าวิเคราะห์กราฟ & AI เต็มจอ)...", flush=True)
+
+def _chart_page(reports_dir):
     from src.chart_page import generate_stock_chart_page_html
-    chart_page_html = generate_stock_chart_page_html()
-    (reports_dir / "stock_chart.html").write_text(chart_page_html, encoding="utf-8")
+    (reports_dir / "stock_chart.html").write_text(generate_stock_chart_page_html(), encoding="utf-8")
 
-    at_sign = "+" if master_data['all_time_profit_thb'] >= 0 else ""
+
+def run_all_reports():
+    """Generate every report. A failed step is logged and skipped. Returns the list of failed steps."""
+    reports_dir = Path("reports")
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    failures = []
+    master_data = None
+
+    def step(label, name, fn, *args):
+        print(label, flush=True)
+        try:
+            return fn(*args)
+        except Exception as e:
+            _report_failure(failures, name, e)
+            return None
+
+    step("📊 [0/6] กำลังอัปเดตข้อมูลแท่งเทียนย้อนหลังและคำนวณ Fibonacci อัจฉริยะ...", "chart data refresh", _refresh_charts)
+    master_data = step("🚀 [1/6] กำลังอัปเดต Master Wealth Dashboard (KKP + Dime!)...", "master dashboard", _master_report, reports_dir)
+    step("🏥 [2/6] กำลังอัปเดต Portfolio Health Review (พอร์ตจริง)...", "health review", _review_report, reports_dir)
+    step("🛟 [3/6] กำลังอัปเดต Drawdown Recovery Strategy (แผนแก้ดอย 360 องศา)...", "recovery strategy", _recovery_report, reports_dir)
+    step("🎯 [4/6] กำลังอัปเดต Simulated Dip Portfolio (พอร์ตจำลองช้อนซื้อ)...", "dip simulation", _dip_report, reports_dir)
+    if master_data is not None:
+        step("📈 [5/6] กำลังอัปเดต Complete Trading Ledger (รายการซื้อขายทั้งหมด)...", "trades ledger",
+             _ledger_report, reports_dir, master_data)
+    else:
+        _report_failure(failures, "trades ledger", RuntimeError("skipped because master dashboard failed"))
+    step("🚀 [6/6] กำลังสร้าง Dedicated Stock Chart Page (หน้าวิเคราะห์กราฟ & AI เต็มจอ)...", "stock chart page", _chart_page, reports_dir)
+
     print("\n" + "=" * 74)
-    print(" 🎉 อัปเดตรายงานทั้งหมด 6 รายการเรียบร้อยสมบูรณ์!")
+    if failures:
+        print(f" ⚠️ อัปเดตไม่สำเร็จ {len(failures)} ขั้นตอน: {', '.join(failures)}")
+    else:
+        print(" 🎉 อัปเดตรายงานทั้งหมด 6 รายการเรียบร้อยสมบูรณ์!")
     print("=" * 74)
-    print(f"💰 พอร์ตหลัก (NAV รวม)   : ฿{master_data['total_net_worth_thb']:,.2f} (~${master_data['total_net_worth_usd']:,.2f} USD)")
-    print(f"📈 กำไรสุทธิสะสม         : {at_sign}฿{master_data['all_time_profit_thb']:,.2f} ({at_sign}{master_data['all_time_roi_pct']:.2f}% ROI)")
-    print(f"💵 เงินสดรอลงทุน         : ฿{master_data['total_cash_thb']:,.2f}")
-    print(f"📊 หุ้นในพอร์ตปัจจุบัน   : {len(master_data['positions'])} ตัว")
-    print("-" * 74)
-    print(f"1. แดชบอร์ดภาพรวมพอร์ต   : reports/portfolio_master.html")
-    print(f"2. ตรวจสุขภาพพอร์ต       : reports/portfolio_review.html")
-    print(f"3. กลยุทธ์ฟื้นฟู/แก้ดอย : reports/portfolio_recovery.html")
-    print(f"4. จำลองช้อนซื้อหุ้น Dip : reports/portfolio_dip_sim.html")
-    print(f"5. รายการซื้อขายทั้งหมด   : reports/trades_ledger.html")
-    print(f"6. หน้ากราฟ & AI เต็มจอ  : reports/stock_chart.html")
+    if master_data is not None:
+        at_sign = "+" if master_data['all_time_profit_thb'] >= 0 else ""
+        print(f"💰 พอร์ตหลัก (NAV รวม)   : ฿{master_data['total_net_worth_thb']:,.2f} (~${master_data['total_net_worth_usd']:,.2f} USD)")
+        print(f"📈 กำไรสุทธิสะสม         : {at_sign}฿{master_data['all_time_profit_thb']:,.2f} ({at_sign}{master_data['all_time_roi_pct']:.2f}% ROI)")
+        print(f"💵 เงินสดรอลงทุน         : ฿{master_data['total_cash_thb']:,.2f}")
+        print(f"📊 หุ้นในพอร์ตปัจจุบัน   : {len(master_data['positions'])} ตัว")
+        print("-" * 74)
+    print("1. แดชบอร์ดภาพรวมพอร์ต   : reports/portfolio_master.html")
+    print("2. ตรวจสุขภาพพอร์ต       : reports/portfolio_review.html")
+    print("3. กลยุทธ์ฟื้นฟู/แก้ดอย : reports/portfolio_recovery.html")
+    print("4. จำลองช้อนซื้อหุ้น Dip : reports/portfolio_dip_sim.html")
+    print("5. รายการซื้อขายทั้งหมด   : reports/trades_ledger.html")
+    print("6. หน้ากราฟ & AI เต็มจอ  : reports/stock_chart.html")
     print("=" * 74)
+    return failures
 
 
 def main():
@@ -135,8 +170,8 @@ def main():
     args = parser.parse_args()
 
     if args.all:
-        run_all_reports()
-        return
+        failures = run_all_reports()
+        sys.exit(1 if failures else 0)
 
     if args.trades:
         trades_data = load_trades()

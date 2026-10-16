@@ -24,9 +24,12 @@ from src.trades import (
     load_trades, calculate_trades_summary, load_ledger,
     resolve_slip_relative_path, get_slip_modal_component
 )
+from html import escape
+
+from src.fmt import FMT_MONEY_JS, money, pct
+from src.fx import resolve_usdthb
 from src.html_report import get_chart_modal_component, _make_chart_onclick
 from src.nav import nav_bar_html
-from scripts.sync_skill_numbers import sync_skill_numbers
 
 MONTH_MAP = {
     "มค": 1, "กพ": 2, "มีค": 3, "เมย": 4, "พค": 5, "มิย": 6,
@@ -237,13 +240,22 @@ def load_statement_cash_flow(manual_movements):
     return all_records
 
 
+def _slip_onclick(*args):
+    return escape(f"openSlipModal({', '.join(json.dumps(str(a), ensure_ascii=False) for a in args)})", quote=True)
+
+
+def dividend_thb(d, fx_rate):
+    """THB value of one dividend at the FX recorded with it, else at the current rate."""
+    return d["amount_usd"] * (d.get("fx_rate") or fx_rate)
+
+
 def generate_master_dashboard_data(ledger_path=None):
     ledger = load_ledger(ledger_path)
 
     # 1. Active Portfolio Live Market Data
     portfolio_data = load_portfolio()
     live_summary = analyze_portfolio(portfolio_data)
-    fx_rate = live_summary.get("fx_rate_usd_thb", 33.62)
+    fx_rate = resolve_usdthb(live_summary.get("fx_rate_usd_thb"))
 
     # 2. Closed Trades Data
     trades_data = load_trades()
@@ -281,7 +293,7 @@ def generate_master_dashboard_data(ledger_path=None):
     total_realized_pl_thb = trades_summary["total_realized_pl_thb"]
     dividends_list = ledger["dividends"]
     total_dividends_usd = round(sum(d["amount_usd"] for d in dividends_list), 2)
-    total_dividends_thb = round(total_dividends_usd * fx_rate, 2)
+    total_dividends_thb = round(sum(dividend_thb(d, fx_rate) for d in dividends_list), 2)
     total_realized_and_div_thb = round(total_realized_pl_thb + total_dividends_thb + dime_save_interest_thb, 2)
 
     # 7. Detailed Buy Orders (55 orders from OCR) & Cash Flow (54 transactions from KKP Statement)
@@ -329,10 +341,11 @@ def get_live_refresh_script(data):
     net_injected = float(data.get("net_injected_capital_thb", 0.0))
     dime_save_cash = float(data.get("dime_save_cash_thb", 0.0))
     dime_usd_cash = float(data.get("dime_usd_cash", 0.0))
-    fx_rate = float(data.get("fx_rate", 33.62))
+    fx_rate = float(data.get("fx_rate") or resolve_usdthb(None))
 
     return f"""
     <script>
+    {FMT_MONEY_JS}
     const PORTFOLIO_STATIC = {{
         netInjectedCapitalThb: {net_injected},
         dimeSaveCashThb: {dime_save_cash},
@@ -422,61 +435,70 @@ def get_live_refresh_script(data):
                 const ticker = r.dataset.ticker;
                 const shares = parseFloat(r.dataset.shares) || 0;
                 const avgCost = parseFloat(r.dataset.cost) || 0;
+                const serverValUsd = parseFloat(r.dataset.serverValUsd);
                 const quote = quotes[ticker];
+                const costUsd = shares * avgCost;
 
-                if (quote && typeof quote.close === 'number') {{
-                    const close = quote.close;
-                    const costUsd = shares * avgCost;
-                    const valUsd = shares * close;
-                    const valThb = valUsd * currentFx;
-                    const plUsd = valUsd - costUsd;
-                    const plThb = plUsd * currentFx;
-                    const plPct = costUsd > 0 ? (plUsd / costUsd * 100) : 0;
-
-                    totalMarketValUsd += valUsd;
-                    totalCostUsd += costUsd;
-
-                    r.dataset.currentValUsd = valUsd;
-
-                    const priceCell = r.querySelector('.cell-price');
-                    const valUsdCell = r.querySelector('.cell-val-usd');
-                    const valThbCell = r.querySelector('.cell-val-thb');
-                    const plUsdCell = r.querySelector('.cell-pl-usd');
-                    const plThbCell = r.querySelector('.cell-pl-thb');
-                    const plPctCell = r.querySelector('.cell-pl-pct');
-
-                    const color = plUsd >= 0 ? '#10b981' : '#f43f5e';
-                    const sign = plUsd >= 0 ? '+' : '';
-
-                    if (priceCell) priceCell.textContent = '$' + close.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                    if (valUsdCell) valUsdCell.textContent = '$' + valUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                    if (valThbCell) valThbCell.textContent = '฿' + valThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-
-                    if (plUsdCell) {{
-                        plUsdCell.textContent = sign + '$' + plUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                        plUsdCell.style.color = color;
+                if (!(quote && typeof quote.close === 'number')) {{
+                    if (!isNaN(serverValUsd)) {{
+                        totalMarketValUsd += serverValUsd;
+                        totalCostUsd += costUsd;
+                        r.dataset.currentValUsd = serverValUsd;
+                        r.title = 'ไม่ได้ราคาสด ใช้มูลค่าล่าสุดจากเซิร์ฟเวอร์';
+                    }} else {{
+                        r.dataset.currentValUsd = 0;
                     }}
-                    if (plThbCell) {{
-                        plThbCell.textContent = sign + '฿' + plThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                        plThbCell.style.color = color;
-                    }}
-                    if (plPctCell) {{
-                        plPctCell.textContent = sign + plPct.toFixed(2) + '%';
-                        plPctCell.style.color = color;
-                    }}
-
-                    // Also update Forward Outlook card badge if present
-                    const outlookBadge = document.querySelector(`.badge-outlook-pl[data-outlook-ticker="${{ticker}}"]`);
-                    if (outlookBadge) {{
-                        outlookBadge.textContent = sign + plPct.toFixed(1) + '%';
-                        outlookBadge.className = 'badge badge-outlook-pl ' + (plUsd >= 0 ? 'badge-success' : 'badge-danger');
-                    }}
-
-                    // Subtle highlight animation
-                    r.style.transition = 'background-color 0.4s ease';
-                    r.style.backgroundColor = 'rgba(59, 130, 246, 0.12)';
-                    setTimeout(() => {{ r.style.backgroundColor = ''; }}, 600);
+                    return;
                 }}
+
+                const close = quote.close;
+                const valUsd = shares * close;
+                const valThb = valUsd * currentFx;
+                const plUsd = valUsd - costUsd;
+                const plThb = plUsd * currentFx;
+                const plPct = costUsd > 0 ? (plUsd / costUsd * 100) : 0;
+
+                totalMarketValUsd += valUsd;
+                totalCostUsd += costUsd;
+
+                r.dataset.currentValUsd = valUsd;
+                r.title = '';
+
+                const priceCell = r.querySelector('.cell-price');
+                const valUsdCell = r.querySelector('.cell-val-usd');
+                const valThbCell = r.querySelector('.cell-val-thb');
+                const plUsdCell = r.querySelector('.cell-pl-usd');
+                const plThbCell = r.querySelector('.cell-pl-thb');
+                const plPctCell = r.querySelector('.cell-pl-pct');
+
+                const color = plUsd >= 0 ? '#10b981' : '#f43f5e';
+
+                if (priceCell) priceCell.textContent = fmtMoney(close, '$');
+                if (valUsdCell) valUsdCell.textContent = fmtMoney(valUsd, '$');
+                if (valThbCell) valThbCell.textContent = fmtMoney(valThb, '฿');
+
+                if (plUsdCell) {{
+                    plUsdCell.textContent = fmtMoney(plUsd, '$', true);
+                    plUsdCell.style.color = color;
+                }}
+                if (plThbCell) {{
+                    plThbCell.textContent = fmtMoney(plThb, '฿', true);
+                    plThbCell.style.color = color;
+                }}
+                if (plPctCell) {{
+                    plPctCell.textContent = fmtPct(plPct, 2);
+                    plPctCell.style.color = color;
+                }}
+
+                const outlookBadge = document.querySelector(`.badge-outlook-pl[data-outlook-ticker="${{ticker}}"]`);
+                if (outlookBadge) {{
+                    outlookBadge.textContent = fmtPct(plPct, 1);
+                    outlookBadge.className = 'badge badge-outlook-pl ' + (plUsd >= 0 ? 'badge-success' : 'badge-danger');
+                }}
+
+                r.style.transition = 'background-color 0.4s ease';
+                r.style.backgroundColor = 'rgba(59, 130, 246, 0.12)';
+                setTimeout(() => {{ r.style.backgroundColor = ''; }}, 600);
             }});
 
             // 5. Update weights
@@ -511,31 +533,29 @@ def get_live_refresh_script(data):
             const kpiFxPill = document.getElementById('kpi-fx-pill');
             const kpiTotalCashThb = document.getElementById('kpi-total-cash-thb');
 
-            if (kpiNetWorthThb) kpiNetWorthThb.textContent = '฿' + totalNetWorthThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-            if (kpiNetWorthUsdSub) kpiNetWorthUsdSub.textContent = '~$' + totalNetWorthUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' USD (หุ้น + เงินสด)';
+            if (kpiNetWorthThb) kpiNetWorthThb.textContent = fmtMoney(totalNetWorthThb, '฿');
+            if (kpiNetWorthUsdSub) kpiNetWorthUsdSub.textContent = '~' + fmtMoney(totalNetWorthUsd, '$') + ' USD (หุ้น + เงินสด)';
 
             const atColor = allTimeProfitThb >= 0 ? '#10b981' : '#f43f5e';
-            const atSign = allTimeProfitThb >= 0 ? '+' : '';
             if (kpiAllTimeProfitThb) {{
-                kpiAllTimeProfitThb.textContent = atSign + '฿' + allTimeProfitThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                kpiAllTimeProfitThb.textContent = fmtMoney(allTimeProfitThb, '฿', true);
                 kpiAllTimeProfitThb.style.color = atColor;
             }}
             if (kpiAllTimeRoiSub) {{
-                kpiAllTimeRoiSub.textContent = atSign + allTimeRoiPct.toFixed(2) + '% All-Time ROI';
+                kpiAllTimeRoiSub.textContent = fmtPct(allTimeRoiPct, 2) + ' All-Time ROI';
                 kpiAllTimeRoiSub.style.color = atColor;
             }}
 
-            if (kpiStockValUsd) kpiStockValUsd.textContent = '$' + totalMarketValUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-            if (kpiStockValThb) kpiStockValThb.textContent = '฿' + totalMarketValThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+            if (kpiStockValUsd) kpiStockValUsd.textContent = fmtMoney(totalMarketValUsd, '$');
+            if (kpiStockValThb) kpiStockValThb.textContent = fmtMoney(totalMarketValThb, '฿');
 
             const unColor = totalPlUsd >= 0 ? '#10b981' : '#f43f5e';
-            const unSign = totalPlUsd >= 0 ? '+' : '';
             if (kpiStockUnrealizedPl) {{
-                kpiStockUnrealizedPl.textContent = unSign + '$' + totalPlUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' (' + unSign + totalPlPct.toFixed(2) + '%)';
+                kpiStockUnrealizedPl.textContent = fmtMoney(totalPlUsd, '$', true) + ' (' + fmtPct(totalPlPct, 2) + ')';
                 kpiStockUnrealizedPl.style.color = unColor;
             }}
 
-            if (kpiTotalCashThb) kpiTotalCashThb.textContent = '฿' + totalCashThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+            if (kpiTotalCashThb) kpiTotalCashThb.textContent = fmtMoney(totalCashThb, '฿');
             if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + currentFx.toFixed(2) + ' THB';
 
             const now = new Date();
@@ -574,24 +594,23 @@ def get_live_refresh_script(data):
                             const weightCell = r.querySelector('.cell-weight');
 
                             const color = plUsd >= 0 ? '#10b981' : '#f43f5e';
-                            const sign = plUsd >= 0 ? '+' : '';
 
-                            if (priceCell) priceCell.textContent = '$' + close.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                            if (valUsdCell) valUsdCell.textContent = '$' + valUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                            if (valThbCell) valThbCell.textContent = '฿' + valThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                            if (priceCell) priceCell.textContent = fmtMoney(close, '$');
+                            if (valUsdCell) valUsdCell.textContent = fmtMoney(valUsd, '$');
+                            if (valThbCell) valThbCell.textContent = fmtMoney(valThb, '฿');
                             if (plUsdCell) {{
-                                plUsdCell.textContent = sign + '$' + plUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                                plUsdCell.textContent = fmtMoney(plUsd, '$', true);
                                 plUsdCell.style.color = color;
                             }}
                             if (plThbCell) {{
-                                plThbCell.textContent = sign + '฿' + plThb.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                                plThbCell.textContent = fmtMoney(plThb, '฿', true);
                                 plThbCell.style.color = color;
                             }}
                             if (plPctCell) {{
-                                plPctCell.textContent = sign + plPct.toFixed(2) + '%';
+                                plPctCell.textContent = fmtPct(plPct, 2) + '';
                                 plPctCell.style.color = color;
                             }}
-                            if (weightCell) weightCell.textContent = weightPct.toFixed(1) + '%';
+                            if (weightCell) weightCell.textContent = (weightPct === null || weightPct === undefined) ? '-' : weightPct.toFixed(1) + '%';
 
                             r.style.transition = 'background-color 0.4s ease';
                             r.style.backgroundColor = 'rgba(16, 185, 129, 0.12)';
@@ -609,36 +628,34 @@ def get_live_refresh_script(data):
                     const kpiFxPill = document.getElementById('kpi-fx-pill');
                     const kpiTotalCashThb = document.getElementById('kpi-total-cash-thb');
 
-                    if (kpiNetWorthThb) kpiNetWorthThb.textContent = '฿' + (cData.total_net_worth_thb || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                    if (kpiNetWorthUsdSub) kpiNetWorthUsdSub.textContent = '~$' + (cData.total_net_worth_usd || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' USD (หุ้น + เงินสด)';
+                    if (kpiNetWorthThb) kpiNetWorthThb.textContent = fmtMoney((cData.total_net_worth_thb || 0), '฿');
+                    if (kpiNetWorthUsdSub) kpiNetWorthUsdSub.textContent = '~' + fmtMoney((cData.total_net_worth_usd || 0), '$') + ' USD (หุ้น + เงินสด)';
 
                     const atProfit = cData.all_time_profit_thb || 0;
                     const atRoi = cData.all_time_roi_pct || 0;
                     const atColor = atProfit >= 0 ? '#10b981' : '#f43f5e';
-                    const atSign = atProfit >= 0 ? '+' : '';
                     if (kpiAllTimeProfitThb) {{
-                        kpiAllTimeProfitThb.textContent = atSign + '฿' + atProfit.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                        kpiAllTimeProfitThb.textContent = fmtMoney(atProfit, '฿', true);
                         kpiAllTimeProfitThb.style.color = atColor;
                     }}
                     if (kpiAllTimeRoiSub) {{
-                        kpiAllTimeRoiSub.textContent = atSign + atRoi.toFixed(2) + '% All-Time ROI';
+                        kpiAllTimeRoiSub.textContent = fmtPct(atRoi, 2) + ' All-Time ROI';
                         kpiAllTimeRoiSub.style.color = atColor;
                     }}
 
-                    if (kpiStockValUsd) kpiStockValUsd.textContent = '$' + (cData.stock_market_val_usd || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                    if (kpiStockValThb) kpiStockValThb.textContent = '฿' + (cData.stock_market_val_thb || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
+                    if (kpiStockValUsd) kpiStockValUsd.textContent = fmtMoney((cData.stock_market_val_usd || 0), '$');
+                    if (kpiStockValThb) kpiStockValThb.textContent = fmtMoney((cData.stock_market_val_thb || 0), '฿');
 
                     const unPlUsd = cData.stock_unrealized_pl_usd || 0;
                     const unPlPct = cData.stock_unrealized_pl_pct || 0;
                     const unColor = unPlUsd >= 0 ? '#10b981' : '#f43f5e';
-                    const unSign = unPlUsd >= 0 ? '+' : '';
                     if (kpiStockUnrealizedPl) {{
-                        kpiStockUnrealizedPl.textContent = unSign + '$' + unPlUsd.toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}) + ' (' + unSign + unPlPct.toFixed(2) + '%)';
+                        kpiStockUnrealizedPl.textContent = fmtMoney(unPlUsd, '$', true) + ' (' + fmtPct(unPlPct, 2) + ')';
                         kpiStockUnrealizedPl.style.color = unColor;
                     }}
 
-                    if (kpiTotalCashThb) kpiTotalCashThb.textContent = '฿' + (cData.total_cash_thb || 0).toLocaleString('en-US', {{ minimumFractionDigits: 2, maximumFractionDigits: 2 }});
-                    if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + (cData.fx_rate || 33.62).toFixed(2) + ' THB';
+                    if (kpiTotalCashThb) kpiTotalCashThb.textContent = fmtMoney((cData.total_cash_thb || 0), '฿');
+                    if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + (cData.fx_rate || PORTFOLIO_STATIC.fxRate).toFixed(2) + ' THB';
 
                     if (ts) ts.innerHTML = '☁️ ซิงค์ข้อมูลล่าสุดจาก Cloud: <strong style="color: #60a5fa;">' + (cData.updated_at || '') + ' น.</strong>';
                 }}
@@ -658,14 +675,10 @@ def get_live_refresh_script(data):
 
 
 def generate_master_dashboard_html(data):
-    at_sign = "+" if data["all_time_profit_thb"] >= 0 else ""
     at_color = "#10b981" if data["all_time_profit_thb"] >= 0 else "#f43f5e"
 
-    un_sign = "+" if data["stock_unrealized_pl_thb"] >= 0 else ""
     un_color = "#10b981" if data["stock_unrealized_pl_thb"] >= 0 else "#f43f5e"
-    rz_sign = "+" if data["trades_summary"]["total_realized_pl_thb"] >= 0 else ""
     rz_color = "#10b981" if data["trades_summary"]["total_realized_pl_thb"] >= 0 else "#f43f5e"
-    rd_sign = "+" if data["total_realized_and_div_thb"] >= 0 else ""
     rd_color = "#10b981" if data["total_realized_and_div_thb"] >= 0 else "#f43f5e"
 
     # 1. Active Holdings Rows
@@ -674,32 +687,34 @@ def generate_master_dashboard_html(data):
         p_pl_usd = p["unrealized_pl_usd"]
         p_pl_thb = p["unrealized_pl_thb"]
         p_pl_pct = p["unrealized_pl_pct"]
-        c = "#10b981" if p_pl_usd >= 0 else "#f43f5e"
-        s = "+" if p_pl_usd >= 0 else ""
+        c = "#10b981" if (p_pl_usd or 0) >= 0 else "#f43f5e"
         onclick_js = _make_chart_onclick(p)
-        ex = p.get('exchange', 'NASDAQ')
+        ex = escape(str(p.get('exchange', 'NASDAQ')), quote=True)
+        tk = escape(str(p['ticker']), quote=True)
+        server_val = p.get('current_val_usd')
+        server_val_attr = f' data-server-val-usd="{server_val}"' if server_val is not None else ""
         holdings_rows += f"""
-        <tr class="holding-row" data-ticker="{p['ticker']}" data-exchange="{ex}" data-shares="{p['shares']}" data-cost="{p['avg_cost_usd']}">
+        <tr class="holding-row" data-ticker="{tk}" data-exchange="{ex}" data-shares="{p['shares']}" data-cost="{p['avg_cost_usd']}"{server_val_attr}>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
-                <span class="clickable-ticker" onclick="{onclick_js}" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{p['ticker']} 📈</span>
+                <span class="clickable-ticker" onclick="{onclick_js}" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{tk} 📈</span>
             </td>
-            <td>{p.get('name', '-')}</td>
+            <td>{escape(str(p.get('name') or '-'))}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{p['shares']:.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${p['avg_cost_usd']:,.2f}</td>
-            <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">${p['close_price']:,.2f}</td>
-            <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">${p['current_val_usd']:,.2f}</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿{p['current_val_thb']:,.2f}</td>
-            <td class="cell-pl-usd" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}${p_pl_usd:,.2f}</td>
-            <td class="cell-pl-thb" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{s}฿{p_pl_thb:,.2f}</td>
-            <td class="cell-pl-pct" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}{p_pl_pct:.2f}%</td>
-            <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">{p['weight_pct']:.1f}%</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(p['avg_cost_usd'])}</td>
+            <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">{money(p.get('close_price'), na='n/a')}</td>
+            <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">{money(p.get('current_val_usd'), na='n/a')}</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">{money(p.get('current_val_thb'), 'THB', na='n/a')}</td>
+            <td class="cell-pl-usd" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{money(p_pl_usd, signed=True, na='n/a')}</td>
+            <td class="cell-pl-thb" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{money(p_pl_thb, 'THB', signed=True, na='n/a')}</td>
+            <td class="cell-pl-pct" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{pct(p_pl_pct, digits=2, na='n/a')}</td>
+            <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">{pct(p.get('weight_pct'), signed=False)}</td>
         </tr>
         """
 
     # 1.1 Master Forward Outlook Cards for Active Holdings
     outlook_cards_master = ""
     for p in data["positions"]:
-        t = p["ticker"]
+        t = escape(str(p["ticker"]))
         fo = p.get("forward_outlook", {})
         thesis = fo.get("thesis_title", f"การลงทุนเชิงยุทธศาสตร์ใน {t}")
         quality = fo.get("quality_badge", "🔵 Strategic Core Holding")
@@ -708,17 +723,17 @@ def generate_master_dashboard_html(data):
         next_cat = timeline[0] if timeline else {}
         t_avg = p.get("price_target_average", 0.0)
         up_val = p.get("target_upside_pct")
-        up_str = f"+{up_val:.1f}%" if (up_val is not None and up_val > 0) else (f"{up_val:.1f}%" if up_val is not None else "-")
+        up_str = pct(up_val)
         roadmap = fo.get("tailored_roadmap", p.get("rating", {}).get("action", ""))
 
         pl_u = p["unrealized_pl_usd"]
         pl_pct = p["unrealized_pl_pct"]
+        pl_u = pl_u or 0
         c_badge = "badge-success" if pl_u >= 0 else "badge-danger"
-        s_sign = "+" if pl_u >= 0 else ""
 
         driver_items = "".join([f"<li style='margin-bottom: 4px;'>• {d}</li>" for d in drivers[:2]]) if drivers else ""
         next_cat_str = f"<strong>{next_cat.get('period', '-')}:</strong> {next_cat.get('event', '-')}" if next_cat else "ไม่มีตัวเร่งเฉพาะระยะสั้น"
-        t_avg_disp = f"${t_avg:,.2f}" if t_avg else "-"
+        t_avg_disp = money(t_avg) if t_avg else "-"
 
         onclick_js = _make_chart_onclick(p)
         outlook_cards_master += f"""
@@ -727,9 +742,9 @@ def generate_master_dashboard_html(data):
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                     <div>
                         <span class="clickable-ticker" onclick="{onclick_js}" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">{p.get('name', '')}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">{escape(str(p.get('name') or ''))}</div>
                     </div>
-                    <span class="badge {c_badge} badge-outlook-pl" data-outlook-ticker="{t}">{s_sign}{pl_pct:.1f}%</span>
+                    <span class="badge {c_badge} badge-outlook-pl" data-outlook-ticker="{t}">{pct(pl_pct, na='n/a')}</span>
                 </div>
                 <div style="font-size: 0.76rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px;">
                     {quality}
@@ -768,7 +783,7 @@ def generate_master_dashboard_html(data):
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Master Portfolio & Wealth Summary - {data['portfolio_name']}</title>
+    <title>Master Portfolio & Wealth Summary - {escape(str(data['portfolio_name']))}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -938,9 +953,9 @@ def generate_master_dashboard_html(data):
                     💎 ศูนย์รวมข้อมูลพอร์ตการลงทุน Master Summary
                 </h1>
                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px;">
-                    พอร์ต: <strong style="color: #fff;">{data['portfolio_name']}</strong> | 
-                    โบรกเกอร์: <strong style="color: #fff;">{data['broker']}</strong> | 
-                    บัญชี: <code>{data['account_no']}</code>
+                    พอร์ต: <strong style="color: #fff;">{escape(str(data['portfolio_name']))}</strong> | 
+                    โบรกเกอร์: <strong style="color: #fff;">{escape(str(data['broker']))}</strong> | 
+                    บัญชี: <code>{escape(str(data['account_no']))}</code>
                 </p>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
@@ -963,23 +978,23 @@ def generate_master_dashboard_html(data):
         <div class="grid-4-cols">
             <div class="card" style="border-left: 4px solid var(--blue);">
                 <div class="kpi-label">มูลค่าพอร์ตรวมสุทธิ (Total Net Worth / NAV)</div>
-                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa;">฿{data['total_net_worth_thb']:,.2f}</div>
-                <div id="kpi-net-worth-usd-sub" class="kpi-subtext">~${data['total_net_worth_usd']:,.2f} USD (หุ้น + เงินสด)</div>
+                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa;">{money(data['total_net_worth_thb'], 'THB')}</div>
+                <div id="kpi-net-worth-usd-sub" class="kpi-subtext">~{money(data['total_net_worth_usd'])} USD (หุ้น + เงินสด)</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--purple);">
                 <div class="kpi-label">เงินต้นทุนเติมสุทธิ (Net Deposited Capital)</div>
-                <div class="kpi-value">฿{data['net_injected_capital_thb']:,.2f}</div>
+                <div class="kpi-value">{money(data['net_injected_capital_thb'], 'THB')}</div>
                 <div class="kpi-subtext">จาก KKP Statement ทางการ 100% (PromptPay 19 ครั้ง - ถอนออก 1 ครั้ง)</div>
             </div>
             <div class="card" style="border-left: 4px solid {at_color};">
                 <div class="kpi-label">กำไรรวมสุทธิของพอร์ต (All-Time Net Profit)</div>
-                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: {at_color};">{at_sign}฿{data['all_time_profit_thb']:,.2f}</div>
-                <div id="kpi-all-time-roi-sub" class="kpi-subtext" style="color: {at_color}; font-weight: 700;">{at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI</div>
+                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: {at_color};">{money(data['all_time_profit_thb'], 'THB', signed=True)}</div>
+                <div id="kpi-all-time-roi-sub" class="kpi-subtext" style="color: {at_color}; font-weight: 700;">{pct(data['all_time_roi_pct'], digits=2)} All-Time ROI</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--emerald);">
                 <div class="kpi-label">เงินสดคงเหลือรวม (Total Idle Cash)</div>
-                <div id="kpi-total-cash-thb" class="kpi-value">฿{data['total_cash_thb']:,.2f}</div>
-                <div class="kpi-subtext">Dime! Save: ฿{data['dime_save_cash_thb']:,.2f} | Dime! USD: ${data['dime_usd_cash']:.2f}</div>
+                <div id="kpi-total-cash-thb" class="kpi-value">{money(data['total_cash_thb'], 'THB')}</div>
+                <div class="kpi-subtext">Dime! Save: {money(data['dime_save_cash_thb'], 'THB')} | Dime! USD: {money(data['dime_usd_cash'])}</div>
             </div>
         </div>
 
@@ -989,24 +1004,24 @@ def generate_master_dashboard_html(data):
                 <div class="kpi-label">หุ้นที่กำลังถือครอง (Active Holdings)</div>
                 <div style="font-size: 1.45rem; font-weight: 700;">{len(data['positions'])} บริษัท</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    มูลค่าตลาด: <strong id="kpi-stock-market-val-usd">${data['stock_market_val_usd']:,.2f}</strong> (<span id="kpi-stock-market-val-thb">฿{data['stock_market_val_thb']:,.2f}</span>)<br>
-                    กำไรที่ยังไม่ขาย: <strong id="kpi-stock-unrealized-pl" style="color: {un_color};">{un_sign}${data['stock_unrealized_pl_usd']:,.2f} ({un_sign}{data['stock_unrealized_pl_pct']:.2f}%)</strong>
+                    มูลค่าตลาด: <strong id="kpi-stock-market-val-usd">{money(data['stock_market_val_usd'])}</strong> (<span id="kpi-stock-market-val-thb">{money(data['stock_market_val_thb'], 'THB')}</span>)<br>
+                    กำไรที่ยังไม่ขาย: <strong id="kpi-stock-unrealized-pl" style="color: {un_color};">{money(data['stock_unrealized_pl_usd'], signed=True)} ({pct(data['stock_unrealized_pl_pct'], digits=2)})</strong>
                 </div>
             </div>
             <div class="card">
                 <div class="kpi-label">กำไรที่ขายทำกำไรจริง (Realized P&L)</div>
-                <div style="font-size: 1.45rem; font-weight: 700; color: {rz_color};">{rz_sign}${data['trades_summary']['total_realized_pl_usd']:,.2f}</div>
+                <div style="font-size: 1.45rem; font-weight: 700; color: {rz_color};">{money(data['trades_summary']['total_realized_pl_usd'], signed=True)}</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    คิดเป็นเงินไทย: <strong style="color: {rz_color};">{rz_sign}฿{data['trades_summary']['total_realized_pl_thb']:,.2f}</strong><br>
+                    คิดเป็นเงินไทย: <strong style="color: {rz_color};">{money(data['trades_summary']['total_realized_pl_thb'], 'THB', signed=True)}</strong><br>
                     Win Rate: <strong style="color: #10b981;">{data['trades_summary']['win_rate_pct']:.1f}%</strong> (ปิด {data['trades_summary']['total_trades']} ชนะ {data['trades_summary']['winning_trades']} ไม้)
                 </div>
             </div>
             <div class="card">
                 <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
-                <div style="font-size: 1.45rem; font-weight: 700; color: #10b981;">+${data['total_dividends_usd']:,.2f}</div>
+                <div style="font-size: 1.45rem; font-weight: 700; color: #10b981;">{money(data['total_dividends_usd'], signed=True)}</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    คิดเป็นเงินไทย: <strong style="color: #10b981;">+฿{data['total_dividends_thb']:,.2f}</strong> (รับรวม {len(data['dividends_list'])} ครั้ง)<br>
-                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: {rd_color};">{rd_sign}฿{data['total_realized_and_div_thb']:,.2f}</strong>
+                    คิดเป็นเงินไทย: <strong style="color: #10b981;">{money(data['total_dividends_thb'], 'THB', signed=True)}</strong> (รับรวม {len(data['dividends_list'])} ครั้ง)<br>
+                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: {rd_color};">{money(data['total_realized_and_div_thb'], 'THB', signed=True)}</strong>
                 </div>
             </div>
         </div>
@@ -1088,11 +1103,10 @@ def generate_master_ledger_html(data):
     dividends_list = data.get("dividends_list", [])
     cash_movements = data.get("cash_movements", [])
     trades_summary = data.get("trades_summary", {})
-    fx_rate = data.get("fx_rate", 33.62)
+    fx_rate = data.get("fx_rate") or resolve_usdthb(None)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    rz_sign = "+" if trades_summary.get("total_realized_pl_thb", 0) >= 0 else ""
     rz_color = "#10b981" if trades_summary.get("total_realized_pl_thb", 0) >= 0 else "#f43f5e"
 
     total_buys_usd = sum(b.get("amt_usd", 0.0) for b in buy_orders)
@@ -1102,33 +1116,34 @@ def generate_master_ledger_html(data):
     buy_rows = ""
     for idx, b in enumerate(buy_orders):
         acc_badge = '<span class="badge badge-success">Dime! Save (THB)</span>' if "Save" in b.get("account", "") else '<span class="badge badge-info">Dime! USD</span>'
-        type_badge = f'<span class="badge badge-purple">{b.get("order_type", "Market")}</span>' if b.get("order_type") == "Limit" else '<span class="badge badge-neutral">Market</span>'
+        type_badge = f'<span class="badge badge-purple">{escape(str(b.get("order_type", "Market")))}</span>' if b.get("order_type") == "Limit" else '<span class="badge badge-neutral">Market</span>'
         fx_val = b.get("fx_rate", 0)
-        fx_str = f"฿{fx_val:.2f}" if fx_val > 0 else "-"
+        fx_str = money(fx_val, 'THB') if fx_val > 0 else "-"
         amt_thb_val = b.get("amt_thb", 0)
-        thb_str = f"฿{amt_thb_val:,.2f}" if amt_thb_val > 0 else "-"
+        thb_str = money(amt_thb_val, 'THB') if amt_thb_val > 0 else "-"
         fn_val = b.get("fn", "")
+        fn_html = escape(str(fn_val or "-"))
         slip_path = resolve_slip_relative_path(fn_val)
         if slip_path:
             b_tick = b.get("ticker", "-")
             b_dt = b.get("date", "-")
             b_sh = b.get("shares", 0.0)
             b_pr = b.get("price_usd", 0.0)
-            b_info = f"{b_sh:.4f} หุ้น @ ${b_pr:.2f}"
-            slip_html = f'<button type="button" onclick="openSlipModal(\'{slip_path}\', \'{fn_val}\', \'{b_tick}\', \'{b_dt}\', \'{b_info}\')" class="slip-badge-btn" title="คลิกเพื่อดูสลิปคำสั่งซื้อ">🧾 {fn_val}</button>'
+            b_info = f"{b_sh:.4f} หุ้น @ {money(b_pr)}"
+            slip_html = f'<button type="button" onclick="{_slip_onclick(slip_path, fn_val, b_tick, b_dt, b_info)}" class="slip-badge-btn" title="คลิกเพื่อดูสลิปคำสั่งซื้อ">🧾 {fn_html}</button>'
         else:
-            slip_html = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{fn_val or "-"}</span>'
+            slip_html = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{fn_html}</span>'
 
         buy_rows += f"""
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
-            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">{b.get('date', '-')}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">{b.get('ticker', '-')}</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">{escape(str(b.get('date', '-')))}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">{escape(str(b.get('ticker', '-')))}</td>
             <td style="text-align: center;">{type_badge}</td>
             <td style="text-align: center;">{acc_badge}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">{b.get('shares', 0):.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${b.get('price_usd', 0):,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${b.get('amt_usd', 0):,.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(b.get('price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(b.get('amt_usd', 0))}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{thb_str}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{fx_str}</td>
             <td style="text-align: center;">{slip_html}</td>
@@ -1139,12 +1154,12 @@ def generate_master_ledger_html(data):
     closed_rows = ""
     for idx, t in enumerate(closed_trades):
         c = "#10b981" if t.get("realized_pl_usd", 0) >= 0 else "#f43f5e"
-        s = "+" if t.get("realized_pl_usd", 0) >= 0 else ""
         tranches = t.get("buy_tranches", [])
         tranche_count = len(tranches)
         trade_id = t.get("id", f"trade_{idx}").replace("-", "_")
 
         buy_date_str = re.sub(r"\s*\(\d+\s*ไม้\)", "", str(t.get("buy_date", "-")))
+        t_ticker = escape(str(t.get("ticker", "")))
         days = t.get("holding_days", "-")
         days_str = f"{days} วัน" if isinstance(days, (int, float)) else str(days)
 
@@ -1157,37 +1172,37 @@ def generate_master_ledger_html(data):
                 t_tk = t.get("ticker", "")
                 t_sh = t.get("shares", 0.0)
                 t_pr = t.get("buy_price_usd", 0.0)
-                t_info = f"{t_sh:.4f} หุ้น @ ${t_pr:.2f}"
-                tranche_btn = f'<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span> <button type="button" onclick="openSlipModal(\'{single_path}\', \'{single_fn}\', \'{t_tk}\', \'{buy_date_str}\', \'{t_info}\')" class="slip-badge-btn" style="padding: 2px 7px; font-size: 0.74rem;" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 สลิป</button>'
+                t_info = f"{t_sh:.4f} หุ้น @ {money(t_pr)}"
+                tranche_btn = f'<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span> <button type="button" onclick="{_slip_onclick(single_path, single_fn, t_tk, buy_date_str, t_info)}" class="slip-badge-btn" style="padding: 2px 7px; font-size: 0.74rem;" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 สลิป</button>'
             else:
                 tranche_btn = '<span class="badge badge-neutral" style="font-size: 0.76rem;">1 ไม้</span>'
 
         closed_rows += f"""
         <tr style="border-bottom: 1px solid var(--border-subtle);">
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
-            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">{buy_date_str}</td>
-            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">{t.get('date', '-')}</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: #60a5fa; font-weight: 500;">{escape(buy_date_str)}</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">{escape(str(t.get('date', '-')))}</td>
             <td style="text-align: center; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">{days_str}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">{t.get('ticker')}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; font-size: 1.05rem; color: #fff;">{t_ticker}</td>
             <td>
-                <div>{t.get('name', '-')}</div>
+                <div>{escape(str(t.get('name') or '-'))}</div>
                 <div style="margin-top: 4px;">{tranche_btn}</div>
             </td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{t.get('shares', 0):.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('buy_price_usd', 0):.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${t.get('sell_price_usd', 0):.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">${t.get('total_cost_usd', 0):,.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${t.get('net_revenue_usd', 0):,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}${t.get('realized_pl_usd', 0):,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{s}฿{t.get('realized_pl_thb', 0):,.2f}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{s}{t.get('realized_pl_pct', 0):.2f}%</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('buy_price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(t.get('sell_price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('total_cost_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(t.get('net_revenue_usd', 0))}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{money(t.get('realized_pl_usd', 0), signed=True)}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{money(t.get('realized_pl_thb', 0), 'THB', signed=True)}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{pct(t.get('realized_pl_pct', 0), digits=2)}</td>
         </tr>
         """
 
         if tranches:
             tranche_subrows = ""
             for tr in tranches:
-                t_thb_str = f"฿{tr.get('amt_thb', 0):,.2f}" if tr.get('amt_thb', 0) > 0 else "-"
+                t_thb_str = money(tr.get('amt_thb', 0), 'THB') if tr.get('amt_thb', 0) > 0 else "-"
                 tr_fn = tr.get('file', '')
                 tr_path = resolve_slip_relative_path(tr_fn)
                 if tr_path:
@@ -1196,20 +1211,20 @@ def generate_master_ledger_html(data):
                     tr_num = tr.get("tranche", 1)
                     tr_sh = tr.get("shares", 0.0)
                     tr_pr = tr.get("price_usd", 0.0)
-                    tr_info = f"ไม้ที่ {tr_num} • {tr_sh:.4f} หุ้น @ ${tr_pr:.2f}"
-                    slip_col = f'<button type="button" onclick="openSlipModal(\'{tr_path}\', \'{tr_fn}\', \'{tr_tk}\', \'{tr_dt}\', \'{tr_info}\')" class="slip-badge-btn" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 {tr_fn}</button>'
+                    tr_info = f"ไม้ที่ {tr_num} • {tr_sh:.4f} หุ้น @ {money(tr_pr)}"
+                    slip_col = f'<button type="button" onclick="{_slip_onclick(tr_path, tr_fn, tr_tk, tr_dt, tr_info)}" class="slip-badge-btn" title="คลิกดูภาพสลิปคำสั่งซื้อ">🧾 {escape(str(tr_fn))}</button>'
                 else:
-                    slip_col = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{tr_fn or "-"}</span>'
+                    slip_col = f'<span style="color: var(--text-muted); font-size: 0.78rem;">{escape(str(tr_fn or "-"))}</span>'
 
                 tranche_subrows += f"""
                 <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
                     <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ {tr.get('tranche')}</td>
-                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">{tr.get('date')}</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">{escape(str(tr.get('date')))}</td>
                     <td style="text-align: right; font-family: 'Inter', sans-serif;">{tr.get('shares', 0):.4f} หุ้น</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif;">${tr.get('price_usd', 0):.2f}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">${tr.get('amt_usd', 0):,.2f}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(tr.get('price_usd', 0))}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(tr.get('amt_usd', 0))}</td>
                     <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{t_thb_str}</td>
-                    <td style="color: var(--text-secondary);">{tr.get('note', '-')}</td>
+                    <td style="color: var(--text-secondary);">{escape(str(tr.get('note', '-')))}</td>
                     <td style="text-align: center;">{slip_col}</td>
                 </tr>
                 """
@@ -1219,7 +1234,7 @@ def generate_master_ledger_html(data):
                 <td colspan="14" style="padding: 12px 18px;">
                     <div style="background: #090e1a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 14px 18px;">
                         <div style="font-size: 0.85rem; font-weight: 700; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ {t.get('ticker')} (ทั้งหมด {tranche_count} ไม้ | ต้นทุนเฉลี่ย ${t.get('buy_price_usd', 0):.2f}):
+                            <span>🔍</span> รายละเอียดการเข้าซื้อทีละไม้ของ {t_ticker} (ทั้งหมด {tranche_count} ไม้ | ต้นทุนเฉลี่ย {money(t.get('buy_price_usd', 0))}):
                         </div>
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
@@ -1249,11 +1264,11 @@ def generate_master_ledger_html(data):
         div_amt_usd = d.get('amount_usd', 0)
         div_rows += f"""
         <tr>
-            <td style="text-align: center; color: var(--text-secondary);">{d.get('date', '-')}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif;">{d.get('ticker', '-')}</td>
-            <td>{d.get('rate', '-')}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+${div_amt_usd:.2f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿{div_amt_usd * fx_rate:,.2f}</td>
+            <td style="text-align: center; color: var(--text-secondary);">{escape(str(d.get('date', '-')))}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif;">{escape(str(d.get('ticker', '-')))}</td>
+            <td>{escape(str(d.get('rate', '-')))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">{money(div_amt_usd, signed=True)}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">{money(dividend_thb({**d, "amount_usd": div_amt_usd}, fx_rate), 'THB', signed=True)}</td>
         </tr>
         """
 
@@ -1264,30 +1279,26 @@ def generate_master_ledger_html(data):
         if "ฝากเงิน" in c_type:
             badge = '<span class="badge badge-success">ฝากเงินเข้าพอร์ต</span>'
             amt_color = "#10b981"
-            sign = "+"
         elif "ดอกเบี้ย" in c_type:
             badge = '<span class="badge badge-info">ดอกเบี้ยรับเงินฝาก</span>'
             amt_color = "#60a5fa"
-            sign = "+"
         elif "โอนเงินออก" in c_type:
             badge = '<span class="badge badge-rose">โอนเงินออกไปต่างธนาคาร</span>'
             amt_color = "#f43f5e"
-            sign = ""
         else:
             badge = '<span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span>'
             amt_color = "#f43f5e"
-            sign = ""
 
-        bal_str = f"฿{c['balance_thb']:,.2f}" if "balance_thb" in c else "-"
-        ch_str = c.get("channel", "Dime! Save")
-        ref_str = c.get("ref", "-")
+        bal_str = money(c['balance_thb'], 'THB') if "balance_thb" in c else "-"
+        ch_str = escape(str(c.get("channel", "Dime! Save")))
+        ref_str = escape(str(c.get("ref", "-")))
 
         cash_rows += f"""
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
-            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">{c.get('date_str', '-')}</td>
+            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">{escape(str(c.get('date_str', '-')))}</td>
             <td>{badge}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: {amt_color};">{sign}฿{c.get('amount_thb', 0):,.2f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: {amt_color};">{money(c.get('amount_thb', 0), 'THB', signed=True)}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">{bal_str}</td>
             <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">{ch_str}</td>
             <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{ref_str}</td>
@@ -1304,7 +1315,7 @@ def generate_master_ledger_html(data):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายการซื้อขายและเดินบัญชีทั้งหมด - {data.get('portfolio_name', 'Portfolio')}</title>
+    <title>รายการซื้อขายและเดินบัญชีทั้งหมด - {escape(str(data.get('portfolio_name', 'Portfolio')))}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1429,7 +1440,7 @@ def generate_master_ledger_html(data):
                     📑 รายการซื้อขายและเดินบัญชีทั้งหมด
                 </h1>
                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px;">
-                    พอร์ต: <strong style="color: #fff;">{data.get('portfolio_name', 'ไม่รวยก็ซวยอ่ะค้าบ')}</strong> | บันทึกประวัติคำสั่งซื้อ ปิดขายทำกำไร เงินปันผล และการเดินบัญชีครบวงจร
+                    พอร์ต: <strong style="color: #fff;">{escape(str(data.get('portfolio_name', 'ไม่รวยก็ซวยอ่ะค้าบ')))}</strong> | บันทึกประวัติคำสั่งซื้อ ปิดขายทำกำไร เงินปันผล และการเดินบัญชีครบวงจร
                 </p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -1444,23 +1455,23 @@ def generate_master_ledger_html(data):
         <div class="grid-4-cols">
             <div class="card">
                 <div class="kpi-label">เงินต้นฝากสะสมสุทธิ (Net Capital)</div>
-                <div class="kpi-value" style="color: #60a5fa;">฿{data.get('net_injected_capital_thb', 0):,.2f}</div>
-                <div class="kpi-subtext">ฝากรวม ฿{gross_deposits:,.2f} (โอนออก -฿{transfer_out:,.2f})</div>
+                <div class="kpi-value" style="color: #60a5fa;">{money(data.get('net_injected_capital_thb', 0), 'THB')}</div>
+                <div class="kpi-subtext">ฝากรวม {money(gross_deposits, 'THB')} (โอนออก {money(-abs(transfer_out), 'THB')})</div>
             </div>
             <div class="card">
                 <div class="kpi-label">ยอดคำสั่งซื้อหุ้นรวม (Total Buys)</div>
-                <div class="kpi-value" style="color: #38bdf8;">฿{total_buys_thb:,.2f}</div>
-                <div class="kpi-subtext">${total_buys_usd:,.2f} USD ({len(buy_orders)} คำสั่งซื้อ)</div>
+                <div class="kpi-value" style="color: #38bdf8;">{money(total_buys_thb, 'THB')}</div>
+                <div class="kpi-subtext">{money(total_buys_usd)} USD ({len(buy_orders)} คำสั่งซื้อ)</div>
             </div>
             <div class="card">
                 <div class="kpi-label">กำไรปิดรอบที่ขายแล้ว (Realized P&L)</div>
-                <div class="kpi-value" style="color: {rz_color};">{rz_sign}฿{trades_summary.get('total_realized_pl_thb', 0):,.2f}</div>
+                <div class="kpi-value" style="color: {rz_color};">{money(trades_summary.get('total_realized_pl_thb', 0), 'THB', signed=True)}</div>
                 <div class="kpi-subtext">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% ({trades_summary.get('winning_trades', 0)} ชนะ / {trades_summary.get('losing_trades', 0)} แพ้)</div>
             </div>
             <div class="card">
                 <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
-                <div class="kpi-value" style="color: #10b981;">+฿{data.get('total_dividends_thb', 0):,.2f}</div>
-                <div class="kpi-subtext">+${data.get('total_dividends_usd', 0):,.2f} USD ({len(dividends_list)} ครั้ง)</div>
+                <div class="kpi-value" style="color: #10b981;">{money(data.get('total_dividends_thb', 0), 'THB', signed=True)}</div>
+                <div class="kpi-subtext">{money(data.get('total_dividends_usd', 0), signed=True)} USD ({len(dividends_list)} ครั้ง)</div>
             </div>
         </div>
 
@@ -1508,7 +1519,7 @@ def generate_master_ledger_html(data):
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <span>🏆</span> 2. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: {len(closed_trades)} ไม้)
-                    <span class="badge badge-success">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% (กำไรสะสม {rz_sign}฿{trades_summary.get('total_realized_pl_thb', 0):,.2f})</span>
+                    <span class="badge badge-success">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% (กำไรสะสม {money(trades_summary.get('total_realized_pl_thb', 0), 'THB', signed=True)})</span>
                 </div>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
@@ -1542,7 +1553,7 @@ def generate_master_ledger_html(data):
         <div id="section-divs" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>💵</span> 3. ประวัติเงินปันผลรับสะสม (Dividends Received: {len(dividends_list)} ครั้ง)
-                <span class="badge badge-success">รวม +${data.get('total_dividends_usd', 0):.2f} (~฿{data.get('total_dividends_thb', 0):,.2f})</span>
+                <span class="badge badge-success">รวม {money(data.get('total_dividends_usd', 0), signed=True)} (~{money(data.get('total_dividends_thb', 0), 'THB')})</span>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
                 <table>
@@ -1573,22 +1584,22 @@ def generate_master_ledger_html(data):
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 0.95rem;">
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดโอนเข้าจากต่างธนาคารรวม (PromptPay):</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">฿{gross_deposits:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">{money(gross_deposits, 'THB')}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(19 รายการ: Statement 18 ครั้ง + 14 ต.ค. 1 ครั้ง)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดโอนเงินกลับออกไปต่างธนาคาร:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--rose);">-฿{transfer_out:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--rose);">{money(-abs(transfer_out), 'THB')}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(เมื่อวันที่ 03/02/2026 ผ่านช่องทาง DIME)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดเงินต้นสุทธิที่คงอยู่ใน Dime!:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #60a5fa;">฿{data.get('net_injected_capital_thb', 0):,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #60a5fa;">{money(data.get('net_injected_capital_thb', 0), 'THB')}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(ใช้เป็นฐานคำนวณผลตอบแทนรวมจริง 100%)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">เงินสดคงเหลือในบัญชี Dime! Save:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--emerald);">฿{dime_save_cash:,.2f}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--emerald);">{money(dime_save_cash, 'THB')}</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(หักซื้อหุ้นชุดล่าสุด 4 ไม้ ฿35,001.63 เมื่อ 13-14 ต.ค. 69)</div>
                     </div>
                 </div>
@@ -1697,28 +1708,22 @@ def main():
     json_path = Path("data/account_summary.json")
     json_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    sync_skill_numbers(data)
     print_master_summary(data, out_path, json_path)
 
 
-def signed_money(value, sym):
-    return f"{'+' if value >= 0 else '-'}{sym}{abs(value):,.2f}"
-
-
 def print_master_summary(data, html_path, json_path):
-    at_sign = "+" if data['all_time_profit_thb'] >= 0 else ""
     ts = data['trades_summary']
     print("==========================================================================")
     print("         MASTER WEALTH & PORTFOLIO SUMMARY (DIME! & KKP)")
     print("==========================================================================")
     print(f"Portfolio Name       : {data['portfolio_name']}")
-    print(f"Total Net Worth (NAV): ฿{data['total_net_worth_thb']:,.2f} (~${data['total_net_worth_usd']:,.2f} USD)")
-    print(f"Net Injected Capital : ฿{data['net_injected_capital_thb']:,.2f} (from KKP Statement)")
-    print(f"All-Time Net Profit  : {at_sign}฿{data['all_time_profit_thb']:,.2f} ({at_sign}{data['all_time_roi_pct']:.2f}% All-Time ROI)")
-    print(f"Total Idle Cash      : ฿{data['total_cash_thb']:,.2f} (Dime! Save: ฿{data['dime_save_cash_thb']:,.2f} | Dime! USD: ${data['dime_usd_cash']:.2f})")
-    print(f"Active Stock Holdings: {len(data['positions'])} stocks | Market Val: ${data['stock_market_val_usd']:,.2f} (฿{data['stock_market_val_thb']:,.2f})")
-    print(f"Realized Trades P&L  : {signed_money(ts['total_realized_pl_usd'], '$')} ({signed_money(ts['total_realized_pl_thb'], '฿')}) | Win Rate {ts['win_rate_pct']:.1f}%")
-    print(f"Total Dividends Recv : {signed_money(data['total_dividends_usd'], '$')} ({signed_money(data['total_dividends_thb'], '฿')}) | {len(data['dividends_list'])} payments")
+    print(f"Total Net Worth (NAV): {money(data['total_net_worth_thb'], 'THB')} (~{money(data['total_net_worth_usd'])} USD)")
+    print(f"Net Injected Capital : {money(data['net_injected_capital_thb'], 'THB')} (from KKP Statement)")
+    print(f"All-Time Net Profit  : {money(data['all_time_profit_thb'], 'THB', signed=True)} ({pct(data['all_time_roi_pct'], digits=2)} All-Time ROI)")
+    print(f"Total Idle Cash      : {money(data['total_cash_thb'], 'THB')} (Dime! Save: {money(data['dime_save_cash_thb'], 'THB')} | Dime! USD: {money(data['dime_usd_cash'])})")
+    print(f"Active Stock Holdings: {len(data['positions'])} stocks | Market Val: {money(data['stock_market_val_usd'])} ({money(data['stock_market_val_thb'], 'THB')})")
+    print(f"Realized Trades P&L  : {money(ts['total_realized_pl_usd'], signed=True)} ({money(ts['total_realized_pl_thb'], 'THB', signed=True)}) | Win Rate {ts['win_rate_pct']:.1f}%")
+    print(f"Total Dividends Recv : {money(data['total_dividends_usd'], signed=True)} ({money(data['total_dividends_thb'], 'THB', signed=True)}) | {len(data['dividends_list'])} payments")
     print("==========================================================================")
     print(f"Master HTML Dashboard: {html_path.resolve()}")
     print(f"Account JSON File    : {json_path.resolve()}")

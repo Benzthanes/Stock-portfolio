@@ -128,6 +128,19 @@ class CDCActionZoneTest(unittest.TestCase):
 
 
 class ChartPageGenerationTest(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        for patcher in (
+            mock.patch("src.chart_page.REPORTS_DIR", Path(tmp.name)),
+            mock.patch("src.news.fetch_batch_news", return_value={}),
+        ):
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
     def test_generate_stock_chart_page_html_renders_cockpit_and_subpane(self):
         from src.chart_page import generate_stock_chart_page_html
         html = generate_stock_chart_page_html()

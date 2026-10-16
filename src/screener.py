@@ -577,9 +577,14 @@ def generate_markdown_report(
 
             bullish = cat.get("bullish", [])
             bearish = cat.get("bearish", [])
+            fetch_ok = cat.get("fetch_ok", True)
 
+            if not fetch_ok:
+                lines.append("⚠️ **ดึงข่าวไม่สำเร็จ:** ยังสรุปข่าวดีหรือข่าวร้ายของหุ้นตัวนี้ไม่ได้ ควรตรวจสอบข่าวเองก่อนตัดสินใจ.")
             lines.append("🟢 **ข่าวดีและปัจจัยบวก (Bullish Catalysts):**")
-            if bullish:
+            if not fetch_ok:
+                lines.append("- -")
+            elif bullish:
                 for b in bullish:
                     title_link = f"[{b['title']}]({b['link']})" if b.get("link") else b["title"]
                     lines.append(f"- **[{b['source']}]** {title_link} *({b['published']})*")
@@ -587,20 +592,24 @@ def generate_markdown_report(
                 lines.append("- ยังไม่มีข่าวด้านบวกโดดเด่นในรอบสัปดาห์นี้.")
 
             lines.append("🔴 **ข่าวร้ายและสาเหตุที่ราคาย่อตัว (Bearish Risks):**")
-            if bearish:
+            if not fetch_ok:
+                lines.append("- -")
+            elif bearish:
                 for b in bearish:
                     title_link = f"[{b['title']}]({b['link']})" if b.get("link") else b["title"]
                     lines.append(f"- **[{b['source']}]** {title_link} *({b['published']})*")
             else:
-                lines.append("- ไม่มีข่าวด้านลบรุนแรง การย่อตัวเกิดจากการปรับฐานตามตลาด.")
+                lines.append("- ไม่พบข่าวด้านลบในพาดหัวล่าสุดที่ดึงมาได้ (จัดกลุ่มด้วยคีย์เวิร์ด ไม่ได้ยืนยันสาเหตุที่ราคาย่อตัว).")
 
             # Beginner Suitability based on real volatility (ATR%) and sector safety
             sec = s_item.get("sector") or ""
-            atr = s_item.get("atr") or 0.0
-            close_p = s_item.get("close") or 1.0
-            atr_pct = (atr / close_p * 100.0) if close_p > 0 else 0.0
+            atr = s_item.get("atr")
+            close_p = s_item.get("close")
+            atr_pct = (atr / close_p * 100.0) if (atr and close_p and close_p > 0) else None
 
-            if atr_pct <= 2.5 and sec in ("Finance", "Health Technology", "Consumer Non-Durables", "Utilities"):
+            if atr_pct is None:
+                suitability_badge = "⚪ ไม่มีข้อมูลความผันผวน (-) ประเมินความเหมาะสมไม่ได้"
+            elif atr_pct <= 2.5 and sec in ("Finance", "Health Technology", "Consumer Non-Durables", "Utilities"):
                 suitability_badge = f"🟢 เหมาะกับมือใหม่มาก (ความผันผวนต่ำเพียง {atr_pct:.1f}%/วัน พื้นฐานมั่นคง)"
             elif atr_pct <= 4.0:
                 suitability_badge = f"🟡 เหมาะกับคนมีประสบการณ์ (หุ้นเติบโต ผันผวนปานกลาง {atr_pct:.1f}%/วัน)"
@@ -611,7 +620,7 @@ def generate_markdown_report(
             lines.append("👶 **สรุปภาษาคน สำหรับมือใหม่:**")
             lines.append(f"- **ระดับความเหมาะสม:** {suitability_badge}")
             rev_g = s_item.get("rev_growth_yoy")
-            growth_txt = f"รายได้เติบโต {rev_g:+.1f}% YoY" if rev_g is not None else "ธุรกิจมีความมั่นคงสูง"
+            growth_txt = f"รายได้เติบโต {rev_g:+.1f}% YoY" if rev_g is not None else "ไม่มีข้อมูลการเติบโตของรายได้ (-)"
             plan_sl = s_item.get("stop_loss", 0.0)
             plan_tp = s_item.get("take_profit", 0.0)
 

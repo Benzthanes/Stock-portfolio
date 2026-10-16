@@ -2,14 +2,20 @@ name: Automated Portfolio Update
 
 on:
   schedule:
-    # 20:39 ICT = 13:39 UTC (Mon-Fri, เลี่ยงคิวหนาแน่น) หลังเปิดตลาดช่วง DST (มี.ค.-พ.ย.) แต่ก่อนเปิดตลาดช่วงฤดูหนาว (ตลาดเปิด 14:30 UTC)
+    # Times are UTC. GitHub runs scheduled jobs late under load (seen 2-4 hours late), so treat these as "not before".
+    # 13:39 UTC = 20:39 ICT Mon-Fri. After the US open during DST (Mar-Nov), before the open in winter (open is 14:30 UTC).
     - cron: '39 13 * * 1-5'
-    # 04:12 ICT (อังคาร - เสาร์ เช้าหลังปิดตลาดสหรัฐฯ) = 21:12 UTC (Mon-Fri, เลี่ยงคิวหนาแน่น)
+    # 21:12 UTC Mon-Fri = 04:12 ICT Tue-Sat. After the US close.
     - cron: '12 21 * * 1-5'
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
+
+concurrency:
+  group: portfolio-update
+  cancel-in-progress: false
 
 env:
   TZ: 'Asia/Bangkok'
@@ -18,21 +24,43 @@ jobs:
   update-portfolio:
     name: Refresh Portfolio Reports
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
 
+      - name: Compute cache date
+        id: date
+        run: echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore market data caches
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            data/candles_cache.json
+            data/.news_cache.json
+          # Keys are immutable, so the run id makes every run save a fresh copy. Restore falls back to today, then any day.
+          key: portfolio-caches-${{ steps.date.outputs.date }}-${{ github.run_id }}
+          restore-keys: |
+            portfolio-caches-${{ steps.date.outputs.date }}-
+            portfolio-caches-
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -t .
+
       - name: Run all portfolio reports
-        run: |
-          python3 portfolio.py --all
+        id: reports
+        run: python3 portfolio.py --all
 
       - name: Commit and push updated reports
+        # Push whatever was generated even if one report step failed. The job still fails afterwards.
+        if: success() || steps.reports.outcome == 'failure'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -40,6 +68,23 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes detected. Skipping commit."
           else
-            git commit -m "chore: automated portfolio update [skip ci]"
-            git push
+            git commit -m "chore: automated portfolio update"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Report failure in an issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          label=portfolio-update-failure
+          gh label create "$label" --color B60205 --description "Automated portfolio update failed" 2>/dev/null || true
+          body="Portfolio update failed on $(date -u '+%Y-%m-%d %H:%M UTC'). Run: $RUN_URL"
+          issue=$(gh issue list --label "$label" --state open --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body "$body"
+          else
+            gh issue create --title "Automated portfolio update failed" --label "$label" --body "$body"
           fi

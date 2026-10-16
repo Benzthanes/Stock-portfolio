@@ -71,7 +71,8 @@ def main():
     buy_parser.add_argument("--ticker", "-t", required=True, type=str, help="Stock ticker symbol (e.g. NVDA)")
     buy_parser.add_argument("--shares", "-s", required=True, type=float, help="Number of shares bought")
     buy_parser.add_argument("--price", "-p", required=True, type=float, help="Execution price in USD")
-    buy_parser.add_argument("--fx", type=float, default=None, help="USD/THB exchange rate (default: from portfolio.json)")
+    buy_parser.add_argument("--fees", type=float, default=0.0, help="Brokerage commissions/fees in USD (default: 0.0)")
+    buy_parser.add_argument("--fx", type=float, default=None, help="USD/THB exchange rate (default: live rate, else portfolio.json)")
     buy_parser.add_argument("--pay", choices=["thb", "usd"], default="thb", help="Pay from Dime! Save THB (default) or Dime! USD")
     buy_parser.add_argument("--exchange", type=str, default=None, help="Exchange for a new ticker (default: auto lookup)")
     buy_parser.add_argument("--date", "-d", type=str, default=None, help="Trade date (YYYY-MM-DD, default: today)")
@@ -143,7 +144,7 @@ def main():
             print(f"Win Rate            : {summary['win_rate_pct']:.1f}% ({summary['winning_trades']} wins, {summary['losing_trades']} losses)")
             print(f"Net Realized P&L    : {pl_sign}${summary['total_realized_pl_usd']:,.2f} ({pl_sign}฿{summary['total_realized_pl_thb']:,.2f})")
             print(f"Overall ROI         : {pl_sign}{summary['roi_pct']:.2f}%")
-            print(f"Profit Factor       : {summary['profit_factor']:.2f}")
+            print(f"Profit Factor       : {summary['profit_factor_display']}")
             print(f"Total Cost Sold     : ${summary['total_cost_usd']:,.2f}")
             print(f"Total Net Proceeds  : ${summary['total_revenue_usd']:,.2f}")
             print("==================================================")
@@ -151,7 +152,7 @@ def main():
 
     try:
         if args.command == "buy":
-            r = record_buy(args.ticker, args.shares, args.price, fx_rate=args.fx, pay=args.pay,
+            r = record_buy(args.ticker, args.shares, args.price, fx_rate=args.fx, pay=args.pay, fees=args.fees,
                            trade_date=args.date, exchange=args.exchange, dry_run=args.dry_run)
             h, b = r["holding"], r["buy_order"]
             print_ledger_result(r, [

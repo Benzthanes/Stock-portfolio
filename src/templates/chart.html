@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Chart & Rule-based Confluence Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- TradingView Lightweight Charts & Technical Widgets -->
+    <script type="text/javascript" src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+__CHART_CSS__    </style>
+</head>
+<body>
+    <div class="chart-page-container">
+        <!-- Top Nav Bar -->
+        <div class="top-nav-bar">
+            <button class="nav-back-btn" onclick="goBackOrDashboard()">
+                <span>← ย้อนกลับ</span>
+            </button>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div class="hotkey-badge">
+                    <span>คีย์ลัด:</span>
+                    <kbd>E</kbd> EMA 200
+                    <kbd>R</kbd> RSI
+                    <kbd>F</kbd> Fibo
+                    <kbd>S</kbd> Supertrend
+                    <kbd>V</kbd> VWAP
+                </div>
+                <div class="hotkey-badge">
+                    <span>🖱️ ดับเบิ้ลคลิกแกนราคาเพื่อรีเซ็ตสเกล</span>
+                </div>
+            </div>
+        </div>
+
+        __NAV_BAR__
+
+        <!-- Ticker Switcher Carousel -->
+        <div class="ticker-carousel-wrap">
+            <div class="search-box">
+                <input type="text" id="ticker_search" class="search-input" placeholder="🔍 ค้นหาหุ้น (เช่น LLY)..." oninput="filterTickers(this.value)">
+            </div>
+            <div class="pills-scroll" id="pills_container">
+                __PILLS_HTML__
+            </div>
+        </div>
+
+        <!-- 2-Column Cockpit Grid -->
+        <div class="cockpit-grid">
+            <!-- Left: Main Chart Area -->
+            <div class="cockpit-main">
+                <div class="stock-main-card">
+                    <!-- Stock Header -->
+                    <div class="stock-header">
+                        <div class="stock-title-wrap">
+                            <span class="stock-ticker-badge" id="st_ticker_pill">NVDA</span>
+                            <div class="stock-name-box">
+                                <h1 id="st_name_title">
+                                    <span id="st_name">NVIDIA Corporation</span>
+                                    <span class="header-price-chip" id="st_head_price">$0.00</span>
+                                    <span class="header-change-chip" id="st_head_change">0.00%</span>
+                                    <span id="st_stale_badge" title="ดึงข้อมูลล่าสุดไม่สำเร็จ กำลังแสดงข้อมูลจากรอบก่อน" style="display:none; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:6px; color:#fbbf24; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4);">⚠️ ข้อมูลเก่า</span>
+                                </h1>
+                                <p id="st_sector_exchange">Semiconductors • NASDAQ</p>
+                            </div>
+                        </div>
+
+                        <div class="stock-header-actions">
+                            <div class="view-tabs">
+                                <button class="v-tab-btn active" id="tab_tech" onclick="switchChartTab('tech')">⚡ Pro Chart</button>
+                                <button class="v-tab-btn" id="tab_tv" onclick="switchChartTab('tv')">🌐 TradingView</button>
+                            </div>
+                            <button class="jump-btn" onclick="scrollToAiSection()">🤖 จุดตัดสินใจ</button>
+                            <a id="st_ext_link" href="#" target="_blank" class="ext-tv-btn" title="เปิดดูกราฟตัวเต็มบน TradingView">
+                                <span>เปิดบน TradingView ↗</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry HUD Strip -->
+                    <div class="hud-strip">
+                        <div class="hud-card">
+                            <span class="hud-label">💵 ทุนพอร์ต (AVG)</span>
+                            <span id="hud_cost" class="hud-val">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">⚡ ราคาล่าสุด</span>
+                            <span id="hud_price" class="hud-val" style="color: #60a5fa;">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🟢 แนวรับสำคัญ (S1)</span>
+                            <span id="hud_support" class="hud-val" style="color: #34d399;">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🔴 แนวต้านสำคัญ (R1)</span>
+                            <span id="hud_resistance" class="hud-val" style="color: #fb7185;">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🛑 Stop Loss (1.5 ATR)</span>
+                            <span id="hud_sl" class="hud-val" style="color: #f43f5e;">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🎯 Take Profit</span>
+                            <span id="hud_tp" class="hud-val" style="color: #10b981;">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🏛️ Consensus สถาบัน</span>
+                            <span id="hud_target" class="hud-val" style="color: #60a5fa;">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🛡️ ATR (14)</span>
+                            <span id="hud_atr" class="hud-val">-</span>
+                        </div>
+                        <div class="hud-card">
+                            <span class="hud-label">🌊 วอลุ่มเทียบ 20D</span>
+                            <span id="hud_vol" class="hud-val">-</span>
+                        </div>
+                        <div class="hud-card" id="hud_earn_card">
+                            <span class="hud-label">🗓️ วันประกาศงบ</span>
+                            <span id="hud_earnings" class="hud-val">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Fibonacci Level Chips Strip -->
+                    <div class="fibo-chips-bar" id="fibo_strip">
+                        <span id="fibo_title_label" style="color: #94a3b8; font-weight: 700;">📐 52W CYCLE FIBO:</span>
+                        <span class="fibo-chip" id="chip_f0">0.0%: -</span>
+                        <span class="fibo-chip" id="chip_f236">23.6%: -</span>
+                        <span class="fibo-chip" id="chip_f382">38.2%: -</span>
+                        <span class="fibo-chip" id="chip_f500">50.0%: -</span>
+                        <span class="fibo-chip golden" id="chip_f618">⭐ 61.8%: -</span>
+                        <span class="fibo-chip" id="chip_f786">78.6%: -</span>
+                        <span class="fibo-chip" id="chip_f100">100.0%: -</span>
+                        <span class="fibo-chip" id="chip_w52_hi" style="display: none; color: #fb923c; border-color: rgba(251, 146, 60, 0.45); background: rgba(251, 146, 60, 0.10); font-weight: 600;">📅 52W High: -</span>
+                        <span class="fibo-chip" id="chip_w52_lo" style="display: none; color: #38bdf8; border-color: rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.10); font-weight: 600;">📅 52W Low: -</span>
+                        <button class="botbar-btn" id="btn_fibo_mode" onclick="toggleFiboCycleMode()" style="margin-left: auto; color: #38bdf8; font-size: 0.70rem; padding: 2px 8px;">🔄 2Y Macro</button>
+                    </div>
+
+                    <!-- Modern Flat Toolbar - All Indicators Always Accessible -->
+                    <div class="chart-toolbar-modern" id="chart_toolbar">
+                        <div class="tb-group">
+                            <span class="tb-group-title">EMAs:</span>
+                            <button class="ema-pill" id="tog_ema9" style="color: #fbbf24;" onclick="toggleIndicator('ema9')"><span class="dot"></span> EMA 9 <span class="help-q" onclick="openIndicatorHelp('ema9', event)" title="วิธีดู EMA 9">?</span></button>
+                            <button class="ema-pill" id="tog_ema21" style="color: #38bdf8;" onclick="toggleIndicator('ema21')"><span class="dot"></span> EMA 21 <span class="help-q" onclick="openIndicatorHelp('ema21', event)" title="วิธีดู EMA 21">?</span></button>
+                            <button class="ema-pill" id="tog_ema50" style="color: #a78bfa;" onclick="toggleIndicator('ema50')"><span class="dot"></span> EMA 50 <span class="help-q" onclick="openIndicatorHelp('ema50', event)" title="วิธีดู EMA 50">?</span></button>
+                            <button class="ema-pill" id="tog_ema200" style="color: #22d3ee;" onclick="toggleIndicator('ema200')"><span class="dot"></span> EMA 200 <span class="help-q" onclick="openIndicatorHelp('ema200', event)" title="วิธีดู EMA 200">?</span></button>
+                        </div>
+
+                        <div class="tb-group">
+                            <span class="tb-group-title">LEVELS & SIGNALS:</span>
+                            <button class="ema-pill" id="tog_pivots" style="color: #fb7185;" onclick="toggleIndicator('pivots')">🎯 Pivots (S/R) <span class="help-q" onclick="openIndicatorHelp('pivots', event)" title="วิธีดู Pivots (S/R)">?</span></button>
+                            <button class="ema-pill" id="tog_ew" style="color: #818cf8;" onclick="toggleIndicator('ew')">🌊 Elliott Wave (1-5) <span class="help-q" onclick="openIndicatorHelp('ew', event)" title="วิธีดู Elliott Wave">?</span></button>
+                            <button class="ema-pill" id="tog_earn" style="color: #facc15;" onclick="toggleIndicator('earn')">🗓️ ผลงบ (Earnings) <span class="help-q" onclick="openIndicatorHelp('earn', event)" title="วิธีดู ผลงบย้อนหลัง">?</span></button>
+                            <button class="ema-pill" id="tog_fibo" style="color: #38bdf8;" onclick="toggleIndicator('fibo')">📐 Fibo Cycle <span class="help-q" onclick="openIndicatorHelp('fibo', event)" title="วิธีดู Fibo Cycle">?</span></button>
+                            <button class="ema-pill active" id="tog_pat" style="color: #34d399;" onclick="toggleIndicator('pat')">🏛️ Patterns <span class="help-q" onclick="openIndicatorHelp('pat', event)" title="วิธีดู Chart Patterns">?</span></button>
+                        </div>
+
+                        <div class="tb-group">
+                            <span class="tb-group-title">BANDS & TREND:</span>
+                            <button class="ema-pill" id="tog_cdc" style="color: #22c55e;" onclick="toggleIndicator('cdc')">🚦 CDC ActionZone <span class="help-q" onclick="openIndicatorHelp('cdc', event)" title="วิธีดู CDC ActionZone V3">?</span></button>
+                            <button class="ema-pill" id="tog_bb" style="color: #06b6d4;" onclick="toggleIndicator('bb')">Bollinger <span class="help-q" onclick="openIndicatorHelp('bb', event)" title="วิธีดู Bollinger Bands">?</span></button>
+                            <button class="ema-pill" id="tog_st" style="color: #34d399;" onclick="toggleIndicator('st')">Supertrend <span class="help-q" onclick="openIndicatorHelp('st', event)" title="วิธีดู Supertrend">?</span></button>
+                            <button class="ema-pill" id="tog_sar" style="color: #ec4899;" onclick="toggleIndicator('sar')">SAR <span class="help-q" onclick="openIndicatorHelp('sar', event)" title="วิธีดู Parabolic SAR">?</span></button>
+                            <button class="ema-pill" id="tog_ichi" style="color: #38bdf8;" onclick="toggleIndicator('ichi')">Ichimoku <span class="help-q" onclick="openIndicatorHelp('ichi', event)" title="วิธีดู Ichimoku Kinko Hyo">?</span></button>
+                            <button class="ema-pill" id="tog_vwap" style="color: #eab308;" onclick="toggleIndicator('vwap')">VWAP <span class="help-q" onclick="openIndicatorHelp('vwap', event)" title="วิธีดู VWAP">?</span></button>
+                        </div>
+
+                        <div class="tb-group tb-actions">
+                            <button class="ema-pill active" id="tog_rsi_pane" style="color: #c084fc;" onclick="toggleRsiPane()">⚡ RSI (14) <span class="help-q" onclick="openIndicatorHelp('rsi', event)" title="วิธีดู RSI (14)">?</span></button>
+                            <button class="reset-ind-btn" onclick="resetAllIndicators()">🔄 ล้างเส้น</button>
+                        </div>
+                    </div>
+
+                    <!-- Main Chart Canvas Body -->
+                    <div id="chart_container" class="main-chart-pane"></div>
+
+                    <!-- Synchronized RSI (14) Sub-Pane -->
+                    <div id="rsi_subpane_wrap" class="rsi-subpane-wrap">
+                        <div class="rsi-pane-header">
+                            <b style="color: #c084fc;">RSI (14)</b>
+                            <span>ค่าล่าสุด: <span id="rsi_hover_val" style="color: #f8fafc; font-weight: 700;">-</span></span>
+                            <span style="color: #fb7185;">Overbought: 70</span>
+                            <span style="color: #34d399;">Oversold: 30</span>
+                        </div>
+                        <div id="rsi_container" class="rsi-pane-canvas"></div>
+                    </div>
+
+                    <!-- Bottom Bar (Timeframe & Zoom Presets like Rocket Tool) -->
+                    <div class="chart-botbar">
+                        <div class="tf-seg-group">
+                            <span style="font-size: 0.70rem; color: #94a3b8; font-weight: 700; margin-right: 2px;">ช่วงแท่ง:</span>
+                            <button class="botbar-btn active agg-tf-btn" id="agg_btn_D" onclick="setCandleAggregation('D')">1D (วัน)</button>
+                            <button class="botbar-btn agg-tf-btn" id="agg_btn_W" onclick="setCandleAggregation('W')">1W (สัปดาห์)</button>
+                            <button class="botbar-btn agg-tf-btn" id="agg_btn_M" onclick="setCandleAggregation('M')">1M (เดือน)</button>
+                        </div>
+
+                        <div class="tf-seg-group">
+                            <span style="font-size: 0.70rem; color: #94a3b8; font-weight: 700; margin-right: 2px;">ซูมช่วงเวลา:</span>
+                            <button class="botbar-btn" id="tf_3m" onclick="setTimeframe('3M')">3 เดือน</button>
+                            <button class="botbar-btn" id="tf_6m" onclick="setTimeframe('6M')">6 เดือน</button>
+                            <button class="botbar-btn active" id="tf_1y" onclick="setTimeframe('1Y')">1 ปี</button>
+                            <button class="botbar-btn" id="tf_5y" onclick="setTimeframe('5Y')">5 ปี</button>
+                            <button class="botbar-btn" id="tf_all" onclick="setTimeframe('ALL')">ทั้งหมด</button>
+                        </div>
+
+                        <div style="font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 6px;">
+                            <span>💡 คลิกที่แท่งเทียนบนกราฟเพื่อส่งราคาเข้าเครื่องคิดเลข DCA</span>
+                        </div>
+                    </div>
+
+                    <!-- TradingView Widget Box (Alternative Tab) -->
+                    <div id="tv_widget_container" class="tv-widget-box"></div>
+
+                    <!-- AI Multi-Technical Confluence Decision Section -->
+                    <div class="ai-decision-section" id="ai_decision_panel">
+                        <div class="ai-sec-header">
+                            <div class="ai-sec-title">
+                                <span>🤖 Rule-based Confluence Decision Engine</span>
+                                <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(ระบบตัดสินใจซื้อ-ขาย-ทยอยสะสม DCA ด้วยคอนฟลูเอนซ์ 5 มิติ)</span>
+                            </div>
+                            <div style="font-size: 0.74rem; color: #64748b;">
+                                💡 คลิกที่มาร์กเกอร์บนแท่งเทียน หรือเลือกจุดตัดสินใจด้านล่าง
+                            </div>
+                        </div>
+
+                        <div class="sig-chips-row" id="signal_chips"></div>
+                        <div class="decision-card-body" id="decision_card"></div>
+                    </div>
+
+                    <!-- Classical Chart Pattern Deep-Dive Breakdown Section -->
+                    <div class="pattern-deepdive-section" id="pattern_deepdive_panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                            <div style="font-size: 1.02rem; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                                <span>🏛️ Classical Chart Pattern Deep-Dive</span>
+                                <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(วิเคราะห์โครงสร้างกราฟและจิตวิทยาตลาดเชิงลึก)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <span id="pdd_badge" style="padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">🟢 กำลังวิเคราะห์...</span>
+                                <span id="pdd_winrate" style="padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(250, 204, 21, 0.3); color: #facc15;">🎯 สถิติความแม่นยำ: -</span>
+                                <button class="botbar-btn active" id="btn_toggle_pat_chart" onclick="toggleIndicator('pat')" style="padding: 4px 12px; font-weight: 700; color: #34d399; border-color: rgba(52, 211, 153, 0.4);">✅ ซ่อนเส้นแพทเทิร์น</button>
+                            </div>
+                        </div>
+
+                        <!-- Showcase Grid: Visual Diagram Box + Detailed Breakdown Cards -->
+                        <div class="pdd-showcase-grid">
+                            <!-- Visual Pattern Blueprint Card -->
+                            <div class="pdd-diagram-box">
+                                <div class="pdd-box-header">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span style="font-size: 1.05rem;">📐</span>
+                                        <span id="pdd_diagram_title" style="font-size: 0.82rem; font-weight: 800; color: #f8fafc;">แผนผังโครงสร้างแพทเทิร์นทางเทคนิค (Visual Pattern Blueprint)</span>
+                                    </div>
+                                    <span id="pdd_diagram_type" style="font-size: 0.68rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); padding: 2px 7px; border-radius: 4px;">Technical Model</span>
+                                </div>
+                                <div id="pdd_diagram_container" style="display: flex; justify-content: center; align-items: center; padding: 6px; background: #060913; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.06); min-height: 190px;">
+                                    <!-- Dynamic SVG Diagram Inserted Here -->
+                                </div>
+                                <div id="pdd_summary_caption" style="margin-top: 10px; font-size: 0.78rem; color: #93c5fd; line-height: 1.5; background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 6px; padding: 8px 12px;">
+                                    -
+                                </div>
+                            </div>
+
+                            <!-- Detailed Deep-Dive Breakdown Cards -->
+                            <div class="pdd-details-column">
+                                <div class="pdd-card">
+                                    <div class="pdd-card-title">🏛️ โครงสร้างราคา & ระดับวัดผล (Structure & Measured Move)</div>
+                                    <div class="pdd-card-body" id="pdd_structure">-</div>
+                                </div>
+                                <div class="pdd-card">
+                                    <div class="pdd-card-title" style="color: #c084fc;">🧠 จิตวิทยาตลาด & พฤติกรรมสถาบัน (Market Psychology & Institutional Footprint)</div>
+                                    <div class="pdd-card-body" id="pdd_psychology">-</div>
+                                </div>
+                                <div class="pdd-card">
+                                    <div class="pdd-card-title" style="color: #34d399;">🎯 แผนเข้าทำกำไร (Actionable Execution Plan)</div>
+                                    <div class="pdd-card-body" id="pdd_action_plan">-</div>
+                                </div>
+                                <div class="pdd-card">
+                                    <div class="pdd-card-title" style="color: #fb7185;">🛑 เงื่อนไขตัดขาดทุนเมื่อเสียทรง (Invalidation & Risk Control)</div>
+                                    <div class="pdd-card-body" id="pdd_invalidation">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Cockpit Sidebar -->
+            <div class="cockpit-sidebar">
+                <!-- Card 1: Smart DCA Calculator -->
+                <div class="sidebar-card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🧮 คิดถัวเฉลี่ยอัจฉริยะ</span>
+                        </div>
+                        <span class="sc-subtitle">Smart DCA & Breakeven</span>
+                    </div>
+
+                    <!-- Portfolio Position Status -->
+                    <div id="dca_pos_box" class="dca-pos-badge">
+                        กำลังตรวจสอบพอร์ต...
+                    </div>
+
+                    <!-- Preset Target Prices -->
+                    <div style="font-size: 0.70rem; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">ราคาที่เล็งซื้อเพิ่ม:</div>
+                    <div class="dca-presets-row">
+                        <button class="dca-preset-btn" onclick="applyDcaPreset('curr')">⚡ ราคาตลาด</button>
+                        <button class="dca-preset-btn" onclick="applyDcaPreset('s1')">🟢 แนวรับ 1</button>
+                        <button class="dca-preset-btn" onclick="applyDcaPreset('s2')">🛡️ แนวรับ 2</button>
+                    </div>
+
+                    <div class="dca-input-row">
+                        <input type="number" id="dca_trade_price" class="dca-input" step="0.01" placeholder="ราคาซื้อ ($)" oninput="recalcDca()">
+                    </div>
+
+                    <!-- Investment Amount & Mode -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 0.70rem; color: #94a3b8; font-weight: 700;">เงินลงทุนหรือจำนวนหุ้น:</span>
+                        <div class="dca-mode-toggle">
+                            <button id="dca_mode_usd" class="dca-mode-btn active" onclick="setDcaMode('USD')">USD ($)</button>
+                            <button id="dca_mode_shares" class="dca-mode-btn" onclick="setDcaMode('SHARES')">หุ้น (Shares)</button>
+                        </div>
+                    </div>
+
+                    <div class="dca-input-row">
+                        <input type="number" id="dca_amount_input" class="dca-input" step="any" placeholder="ระบุจำนวนเงินหรือหุ้น..." value="1000" oninput="recalcDca()">
+                    </div>
+
+                    <!-- Calculation Results Card -->
+                    <div class="dca-results-card">
+                        <div class="dca-res-line">
+                            <span>หุ้นที่ได้เพิ่ม:</span>
+                            <b id="dca_res_add_shares">0.00 หุ้น</b>
+                        </div>
+                        <div class="dca-res-line">
+                            <span>เงินลงทุนรอบนี้:</span>
+                            <b id="dca_res_add_cost">$0.00</b>
+                        </div>
+                        <div class="dca-res-line" style="padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+                            <span>ต้นทุนเฉลี่ยใหม่:</span>
+                            <b id="dca_res_new_avg" style="color: #60a5fa; font-size: 0.95rem;">$0.00</b>
+                        </div>
+                        <div class="dca-res-line">
+                            <span>ระยะคืนทุน (Breakeven):</span>
+                            <b id="dca_res_breakeven">-</b>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: AI Narrative Summary -->
+                <div class="sidebar-card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🎙️ ผู้ช่วยวิเคราะห์อ่านทรงหุ้น</span>
+                        </div>
+                        <span class="sc-subtitle">Rule-based Technical Readout</span>
+                    </div>
+
+                    <div id="ai_narrative_badge_container"></div>
+                    <div id="ai_narrative_text" class="ai-narrative-box">
+                        กำลังอ่านข้อมูลและคำนวณทรงราคา...
+                    </div>
+                </div>
+
+                <!-- Card 3: Key Levels Radar Table -->
+                <div class="sidebar-card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>📊 ระดับราคาสำคัญ (Key Levels)</span>
+                        </div>
+                        <span class="sc-subtitle">Pivots & ATR</span>
+                    </div>
+
+                    <table class="kl-table">
+                        <tbody>
+                            <tr>
+                                <td class="kl-name">🔴 แนวต้าน 2 (R2)</td>
+                                <td class="kl-val" id="kl_r2" style="color: #fb7185;">-</td>
+                            </tr>
+                            <tr>
+                                <td class="kl-name">🔴 แนวต้าน 1 (R1)</td>
+                                <td class="kl-val" id="kl_r1" style="color: #fb7185;">-</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.08);">
+                                <td class="kl-name" style="color: #93c5fd; font-weight: 700;">⚡ ราคาตลาดปัจจุบัน</td>
+                                <td class="kl-val" id="kl_current" style="color: #60a5fa; font-size: 0.88rem;">-</td>
+                            </tr>
+                            <tr>
+                                <td class="kl-name">🟢 แนวรับ 1 (S1)</td>
+                                <td class="kl-val" id="kl_s1" style="color: #34d399;">-</td>
+                            </tr>
+                            <tr>
+                                <td class="kl-name">🛡️ แนวรับ 2 (S2)</td>
+                                <td class="kl-val" id="kl_s2" style="color: #34d399;">-</td>
+                            </tr>
+                            <tr>
+                                <td class="kl-name">🛑 Stop Loss (1.5 ATR)</td>
+                                <td class="kl-val" id="kl_sl" style="color: #f43f5e;">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Card 4: Elliott Wave (1-5) Analysis -->
+                <div class="sidebar-card" id="ew_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🌊 โครงสร้าง Elliott Wave (1-5)</span>
+                        </div>
+                        <span class="sc-subtitle" id="ew_degree">Cycle Wave</span>
+                    </div>
+                    <div id="ew_sidebar_body">
+                        กำลังคำนวณโครงสร้างคลื่น...
+                    </div>
+                </div>
+
+                <!-- Card 5: Super Investors & Whale Holdings -->
+                <div class="sidebar-card" id="whales_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🐋 วาฬ & คนดังที่ถือหุ้น</span>
+                        </div>
+                        <span class="sc-subtitle">Super Investors & Whales</span>
+                    </div>
+                    <div id="whales_sidebar_body">
+                        กำลังโหลดข้อมูลผู้ถือหุ้นสถาบันและคนดัง...
+                    </div>
+                </div>
+
+                <!-- Card 6: Earnings Radar -->
+                <div class="sidebar-card" id="earn_radar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🗓️ ปฏิทินงบการเงิน (Earnings)</span>
+                        </div>
+                        <span class="sc-subtitle">Shock Guard</span>
+                    </div>
+                    <div id="earn_radar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
+                        กำลังตรวจสอบปฏิทินงบ...
+                    </div>
+                </div>
+
+                <!-- Card 7: Live News & Sentiment Catalysts -->
+                <div class="sidebar-card" id="news_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>📰 ข่าวล่าสุด & เซนติเมนต์ (5 ข่าว)</span>
+                        </div>
+                        <span class="sc-subtitle" id="news_count_badge">Live RSS & Catalysts</span>
+                    </div>
+                    <div id="news_sidebar_body">
+                        กำลังโหลดข่าวสารล่าสุด...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Indicator Explainer Modal -->
+    <div class="ind-modal-overlay" id="ind_modal" onclick="closeIndicatorHelp(event)">
+        <div class="ind-modal-card" onclick="event.stopPropagation()">
+            <div class="ind-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="im_icon" style="font-size: 1.5rem;">📈</span>
+                    <div>
+                        <div id="im_title" style="font-size: 1.05rem; font-weight: 800; color: #f8fafc;">EMA 9 (Fast Momentum)</div>
+                        <div id="im_badge" class="ind-cat-badge">Trend Indicator</div>
+                    </div>
+                </div>
+                <button class="ind-modal-close" onclick="closeIndicatorHelp()" title="ปิดหน้าต่าง (Esc)">✕</button>
+            </div>
+            <div class="ind-modal-body">
+                <div class="ind-info-section">
+                    <div class="ind-sec-title">📌 ความหมายและหลักการ</div>
+                    <div id="im_desc" class="ind-sec-content">-</div>
+                </div>
+                <div class="ind-info-section">
+                    <div class="ind-sec-title">🎯 วิธีดูและสัญญาณเทรด</div>
+                    <div id="im_usage" class="ind-sec-content">-</div>
+                </div>
+                <div class="ind-info-section" style="background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 8px; padding: 10px 12px;">
+                    <div class="ind-sec-title" style="color: #38bdf8;">💡 เคล็ดลับโปร (Pro Tip)</div>
+                    <div id="im_tip" class="ind-sec-content" style="color: #e2e8f0;">-</div>
+                </div>
+            </div>
+            <div class="ind-modal-footer">
+                <button class="botbar-btn" id="im_toggle_btn" onclick="toggleFromModal()" style="padding: 6px 14px; font-weight: 700;">⚡ สลับเปิด/ปิดเส้นนี้บนกราฟ</button>
+                <button class="botbar-btn" onclick="closeIndicatorHelp()" style="padding: 6px 14px; margin-left: auto;">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial News Thai Synthesis & Impact Modal Popup -->
+    <div class="ind-modal-overlay" id="news_modal" onclick="closeNewsModal(event)">
+        <div class="ind-modal-card" style="max-width: 640px;" onclick="event.stopPropagation()">
+            <div class="ind-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">📰</span>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span id="nm_ticker" style="font-size: 1.05rem; font-weight: 800; color: #f8fafc;">STOCK</span>
+                            <span id="nm_sentiment_badge" class="ind-cat-badge">🟢 เชิงบวก</span>
+                        </div>
+                        <div id="nm_meta" style="font-size: 0.70rem; color: #94a3b8; margin-top: 2px;">News • วันนี้</div>
+                    </div>
+                </div>
+                <button class="ind-modal-close" onclick="closeNewsModal()" title="ปิดหน้าต่าง (Esc)">✕</button>
+            </div>
+            <div class="ind-modal-body">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <span id="nm_topic" style="font-size: 0.68rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); padding: 2px 8px; border-radius: 4px;">🏷️ ประเด็นสำคัญ</span>
+                </div>
+                <!-- Thai Title -->
+                <div id="nm_title_th" style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; line-height: 1.45;">-</div>
+                <!-- English Title -->
+                <div id="nm_title_en" style="font-size: 0.76rem; color: #94a3b8; font-style: italic; border-left: 2px solid rgba(255, 255, 255, 0.15); padding-left: 8px; line-height: 1.4;">-</div>
+                <div style="font-size: 0.70rem; color: #fbbf24; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 6px 10px; line-height: 1.5;">⚠️ หัวข้อแปลด้วย Google Translate ส่วนสรุป ผลกระทบ และกลยุทธ์ด้านล่างเป็นแนวทางทั่วไปตาม sentiment ของหัวข่าว ไม่ได้สรุปจากเนื้อข่าวจริง โปรดอ่านข่าวต้นฉบับประกอบ</div>
+
+                <!-- Section 1: สรุปสาระสำคัญภาษาไทย -->
+                <div class="ind-info-section" style="background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px;">
+                    <div class="ind-sec-title" style="color: #93c5fd;">📌 ภาพรวมประเด็นข่าว (แนวทางทั่วไปตาม sentiment)</div>
+                    <div id="nm_summary" class="ind-sec-content" style="color: #e2e8f0; font-size: 0.84rem; line-height: 1.6;">-</div>
+                </div>
+
+                <!-- Section 2: การวิเคราะห์ผลกระทบต่อราคาหุ้น -->
+                <div id="nm_impact_container" class="ind-info-section" style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 12px;">
+                    <div id="nm_impact_title" class="ind-sec-title" style="color: #34d399;">📊 การวิเคราะห์ผลกระทบต่อราคาและพื้นฐาน (Market Impact)</div>
+                    <div id="nm_impact" class="ind-sec-content" style="color: #f1f5f9; font-size: 0.84rem; line-height: 1.6;">-</div>
+                </div>
+
+                <!-- Section 3: กลยุทธ์และคำแนะนำสำหรับนักลงทุน -->
+                <div class="ind-info-section" style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px; padding: 12px;">
+                    <div class="ind-sec-title" style="color: #fbbf24;">💡 คำแนะนำและกลยุทธ์สำหรับนักลงทุน (Actionable Strategy)</div>
+                    <div id="nm_action" class="ind-sec-content" style="color: #fef08a; font-size: 0.84rem; line-height: 1.6;">-</div>
+                </div>
+            </div>
+            <div class="ind-modal-footer">
+                <a id="nm_source_link" href="#" target="_blank" rel="noopener noreferrer" class="botbar-btn" style="text-decoration: none; padding: 6px 14px; font-size: 0.74rem; color: #94a3b8; display: inline-flex; align-items: center; gap: 5px;">
+                    🔗 ข่าวต้นฉบับภาษาอังกฤษ (External Source)
+                </a>
+                <button class="botbar-btn" onclick="closeNewsModal()" style="padding: 6px 16px; margin-left: auto; font-weight: 700;">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Technical Dataset (Cached) -->
+    <script type="text/javascript" src="chart_data.js"></script>
+    <!-- Core Chart & Technical Engine JavaScript -->
+    <script>
+__CHART_JS__    </script>
+</body>
+</html>

@@ -7,12 +7,11 @@ import json
 from html import escape
 from typing import Any, Dict, List, Optional
 
+from src.fmt import money, pct
+from src.fx import resolve_usdthb
 from src.nav import nav_bar_html
 
-
-def _fmt_curr(val: float, sym: str = "$") -> str:
-    sign = "+" if val > 0 else ("-" if val < 0 else "")
-    return f"{sign}{sym}{abs(val):,.2f}"
+NA = "n/a"
 
 
 def _make_chart_onclick(p: Dict[str, Any], is_thb: bool = False) -> str:
@@ -78,9 +77,9 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     """
     Render portfolio summary into a standalone, luxury dark-themed HTML report.
     """
-    port_name = summary.get("portfolio_name", "Portfolio")
-    broker = summary.get("broker", "Broker")
-    fx = summary.get("fx_rate_usd_thb", 33.62)
+    port_name = escape(str(summary.get("portfolio_name", "Portfolio")))
+    broker = escape(str(summary.get("broker", "Broker")))
+    fx = summary.get("fx_rate_usd_thb") or resolve_usdthb(None)
     val_usd = summary.get("total_market_val_usd", 0.0)
     val_thb = summary.get("total_market_val_thb", 0.0)
     cost_usd = summary.get("total_cost_usd", 0.0)
@@ -106,8 +105,13 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     positions = summary.get("positions", [])
 
     is_thb = summary.get("base_currency") == "THB"
-    curr_sym = "฿" if is_thb else "$"
-    sub_sym = "$" if is_thb else "฿"
+    ccy = "THB" if is_thb else "USD"
+    missing_tickers = summary.get("price_missing_tickers") or []
+    unpriced_cost = summary.get("unpriced_cost_thb" if is_thb else "unpriced_cost_usd") or 0.0
+    missing_note = (
+        f'<div class="kpi-subtext text-amber">⚠️ ไม่ได้ราคา {escape(", ".join(map(str, missing_tickers)))} '
+        f'(ต้นทุน {money(unpriced_cost, ccy)} ไม่รวมในยอดรวม)</div>'
+    ) if missing_tickers else ""
 
     # Color tokens based on P/L
     pl_color = "var(--emerald)" if (pl_thb >= 0 if is_thb else pl_usd >= 0) else "var(--rose)"
@@ -170,10 +174,9 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         in_val = p.get("in_value_zone")
         alerts = p.get("alerts", [])
 
-        pl_cls = "text-emerald" if un_pl_usd >= 0 else "text-rose"
-        day_cls = "text-emerald" if p_chg >= 0 else "text-rose"
-        pl_sign = "+" if un_pl_usd >= 0 else ""
-        day_sign = "+" if p_chg >= 0 else ""
+        missing = bool(p.get("price_missing")) or price is None
+        pl_cls = "text-muted" if un_pl_usd is None else ("text-emerald" if un_pl_usd >= 0 else "text-rose")
+        day_cls = "text-emerald" if (p_chg or 0) >= 0 else "text-rose"
 
         rsi_html = f"{rsi:.1f}" if rsi is not None else "-"
         if rsi is not None and rsi <= 30:
@@ -182,8 +185,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             rsi_html = f'<span class="badge badge-amber">{rsi:.1f} 📉</span>'
 
         if dist_sma is not None:
-            dist_sign = "+" if dist_sma >= 0 else ""
-            dist_html = f"{dist_sign}{dist_sma:.1f}%"
+            dist_html = pct(dist_sma)
             if in_val:
                 dist_html += ' <span title="Value Zone">💎</span>'
         else:
@@ -197,20 +199,22 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                 badges_html += f'<span class="badge badge-amber">{a}</span> '
             else:
                 badges_html += f'<span class="badge badge-neutral">{a}</span> '
+        if missing:
+            badges_html += '<span class="badge badge-amber">⚠️ ไม่ได้ราคา (ไม่รวมในยอดรวม)</span> '
         if in_val:
             badges_html += '<span class="badge badge-emerald">💎 Value Zone</span> '
         if not badges_html:
             badges_html = '<span class="badge badge-neutral">Normal</span>'
 
 
-        avg_cost_disp = f"฿{p.get('avg_cost_thb', avg_cost):,.2f}" if is_thb else f"${avg_cost:,.2f}"
-        price_disp = f"฿{price:,.2f}" if is_thb else f"${price:,.2f}"
-        supp_disp = f"รับ ฿{p.get('key_support', 0):,.2f}" if is_thb else f"รับ ${p.get('key_support', 0):,.2f}"
-        res_disp = f"ต้าน ฿{p.get('key_resistance', 0):,.2f}" if is_thb else f"ต้าน ${p.get('key_resistance', 0):,.2f}"
-        val_main = f"฿{p_val_thb:,.2f}" if is_thb else f"${p_val_usd:,.2f}"
-        val_sub = f"≈ ${p_val_usd:,.2f}" if is_thb else f"≈ ฿{p_val_thb:,.0f}"
+        avg_cost_disp = money(p.get('avg_cost_thb', avg_cost) if is_thb else avg_cost, ccy)
+        price_disp = money(price, ccy, na=NA)
+        supp_disp = f"รับ {money(p.get('key_support'), ccy, na=NA)}"
+        res_disp = f"ต้าน {money(p.get('key_resistance'), ccy, na=NA)}"
+        val_main = money(p_val_thb if is_thb else p_val_usd, ccy, na=NA)
+        val_sub = f"≈ {money(p_val_usd, 'USD', na=NA)}" if is_thb else f"≈ {money(p_val_thb, 'THB', digits=0, na=NA)}"
         un_pl_main = p.get('unrealized_pl_thb', un_pl_usd) if is_thb else un_pl_usd
-        pl_sub_disp = f"({pl_sign}฿{abs(un_pl_main):,.2f})" if is_thb else f"({pl_sign}${abs(un_pl_main):,.2f})"
+        pl_sub_disp = f"({money(un_pl_main, ccy, signed=True, na=NA)})"
 
         onclick_js = _make_chart_onclick(p, is_thb=is_thb)
 
@@ -236,10 +240,10 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                 <div class="text-muted small">{val_sub}</div>
             </td>
             <td style="text-align: right;" class="{pl_cls}">
-                <div class="fw-bold">{pl_sign}{un_pl_pct:.2f}%</div>
+                <div class="fw-bold">{pct(un_pl_pct, digits=2, na=NA)}</div>
                 <div class="small">{pl_sub_disp}</div>
             </td>
-            <td style="text-align: right;" class="{day_cls}">{day_sign}{p_chg:.2f}%</td>
+            <td style="text-align: right;" class="{day_cls}">{pct(p_chg, digits=2)}</td>
             <td style="text-align: center;">{rsi_html}</td>
             <td style="text-align: center;">{dist_html}</td>
             <td>{badges_html}</td>
@@ -265,16 +269,16 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         else:
             badge_html = f"<span class='badge badge-neutral'>{h_badge}</span>"
 
-        rev_g = f"{p['rev_growth_yoy']:+.1f}%" if p.get('rev_growth_yoy') is not None else "-"
-        net_g = f"{p['net_inc_growth_yoy']:+.1f}%" if p.get('net_inc_growth_yoy') is not None else "-"
+        rev_g = pct(p.get('rev_growth_yoy'))
+        net_g = pct(p.get('net_inc_growth_yoy'))
         peg_str = f"{p['peg']:.2f}" if p.get('peg') is not None else "-"
         pe_str = f"{p['pe']:.1f}x" if p.get('pe') is not None else "-"
 
-        t_avg = f"${p['price_target_average']:,.2f}" if p.get('price_target_average') else "-"
-        t_up = f"({p['target_upside_pct']:+.1f}%)" if p.get('target_upside_pct') is not None else ""
+        t_avg = money(p['price_target_average'], ccy) if p.get('price_target_average') else "-"
+        t_up = f"({pct(p['target_upside_pct'])})" if p.get('target_upside_pct') is not None else ""
         t_target_html = f"<strong>{t_avg}</strong> <span class='text-emerald small'>{t_up}</span>" if p.get('price_target_average') else "-"
 
-        range_str = f"${p['price_target_low']:,.0f} - ${p['price_target_high']:,.0f}" if (p.get('price_target_low') and p.get('price_target_high')) else "-"
+        range_str = f"{money(p['price_target_low'], ccy, digits=0)} - {money(p['price_target_high'], ccy, digits=0)}" if (p.get('price_target_low') and p.get('price_target_high')) else "-"
 
         b = p.get('rec_buy')
         h = p.get('rec_hold')
@@ -314,7 +318,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     medals = ["🥇 อันดับ 1", "🥈 อันดับ 2", "🥉 อันดับ 3"]
     medal_colors = ["var(--gold)", "var(--silver)", "var(--bronze)"]
     top_cards_html = ""
-    for idx, pick in enumerate(top_picks[:3]):
+    for idx, pick in enumerate([q for q in top_picks if q.get("close_price") is not None][:3]):
         medal_title = medals[idx] if idx < len(medals) else f"อันดับ {idx+1}"
         m_color = medal_colors[idx] if idx < len(medal_colors) else "var(--blue)"
         t = pick["ticker"]
@@ -331,10 +335,10 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         if t in ("VOO", "SPY", "QQQ"):
             reason = "เป็นกองทุนดัชนีรวมที่ช่วยกระจายความเสี่ยงของพอร์ตทันที ช่วยลดการพึ่งพาหุ้นตัวใดตัวหนึ่งมากเกินไป."
         elif pick.get("in_value_zone"):
-            t_avg = f"{curr_sym}{pick['price_target_average']:,.2f}" if pick.get("price_target_average") else "ไม่ระบุ"
+            t_avg = money(pick['price_target_average'], ccy) if pick.get("price_target_average") else "ไม่ระบุ"
             reason = f"ราคาพักตัวลงมาในจุดรับที่มีแต้มต่อสูง (Value Zone 💎) ใกล้เส้น 200 วัน กำไรเติบโตเด่น และสถาบันให้เป้าหมายเฉลี่ย {t_avg}."
         elif target_upside is not None:
-            reason = f"หุ้นคุณภาพดี พื้นฐานแกร่ง เทรนด์ขาขึ้นเหนือเส้น 200 วัน สถาบันให้เป้าหมายมี Upside {target_upside:+.1f}%."
+            reason = f"หุ้นคุณภาพดี พื้นฐานแกร่ง เทรนด์ขาขึ้นเหนือเส้น 200 วัน สถาบันให้เป้าหมายมี Upside {pct(target_upside)}."
         else:
             reason = "หุ้นคุณภาพดี พื้นฐานมั่นคง เทรนด์ทางเทคนิคประคองตัวได้ดี."
 
@@ -351,16 +355,16 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             </div>
             <div class="grid-2-cols" style="margin-top: 14px; font-size: 0.9rem;">
                 <div><span class="text-muted">สัดส่วนปัจจุบัน:</span> <strong>{w:.1f}%</strong></div>
-                <div><span class="text-muted">ราคาตลาด:</span> <strong>{curr_sym}{c:,.2f}</strong></div>
+                <div><span class="text-muted">ราคาตลาด:</span> <strong>{money(c, ccy)}</strong></div>
             </div>
             <div class="order-box">
                 <div class="order-row">
                     <span>โซนตั้งซื้อ (Limit Order):</span>
-                    <strong class="text-emerald">{curr_sym}{buy_low:,.2f} - {curr_sym}{buy_high:,.2f}</strong>
+                    <strong class="text-emerald">{money(buy_low, ccy)} - {money(buy_high, ccy)}</strong>
                 </div>
                 <div class="order-row">
                     <span>จุดตัดขาดทุน (SL):</span>
-                    <strong class="text-rose">{curr_sym}{sl:,.2f}</strong>
+                    <strong class="text-rose">{money(sl, ccy)}</strong>
                 </div>
             </div>
         </div>
@@ -371,7 +375,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     for fb in forbidden:
         forbidden_html += f"""
         <div class="forbidden-item">
-            <span class="badge badge-rose">❌ ห้ามซื้อ {fb['ticker']}</span>
+            <span class="badge badge-rose">❌ ห้ามซื้อ {escape(str(fb['ticker']))}</span>
             <div><strong>{escape(fb['name'])}:</strong> {fb['reason']}</div>
         </div>
         """
@@ -396,7 +400,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         timeline = fo.get("catalyst_timeline", [])
         ws_verdict = fo.get("wall_street_verdict", "")
         tailored_roadmap = fo.get("tailored_roadmap", p.get("rating", {}).get("action", ""))
-        invalidation_risk = fo.get("invalidation_risk", f"ระวังการหลุดแนวรับสำคัญ {curr_sym}{p.get('key_support', 0):,.2f}")
+        invalidation_risk = fo.get("invalidation_risk", f"ระวังการหลุดแนวรับสำคัญ {money(p.get('key_support'), ccy, na=NA)}")
 
         # Format drivers
         drivers_li = "".join([f"<li>{d}</li>" for d in drivers]) if drivers else "<li>กำลังติดตามข้อมูลปัจจัยขับเคลื่อนเชิงลึก</li>"
@@ -415,20 +419,20 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         bear_items = _news_items_html(bearish, "ไม่มีข่าวร้ายรุนแรงในระยะสั้น.")
 
         # Targets & Consensus
-        t_low_str = f"{curr_sym}{t_low:,.2f}" if t_low else "-"
-        t_avg_str = f"{curr_sym}{t_avg:,.2f}" if t_avg else "-"
-        t_high_str = f"{curr_sym}{t_high:,.2f}" if t_high else "-"
+        t_low_str = money(t_low, ccy) if t_low else "-"
+        t_avg_str = money(t_avg, ccy) if t_avg else "-"
+        t_high_str = money(t_high, ccy) if t_high else "-"
         up_val = p.get('target_upside_pct')
-        up_str = f" (+{up_val:.1f}%)" if (up_val is not None and up_val > 0) else (f" ({up_val:.1f}%)" if up_val is not None else "")
+        up_str = f" ({pct(up_val)})" if up_val is not None else ""
 
         ratings_summary = ""
         if p.get("rec_buy") is not None:
             ratings_summary = f"<span class='text-emerald fw-bold'>🟢 Buy: {p.get('rec_buy', 0)}</span> &nbsp;|&nbsp; <span class='text-amber fw-bold'>🟡 Hold: {p.get('rec_hold', 0)}</span> &nbsp;|&nbsp; <span class='text-rose fw-bold'>🔴 Sell: {p.get('rec_sell', 0)}</span>"
 
-        pl_pct_pos = p.get("unrealized_pl_pct", 0.0)
+        pl_pct_raw = p.get("unrealized_pl_pct")
+        pl_pct_pos = pl_pct_raw or 0.0
         pl_cls = "badge-emerald" if pl_pct_pos >= 0 else "badge-rose"
-        pl_sign = "+" if pl_pct_pos >= 0 else ""
-        c_price = p.get("close_price", 0.0)
+        c_price = p.get("close_price")
         c_avg = p.get("avg_cost_thb" if is_thb else "avg_cost_usd", 0.0)
         star_str = p.get("rating", {}).get("stars", "⭐⭐⭐")
 
@@ -445,7 +449,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">{quality_badge}</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge {pl_cls}" style="font-size: 0.95rem; padding: 5px 12px;">{pl_sign}{pl_pct_pos:.2f}%</span>
+                    <span class="badge {pl_cls}" style="font-size: 0.95rem; padding: 5px 12px;">{pct(pl_pct_raw, digits=2, na=NA)}</span>
                     <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน {p.get('weight_pct', 0.0):.1f}% ({star_str})</span>
                     <button onclick="{onclick_js}" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
@@ -482,11 +486,11 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                 <div class="ws-targets-grid">
                     <div class="ws-target-cell">
                         <div class="text-muted small">ต้นทุนของคุณ</div>
-                        <div class="fw-bold text-main" style="font-size: 1.1rem;">{curr_sym}{c_avg:,.2f}</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">{money(c_avg, ccy)}</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">ราคาปัจจุบัน</div>
-                        <div class="fw-bold {'text-emerald' if pl_pct_pos >= 0 else 'text-rose'}" style="font-size: 1.1rem;">{curr_sym}{c_price:,.2f}</div>
+                        <div class="fw-bold {'text-emerald' if pl_pct_pos >= 0 else 'text-rose'}" style="font-size: 1.1rem;">{money(c_price, ccy, na=NA)}</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าต่ำสุด (Low)</div>
@@ -1086,7 +1090,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
 </head>
 <body>
     <div class="container">
-        {nav_bar_html('review')}
+        {nav_bar_html('set_review' if is_thb else 'review')}
         <!-- Header -->
         <header class="header">
             <div class="header-title">
@@ -1113,19 +1117,20 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
 
             <div class="card kpi-card">
                 <div class="kpi-label">💰 มูลค่าพอร์ตปัจจุบัน</div>
-                <div class="kpi-value">{'฿' + f'{val_thb:,.2f}' if is_thb else '$' + f'{val_usd:,.2f}'}</div>
-                <div class="kpi-subtext">{'≈ $' + f'{val_usd:,.2f} USD (ต้นทุน ฿{cost_thb:,.2f})' if is_thb else '≈ ฿' + f'{val_thb:,.2f} THB (ต้นทุน ${cost_usd:,.2f})'}</div>
+                <div class="kpi-value">{money(val_thb, 'THB') if is_thb else money(val_usd, 'USD')}</div>
+                <div class="kpi-subtext">{f"≈ {money(val_usd, 'USD')} USD (ต้นทุน {money(cost_thb, 'THB')})" if is_thb else f"≈ {money(val_thb, 'THB')} THB (ต้นทุน {money(cost_usd, 'USD')})"}</div>
+                {missing_note}
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">📈 กำไร/ขาดทุนสุทธิ (Unrealized)</div>
-                <div class="kpi-value" style="color: {pl_color};">{_fmt_curr(pl_thb, '฿') if is_thb else _fmt_curr(pl_usd, '$')} ({pl_pct:+.2f}%)</div>
-                <div class="kpi-subtext">{'≈ ' + _fmt_curr(pl_usd, '$') + ' USD' if is_thb else '≈ ' + _fmt_curr(pl_thb, '฿') + ' THB'}</div>
+                <div class="kpi-value" style="color: {pl_color};">{money(pl_thb, 'THB', signed=True) if is_thb else money(pl_usd, 'USD', signed=True)} ({pct(pl_pct, digits=2)})</div>
+                <div class="kpi-subtext">{'≈ ' + money(pl_usd, 'USD', signed=True) + ' USD' if is_thb else '≈ ' + money(pl_thb, 'THB', signed=True) + ' THB'}</div>
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">⚡ กำไร/ขาดทุนวันนี้ (1D Change)</div>
-                <div class="kpi-value" style="color: {day_color};">{_fmt_curr(day_thb, '฿') if is_thb else _fmt_curr(day_usd, '$')} ({day_pct:+.2f}%)</div>
+                <div class="kpi-value" style="color: {day_color};">{money(day_thb, 'THB', signed=True) if is_thb else money(day_usd, 'USD', signed=True)} ({pct(day_pct, digits=2)})</div>
                 <div class="kpi-subtext">HHI: {hhi:.0f} ({conc_lvl})</div>
             </div>
         </div>
@@ -1136,10 +1141,10 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             <p style="color: var(--text-secondary); margin-bottom: 12px;">{grade_desc}</p>
             <div class="grid-2-cols" style="margin-bottom: 12px; gap: 12px;">
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> {f"[{best_pos['ticker']}] {escape(best_pos['name'])} (+{best_pos['unrealized_pl_pct']:.1f}%)" if best_pos else "-"}
+                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> {f"[{best_pos['ticker']}] {escape(best_pos['name'])} ({pct(best_pos['unrealized_pl_pct'])})" if best_pos else "-"}
                 </div>
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🔻 <strong>ตัวฉุดดอยหนัก:</strong> {f"[{worst_pos['ticker']}] {escape(worst_pos['name'])} ({worst_pos['unrealized_pl_pct']:.1f}%)" if worst_pos else "-"}
+                    🔻 <strong>ตัวฉุดดอยหนัก:</strong> {f"[{worst_pos['ticker']}] {escape(worst_pos['name'])} ({pct(worst_pos['unrealized_pl_pct'])})" if worst_pos else "-"}
                 </div>
             </div>
             <ul class="layman-checklist">
@@ -1269,15 +1274,14 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
     """
     Render portfolio recovery analysis into a standalone, luxury dark-themed HTML report.
     """
-    port_name = summary.get("portfolio_name", "Portfolio")
-    fx = summary.get("fx_rate", 33.62)
+    port_name = escape(str(summary.get("portfolio_name", "Portfolio")))
+    fx = summary.get("fx_rate") or resolve_usdthb(None)
     count = summary.get("total_underwater_count", 0)
     loss_usd = summary.get("total_underwater_loss_usd", 0.0)
     loss_thb = summary.get("total_underwater_loss_thb", 0.0)
     positions = summary.get("positions", [])
     is_thb = summary.get("base_currency") == "THB"
-    curr_sym = "฿" if is_thb else "$"
-    sub_sym = "$" if is_thb else "฿"
+    ccy = "THB" if is_thb else "USD"
 
     # Table rows
     table_rows = ""
@@ -1300,15 +1304,15 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         dca_half = p["dca_half"]
         gain_rot = p["gain_pct_needed_on_rotation"]
 
-        rev_g = f"{f['rev_growth_yoy']:+.1f}%" if f.get('rev_growth_yoy') is not None else "-"
-        net_g = f"{f['net_inc_growth_yoy']:+.1f}%" if f.get('net_inc_growth_yoy') is not None else "-"
+        rev_g = pct(f.get('rev_growth_yoy'))
+        net_g = pct(f.get('net_inc_growth_yoy'))
         fund_str = f"Rev {rev_g} | Net {net_g}"
 
         earn_str = f"{p['days_to_earnings']}d" if p.get('days_to_earnings') is not None else "-"
         earn_badge = f"<span class='badge badge-rose'>⚠️ {earn_str}</span>" if p.get("is_earnings_imminent") else f"<span class='badge badge-neutral'>{earn_str}</span>"
 
-        target_str = f"<strong>{curr_sym}{t_avg:,.1f}</strong> <span class='text-emerald small'>({t_up:+.0f}%)</span>" if (t_avg and t_up is not None) else (f"<strong>{curr_sym}{t_avg:,.1f}</strong>" if t_avg else "-")
-        loss_disp = f"(-฿{p.get('loss_thb', abs(loss_u)):,.0f})" if is_thb else f"(-${abs(loss_u):,.1f})"
+        target_str = f"<strong>{money(t_avg, ccy, digits=1)}</strong> <span class='text-emerald small'>({pct(t_up, digits=0)})</span>" if (t_avg and t_up is not None) else (f"<strong>{money(t_avg, ccy, digits=1)}</strong>" if t_avg else "-")
+        loss_disp = f"({money(-abs(p.get('loss_thb', abs(loss_u))), 'THB', digits=0)})" if is_thb else f"({money(-abs(loss_u), 'USD', digits=1)})"
 
         onclick_js = _make_chart_onclick(p, is_thb=is_thb)
 
@@ -1316,13 +1320,13 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         <tr>
             <td><span class="ticker-pill clickable-ticker" onclick="{onclick_js}" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span></td>
             <td><div class="fw-bold">{name}</div><div class="text-muted small">{biz}</div></td>
-            <td style="text-align: right;">{curr_sym}{avg:,.2f}<br><span class="text-muted small">{curr_sym}{c:,.2f}</span></td>
+            <td style="text-align: right;">{money(avg, ccy)}<br><span class="text-muted small">{money(c, ccy)}</span></td>
             <td style="text-align: right;" class="text-rose fw-bold">{loss_pct:.1f}%<br><span class="small">{loss_disp}</span></td>
             <td style="text-align: right;">
-                <div class="text-emerald fw-bold">รับ {curr_sym}{p.get('key_support', 0):,.2f}</div>
-                <div class="text-amber small">ต้าน {curr_sym}{p.get('key_resistance', 0):,.2f}</div>
+                <div class="text-emerald fw-bold">รับ {money(p.get('key_support', 0), ccy)}</div>
+                <div class="text-amber small">ต้าน {money(p.get('key_resistance', 0), ccy)}</div>
             </td>
-            <td style="text-align: right;" class="text-emerald fw-bold">+{be_gap:.1f}%</td>
+            <td style="text-align: right;" class="text-emerald fw-bold">{pct(be_gap)}</td>
             <td style="text-align: right;">{target_str}</td>
             <td style="text-align: center;"><span class="badge badge-neutral">{fund_str}</span></td>
             <td style="text-align: center;">{earn_badge}</td>
@@ -1339,7 +1343,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         timeline = fo.get("catalyst_timeline", [])
         ws_verdict = fo.get("wall_street_verdict", "")
         tailored_roadmap = fo.get("tailored_roadmap", p.get("layman_action", ""))
-        invalidation_risk = fo.get("invalidation_risk", f"หลุดจุดตัดขาดทุน {curr_sym}{sl:,.2f} ต้องลดพอร์ตเพื่อจำกัดความเสียหาย")
+        invalidation_risk = fo.get("invalidation_risk", f"หลุดจุดตัดขาดทุน {money(sl, ccy)} ต้องลดพอร์ตเพื่อจำกัดความเสียหาย")
 
         drivers_li = "".join([f"<li>{d}</li>" for d in drivers]) if drivers else "<li>กำลังติดตามข้อมูลปัจจัยขับเคลื่อนเชิงลึก</li>"
         drawdown_li = "".join([f"<li>{r}</li>" for r in drawdown_reasons]) if drawdown_reasons else "<li>การพักฐานตามภาวะตลาดรวมและแรงกดดันทางเทคนิค</li>"
@@ -1359,16 +1363,16 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         # Wall Street Consensus Targets
         t_low = p.get("price_target_low")
         t_high = p.get("price_target_high")
-        t_low_str = f"{curr_sym}{t_low:,.2f}" if t_low else "-"
-        t_avg_str = f"{curr_sym}{t_avg:,.2f}" if t_avg else "-"
-        t_high_str = f"{curr_sym}{t_high:,.2f}" if t_high else "-"
+        t_low_str = money(t_low, ccy) if t_low else "-"
+        t_avg_str = money(t_avg, ccy) if t_avg else "-"
+        t_high_str = money(t_high, ccy) if t_high else "-"
         
         ratings_summary = ""
         if p.get("rec_buy") is not None:
             ratings_summary = f"<span class='text-emerald fw-bold'>🟢 Buy: {p.get('rec_buy', 0)}</span> &nbsp;|&nbsp; <span class='text-amber fw-bold'>🟡 Hold: {p.get('rec_hold', 0)}</span> &nbsp;|&nbsp; <span class='text-rose fw-bold'>🔴 Sell: {p.get('rec_sell', 0)}</span>"
 
-        loss_card_str = f"-฿{p.get('loss_thb', abs(loss_u)):,.2f} THB" if is_thb else f"-${abs(loss_u):,.2f} USD"
-        dca_cash_disp = f"฿{dca_half['cash_needed_usd']:,.2f}" if is_thb else f"${dca_half['cash_needed_usd']:,.2f}"
+        loss_card_str = f"{money(-abs(p.get('loss_thb', abs(loss_u))), 'THB')} THB" if is_thb else f"{money(-abs(loss_u), 'USD')} USD"
+        dca_cash_disp = money(dca_half.get("cash_needed"), ccy)
 
         onclick_js = _make_chart_onclick(p, is_thb=is_thb)
 
@@ -1399,32 +1403,32 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             <div class="kpi-strip">
                 <div class="kpi-box">
                     <div class="text-muted small">ต้นทุนของคุณ (Cost)</div>
-                    <div class="fw-bold" style="font-size: 1.15rem;">{curr_sym}{avg:,.2f}</div>
+                    <div class="fw-bold" style="font-size: 1.15rem;">{money(avg, ccy)}</div>
                     <div class="text-muted small">จำนวน: {p.get('shares', 0):,.4f} หุ้น</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ราคาตลาด (Market Price)</div>
-                    <div class="fw-bold" style="font-size: 1.15rem;">{curr_sym}{c:,.2f}</div>
+                    <div class="fw-bold" style="font-size: 1.15rem;">{money(c, ccy)}</div>
                     <div class="text-rose small">ห่างจากทุน: {loss_pct:.1f}%</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ระยะทางดีดคืนทุน (Gap)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+{be_gap:.1f}%</div>
-                    <div class="text-muted small">ต้องการราคาแตะ {curr_sym}{avg:,.2f}</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">{pct(be_gap)}</div>
+                    <div class="text-muted small">ต้องการราคาแตะ {money(avg, ccy)}</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวรับดักช้อน (Key Support)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">{curr_sym}{p.get('key_support', 0):,.2f}</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">{money(p.get('key_support', 0), ccy)}</div>
                     <div class="text-muted small">{p.get('support_desc', '-')}</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวต้านรีบาวด์ (Key Resistance)</div>
-                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">{curr_sym}{p.get('key_resistance', 0):,.2f}</div>
+                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">{money(p.get('key_resistance', 0), ccy)}</div>
                     <div class="text-muted small">{p.get('resistance_desc', '-')}</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">จุดตัดขาดทุน (SL Guard)</div>
-                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">{curr_sym}{sl:,.2f}</div>
+                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">{money(sl, ccy)}</div>
                     <div class="text-muted small">หลุดต้องลดพอร์ต</div>
                 </div>
             </div>
@@ -1468,11 +1472,11 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                 <div class="ws-targets-grid">
                     <div class="ws-target-cell">
                         <div class="text-muted small">ต้นทุนของคุณ</div>
-                        <div class="fw-bold text-main" style="font-size: 1.1rem;">{curr_sym}{avg:,.2f}</div>
+                        <div class="fw-bold text-main" style="font-size: 1.1rem;">{money(avg, ccy)}</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">ราคาปัจจุบัน</div>
-                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">{curr_sym}{c:,.2f}</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">{money(c, ccy)}</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าต่ำสุด (Low Target)</div>
@@ -1480,7 +1484,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">{t_avg_str}{f' <span class="small">({t_up:+.0f}%)</span>' if t_up is not None else ''}</div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">{t_avg_str}{f' <span class="small">({pct(t_up, digits=0)})</span>' if t_up is not None else ''}</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -1533,22 +1537,22 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                         <tr>
                             <td><strong>1. ถือรอเฉยๆ (Hold)</strong></td>
                             <td>ไม่เติมเงิน รอราคาฟื้นตัวกลับหาทุนเดิมตามปัจจัยพื้นฐาน</td>
-                            <td style="text-align: right;">{curr_sym}0.00</td>
-                            <td style="text-align: right;"><strong>{curr_sym}{avg:,.2f}</strong> (+{be_gap:.1f}%)</td>
+                            <td style="text-align: right;">{money(0, ccy)}</td>
+                            <td style="text-align: right;"><strong>{money(avg, ccy)}</strong> ({pct(be_gap)})</td>
                             <td><span class="text-muted">ความเสี่ยงต่ำสุด แต่เงินจมและเสียโอกาสทำกำไร</span></td>
                         </tr>
                         <tr>
                             <td><strong>2. Smart DCA</strong></td>
-                            <td>ซื้อเพิ่ม {dca_half['shares_to_buy']:.4f} หุ้น ที่แนวรับ <strong>{curr_sym}{p.get('key_support', 0):,.2f}</strong> ({p.get('support_desc', '-')})</td>
+                            <td>ซื้อเพิ่ม {dca_half['shares_to_buy']:.4f} หุ้น ที่แนวรับ <strong>{money(p.get('key_support', 0), ccy)}</strong> ({p.get('support_desc', '-')})</td>
                             <td style="text-align: right;" class="text-amber"><strong>{dca_cash_disp}</strong></td>
-                            <td style="text-align: right;" class="text-emerald"><strong>{curr_sym}{dca_half['new_avg_cost']:,.2f}</strong> (+{dca_half['new_breakeven_gain_pct']:.1f}%)</td>
+                            <td style="text-align: right;" class="text-emerald"><strong>{money(dca_half['new_avg_cost'], ccy)}</strong> ({pct(dca_half['new_breakeven_gain_pct'])})</td>
                             <td><span class="text-emerald">ดึงทุนต่ำลง คืนทุนเร็วขึ้น (ห้ามถัวหากใกล้วันงบออก)</span></td>
                         </tr>
                         <tr>
                             <td><strong>3. สลับตัว (Rotation)</strong></td>
-                            <td>ตัดขายแล้วย้ายเงินที่เหลือ {curr_sym}{p['current_val']:,.2f} ไปเข้าหุ้น Dip ตัวแกร่ง</td>
-                            <td style="text-align: right;">{curr_sym}0.00</td>
-                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +{gain_rot:.1f}%</strong></td>
+                            <td>ตัดขายแล้วย้ายเงินที่เหลือ {money(p['current_val'], ccy)} ไปเข้าหุ้น Dip ตัวแกร่ง</td>
+                            <td style="text-align: right;">{money(0, ccy)}</td>
+                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร {pct(gain_rot)}</strong></td>
                             <td><span class="text-muted">เหมาะเฉพาะเมื่อพื้นฐานหุ้นเดิมพัง หรือกำไรหดตัวยาวนาน</span></td>
                         </tr>
                     </tbody>
@@ -1801,7 +1805,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
 </head>
 <body>
     <div class="container">
-        {nav_bar_html('recovery')}
+        {nav_bar_html('set_recovery' if is_thb else 'recovery')}
         <header class="header">
             <div>
                 <h1>🧗 แผนกลยุทธ์แก้หลุดดอย 360 องศา</h1>
@@ -1820,12 +1824,12 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             </div>
             <div class="card">
                 <div class="kpi-label">{'💸 ยอดขาดทุนรวม (THB)' if is_thb else '💸 ยอดขาดทุนรวม (USD)'}</div>
-                <div class="kpi-value text-rose">{'-฿' + f'{loss_thb:,.2f}' if is_thb else '-$' + f'{loss_usd:,.2f}'}</div>
+                <div class="kpi-value text-rose">{money(-abs(loss_thb), 'THB') if is_thb else money(-abs(loss_usd), 'USD')}</div>
                 <div class="kpi-subtext">{'เงินลงทุนที่จมอยู่ ณ ราคาตลาดปัจจุบัน' if is_thb else 'เงินลงทุนที่จมอยู่ ณ ราคาตลาดปัจจุบัน'}</div>
             </div>
             <div class="card">
                 <div class="kpi-label">{'฿ ยอดเทียบเท่า (USD)' if is_thb else '฿ ยอดขาดทุนรวม (THB)'}</div>
-                <div class="kpi-value text-rose">{'-$' + f'{loss_usd:,.2f}' if is_thb else '-฿' + f'{loss_thb:,.2f}'}</div>
+                <div class="kpi-value text-rose">{money(-abs(loss_usd), 'USD') if is_thb else money(-abs(loss_thb), 'THB')}</div>
                 <div class="kpi-subtext">คำนวณที่อัตราแลกเปลี่ยน {fx:.2f} THB/USD</div>
             </div>
         </div>

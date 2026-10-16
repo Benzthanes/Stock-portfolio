@@ -119,6 +119,21 @@ python3 recovery.py -f data/portfolio_set.json
 
 ---
 
+## 🛠️ Setup & Development
+
+- ใช้ Python 3.11 และไม่มี dependency ภายนอก (ใช้แค่ standard library).
+- อัปเดตทุกรายงาน: `python3 portfolio.py --all`.
+  ถ้ามีขั้นตอนไหนพัง รายงานอื่นยังสร้างต่อ แต่คำสั่งจะจบด้วย exit code 1.
+- รัน test: `python3 -m unittest discover -s tests -t .`.
+  test ถูกบล็อกไม่ให้ต่อเน็ตจริง ตั้ง `ALLOW_NETWORK=1` ถ้าต้องการปิดการบล็อก.
+- Lint (ไม่บังคับ): `uvx ruff check .` ใช้ค่าจาก `pyproject.toml`.
+- CI: `.github/workflows/update_portfolio.yml` รันจันทร์ถึงศุกร์ 13:39 และ 21:12 UTC.
+  GitHub มักรันช้ากว่าเวลาที่ตั้งไว้ 2 ถึง 4 ชั่วโมง.
+  ถ้ารันพัง จะเปิดหรือคอมเมนต์ใน issue ที่มี label `portfolio-update-failure`.
+- Claude skills อยู่ที่ `.agents/skills/` และเข้าถึงผ่าน symlink `.claude/skills`.
+
+---
+
 ## 📂 ไฟล์ข้อมูลและรายงานในระบบ
 
 - ข้อมูลพอร์ตของคุณ: [portfolio.json](data/portfolio.json).

@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.trades import load_ledger, record_buy, record_deposit, record_dividend, record_sell, record_withdraw
-from scripts.sync_skill_numbers import sync_skill_numbers
 
 
 def no_lookup(ticker):
@@ -120,37 +119,6 @@ class CashTest(LedgerCase):
         self.assertEqual(load_ledger(str(self.ledger))["cash"]["dime_usd"], 199.0)
 
 
-class SyncSkillTest(LedgerCase):
-    def master_data(self):
-        ledger = load_ledger(str(self.ledger))
-        return {"buy_orders": [{}] * 55, "dividends_list": ledger["dividends"], "cash_movements": [{}] * 54,
-                "net_injected_capital_thb": ledger["net_injected_capital_thb"],
-                "trades_summary": {"winning_trades": 7, "total_trades": 7, "win_rate_pct": 100.0}}
-
-    def test_sync_is_idempotent_and_tracks_new_dividend(self):
-        skill = self.tmp / "SKILL.md"
-        shutil.copy(ROOT / ".agents" / "skills" / "master" / "SKILL.md", skill)
-        err = io.StringIO()
-        with contextlib.redirect_stderr(err):
-            sync_skill_numbers(self.master_data(), skill)
-            first = skill.read_text(encoding="utf-8")
-            self.assertFalse(sync_skill_numbers(self.master_data(), skill))
-            self.assertEqual(skill.read_text(encoding="utf-8"), first)
-            self.assertIn("(13 ครั้ง)", first)
-            self.assertIn("(54 transactions", first)
-
-            record_dividend("VOO", 1.0, fx_rate=34.0, ledger_path=str(self.ledger))
-            record_deposit(5000.0, ledger_path=str(self.ledger))
-            self.assertTrue(sync_skill_numbers(self.master_data(), skill))
-        text = skill.read_text(encoding="utf-8")
-        self.assertIn("(14 ครั้ง)", text)
-        self.assertIn("(14 payments", text)
-        self.assertIn("(1,250,000.00 บาท)", text)
-        self.assertIn("all 55 buy orders", text)
-        self.assertIn("(7 ไม้ Win Rate 100%)", text)
-        self.assertEqual(err.getvalue(), "")
-
-
 from src.trades import resolve_slip_relative_path, get_slip_modal_component
 from scripts.generate_master_report import generate_master_ledger_html
 
@@ -197,7 +165,7 @@ class SlipViewerTest(unittest.TestCase):
         }
         html = generate_master_ledger_html(sample_data)
         self.assertIn('id="slipModal"', html)
-        self.assertIn("openSlipModal('../data/screenshots/IMG_5526.webp'", html)
+        self.assertIn('openSlipModal(&quot;../data/screenshots/IMG_5526.webp&quot;', html)
 
 
 if __name__ == "__main__":

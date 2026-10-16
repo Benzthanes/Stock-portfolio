@@ -16,7 +16,8 @@ from typing import Any, Dict, List, Optional
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from src.portfolio import load_portfolio
+from src.portfolio import load_portfolio, cost_basis
+from src.fx import resolve_usdthb
 from src.tradingview import fetch_screener_data
 from src.news import get_catalyst_breakdown, fetch_batch_catalysts
 from src.profiles import get_business_summary
@@ -95,7 +96,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         )
 
     shares = custom_shares if custom_shares is not None else (pos.get("shares", 1.0) if pos else 1.0)
-    avg_cost = custom_cost if custom_cost is not None else (float(pos.get("avg_cost_thb") or pos.get("avg_cost_usd", 0.0)) if pos else 0.0)
+    avg_cost = custom_cost if custom_cost is not None else (cost_basis(pos, base_currency)[0] if pos else 0.0)
     if shares <= 0:
         raise ValueError(f"Shares must be greater than 0 (got {shares}).")
     
@@ -299,14 +300,12 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         "gain_pct_needed_on_rotation": round(gain_pct_needed_on_rotation, 1),
         "dca_half": {
             "shares_to_buy": round(shares_add_a, 4),
-            "cash_needed_usd": round(cost_add_a, 2),
             "cash_needed": round(cost_add_a, 2),
             "new_avg_cost": round(new_avg_a, 2),
             "new_breakeven_gain_pct": round(be_gain_a, 2),
         },
         "dca_equal": {
             "shares_to_buy": round(shares_add_b, 4),
-            "cash_needed_usd": round(cost_add_b, 2),
             "cash_needed": round(cost_add_b, 2),
             "new_avg_cost": round(new_avg_b, 2),
             "new_breakeven_gain_pct": round(be_gain_b, 2),
@@ -321,7 +320,7 @@ def analyze_all_underwater(portfolio_path: Optional[str] = None) -> Dict[str, An
     portfolio = load_portfolio(portfolio_path)
     holdings = portfolio.get("holdings", [])
     base_currency = str(portfolio.get("base_currency", "USD")).upper()
-    fx_rate = float(portfolio.get("fx_rate_usd_thb", 33.62))
+    fx_rate = resolve_usdthb(portfolio.get("fx_rate_usd_thb"))
     curr_sym = "฿" if base_currency == "THB" else "$"
 
     symbols = [f"{h.get('exchange', 'NASDAQ')}:{h['ticker']}" for h in holdings]
@@ -344,8 +343,7 @@ def analyze_all_underwater(portfolio_path: Optional[str] = None) -> Dict[str, An
         if close <= 0 or shares <= 0:
             print(f"Warning: skipping {t} (missing quote or zero shares).", file=sys.stderr)
             continue
-        avg_cost = float(h.get("avg_cost_thb") or h.get("avg_cost_usd", 0.0))
-        total_cost = float(h.get("total_cost_thb") or h.get("total_cost_usd", shares * avg_cost))
+        avg_cost, total_cost = cost_basis(h, base_currency)
         current_val = shares * close
         unrealized_pl = current_val - total_cost
         unrealized_pl_pct = (unrealized_pl / total_cost * 100.0) if total_cost > 0 else 0.0
@@ -507,8 +505,8 @@ def generate_single_report(res: Dict[str, Any]) -> str:
         lines.append("- **เงื่อนไขสำคัญก่อนเข้าซื้อ:** รอให้เกิดแท่งเทียนเขียว Daily ปิดเหนือราคาเปิด และเส้น Stoch RSI %K ตัดขึ้นเหนือ %D ก่อนเสมอ.")
 
     lines.extend([
-        f"- **สูตรซื้อเพิ่ม 50%:** ซื้อเพิ่ม {res['dca_half']['shares_to_buy']:.4f} หุ้น (เงินทุน {curr_sym}{res['dca_half']['cash_needed_usd']:,.2f} {curr_code}). ทุนเฉลี่ยใหม่จะลดเหลือ **{curr_sym}{res['dca_half']['new_avg_cost']:.2f} {curr_code}** (ต้องการรีบาวด์เพียง **{res['dca_half']['new_breakeven_gain_pct']:+.1f}%** เพื่อคืนทุน).",
-        f"- **สูตรซื้อเพิ่ม 100%:** ซื้อเพิ่ม {res['dca_equal']['shares_to_buy']:.4f} หุ้น (เงินทุน {curr_sym}{res['dca_equal']['cash_needed_usd']:,.2f} {curr_code}). ทุนเฉลี่ยใหม่จะลดเหลือ **{curr_sym}{res['dca_equal']['new_avg_cost']:.2f} {curr_code}** (ต้องการรีบาวด์เพียง **{res['dca_equal']['new_breakeven_gain_pct']:+.1f}%** เพื่อคืนทุน).",
+        f"- **สูตรซื้อเพิ่ม 50%:** ซื้อเพิ่ม {res['dca_half']['shares_to_buy']:.4f} หุ้น (เงินทุน {curr_sym}{res['dca_half']['cash_needed']:,.2f} {curr_code}). ทุนเฉลี่ยใหม่จะลดเหลือ **{curr_sym}{res['dca_half']['new_avg_cost']:.2f} {curr_code}** (ต้องการรีบาวด์เพียง **{res['dca_half']['new_breakeven_gain_pct']:+.1f}%** เพื่อคืนทุน).",
+        f"- **สูตรซื้อเพิ่ม 100%:** ซื้อเพิ่ม {res['dca_equal']['shares_to_buy']:.4f} หุ้น (เงินทุน {curr_sym}{res['dca_equal']['cash_needed']:,.2f} {curr_code}). ทุนเฉลี่ยใหม่จะลดเหลือ **{curr_sym}{res['dca_equal']['new_avg_cost']:.2f} {curr_code}** (ต้องการรีบาวด์เพียง **{res['dca_equal']['new_breakeven_gain_pct']:+.1f}%** เพื่อคืนทุน).",
         "",
         "### ทางเลือกที่ 3: การโยกย้ายเงินทุนไปหาหุ้นผู้นำขาขึ้น (Capital Rotation)",
         f"- **หลักการ:** หากตัดสินใจตัดขาดทุน {curr_sym}{abs(pl_usd):,.2f} {curr_code} แล้วนำเงินสดที่เหลือ {curr_sym}{res['current_val']:,.2f} {curr_code} ไปเข้าหุ้น Dip ขาขึ้นที่เข้าเกณฑ์ `/dip` (เช่น หุ้นที่มี R:R ≥ 2.0x).",
@@ -695,7 +693,7 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
             "| ทางเลือก | แผนการปฏิบัติการ | เงินที่ต้องใช้เพิ่ม | จุดขายเป้าหมาย | ความเสี่ยงหลัก |",
             "| :--- | :--- | :---: | :---: | :--- |",
             f"| **1. ถือรอเฉยๆ (Hold)** | ไม่เติมเงิน รอราคาฟื้นตัวกลับหาทุนเดิม | {curr_sym}0.00 | **{curr_sym}{avg:.2f}** ({be_gap:+.1f}%) | เงินจมและเสียเวลา |",
-            f"| **2. Smart DCA** | ซื้อเพิ่ม {p['dca_half']['shares_to_buy']:.4f} หุ้น ที่แนวรับ **{curr_sym}{p['key_support']:.2f}** ({p['support_desc']}) | **{curr_sym}{p['dca_half']['cash_needed_usd']:,.2f}** | **{curr_sym}{p['dca_half']['new_avg_cost']:.2f}** ({p['dca_half']['new_breakeven_gain_pct']:+.1f}%) | เสี่ยงขาดทุนเพิ่มหากหลุด SL |",
+            f"| **2. Smart DCA** | ซื้อเพิ่ม {p['dca_half']['shares_to_buy']:.4f} หุ้น ที่แนวรับ **{curr_sym}{p['key_support']:.2f}** ({p['support_desc']}) | **{curr_sym}{p['dca_half']['cash_needed']:,.2f}** | **{curr_sym}{p['dca_half']['new_avg_cost']:.2f}** ({p['dca_half']['new_breakeven_gain_pct']:+.1f}%) | เสี่ยงขาดทุนเพิ่มหากหลุด SL |",
             f"| **3. สลับตัว (Rotation)** | ย้ายเงินที่เหลือ {curr_sym}{p['current_val']:,.2f} ไปเข้าหุ้น Dip | {curr_sym}0.00 | หุ้นใหม่กำไร **{p['gain_pct_needed_on_rotation']:+.1f}%** | เสี่ยงขายหมูหากตัวเดิมเด้ง |",
             "",
             f"👉 💡 **ทางเลือกที่แนะนำที่สุดสำหรับมือใหม่:** **{recommended_choice}**",

@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
 from unittest import mock
 
@@ -42,7 +43,8 @@ class NewsCacheTest(unittest.TestCase):
             resp = mock.MagicMock()
             resp.__enter__.return_value.read.return_value = self._rss(6)
             with mock.patch.object(news, "CACHE_FILE", Path(d) / "cache.json"), \
-                    mock.patch.object(news.urllib.request, "urlopen", return_value=resp) as urlopen:
+                    mock.patch.object(news, "translate_texts_to_thai", side_effect=lambda ts: list(ts)), \
+                    mock.patch("src.http.urllib.request.urlopen", return_value=resp) as urlopen:
                 self.assertEqual(len(news.fetch_stock_news("ZZZ", max_items=2)), 2)
                 self.assertEqual(len(news.fetch_stock_news("ZZZ", max_items=4)), 4)
                 self.assertEqual(len(news.fetch_stock_news("ZZZ", max_items=3)), 3)
@@ -139,9 +141,10 @@ class TopicTest(unittest.TestCase):
 
 class TranslateBatchTest(unittest.TestCase):
     def test_falls_back_to_originals_on_network_error(self):
-        with mock.patch("http.client.HTTPSConnection", side_effect=OSError("blocked")) as conn:
+        with mock.patch("src.http.urllib.request.urlopen", side_effect=urllib.error.URLError("blocked")) as urlopen, \
+                mock.patch("src.http._sleep"):
             self.assertEqual(news.translate_texts_to_thai(["A", "B", "C"]), ["A", "B", "C"])
-            self.assertEqual(conn.call_count, 1)
+            self.assertEqual(urlopen.call_count, 2)
 
     def test_cache_backfill_is_persisted(self):
         with tempfile.TemporaryDirectory() as tmp:
