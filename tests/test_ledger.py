@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+import tests  # noqa: F401
 
 from src.trades import load_ledger, record_buy, record_deposit, record_dividend, record_sell, record_withdraw
 
