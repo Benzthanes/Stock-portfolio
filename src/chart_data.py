@@ -237,6 +237,32 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             price_diff = abs(t1["price"] - t2["price"]) / t1["price"]
             bounce = (neck_p["price"] - min(t1["price"], t2["price"])) / min(t1["price"], t2["price"])
             if price_diff <= 0.045 and bounce >= 0.035:
+                # Find drop start (swing high before t1)
+                prior_peaks = [p for p in peaks if p["idx"] < t1["idx"]]
+                if prior_peaks:
+                    start_p = prior_peaks[-1]
+                else:
+                    win = recent[max(0, t1["idx"] - 12): t1["idx"]]
+                    if win:
+                        max_h = max(c["high"] for c in win)
+                        start_c = [c for c in win if c["high"] == max_h][0]
+                        start_p = {"name": "Drop Start", "time": start_c["time"], "price": start_c["high"]}
+                    else:
+                        start_p = {"name": "Drop Start", "time": t1["time"], "price": round(t1["price"] * 1.05, 2)}
+
+                # Find post-bounce swing high after t2
+                post_peaks = [p for p in peaks if p["idx"] > t2["idx"]]
+                if post_peaks:
+                    end_p = post_peaks[0]
+                else:
+                    post_win = recent[t2["idx"] + 1:]
+                    if post_win:
+                        max_h = max(c["high"] for c in post_win)
+                        end_c = [c for c in post_win if c["high"] == max_h][0]
+                        end_p = {"name": "Rebound High", "time": end_c["time"], "price": end_c["high"]}
+                    else:
+                        end_p = {"name": "Rebound High", "time": times[-1], "price": closes[-1]}
+
                 target = round(neck_p["price"] + (neck_p["price"] - min(t1["price"], t2["price"])), 2)
                 detected = {
                     "name": "Bullish Double Bottom (W-Shape)",
@@ -248,19 +274,21 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "target": target,
                     "upside_pct": round((target - current_price) / current_price * 100, 1),
                     "psychology": "หลังการทดสอบจุดต่ำสุดครั้งแรก เกิดการดีดตัวและลงมาทดสอบจุดเดิมอีกครั้ง แต่ผู้ขายไม่สามารถทำ Lower Low ได้ ผู้ซื้อสถาบันชิงเข้าซื้อตัดหน้า ทำให้เกิดฐานคู่ทรง W พร้อมแรงส่งขาขึ้นรอบใหม่",
-                    "structure": f"ฐานแรก (${t1['price']:.2f}) • ยอดกลาง Neckline (${neck_p['price']:.2f}) • ฐานที่สอง (${t2['price']:.2f})",
+                    "structure": f"จุดเริ่มทิ้งตัว (${start_p['price']:.2f}) ➔ ฐานแรก (${t1['price']:.2f}) ➔ ยอดกลาง Neckline (${neck_p['price']:.2f}) ➔ ฐานที่สอง (${t2['price']:.2f}) ➔ แรงส่งดีดตัว (${end_p['price']:.2f})",
                     "action_plan": f"เข้าซื้อเมื่อแท่งเทียนปิดทะลุ Neckline ${neck_p['price']:.2f} ด้วย Volume หนาแน่น เป้าหมาย ${target:.2f}",
                     "invalidation": f"รูปแบบจะล้มเหลวหากราคาปิดหลุดต่ำกว่าฐานที่ 2 (${t2['price']:.2f})",
                     "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดส่วนสูงฐานคู่ถึงยอดกลาง (${neck_p['price'] - min(t1['price'], t2['price']):.2f}) บวกเพิ่มจากยอด Neckline",
                     "key_points": [
-                        {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
-                        {"name": "Neckline Peak", "time": neck_p["time"], "price": neck_p["price"]},
-                        {"name": "Bottom 2", "time": t2["time"], "price": t2["price"]},
+                        {"name": "Left High (จุดเริ่มทิ้งตัว)", "time": start_p["time"], "price": start_p["price"], "role": "start"},
+                        {"name": "Bottom 1 (ฐานแรก)", "time": t1["time"], "price": t1["price"]},
+                        {"name": "Neckline Peak (ยอดกลาง W)", "time": neck_p["time"], "price": neck_p["price"]},
+                        {"name": "Bottom 2 (ฐานที่สอง)", "time": t2["time"], "price": t2["price"]},
+                        {"name": "Rebound (ขาขวาดีดตัว)", "time": end_p["time"], "price": end_p["price"]},
                     ],
                     "lines": [
-                        {"name": "Double Bottom Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": t2["time"], "value": t2["price"]}]},
-                        {"name": "Neckline Breakout", "color": "#38bdf8", "style": 2, "points": [{"time": t1["time"], "value": neck_p["price"]}, {"time": times[-1], "value": neck_p["price"]}]}
+                        {"name": "Neckline Breakout", "color": "#38bdf8", "style": 2, "points": [{"time": start_p["time"], "value": neck_p["price"]}, {"time": times[-1], "value": neck_p["price"]}]},
+                        {"name": "Double Bottom Support Floor", "color": "#10b981", "style": 1, "points": [{"time": t1["time"], "value": min(t1["price"], t2["price"])}, {"time": times[-1], "value": min(t1["price"], t2["price"])}]}
                     ]
                 }
 
@@ -273,6 +301,32 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             price_diff = abs(p1["price"] - p2["price"]) / p1["price"]
             drop = (max(p1["price"], p2["price"]) - neck_t["price"]) / max(p1["price"], p2["price"])
             if price_diff <= 0.045 and drop >= 0.035:
+                # Find rally start (swing low before p1)
+                prior_troughs = [t for t in troughs if t["idx"] < p1["idx"]]
+                if prior_troughs:
+                    start_t = prior_troughs[-1]
+                else:
+                    win = recent[max(0, p1["idx"] - 12): p1["idx"]]
+                    if win:
+                        min_l = min(c["low"] for c in win)
+                        start_c = [c for c in win if c["low"] == min_l][0]
+                        start_t = {"name": "Rally Start", "time": start_c["time"], "price": start_c["low"]}
+                    else:
+                        start_t = {"name": "Rally Start", "time": p1["time"], "price": round(p1["price"] * 0.95, 2)}
+
+                # Find post-drop swing low after p2
+                post_troughs = [t for t in troughs if t["idx"] > p2["idx"]]
+                if post_troughs:
+                    end_t = post_troughs[0]
+                else:
+                    post_win = recent[p2["idx"] + 1:]
+                    if post_win:
+                        min_l = min(c["low"] for c in post_win)
+                        end_c = [c for c in post_win if c["low"] == min_l][0]
+                        end_t = {"name": "Drop Low", "time": end_c["time"], "price": end_c["low"]}
+                    else:
+                        end_t = {"name": "Drop Low", "time": times[-1], "price": closes[-1]}
+
                 target = round(neck_t["price"] - (max(p1["price"], p2["price"]) - neck_t["price"]), 2)
                 detected = {
                     "name": "Bearish Double Top (M-Shape)",
@@ -284,19 +338,21 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "target": target,
                     "upside_pct": round((target - current_price) / current_price * 100, 1),
                     "psychology": "ราคาพยายามทดสอบจุดสูงสุดเดิมเป็นครั้งที่สองแต่ถูกแรงขายเททับสะท้อนว่าผู้ซื้อหมดแรงขับเคลื่อน (Buyer Exhaustion) และเกิดการกระจายหุ้นของสถาบันก่อนทิ้งตัวลง",
-                    "structure": f"ยอดแรก (${p1['price']:.2f}) • ฐานรับกลาง Neckline (${neck_t['price']:.2f}) • ยอดที่สอง (${p2['price']:.2f})",
+                    "structure": f"จุดเริ่มยกตัว (${start_t['price']:.2f}) ➔ ยอดแรก (${p1['price']:.2f}) ➔ ฐานรับกลาง Neckline (${neck_t['price']:.2f}) ➔ ยอดที่สอง (${p2['price']:.2f}) ➔ ขาขวาทิ้งตัว (${end_t['price']:.2f})",
                     "action_plan": f"ขายทำกำไร (Trim/TP) หรือตั้ง Stop Loss เมื่อราคาหลุด Neckline ${neck_t['price']:.2f} เป้าหมายขาลง ${target:.2f}",
                     "invalidation": f"รูปแบบล้มเหลวหากราคาเบรกทะลุยอดสูงสุด ${max(p1['price'], p2['price']):.2f}",
                     "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดส่วนสูงของยอดคู่แล้วหักลบออกจาก Neckline ${neck_t['price']:.2f}",
                     "key_points": [
-                        {"name": "Peak 1", "time": p1["time"], "price": p1["price"], "role": "start"},
-                        {"name": "Neckline Trough", "time": neck_t["time"], "price": neck_t["price"]},
-                        {"name": "Peak 2", "time": p2["time"], "price": p2["price"]},
+                        {"name": "Left Low (จุดเริ่มยกตัว)", "time": start_t["time"], "price": start_t["price"], "role": "start"},
+                        {"name": "Peak 1 (ยอดแรก)", "time": p1["time"], "price": p1["price"]},
+                        {"name": "Neckline Trough (ฐานกลาง M)", "time": neck_t["time"], "price": neck_t["price"]},
+                        {"name": "Peak 2 (ยอดที่สอง)", "time": p2["time"], "price": p2["price"]},
+                        {"name": "Breakdown (ขาขวาทิ้งตัว)", "time": end_t["time"], "price": end_t["price"]},
                     ],
                     "lines": [
-                        {"name": "Resistance Ceiling", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": p2["time"], "value": p2["price"]}]},
-                        {"name": "Neckline Support", "color": "#38bdf8", "style": 2, "points": [{"time": p1["time"], "value": neck_t["price"]}, {"time": times[-1], "value": neck_t["price"]}]}
+                        {"name": "Neckline Support", "color": "#38bdf8", "style": 2, "points": [{"time": start_t["time"], "value": neck_t["price"]}, {"time": times[-1], "value": neck_t["price"]}]},
+                        {"name": "Double Top Resistance Ceiling", "color": "#f43f5e", "style": 1, "points": [{"time": p1["time"], "value": max(p1["price"], p2["price"])}, {"time": times[-1], "value": max(p1["price"], p2["price"])}]}
                     ]
                 }
 
@@ -2389,3 +2445,17 @@ def compact_charts_for_page(cache: Dict[str, Any], tickers: Iterable[str]) -> Di
         entry_copy = _strip_candle_colors(entry)
         out[t] = {**entry_copy, "candles": monthly + candles[cut:]}
     return out
+
+
+def remove_from_candles_cache(tickers: Iterable[str]) -> List[str]:
+    """Remove tickers from data/candles_cache.json if present and persist atomically."""
+    cache = load_candles_cache()
+    removed = []
+    for t in tickers:
+        t_up = str(t).upper().strip()
+        if t_up in cache:
+            del cache[t_up]
+            removed.append(t_up)
+    if removed:
+        save_candles_cache(cache)
+    return removed

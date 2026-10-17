@@ -173,18 +173,40 @@ def translate_text_to_thai(text: str) -> str:
 
 
 def _enrich_articles(articles: List[Dict[str, str]], ticker: str) -> bool:
-    """Adds Thai title and synthesized guidance to articles missing them. Returns True if any changed."""
-    missing = [a for a in articles if "summary_th" not in a or "title_th" not in a]
+    """Adds Thai title and synthesized guidance to articles. Prefers AI-analyzed cache if available."""
+    changed = False
+    try:
+        from src.ai_news import get_ai_analyzed_article
+    except Exception:
+        get_ai_analyzed_article = None
+
+    # 1. Upgrade or preserve articles using high-quality AI analysis if present
+    for a in articles:
+        if get_ai_analyzed_article and not a.get("ai_analyzed"):
+            ai_data = get_ai_analyzed_article(ticker, a.get("title", ""), a.get("link", ""))
+            if ai_data and ai_data.get("ai_analyzed"):
+                for key in ("title_th", "summary_th", "impact_th", "action_th", "topic", "sentiment", "ai_analyzed", "ai_analyzed_at"):
+                    if key in ai_data:
+                        a[key] = ai_data[key]
+                changed = True
+
+    # 2. For any remaining articles missing translation or summary, apply programmatic fallback
+    missing = [a for a in articles if ("summary_th" not in a or "title_th" not in a) and not a.get("ai_analyzed")]
     if not missing:
-        return False
+        return changed
+
     need_translation = [a for a in missing if not a.get("title_th")]
-    for a, th in zip(need_translation, translate_texts_to_thai([a.get("title", "") for a in need_translation])):
-        a["title_th"] = th
+    if need_translation:
+        for a, th in zip(need_translation, translate_texts_to_thai([a.get("title", "") for a in need_translation])):
+            a["title_th"] = th
+            changed = True
     for a in missing:
         syn = synthesize_news_summary(a.get("title", ""), a.get("title_th", ""), a.get("source", "News"), ticker, a.get("sentiment", "neutral"))
         for key in ("title_th", "summary_th", "impact_th", "action_th", "topic"):
             a[key] = syn[key]
-    return True
+        a["ai_analyzed"] = False
+        changed = True
+    return changed
 
 
 _TOPIC_RULES = [

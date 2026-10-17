@@ -177,7 +177,8 @@ class ReviewPageTest(_Offline):
         self.assertIn("<strong>฿90.00</strong>", html)
         self.assertIn("฿70 - ฿120", html)
         self.assertNotIn("$90.00", html)
-        self.assertRegex(html, r'href="portfolio_set_review.html" class="rnav-link active"')
+        self.assertRegex(html, r'href="portfolio_review.html" class="rnav-link active"')
+        self.assertNotIn("portfolio_set_review.html", html)
 
 
 class RecoveryPageTest(_Offline):
@@ -187,7 +188,8 @@ class RecoveryPageTest(_Offline):
         self.assertCleanHtml(html)
         self.assertIn("฿321.80", html)
         self.assertIn("-฿11,760.54", html)
-        self.assertRegex(html, r'href="portfolio_set_recovery.html" class="rnav-link active"')
+        self.assertRegex(html, r'href="portfolio_recovery.html" class="rnav-link active"')
+        self.assertNotIn("portfolio_set_recovery.html", html)
 
 
 class MasterPageTest(_Offline):
@@ -268,10 +270,12 @@ class OutlookTest(unittest.TestCase):
 
 
 class NavSetPagesTest(unittest.TestCase):
-    def test_set_pages_listed(self):
+    def test_set_pages_not_in_tabs(self):
         html = nav_bar_html("set_review")
-        self.assertIn('href="portfolio_set_review.html" class="rnav-link active"', html)
-        self.assertIn('href="portfolio_set_recovery.html"', html)
+        self.assertNotIn('portfolio_set_review.html', html)
+        self.assertNotIn('portfolio_set_recovery.html', html)
+        self.assertNotIn('หุ้นไทย', html)
+        self.assertIn('href="portfolio_review.html" class="rnav-link active"', html)
 
 
 if __name__ == "__main__":

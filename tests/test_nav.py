@@ -23,8 +23,6 @@ class NavBarTest(unittest.TestCase):
                 "portfolio_dip_sim.html",
                 "trades_ledger.html",
                 "stock_chart.html",
-                "portfolio_set_review.html",
-                "portfolio_set_recovery.html",
             ],
         )
 
@@ -44,8 +42,18 @@ class NavBarTest(unittest.TestCase):
         html = nav_bar_html("review", FIXED)
         self.assertEqual(
             re.findall(r'class="rnav-link[^"]*"[^>]*>([^<]+)</a>', html),
-            ["ภาพรวม", "สุขภาพพอร์ต", "แก้ดอย", "Dip จำลอง", "รายการซื้อขายทั้งหมด", "กราฟ", "หุ้นไทย สุขภาพพอร์ต", "หุ้นไทย แก้ดอย"],
+            ["ภาพรวม", "สุขภาพพอร์ต", "แก้ดอย", "Dip จำลอง", "รายการซื้อขายทั้งหมด", "กราฟ"],
         )
+        self.assertNotIn("หุ้นไทย", html)
+
+    def test_set_aliases(self):
+        html_rev = nav_bar_html("set_review", FIXED)
+        self.assertIn('href="portfolio_review.html" class="rnav-link active"', html_rev)
+        self.assertNotIn("portfolio_set_review.html", html_rev)
+
+        html_rec = nav_bar_html("set_recovery", FIXED)
+        self.assertIn('href="portfolio_recovery.html" class="rnav-link active"', html_rec)
+        self.assertNotIn("portfolio_set_recovery.html", html_rec)
 
     def test_unknown_page_rejected(self):
         with self.assertRaises(ValueError):

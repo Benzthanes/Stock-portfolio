@@ -263,7 +263,7 @@ def generate_stock_chart_page_html() -> str:
 
     all_tickers = sorted(list(cache.keys()))
     # Put portfolio core holdings first
-    priority_order = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "BMY", "JPM", "ROST", "MU", "ARM", "INTC", "C", "VRTX", "NOW", "SPCX", "QQQI", "BNY", "AMAT", "LRCX", "JNJ"]
+    priority_order = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "BMY", "JPM", "MU", "ARM", "C", "VRTX", "NOW", "SPCX", "QQQI", "JNJ"]
     sorted_tickers = [t for t in priority_order if t in all_tickers] + [t for t in all_tickers if t not in priority_order]
     sorted_tickers_json = json.dumps(sorted_tickers)
 
@@ -316,3 +316,8 @@ def generate_stock_chart_page_html() -> str:
     })
     (reports_dir / "stock_chart.html").write_text(html_content, encoding="utf-8")
     return html_content
+
+
+if __name__ == "__main__":
+    generate_stock_chart_page_html()
+

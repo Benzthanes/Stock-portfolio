@@ -12,7 +12,7 @@ import math
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -358,6 +358,11 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         r_pl_t = t.get("realized_pl_thb", 0.0)
         r_pl_pct = t.get("realized_pl_pct", 0.0)
         c = "#10b981" if r_pl_u >= 0 else "#f43f5e"
+        pill_bg = "rgba(16, 185, 129, 0.15)" if r_pl_u >= 0 else "rgba(244, 63, 94, 0.15)"
+        pill_color = "#6ee7b7" if r_pl_u >= 0 else "#fda4af"
+        pill_border = "rgba(16, 185, 129, 0.3)" if r_pl_u >= 0 else "rgba(244, 63, 94, 0.3)"
+        badge_cls = "badge-success" if r_pl_u >= 0 else "badge-danger"
+        badge_txt = "🎯 ทำกำไรตาม TP" if r_pl_u >= 0 else "🛑 ตัดขาดทุนตาม SL"
         t_click_js = _make_chart_onclick({
             "ticker": t['ticker'],
             "exchange": t.get('exchange', 'NYSE'),
@@ -375,21 +380,21 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         closed_rows_html += f"""
         <tr>
             <td style="font-weight: 700; color: #fff; font-family: 'Inter', sans-serif;">
-                <span class="clickable-ticker" onclick="{t_click_js}" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">{escape(str(t['ticker']))} 📈</span>
+                <span class="clickable-ticker" onclick="{t_click_js}" style="background: {pill_bg}; color: {pill_color}; border: 1px solid {pill_border}; padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัล">{escape(str(t['ticker']))} 📈</span>
             </td>
             <td>
                 <div style="font-weight: 600;">{escape(str(t.get('name') or t['ticker']))}</div>
                 <div class="text-muted small">{escape(str(t.get('exit_reason', '-')))}</div>
             </td>
             <td style="text-align: center; color: var(--text-secondary); font-size: 0.85rem;">{t.get('entry_date', '-')}</td>
-            <td style="text-align: center; color: var(--rose); font-size: 0.85rem; font-weight: 600;">{t.get('exit_date', '-')} ({t.get('holding_days', '-')} วัน)</td>
+            <td style="text-align: center; color: {c}; font-size: 0.85rem; font-weight: 600;">{t.get('exit_date', '-')} ({t.get('holding_days', '-')} วัน)</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('buy_price_usd', 0))}</td>
-            <td style="text-align: right; font-weight: 600; color: var(--rose); font-family: 'Inter', sans-serif;">{money(t.get('exit_price_usd', 0))}</td>
+            <td style="text-align: right; font-weight: 600; color: {c}; font-family: 'Inter', sans-serif;">{money(t.get('exit_price_usd', 0))}</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('capital_thb', 0), 'THB', digits=0)}</td>
             <td style="text-align: right; font-weight: 600; font-family: 'Inter', sans-serif;">{money(t.get('net_revenue_thb', 0), 'THB', digits=0)}</td>
             <td style="text-align: right; color: {c}; font-weight: 700; font-family: 'Inter', sans-serif;">{money(r_pl_t, 'THB', signed=True)} ({money(r_pl_u, signed=True)})</td>
             <td style="text-align: right; color: {c}; font-weight: 700; font-family: 'Inter', sans-serif;">{pct(r_pl_pct, digits=2)}</td>
-            <td style="text-align: center;"><span class="badge badge-danger">ตัดขาดทุนตาม SL</span></td>
+            <td style="text-align: center;"><span class="badge {badge_cls}">{badge_txt}</span></td>
         </tr>
         """
 
@@ -577,27 +582,27 @@ def generate_html_report(data: Dict[str, Any]) -> str:
             </div>
         </div>
 
-        <!-- SECTION 1.5: CLOSED TRADES / STOP-LOSS EXECUTIONS -->
+        <!-- SECTION 1.5: CLOSED TRADES / STOP-LOSS & TAKE-PROFIT EXECUTIONS -->
         {f'''
         <div style="margin-bottom: 32px;">
             <div class="section-title">
-                <span>🛑</span> รายการที่แตะจุดยอมแพ้และขายตัดขาดทุนจำลองแล้ว (Closed Trades: {len(data.get('closed_trades', []))} ตัว)
-                <span class="badge badge-danger">ขายตัดขาดทุนตามวินัย Stop-Loss</span>
+                <span>📑</span> รายการเทรดจำลองที่ปิดสถานะแล้ว (Closed Trades: {len(data.get('closed_trades', []))} รายการ)
+                <span class="badge badge-info">ปิดสถานะตามวินัย TP / SL</span>
             </div>
-            <div class="card" style="padding: 0; overflow-x: auto; border-left: 4px solid var(--rose);">
+            <div class="card" style="padding: 0; overflow-x: auto; border-left: 4px solid var(--blue);">
                 <table>
                     <thead>
                         <tr>
                             <th>Ticker</th>
-                            <th>บริษัท & เหตุผลการขาย</th>
+                            <th>บริษัท & เหตุผลการปิดสถานะ</th>
                             <th style="text-align: center;">วันที่ซื้อ</th>
                             <th style="text-align: center;">วันที่ขาย</th>
                             <th style="text-align: right;">ราคาซื้อ ($)</th>
                             <th style="text-align: right;">ราคาขาย ($)</th>
                             <th style="text-align: right;">ทุน (฿)</th>
                             <th style="text-align: right;">ยอดรับสุทธิ (฿)</th>
-                            <th style="text-align: right;">ผลขาดทุนจริง</th>
-                            <th style="text-align: right;">% ผลขาดทุน</th>
+                            <th style="text-align: right;">ผลกำไร/ขาดทุนจริง</th>
+                            <th style="text-align: right;">% ผลตอบแทน</th>
                             <th style="text-align: center;">สถานะ</th>
                         </tr>
                     </thead>
@@ -721,6 +726,102 @@ def reset_sim_holdings():
     save_simulation_data(sim_data)
 
 
+def close_triggered_holdings(now: Optional[datetime] = None) -> List[Dict[str, Any]]:
+    """
+    Evaluates active holdings against live prices.
+    Holdings hitting SL (close <= sl) or TP (close >= tp) are closed and moved
+    to closed_trades with full P/L accounting.
+    """
+    sim_data = load_simulation_data()
+    analyzed = analyze_simulation(sim_data)
+    fx_rate = analyzed.get("fx_rate", 33.62)
+    today_dt = now or datetime.now()
+    today_str = today_dt.strftime("%Y-%m-%d")
+
+    closed_now = []
+    remaining_holdings = []
+    pos_by_ticker = {p["ticker"]: p for p in analyzed.get("positions", [])}
+
+    for h in sim_data.get("holdings", []):
+        t = h["ticker"]
+        p = pos_by_ticker.get(t)
+        if not p or p.get("price_missing") or p.get("close_price") is None:
+            remaining_holdings.append(h)
+            continue
+
+        close_price = p["close_price"]
+        sl = p["stop_loss_usd"]
+        tp = p["take_profit_usd"]
+
+        hit_tp = close_price >= tp
+        hit_sl = close_price <= sl
+
+        if not (hit_tp or hit_sl):
+            remaining_holdings.append(h)
+            continue
+
+        entry_date_str = h.get("entry_date", today_str)
+        try:
+            entry_dt = datetime.strptime(entry_date_str, "%Y-%m-%d")
+            holding_days = max(1, (today_dt - entry_dt).days)
+        except Exception:
+            holding_days = 1
+
+        cap_thb = float(h.get("capital_thb", 10000.0))
+        cap_usd = float(h.get("capital_usd", cap_thb / fx_rate))
+        shares = float(h.get("shares", 0.0))
+        exit_price_usd = round(close_price, 2)
+        net_revenue_usd = round(shares * exit_price_usd, 2)
+        net_revenue_thb = round(net_revenue_usd * fx_rate, 2)
+        realized_pl_usd = round(net_revenue_usd - cap_usd, 2)
+        realized_pl_thb = round(net_revenue_thb - cap_thb, 2)
+        realized_pl_pct = round((realized_pl_usd / cap_usd * 100.0) if cap_usd > 0 else 0.0, 2)
+
+        if hit_tp:
+            exit_reason = f"🎯 แตะเป้าทำกำไร Take-Profit (${tp:.2f}) - ขายทำกำไรอัตโนมัติตามวินัย"
+            action_notes = "ขายทำกำไรจำลองตามเป้าหมายของระบบ"
+        else:
+            exit_reason = f"🛑 แตะจุดยอมแพ้ Stop-Loss (${sl:.2f}) - ขายตัดขาดทุนอัตโนมัติตามวินัย"
+            action_notes = "ขายตัดขาดทุนจำลองเพื่อรักษาเงินต้นตามระบบ"
+
+        closed_item = {
+            "id": h.get("id") or f"dip-{int(today_dt.timestamp())}",
+            "ticker": t,
+            "name": h.get("name", t),
+            "exchange": h.get("exchange", "NASDAQ"),
+            "business": h.get("business", "-"),
+            "entry_date": entry_date_str,
+            "exit_date": today_str,
+            "holding_days": holding_days,
+            "capital_thb": cap_thb,
+            "capital_usd": cap_usd,
+            "buy_price_usd": float(h.get("buy_price_usd", 0.0)),
+            "shares": shares,
+            "stop_loss_usd": sl,
+            "take_profit_usd": tp,
+            "exit_price_usd": exit_price_usd,
+            "net_revenue_usd": net_revenue_usd,
+            "net_revenue_thb": net_revenue_thb,
+            "realized_pl_usd": realized_pl_usd,
+            "realized_pl_thb": realized_pl_thb,
+            "realized_pl_pct": realized_pl_pct,
+            "exit_reason": exit_reason,
+            "strategy_tier": h.get("strategy_tier", "⭐⭐⭐ Manual Dip Pick"),
+            "setup_reason": h.get("setup_reason", "-"),
+            "notes": action_notes,
+        }
+        closed_now.append(closed_item)
+
+    if closed_now:
+        sim_data["holdings"] = remaining_holdings
+        if "closed_trades" not in sim_data:
+            sim_data["closed_trades"] = []
+        sim_data["closed_trades"].extend(closed_now)
+        save_simulation_data(sim_data)
+
+    return closed_now
+
+
 def main():
     parser = argparse.ArgumentParser(description="Simulated Dip Portfolio Generator")
     parser.add_argument("--save-html", type=str, default=str(DEFAULT_HTML_PATH), help="Path to save HTML dashboard")
@@ -729,8 +830,18 @@ def main():
     parser.add_argument("--capital", type=float, default=10000.0, help="Capital in THB for simulated purchase (default: 10000)")
     parser.add_argument("--notes", type=str, default="", help="Custom notes for simulated purchase")
     parser.add_argument("--sell", "-s", type=str, help="Remove/Sell a stock ticker from simulated dip portfolio (e.g. --sell JPM)")
+    parser.add_argument("--close-triggers", action="store_true", help="Close positions reaching SL or TP")
     parser.add_argument("--reset", action="store_true", help="Clear all simulated holdings")
     args = parser.parse_args()
+
+    if args.close_triggers:
+        closed = close_triggered_holdings()
+        if closed:
+            print(f"ปิดสถานะจำลองตามเงื่อนไข SL / TP จำนวน {len(closed)} ตัว:")
+            for c in closed:
+                print(f"  - {c['ticker']} ({c['name']}): Exit ${c['exit_price_usd']} | {c['exit_reason']} | P/L: {c['realized_pl_usd']:+.2f} USD ({c['realized_pl_pct']:+.2f}%)")
+        else:
+            print("ไม่มีหุ้นตัวใดแตะจุด SL หรือ TP ในขณะนี้")
 
     if args.reset:
         reset_sim_holdings()

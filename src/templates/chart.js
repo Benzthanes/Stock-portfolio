@@ -283,6 +283,30 @@
         const topicElem = document.getElementById('nm_topic');
         if (topicElem) topicElem.textContent = '🏷️ ' + (item.topic || 'ข่าวสารตลาดการเงิน');
 
+        const isAi = Boolean(item.ai_analyzed);
+        const disclaimerElem = document.getElementById('nm_disclaimer');
+        const sumTitleElem = document.getElementById('nm_summary_title');
+
+        if (disclaimerElem) {
+            if (isAi) {
+                disclaimerElem.style.color = '#34d399';
+                disclaimerElem.style.background = 'rgba(16, 185, 129, 0.08)';
+                disclaimerElem.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+                disclaimerElem.style.borderStyle = 'solid';
+                disclaimerElem.innerHTML = '🤖 <b>วิเคราะห์และแปลเชิงลึกโดย AI (Antigravity Intelligence)</b> • แปลภาษาและสังเคราะห์สาระสำคัญตามบริบทธุรกิจจริง';
+            } else {
+                disclaimerElem.style.color = '#fbbf24';
+                disclaimerElem.style.background = 'rgba(245, 158, 11, 0.08)';
+                disclaimerElem.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+                disclaimerElem.style.borderStyle = 'dashed';
+                disclaimerElem.innerHTML = '⚠️ หัวข้อแปลด้วย Google Translate ส่วนสรุป ผลกระทบ และกลยุทธ์ด้านล่างเป็นแนวทางทั่วไปตาม sentiment ของหัวข่าว ไม่ได้สรุปจากเนื้อข่าวจริง โปรดอ่านข่าวต้นฉบับประกอบ';
+            }
+        }
+
+        if (sumTitleElem) {
+            sumTitleElem.textContent = isAi ? '📌 สรุปสาระสำคัญเชิงลึก (AI Contextual Summary)' : '📌 ภาพรวมประเด็นข่าว (แนวทางทั่วไปตาม sentiment)';
+        }
+
         const titleThElem = document.getElementById('nm_title_th');
         if (titleThElem) titleThElem.textContent = item.title_th || item.title || '-';
 
@@ -1386,7 +1410,9 @@
                     <div class="news-title">
                         ${displayTitle}
                     </div>
-                    <div class="news-heuristic" title="เซนติเมนต์และสรุปสร้างจากคีย์เวิร์ดในพาดหัว ไม่ได้อ่านเนื้อข่าวจริง" style="font-size:0.62rem; color:#94a3b8; margin:4px 0 6px;">🔎 วิเคราะห์จากคีย์เวิร์ด</div>
+                    ${item.ai_analyzed
+                        ? `<div class="news-ai-tag" style="display:inline-flex; align-items:center; gap:4px; font-size:0.64rem; font-weight:700; color:#34d399; background:rgba(16, 185, 129, 0.12); border:1px solid rgba(16, 185, 129, 0.3); border-radius:4px; padding:2px 6px; margin:4px 0 6px;">🤖 วิเคราะห์ลึกโดย AI</div>`
+                        : `<div class="news-heuristic" title="เซนติเมนต์และสรุปสร้างจากคีย์เวิร์ดในพาดหัว ไม่ได้อ่านเนื้อข่าวจริง" style="font-size:0.62rem; color:#94a3b8; margin:4px 0 6px;">🔎 วิเคราะห์จากคีย์เวิร์ด</div>`}
                     <div class="news-actions-row">
                         <button class="news-btn-th" onclick="event.stopPropagation(); openNewsModal('${ticker}', ${idx})">
                             🔍 สรุปไทย & วิเคราะห์
@@ -2546,11 +2572,11 @@
                 <!-- Double Bottom W-Shape Blueprint -->
                 <line x1="70" y1="85" x2="465" y2="85" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4,4" />
                 <rect x="80" y="68" width="130" height="18" rx="4" fill="rgba(56, 189, 248, 0.15)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1"/>
-                <text x="145" y="81" fill="#38bdf8" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline $\{neckVal}</text>
+                <text x="145" y="81" fill="#38bdf8" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline ${neckVal}</text>
 
                 <line x1="395" y1="32" x2="495" y2="32" stroke="#10b981" stroke-width="1.8" stroke-dasharray="3,3" />
                 <rect x="395" y="15" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="447" y="28" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="447" y="28" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
 
                 <path d="M 50 60 L 130 185 L 235 85 L 340 185 L 415 85 L 475 32" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
                 <line x1="415" y1="85" x2="475" y2="32" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
@@ -2579,11 +2605,11 @@
                 <!-- Double Top M-Shape Blueprint -->
                 <line x1="70" y1="145" x2="465" y2="145" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="4,4" />
                 <rect x="80" y="152" width="140" height="18" rx="4" fill="rgba(244, 63, 94, 0.15)" stroke="rgba(244, 63, 94, 0.4)" stroke-width="1"/>
-                <text x="150" y="165" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline รับ $\{neckVal}</text>
+                <text x="150" y="165" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline รับ ${neckVal}</text>
 
                 <line x1="395" y1="202" x2="495" y2="202" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="3,3" />
                 <rect x="395" y="206" width="105" height="18" rx="4" fill="rgba(244, 63, 94, 0.2)" stroke="rgba(244, 63, 94, 0.5)" stroke-width="1"/>
-                <text x="447" y="219" fill="#fda4af" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 เป้าลง $\{tgtVal} ($\{upsideVal})</text>
+                <text x="447" y="219" fill="#fda4af" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 เป้าลง ${tgtVal} (${upsideVal})</text>
 
                 <path d="M 50 170 L 130 55 L 235 145 L 340 55 L 415 145 L 475 202" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
                 <line x1="415" y1="145" x2="475" y2="202" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-rose)" />
@@ -2606,11 +2632,11 @@
                 <!-- Inverted Head & Shoulders Blueprint -->
                 <line x1="60" y1="85" x2="470" y2="85" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4,4" />
                 <rect x="70" y="68" width="130" height="18" rx="4" fill="rgba(16, 185, 129, 0.15)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="1"/>
-                <text x="135" y="81" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline $\{neckVal}</text>
+                <text x="135" y="81" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline ${neckVal}</text>
 
                 <line x1="395" y1="28" x2="495" y2="28" stroke="#10b981" stroke-width="1.8" stroke-dasharray="3,3" />
                 <rect x="395" y="12" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="447" y="25" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="447" y="25" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
 
                 <path d="M 50 60 L 110 135 L 175 85 L 245 190 L 315 85 L 380 135 L 425 85 L 475 28" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
                 <line x1="425" y1="85" x2="475" y2="28" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
@@ -2632,11 +2658,11 @@
                 <!-- Head & Shoulders Blueprint -->
                 <line x1="60" y1="145" x2="470" y2="145" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="4,4" />
                 <rect x="70" y="152" width="130" height="18" rx="4" fill="rgba(244, 63, 94, 0.15)" stroke="rgba(244, 63, 94, 0.4)" stroke-width="1"/>
-                <text x="135" y="165" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline $\{neckVal}</text>
+                <text x="135" y="165" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline ${neckVal}</text>
 
                 <line x1="395" y1="205" x2="495" y2="205" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="3,3" />
                 <rect x="395" y="208" width="105" height="18" rx="4" fill="rgba(244, 63, 94, 0.2)" stroke="rgba(244, 63, 94, 0.5)" stroke-width="1"/>
-                <text x="447" y="221" fill="#fda4af" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="447" y="221" fill="#fda4af" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
 
                 <path d="M 50 170 L 110 95 L 175 145 L 245 40 L 315 145 L 380 95 L 425 145 L 475 205" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
                 <line x1="425" y1="145" x2="475" y2="205" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-rose)" />
@@ -2664,7 +2690,7 @@
                 <line x1="330" y1="95" x2="470" y2="30" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
 
                 <rect x="365" y="12" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="417" y="25" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="417" y="25" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
 
                 <text x="110" y="140" fill="#a7f3d0" font-size="11" font-family="'Inter', sans-serif" font-weight="700">เสาธง (Pole)</text>
                 <text x="255" y="125" fill="#7dd3fc" font-size="11" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">กรอบธงสะสมพลัง</text>
@@ -2675,7 +2701,7 @@
             body = `
                 <!-- Ascending Triangle Blueprint -->
                 <line x1="70" y1="70" x2="420" y2="70" stroke="#f43f5e" stroke-width="2.5" />
-                <text x="150" y="60" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">แนวต้านคงที่ $\{neckVal}</text>
+                <text x="150" y="60" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">แนวต้านคงที่ ${neckVal}</text>
 
                 <line x1="70" y1="195" x2="420" y2="85" stroke="#10b981" stroke-width="2.5" />
                 <text x="150" y="180" fill="#34d399" font-size="10" font-family="'Inter', sans-serif" font-weight="700">แนวรับยกฐาน (Higher Lows)</text>
@@ -2684,7 +2710,7 @@
                 <line x1="420" y1="70" x2="475" y2="25" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
 
                 <rect x="365" y="10" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="417" y="23" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="417" y="23" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <circle cx="420" cy="70" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
                 <text x="420" y="90" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">ทะลุต้าน 🚀</text>
             `;
@@ -2692,7 +2718,7 @@
             body = `
                 <!-- Descending Triangle Blueprint -->
                 <line x1="70" y1="165" x2="420" y2="165" stroke="#10b981" stroke-width="2.5" />
-                <text x="150" y="180" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">แนวรับคงที่ $\{neckVal}</text>
+                <text x="150" y="180" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">แนวรับคงที่ ${neckVal}</text>
 
                 <line x1="70" y1="45" x2="420" y2="155" stroke="#f43f5e" stroke-width="2.5" />
                 <text x="150" y="65" fill="#fb7185" font-size="10" font-family="'Inter', sans-serif" font-weight="700">แนวต้านกดต่ำ (Lower Highs)</text>
@@ -2701,7 +2727,7 @@
                 <line x1="420" y1="165" x2="475" y2="210" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-rose)" />
 
                 <rect x="365" y="206" width="105" height="18" rx="4" fill="rgba(244, 63, 94, 0.2)" stroke="rgba(244, 63, 94, 0.5)" stroke-width="1"/>
-                <text x="417" y="219" fill="#fda4af" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="417" y="219" fill="#fda4af" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <circle cx="420" cy="165" r="5" fill="#f43f5e" stroke="#ffffff" stroke-width="1.5" />
                 <text x="420" y="152" fill="#fb7185" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">หลุดแนวรับ 🔻</text>
             `;
@@ -2715,7 +2741,7 @@
                 <line x1="365" y1="145" x2="475" y2="35" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
 
                 <rect x="365" y="15" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="417" y="28" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="417" y="28" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <text x="210" y="65" fill="#7dd3fc" font-size="10" font-family="'Inter', sans-serif" font-weight="700">แนวต้านลิ่มเฉียงลง</text>
                 <text x="210" y="175" fill="#a7f3d0" font-size="10" font-family="'Inter', sans-serif" font-weight="700">แนวรับลิ่ม</text>
                 <circle cx="365" cy="145" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
@@ -2731,7 +2757,7 @@
                 <line x1="420" y1="145" x2="475" y2="40" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
 
                 <rect x="365" y="15" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="417" y="28" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="417" y="28" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <text x="180" y="55" fill="#a7f3d0" font-size="10" font-family="'Inter', sans-serif" font-weight="700">กรอบบน (Higher High)</text>
                 <text x="180" y="195" fill="#7dd3fc" font-size="10" font-family="'Inter', sans-serif" font-weight="700">กรอบล่าง (Higher Low)</text>
             `;
@@ -2740,7 +2766,7 @@
                 <!-- Triple Bottom Blueprint -->
                 <line x1="70" y1="180" x2="430" y2="180" stroke="#10b981" stroke-width="2.5" />
                 <line x1="70" y1="95" x2="450" y2="95" stroke="#38bdf8" stroke-dasharray="4,4" />
-                <text x="140" y="85" fill="#38bdf8" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">Neckline $\{neckVal}</text>
+                <text x="140" y="85" fill="#38bdf8" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">Neckline ${neckVal}</text>
 
                 <path d="M 50 60 L 110 180 L 175 95 L 240 180 L 305 95 L 370 180 L 420 95 L 475 35" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
                 <line x1="420" y1="95" x2="475" y2="35" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
@@ -2761,11 +2787,11 @@
                 <path d="M 80 170 L 150 75 L 220 170 L 290 75 L 360 170 L 415 75 L 475 25" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
                 <line x1="415" y1="75" x2="475" y2="25" stroke="#10b981" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-green)" />
 
-                <text x="140" y="65" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">กรอบแนวต้าน $\{neckVal}</text>
+                <text x="140" y="65" fill="#fb7185" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">กรอบแนวต้าน ${neckVal}</text>
                 <text x="140" y="190" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700">กรอบแนวรับสะสม</text>
 
                 <rect x="365" y="10" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
-                <text x="417" y="23" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 $\{tgtVal} ($\{upsideVal})</text>
+                <text x="417" y="23" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <circle cx="415" cy="75" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
                 <text x="415" y="95" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout 🚀</text>
             `;

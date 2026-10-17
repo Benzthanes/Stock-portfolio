@@ -10,9 +10,12 @@ PAGES = (
     ("dip_sim", "portfolio_dip_sim.html", "Dip จำลอง"),
     ("ledger", "trades_ledger.html", "รายการซื้อขายทั้งหมด"),
     ("chart", "stock_chart.html", "กราฟ"),
-    ("set_review", "portfolio_set_review.html", "หุ้นไทย สุขภาพพอร์ต"),
-    ("set_recovery", "portfolio_set_recovery.html", "หุ้นไทย แก้ดอย"),
 )
+
+ALIASES = {
+    "set_review": "review",
+    "set_recovery": "recovery",
+}
 
 _STYLE = """<style>
 .rnav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; box-sizing: border-box; width: 100%; max-width: 100%;
@@ -30,6 +33,7 @@ _STYLE = """<style>
 
 def nav_bar_html(active: str, now: Optional[datetime] = None) -> str:
     """Return the nav bar (with its scoped <style>) marking the page whose key is `active`."""
+    active = ALIASES.get(active, active)
     if active not in {key for key, _, _ in PAGES}:
         raise ValueError(f"unknown nav page: {active!r}")
     stamp = (now or datetime.now()).strftime("%Y-%m-%d %H:%M")

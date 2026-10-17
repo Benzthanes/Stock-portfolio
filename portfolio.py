@@ -40,7 +40,6 @@ def _refresh_charts():
         [h["ticker"] for h in p_data.get("holdings", [])]
         + [t["ticker"] for t in t_data.get("trades", [])]
         + [h["ticker"] for h in d_data.get("holdings", [])]
-        + [c["ticker"] for c in d_data.get("closed_trades", [])]
     )
     get_all_charts_payload(list(all_t))
 
