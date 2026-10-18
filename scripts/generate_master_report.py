@@ -490,12 +490,6 @@ def get_live_refresh_script(data):
                     plPctCell.style.color = color;
                 }}
 
-                const outlookBadge = document.querySelector(`.badge-outlook-pl[data-outlook-ticker="${{ticker}}"]`);
-                if (outlookBadge) {{
-                    outlookBadge.textContent = fmtPct(plPct, 1);
-                    outlookBadge.className = 'badge badge-outlook-pl ' + (plUsd >= 0 ? 'badge-success' : 'badge-danger');
-                }}
-
                 r.style.transition = 'background-color 0.4s ease';
                 r.style.backgroundColor = 'rgba(59, 130, 246, 0.12)';
                 setTimeout(() => {{ r.style.backgroundColor = ''; }}, 600);
@@ -710,70 +704,6 @@ def generate_master_dashboard_html(data):
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">{pct(p.get('weight_pct'), signed=False)}</td>
         </tr>
         """
-
-    # 1.1 Master Forward Outlook Cards for Active Holdings
-    outlook_cards_master = ""
-    for p in data["positions"]:
-        t = escape(str(p["ticker"]))
-        fo = p.get("forward_outlook", {})
-        thesis = fo.get("thesis_title", f"การลงทุนเชิงยุทธศาสตร์ใน {t}")
-        quality = fo.get("quality_badge", "🔵 Strategic Core Holding")
-        drivers = fo.get("future_growth_drivers", [])
-        timeline = fo.get("catalyst_timeline", [])
-        next_cat = timeline[0] if timeline else {}
-        t_avg = p.get("price_target_average", 0.0)
-        up_val = p.get("target_upside_pct")
-        up_str = pct(up_val)
-        roadmap = fo.get("tailored_roadmap", p.get("rating", {}).get("action", ""))
-
-        pl_u = p["unrealized_pl_usd"]
-        pl_pct = p["unrealized_pl_pct"]
-        pl_u = pl_u or 0
-        c_badge = "badge-success" if pl_u >= 0 else "badge-danger"
-
-        driver_items = "".join([f"<li style='margin-bottom: 4px;'>• {d}</li>" for d in drivers[:2]]) if drivers else ""
-        next_cat_str = f"<strong>{next_cat.get('period', '-')}:</strong> {next_cat.get('event', '-')}" if next_cat else "ไม่มีตัวเร่งเฉพาะระยะสั้น"
-        t_avg_disp = money(t_avg) if t_avg else "-"
-
-        onclick_js = _make_chart_onclick(p)
-        outlook_cards_master += f"""
-        <div class="card" style="padding: 18px; display: flex; flex-direction: column; justify-content: space-between; border-top: 3px solid {'var(--emerald)' if pl_u >= 0 else 'var(--rose)'};">
-            <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <div>
-                        <span class="clickable-ticker" onclick="{onclick_js}" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; cursor: pointer;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">{escape(str(p.get('name') or ''))}</div>
-                    </div>
-                    <span class="badge {c_badge} badge-outlook-pl" data-outlook-ticker="{t}">{pct(pl_pct, na='n/a')}</span>
-                </div>
-                <div style="font-size: 0.76rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px;">
-                    {quality}
-                </div>
-                <div style="font-size: 0.86rem; color: #e2e8f0; line-height: 1.4; margin-bottom: 12px; font-weight: 500;">
-                    {thesis}
-                </div>
-                <div style="font-size: 0.8rem; color: #94a3b8; background: rgba(0,0,0,0.25); padding: 10px; border-radius: 6px; margin-bottom: 10px;">
-                    <div style="color: #38bdf8; font-weight: 600; margin-bottom: 4px;">🚀 ปัจจัยขับเคลื่อนสำคัญ:</div>
-                    <ul style="list-style: none; padding-left: 0; line-height: 1.4;">
-                        {driver_items}
-                    </ul>
-                </div>
-            </div>
-            <div>
-                <div style="font-size: 0.78rem; color: #cbd5e1; background: rgba(16, 185, 129, 0.06); padding: 6px 8px; border-radius: 4px; border-left: 2px solid var(--emerald); margin-bottom: 8px;">
-                    🎯 <strong>เป้าวอลล์สตรีท:</strong> {t_avg_disp} ({up_str})
-                </div>
-                <div style="font-size: 0.78rem; color: #fde047; background: rgba(245, 158, 11, 0.08); padding: 6px 8px; border-radius: 4px; border-left: 2px solid var(--amber);">
-                    🧭 <strong>แผนแอ็กชัน:</strong> {roadmap}
-                </div>
-                <div style="margin-top: 10px;">
-                    <button onclick="{onclick_js}" style="width: 100%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
-                </div>
-            </div>
-        </div>
-        """
-
-
 
     html = f"""<!DOCTYPE html>
 <html lang="th">
@@ -1055,15 +985,18 @@ def generate_master_dashboard_html(data):
                 </table>
             </div>
 
-            <!-- Master Forward Outlook Dossiers -->
-            <div style="margin-top: 24px;">
-                <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-                    <span>🔭</span> วิสัยทัศน์ & ตัวเร่งราคาในอนาคตรายตัว (Forward Intelligence & Catalysts)
-                    <span class="badge badge-purple">{len(data.get('positions', []))} หุ้นในพอร์ต</span>
+            <!-- Link to Deep-Dive Health & Catalysts -->
+            <div class="card" style="margin-top: 18px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 1.4rem;">🔭</span>
+                    <div>
+                        <div style="color: #f8fafc; font-size: 0.95rem; font-weight: 700;">ต้องการอ่านวิสัยทัศน์ ตัวเร่งราคา และบทวิเคราะห์ข่าว AI เชิงลึกรายตัว?</div>
+                        <div style="color: var(--text-secondary); font-size: 0.84rem;">ตรวจสุขภาพพอร์ต สัดส่วนกลุ่มธุรกิจ แผน Action Roadmap และปฏิทินงบการเงิน</div>
+                    </div>
                 </div>
-                <div class="grid-3-cols">
-                    {outlook_cards_master}
-                </div>
+                <a href="portfolio_review.html" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; text-decoration: none; transition: all 0.2s;">
+                    <span>ดูรายงานตรวจสุขภาพพอร์ตฉบับเต็ม</span> <span>→</span>
+                </a>
             </div>
         </div>
 

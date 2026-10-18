@@ -1,7 +1,35 @@
 {
   "NOK": {
-    "updated_at": "2026-10-17T17:13:39.936582",
+    "updated_at": "2026-10-18T14:51:32.434206",
     "articles": [
+      {
+        "title": "Nokia to sell private 5G ECE unit to Aurelius",
+        "source": "Fierce Network",
+        "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPbjFUUTBkRUxyQnp4SHRaMDc0N0kzZHNqcDhRcTN4bjVvdHN5MC1pZFBxX3N6SGVnd0hIaWhSQlpMelo3Z0hwZlFEdnpveldUVHVCQkNlWlcxbzg4LVczVk1JcXhuRVlJVF90LXo4M09UZ0t4b1RWTm9xTWJ5MnJ1Mmo5aXBUUzI1dGlmYXY4SUJxXzk1Y0drelc1TGxKZEhR?oc=5",
+        "published": "4d ago",
+        "title_th": "Nokia บรรลุข้อตกลงขายหน่วยธุรกิจ Private 5G ECE ให้แก่ Aurelius เพื่อปรับโครงสร้างโฟกัสธุรกิจหลัก",
+        "summary_th": "• Nokia ดำเนินการขายหน่วยธุรกิจที่มิใช่ธุรกิจหลักตามแผนยุทธศาสตร์การปรับปรุงประสิทธิภาพองค์กร\n• การขายหน่วยงานนี้ช่วยลดค่าใช้จ่ายในการดำเนินงาน (OpEx) และเพิ่มสภาพคล่องเงินสดให้แก่บริษัท\n• บริษัทสามารถทุ่มเททรัพยากรไปยังธุรกิจที่มีอัตรากำไรสูง เช่น โซลูชันเครือข่ายออปติคอลและสวิตช์สำหรับ AI ดาต้าเซ็นเตอร์",
+        "impact_th": "ส่งผลบวกต่อโครงสร้างอัตรากำไร (Margin Expansion) ในระยะกลางถึงยาว แม้ในระยะสั้นอาจดูเหมือนเป็นการหดตัวของขนาดธุรกิจ",
+        "action_th": "ถือครองและติดตามผลลัพธ์การปรับโครงสร้างในการประกาศงบการเงิน",
+        "sentiment": "bullish",
+        "topic": "การปรับโครงสร้างองค์กรและการขายสินทรัพย์ (Corporate Restructuring & Divestment)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348818"
+      },
+      {
+        "title": "Nokia Stock Is Still Up 52% This Year, but Is the AI Rally Already Over?",
+        "title_th": "Nokia บวกขึ้นมาแล้ว 52% ในปีนี้: รอบการขึ้นของกระแส AI กำลังจะจบลงหรือเพิ่งเริ่มต้น?",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQUlhqZVlYbzJWRGwtTndlMWNGRnJqekx3Mi0xQ3Ezc2piTG1tLW1RUGk0RC14Y0hibmNFNGdBeWNLNl9qM2U5dzY1aFZSVEFxVHJlMG1vaU1RaWFoQVpSUy1oMTFiZ1dfOXRfVjJ2ZHNkanV1MEU5VTZDSnQ2aWFHZkRmTTM3WmNQVGZZOTBkQ2pyQQ?oc=5",
+        "published": "4d ago",
+        "sentiment": "bullish",
+        "topic": "การประเมินมูลค่าหุ้นและรอบการเติบโตใหม่",
+        "summary_th": "• แม้ราคาจะปรับตัวขึ้นมาแรง แต่ค่า Valuation ของ Nokia ยังคงอยู่ในระดับต่ำเมื่อเทียบกับบริษัทโทรคมนาคมและคลาวด์ระดับโลก\n• สัญญาความร่วมมือกับดาต้าเซ็นเตอร์ AI ด้านสวิตช์ความเร็วสูงและ Optical Networking เพิ่งเริ่มรับรู้รายได้\n• งบการเงินวันที่ 22 ต.ค. จะเป็นจุดพิสูจน์การฟื้นตัวของอัตรากำไรในระยะถัดไป",
+        "impact_th": "🟢 วงจรฟื้นตัวยังอยู่ในช่วงแรก (Early Turnaround): ไม่มีความเสี่ยงฟองสบู่ ราคาเทรดใกล้เคียงมูลค่าทางบัญชี",
+        "action_th": "💡 แผนกลยุทธ์: วันงบออกใกล้เข้ามาใน 3 วัน ถือรอผลประกอบการ ไม่ต้องเร่งเติมเงิน",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.257217"
+      },
       {
         "title": "Nokia Stock Is Falling Monday: What's Going On?",
         "title_th": "หุ้น Nokia ย่อตัวลงในวันจันทร์: เกิดอะไรขึ้นและมีนัยต่อนักลงทุนอย่างไร?",
@@ -47,8 +75,50 @@
     ]
   },
   "GOOGL": {
-    "updated_at": "2026-10-17T17:13:39.949360",
+    "updated_at": "2026-10-18T14:51:32.402150",
     "articles": [
+      {
+        "title": "Not Alphabet. Not Microsoft. This Is the Cloud Stock I'd Buy With ,000 Right Now.",
+        "source": "The Motley Fool",
+        "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPN2Nnc0U1UVZtUEswMHVTUksxVkp5X0Z6T0JmSkt3UTA0QkM2b3ZrWVdVSjFfSlpHSm5QY2pBM01JXzJNZkVTT19OU3E1M3otYjltQWNtQ3BQRUFOdGc1RzgzWXJLN0N2OEJ0TWx0VEpJeThBSWhETjZ4c05NZDY0bzhDdU9uVFRFVHRoNWFyZWtEbjZZMFNSUQ?oc=5",
+        "published": "1d ago",
+        "title_th": "มุมมองเปรียบเทียบหุ้นคลาวด์กับ Alphabet และ Microsoft ในจังหวะการลงทุนปัจจุบัน",
+        "summary_th": "• บทวิเคราะห์เปรียบเทียบจุดแข็งของยักษ์ใหญ่คลาวด์ Alphabet กับผู้เล่นรายอื่นในสมรภูมิ AI Infrastructure\n• แม้จะมีหุ้นคลาวด์ทางเลือก แต่ Google Cloud ยังคงมีความได้เปรียบด้วยชิป TPU v5p และระบบนิเวศข้อมูลที่เชื่อมโยงกับโมเดล Gemini\n• ฐานลูกค้าระดับองค์กรและอัตรากำไรจากการดำเนินงานของ Google Cloud มีทิศทางขยายตัวดีขึ้นอย่างชัดเจน",
+        "impact_th": "ยืนยันว่า Google Cloud เป็นหนึ่งในเสาหลักขับเคลื่อนการเติบโตที่มั่นคง แม้ตลาดจะเปรียบเทียบกับคู่แข่งทางเลือก",
+        "action_th": "ถือครอง Alphabet เป็นตัวแทนหลักของการลงทุนระบบคลาวด์และ AI",
+        "sentiment": "neutral",
+        "topic": "การแข่งขันและโครงสร้างพื้นฐานคลาวด์ (Cloud Infrastructure Competition)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348812"
+      },
+      {
+        "title": "The Next  Trillion Dollar Company: Alphabet or Microsoft?",
+        "source": "24/7 Wall St.",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNLVg0M01UU0NWVzhhbWljRHJvTFpvQzRncmtwcG1nbDNuQW14enhxd3JDdUFCUldhbkUxcGxDa05PVDlkTjJXMGJoNmFWV2UtYTBkVzBZRk1vMUNNbW1yY043WmVSTjEtdWpNNkI4ZnVsZjgwZTEzZzlhSU9Gbk1mODVPVGZNSEFVaUVFc19TTXQ1ZTM5Z0dXcC1pOXFXMmhpamc?oc=5",
+        "published": "1d ago",
+        "title_th": "วิเคราะห์เส้นทางสู่บริษัทมูลค่า 5 ล้านล้านดอลลาร์: Alphabet หรือ Microsoft?",
+        "summary_th": "• สถาบันการเงินประเมินว่า Alphabet มีโอกาสทะยานสู่มูลค่า 5 ล้านล้านดอลลาร์ด้วยพลังของ AI ใน Search, YouTube, Android และ Cloud\n• ระดับราคาของ Alphabet ปัจจุบันถูกประเมินว่ามี Forward P/E ต่ำที่สุดในกลุ่ม Magnificent Seven ทำให้มี Upside เชิงมูลค่าสูงกว่า\n• การต่อยอดเทคโนโลยีโมเดล Gemini เข้าสู่บริการค้นหาแบบ Generative Search ช่วยปกป้องส่วนแบ่งการตลาดโฆษณาได้อย่างเหนียวแน่น",
+        "impact_th": "ตอกย้ำโอกาสการขยายตัวของมูลค่าหลักทรัพย์ตามราคาตลาด (Market Cap Expansion) ในระยะยาว 3-5 ปี",
+        "action_th": "สะสมเพื่อถือครองระยะยาวเพื่อรับผลตอบแทนจากการเติบโตของมาร์เก็ตแคป",
+        "sentiment": "bullish",
+        "topic": "การประเมินมูลค่าและศักยภาพการเติบโตระยะยาว (Long-Term Market Cap Potential)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348813"
+      },
+      {
+        "title": "Greg Abel Made Major Additions to Alphabet and Delta Last Quarter While Berkshire Bought Back $4.4 Billion of Its Own Stock. Is This a Buying Signal Investors Should Watch?",
+        "title_th": "Greg Abel ทายาทบัฟเฟตต์เข้าซื้อหุ้น Alphabet เพิ่มในพอร์ต Berkshire: สัญญาณบวกที่นักลงทุนต้องจับตา",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNc0FUTzhnVHVxRzRFWkxSYm5WYzU2X296cnhMMURmWHFDZWUtNGJfRkdqMlVqUEZqYVF3VFMzVVNhZ1dfaDhRWWlOMG16Y1FFZTBCVUZmdFpncHg1STRudURRU3lyZWpSU3pzZUhlWEgzUHJxNzB6TExiSXl3dlU3NVkzdXlQUnlqQ1ZGX252aTZlejgyWlduUml0bw?oc=5",
+        "published": "8h ago",
+        "sentiment": "bullish",
+        "topic": "การลงทุนของสถาบันและผู้นำระดับโลก",
+        "summary_th": "• Greg Abel ว่าที่ผู้นำคนใหม่ของ Berkshire Hathaway เพิ่มน้ำหนักการลงทุนใน Alphabet (GOOGL) อย่างมีนัยสำคัญ\n• ตอกย้ำความเชื่อมั่นว่า Alphabet มีความได้เปรียบเชิงโครงสร้าง (Economic Moat) ทั้งด้าน Search, YouTube และ Cloud\n• ชี้ระดับราคา Valuation ปัจจุบันของ GOOGL มี Margin of Safety สูงเมื่อเทียบกับกลุ่มบิ๊กเทคอื่น",
+        "impact_th": "🟢 ปัจจัยบวกเชิงจิตวิทยาและสถาบัน (Institutional Accumulation): ตอกย้ำความแข็งแกร่งของกระแสเงินสดและมูลค่าพื้นฐาน",
+        "action_th": "💡 แผนกลยุทธ์: วันประกาศงบใกล้เข้ามาใน 10 วัน ควรถือสถานะเดิมและรอฟังตัวเลขกำไรก่อนพิจารณาเติมเงินเพิ่ม",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.216624"
+      },
       {
         "title": "Alphabet Stock Can Soar 22%, J.P. Morgan Says. Why Google Can Defy AI Fears.",
         "title_th": "J.P. Morgan คาดหุ้น Alphabet ทะยานได้อีก 22% ชี้ศักยภาพ Google ก้าวข้ามความกังวลด้าน AI",
@@ -80,8 +150,64 @@
     ]
   },
   "LLY": {
-    "updated_at": "2026-10-17T17:13:39.957938",
+    "updated_at": "2026-10-18T14:51:32.349250",
     "articles": [
+      {
+        "title": "Eli Lilly (LLY) Stock Looks Undervalued As Its 404% Run Continues",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVWJJVWFhN0NSdXhOYk1ESEs5MUNPSHpEdkw4M2E0cnVCZ0tXLWE2R3pyR3ZuSkV3alZ6cE9XSTJqVmtTSW8xVnZQZW5acE5uM2ZhTVRqVVplVjNtWUlrYm1yaXBzaTUwWXZyZUZkeG1BLXY2UjJtVER3TE5zUXBBOXN5MkZ2ZTlDVTVsT1JjMVpUMVZT?oc=5",
+        "published": "3d ago",
+        "title_th": "หุ้น Eli Lilly (LLY) ยังคงน่าสนใจในเชิงมูลค่า แม้ราคาจะปรับขึ้นมาแล้วกว่า 404% ในช่วงที่ผ่านมา",
+        "summary_th": "• ตลาดยังคงประเมินมูลค่าหุ้น Eli Lilly ต่ำเกินไปเมื่อเทียบกับการเติบโตของกำไรสุทธิระดับ 100%+ YoY จาก Zepbound และ Mounjaro\n• ความสามารถในการรักษาอัตรากำไรขั้นต้นสูงกว่า 80% และการขยายโรงงานผลิตใหม่ช่วยปลดล็อกข้อจำกัดด้านอุปทาน\n• แม้ราคาจะขึ้นมามาก แต่ค่า PEG Ratio ยังคงอยู่ในระดับที่สมเหตุสมผลสำหรับบริษัทยาชีวเวชภัณฑ์ที่มี Moat แข็งแกร่งที่สุดในโลก",
+        "impact_th": "ขจัดความกังวลเรื่องการซื้อที่จุดสูงสุด (All-Time High) โดยชี้ว่าการเติบโตของกำไรจะรองรับมูลค่าหุ้นในระยะ 3-5 ปีข้างหน้า",
+        "action_th": "ทยอยสะสมแบบ Buy on Dip เมื่อราคาพักตัวทดสอบแนวรับ หรือแบ่งไม้ DCA ตามรอบบัญชี",
+        "sentiment": "bullish",
+        "topic": "การประเมินมูลค่าหุ้น (Stock Valuation & Fair Value)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348795"
+      },
+      {
+        "title": "What Is Eli Lilly Stock’s Biggest Opportunity?",
+        "source": "Trefis",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNdlZ6UHowOXBmYlhmUlRWSEhLX21Hc0dDcWNXSWtDbEJXZExkdWhJcDBndy05Sl95MWJUVlp5WWFwUmpVeFB0M2ZOTTg1YXdjUGNKNFZjYWl0eHJYQ2VxR29qemtpLXJTNnpCbEw3cHhtMHBoVVQzX0k5VFB0RGp3Q1NKNEQ0cXlhVk1hLTZlV3FlYnoxVm9JXzhmNzg5UThMTVlTaXZpTQ?oc=5",
+        "published": "4d ago",
+        "title_th": "เจาะลึกโอกาสเติบโตที่ยิ่งใหญ่ที่สุดของ Eli Lilly นอกเหนือจากตลาดยาลดน้ำหนัก",
+        "summary_th": "• โอกาสเติบโตระดับเมกะเทรนด์ของ Lilly ไม่ได้จำกัดอยู่แค่ GLP-1 แต่ครอบคลุมถึงยารักษาโรคอัลไซเมอร์ (Donanemab) และยาภูมิคุ้มกันบกพร่อง\n• ตลาดโรคไม่ติดต่อเรื้อรัง (NCDs) และภาวะหัวใจล้มเหลวมีแนวโน้มขยายตัวอย่างต่อเนื่องตามโครงสร้างประชากรสูงวัยทั่วโลก\n• กระแสเงินสดจากการดำเนินงานที่สูงช่วยให้บริษัทสามารถลงทุนด้าน R&D เชิงรุกและเข้าซื้อกิจการเทคโนโลยีการแพทย์ใหม่ๆ ได้ต่อเนื่อง",
+        "impact_th": "สร้างความหลากหลายของแหล่งรายได้ในอนาคต (Pipeline Diversification) ลดความเสี่ยงจากการพึ่งพายาตัวใดตัวหนึ่ง",
+        "action_th": "ถือครองลงทุนระยะยาวเป็นแกนหลักของพอร์ตโฟลิโอ (Core Holding)",
+        "sentiment": "bullish",
+        "topic": "แผนยุทธศาสตร์และการเติบโตทางธุรกิจ (Strategic Growth & Pipeline)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348808"
+      },
+      {
+        "title": "Eli Lilly stock rises as investors move from tech to healthcare",
+        "source": "Quartz",
+        "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFA1WXkzVy10dXV3ZTVPYmZjY2Y5QlRSTlFlWDBYUzJhVUNFeG9DVnFKeGZGc0t1YUxnUzlMTkMzR2piNkpyUlR5d1NoN21NYTNoYnZ6RlVkZXNXWldnMHhSd3o5eFJhcnZ4a3dPaERn?oc=5",
+        "published": "2d ago",
+        "title_th": "หุ้น Eli Lilly ปรับตัวขึ้นต่อเนื่องหลังเม็ดเงินสถาบันสลับกลุ่มจากเทคโนโลยีเข้าสู่กลุ่มเฮลท์แคร์",
+        "summary_th": "• กระแสเงินลงทุนระดับโลก (Sector Rotation) ไหลออกจากหุ้นเทคโนโลยีที่มีความผันผวนสูงเข้าสู่หุ้นกลุ่มเฮลท์แคร์ที่มีรายได้แน่นอน\n• Eli Lilly ถูกเลือกเป็นเป้าหมายหลักของกองทุนสถาบันเนื่องจากมีอัตราการเติบโตของกำไรระดับเดียวกับบิ๊กเทค แต่มีความทนทานต่อภาวะเศรษฐกิจสูงกว่า\n• แรงซื้อสถาบันช่วยหนุนเสถียรภาพของราคาหุ้นและลดความเสี่ยงจากการปรับฐานรุนแรง",
+        "impact_th": "ได้รับแรงส่งจากเม็ดเงินสถาบันขนาดใหญ่ ทำให้การย่อตัวมีกรอบจำกัดและมีแรงซื้อหนุนตลอดทาง",
+        "action_th": "ถือครองต่ออย่างมั่นใจ และใช้จังหวะที่กลุ่มเทคฯ ผันผวนในการสังเกตความแข็งแกร่งของ LLY",
+        "sentiment": "bullish",
+        "topic": "พฤติกรรมเม็ดเงินสถาบันและการสลับกลุ่มอุตสาหกรรม (Sector Rotation)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348810"
+      },
+      {
+        "title": "Why Eli Lilly Stock Is Down Today",
+        "title_th": "ทำไมหุ้น Eli Lilly ถึงย่อตัวลง: แรงขายทำกำไรระยะสั้นหรือสัญญาณเปลี่ยนแนวโน้ม?",
+        "source": "The Motley Fool",
+        "link": "https://news.google.com/rss/articles/CBMiWWh0dHBzOi8vd3d3LmZvb2wuY29tL2ludmVzdGluZy8yMDI2LzEwLzE0L3doeS1lbGktbGlsbHktc3RvY2staXMtZG93bi10b2RheS80ODIwMjc5NQ0gEA",
+        "published": "3d ago",
+        "sentiment": "neutral",
+        "topic": "การประเมินมูลค่าหุ้นและแรงขายทำกำไร",
+        "summary_th": "• หุ้น Eli Lilly (LLY) ปรับตัวย่อลงเล็กน้อยจากแรงขายทำกำไรของกองทุน หลังราคาพุ่งทำ All-Time High ต่อเนื่อง\n• ความต้องการยาลดน้ำหนัก Zepbound และยาเบาหวาน Mounjaro ยังคงสูงกว่ากำลังการผลิตอย่างมหาศาล\n• โครงสร้างการเติบโตของยอดขายและกำไรยังคงแกร่งที่สุดในกลุ่มชีวเวชภัณฑ์โลก",
+        "impact_th": "🟡 ย่อตัวปกติในเทรนด์ขาขึ้น (Healthy Pullback): เป็นการพักฐานเพื่อคลายความร้อนแรงของ RSI ไม่กระทบปัจจัยพื้นฐานระยะยาว",
+        "action_th": "💡 แผนกลยุทธ์: หุ้นมีสัดส่วนใหญ่ในพอร์ตแล้ว (76%) ให้ถือรันเทรนด์ต่อ ไม่ต้องรีบซื้อเพิ่ม ปล่อยให้กำไรทำงาน",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.203219"
+      },
       {
         "title": "What Was Eli Lilly Telling You Before Its Stock Ran?",
         "title_th": "สัญญาณพื้นฐานที่ Eli Lilly ส่งสัญญาณบอกตลาด ก่อนที่ราคาหุ้นจะพุ่งทะยาน",
@@ -132,8 +258,50 @@
     ]
   },
   "VRT": {
-    "updated_at": "2026-10-17T17:13:39.968819",
+    "updated_at": "2026-10-18T14:51:32.447730",
     "articles": [
+      {
+        "title": "Vertiv Stock and 5 More Industrial Picks Ahead Of Earnings",
+        "source": "Barron's",
+        "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPNzVXQmVHWUxKWEdhQzY2Q0ZvdW5DUGV1NF9FQU5lbWhTdkNreHNpaHNlMnZoeVFEX0lFUUJpZUFpMjdjT2xyR2VObnU3NkpqS2xROHN0NHRtR2libHRDUUt0bC00QTEzMEZDMUZpNGNzamNMSGdpRjBLajU2ajdkRUZjNVcxTUVF?oc=5",
+        "published": "5d ago",
+        "title_th": "Barron's ชู Vertiv เป็นหุ้นเด่นกลุ่มอุตสาหกรรมโครงสร้างพื้นฐานก่อนการประกาศงบการเงิน",
+        "summary_th": "• สื่อการเงินชั้นนำจัดให้ Vertiv เป็นหนึ่งในตัวเลือกการลงทุนที่ดีที่สุดในหมวด AI Industrial Infrastructure\n• ความต้องการระบบระบายความร้อนด้วยของเหลวสำหรับชิป Blackwell และการขยายกำลังไฟฟ้าในดาต้าเซ็นเตอร์ยังคงเร่งตัว\n• คาดการณ์ว่างบไตรมาส 3 จะแสดงให้เห็นการขยายตัวของยอดสั่งซื้อล่วงหน้า (Order Intake) และอัตรากำไรจากการดำเนินงาน",
+        "impact_th": "เสริมความเชื่อมั่นของนักลงทุนสถาบันก่อนเข้าสู่ช่วงประกาศงบการเงิน",
+        "action_th": "ถือครองหุ้นผู้นำตลาด AI Infrastructure เพื่อรอรับตัวเร่งราคาจากงบไตรมาส 3",
+        "sentiment": "bullish",
+        "topic": "ตัวเลือกการลงทุนเด่นก่อนประกาศงบ (Top Industrial Pick Ahead of Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348822"
+      },
+      {
+        "title": "How Much Further Could Vertiv Stock Fall?",
+        "source": "Trefis",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxObUZwNGNiWHdKOHlKZ0tjWWZ2T0V2MXZ1TlZnUWNsSFJBTnRJNnNreEpUbGVOTVpWd2VFcXROZV9PdjRVZDJpcDVWY3ROWFZOb25FN1E3Z1BpQXRkeVJzdXFUN1NqZHNCZElsVVZla1BLRExscEtLQ2FUVllEdjZPby1fU0pSeGdOeDhvcTA5NHNaQUZyaDVpWWFuZjNmU3UzSnc?oc=5",
+        "published": "23d ago",
+        "title_th": "ประเมินกรอบแนวรับและจุดต่ำสุดที่เป็นไปได้ของ Vertiv ในช่วงที่มีแรงเทขายทำกำไร",
+        "summary_th": "• การวิเคราะห์ระดับราคาประเมินว่าการปรับฐานของ Vertiv เป็นไปตามภาวะการหมุนเวียนเงินของตลาดหุ้นกลุ่ม AI\n• แนวรับทางเทคนิคที่ระดับเส้นค่าเฉลี่ยระยะยาวมีนัยสำคัญและมักดึงดูดแรงซื้อกลับจากนักลงทุนสถาบัน\n• แบ็กล็อกคำสั่งซื้องานระบบระบายความร้อนมูลค่าหลายพันล้านดอลลาร์ทำหน้าที่เป็นปราการปกป้องรายได้ขั้นต่ำของบริษัท",
+        "impact_th": "ช่วยกำหนดกรอบความเสี่ยงและยืนยันว่าการย่อตัวมีขอบเขตจำกัดตามปัจจัยพื้นฐานที่แข็งแกร่ง",
+        "action_th": "มองการย่อตัวเป็นโอกาสในการสะสมหรือถือครองต่อไปโดยไม่ตื่นตระหนก",
+        "sentiment": "neutral",
+        "topic": "การวิเคราะห์แนวรับและแบ็กล็อกคำสั่งซื้อ (Support Levels & Order Backlog)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348823"
+      },
+      {
+        "title": "Why Should Vertiv Stock Holders Watch This One Number?",
+        "title_th": "ทำไมผู้ถือหุ้น Vertiv ต้องจับตาตัวเลขนี้: ยอดคำสั่งซื้อค้างส่ง (Backlog) ของระบบระบายความร้อน AI Data Center",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPc185Tnc4RW83Vk93Z3BSQjlXeFp6Yzk3Wkt6SG9WMXV0cTZXaXV1WXJSTk5MNFE5MVN0QzBhdUk3TUNhYmwzTUJRS0RIZ3phbzYzZnZfOGtiOVVjQlNwT0tVY2VmSC1rajF3U2Y1UTVUc0ZSOUY5RlJ0NDdoTllPUUhwaVU0S0dJdldhTFZwY1h1UDNXMGxPWnlpUQ?oc=5",
+        "published": "3d ago",
+        "sentiment": "bullish",
+        "topic": "การเติบโตของคำสั่งซื้อและระบบระบายความร้อนดาต้าเซ็นเตอร์",
+        "summary_th": "• Vertiv (VRT) ผู้นำระบบระบายความร้อนด้วยของเหลว (Liquid Cooling) ได้รับอานิสงส์เต็มที่จากการส่งมอบชิป Nvidia Blackwell\n• ตลาดจับตาตัวเลข Backlog ที่จะประกาศในงบ Q3 วันที่ 28 ต.ค. นี้ ซึ่งคาดว่าจะทำสถิติสูงสุดใหม่\n• สถาบันวอลล์สตรีทยังคงมองเป็นหนึ่งในหุ้นโครงสร้างพื้นฐาน AI ที่ปลอดภัยและได้ผลประโยชน์โดยตรงที่สุด",
+        "impact_th": "🟢 เมกะเทรนด์โครงสร้างพื้นฐาน AI (Secular Tailwinds): แข็งแกร่งทั้ง ROE 44% และภาระหนี้ต่ำ D/E 0.7",
+        "action_th": "💡 แผนกลยุทธ์: วันงบใกล้เข้ามาใน 10 วัน ห้ามซื้อถัวเฉลี่ยเพิ่ม รอผลงานงบจริงก่อนเริ่มแผนกู้พอร์ต",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.253276"
+      },
       {
         "title": "Bloom Energy vs. Vertiv: Which AI Infrastructure Stock Is the Better Buy After the Pullback?",
         "title_th": "เปรียบเทียบ Bloom Energy vs Vertiv: หุ้นโครงสร้างพื้นฐานระบบระบายความร้อน AI ตัวไหนน่าช้อนซื้อที่สุด?",
@@ -147,6 +315,311 @@
         "action_th": "💡 แผนกลยุทธ์: ทยอยตั้งรับซื้อ (DCA) ตามแนวรับ Pivot S1 หรือจุดพักฐาน",
         "ai_analyzed": true,
         "ai_analyzed_at": "2026-10-17T17:13:39.968815"
+      }
+    ]
+  },
+  "ABNB": {
+    "updated_at": "2026-10-18T14:51:32.419442",
+    "articles": [
+      {
+        "title": "Is The Market Underpricing Airbnb Stock?",
+        "source": "Trefis",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQTFRwUGEzUDJ2d1NuaGRaOEdydVBnZEJUb2o5UEx4Y1pmVk5xWG0xSzFUMV9Od1hJdjlCa28zUkFnb0w2ZTdhNmgxOUc4bWk1UDY2UzU5b0VqcUVCWnhCdHlsMkt0bi05dndVdTJNNzlPTi1FVTRRbHNQelB0NTgwZ2h4N1lwaEUtWFgxYmVwYURfMmlfMlAweFBvZmpIWEJTZkE?oc=5",
+        "published": "1d ago",
+        "title_th": "ตลาดกำลังประเมินมูลค่าหุ้น Airbnb ต่ำเกินไปหรือไม่ ท่ามกลางกระแสเงินสดที่แข็งแกร่ง",
+        "summary_th": "• Trefis ชี้ว่าตลาดอาจมองข้ามความสามารถในการทำกำไรและกระแสเงินสดอิสระ (FCF) มหาศาลกว่า 4 พันล้านดอลลาร์ของ Airbnb\n• ค่า Forward P/E ของ ABNB ปรับตัวลงมาอยู่ในระดับที่น่าดึงดูดเมื่อเทียบกับอัตราผลตอบแทนส่วนของผู้ถือหุ้น (ROE) สูงถึง 35%\n• โมเดลธุรกิจแบบ Asset-Light ปราศจากภาระต้นทุนอสังหาริมทรัพย์ ทำให้มีความยืดหยุ่นสูงในทุกสภาวะเศรษฐกิจ",
+        "impact_th": "ราคาปัจจุบันมี Margin of Safety สูง และสะท้อนความเสี่ยงเชิงลบไปมากแล้ว",
+        "action_th": "ถือครองเป็นหุ้นคุณค่าที่มีการเติบโต (Quality Growth at a Reasonable Price)",
+        "sentiment": "bullish",
+        "topic": "การประเมินมูลค่าหุ้นและกระแสเงินสด (Valuation & Cash Flow Analysis)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348814"
+      },
+      {
+        "title": "Advance Auto Parts vs. Airbnb: Which Consumer Stock Is a Better Buy in 2026?",
+        "source": "The Motley Fool",
+        "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOcU9ibVJHc0NIa0tBUWtZRlZheFl0NV9EQU5CMmZJRFM5cFlMQjBNOVpWSUlaMkU2VEZUal95UzVjWXJma19jZ3RwalJzZ0hmay1nYXFLa0lhOUZIVDV3NllIQ25wUVVnUUlBN1FkOGJCb3hBVnp5RnREbTNaU0dZZEYtWUVZQ1pBSlNLYUlBaVBsMGRnaXdOaXVJckxYZkhkVkRPQm1YUTFSMy12TE9WVDFSR3hoWVkzTEIxMHNaSWJ2QTZy?oc=5",
+        "published": "17h ago",
+        "title_th": "เปรียบเทียบหุ้นกลุ่มสินค้าผู้บริโภค: Airbnb มีความได้เปรียบเชิงโครงสร้างที่เหนือกว่าชัดเจน",
+        "summary_th": "• Airbnb โดดเด่นกว่าหุ้นกลุ่มบริโภคดั้งเดิมด้วยการเป็นผู้นำตลาดที่ไม่มีคู่แข่งทางตรงในสเกลระดับโลก\n• พฤติกรรมผู้บริโภคยุคใหม่ให้ความสำคัญกับการท่องเที่ยวและประสบการณ์ (Experience Economy) มากกว่าการซื้อสินค้าคงทน\n• งบดุลที่สะอาด ปราศจากหนี้สินสุทธิ (Net Cash Position) ทำให้ Airbnb มีความพร้อมในการซื้อหุ้นคืนเพื่อเพิ่มมูลค่าต่อหุ้น",
+        "impact_th": "ยืนยันความแข็งแกร่งเชิงเปรียบเทียบในหมวด Consumer Discretionary",
+        "action_th": "ทยอยสะสมตามแผนการลงทุนระยะยาว",
+        "sentiment": "bullish",
+        "topic": "การเปรียบเทียบเชิงอุตสาหกรรมและความได้เปรียบในการแข่งขัน (Competitive Advantage)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348815"
+      },
+      {
+        "title": "How Investors May Respond To Airbnb Stock AI Search Update",
+        "title_th": "Airbnb อัปเกรดระบบค้นหาด้วย AI: ก้าวสำคัญที่จะเปลี่ยนพฤติกรรมการจองและรายได้ของแพลตฟอร์ม",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQOXg4T2hxYTRIcnNtdFh4RFpCdE1pckpGNDFHNVNiaDBkMnZtRzc2cnBsOTJKYUZaeVhHckNVUXR0MXZ6SzVrLUo4aTNRWEVNSkpTVEF1Y2VEV3ZtT0FLQ3hhOXhsVUVhUEVLMGQwVVdTRDc3d0hOWE5JemxkYWtvQlRwd3FPTHB5RXZQNkx4N0t2clpSdDAtaVpvQ05GcDFR?oc=5",
+        "published": "3h ago",
+        "sentiment": "bullish",
+        "topic": "เทคโนโลยี AI และนวัตกรรมแพลตฟอร์ม",
+        "summary_th": "• Airbnb (ABNB) เปิดตัวฟีเจอร์ AI Search อัจฉริยะ ช่วยแนะนำที่พักและประสบการณ์การท่องเที่ยวแบบเฉพาะบุคคล\n• เพิ่มอัตราการเปลี่ยนผู้ชมเป็นผู้จองจริง (Conversion Rate) และเพิ่มมูลค่าการใช้จ่ายต่อทริป (Gross Booking Value)\n• ตลาดมองเป็นการนำ AI มาประยุกต์ใช้สร้างรายได้จริงได้อย่างมีประสิทธิภาพสูงสุดตัวหนึ่งในกลุ่มท่องเที่ยว",
+        "impact_th": "🟢 ปัจจัยเร่งรายได้ระยะยาว (Catalyst): เสริมสร้างความแข็งแกร่งให้โมเดลธุรกิจและเพิ่ม Free Cash Flow",
+        "action_th": "💡 แผนกลยุทธ์: หุ้นอยู่ใน Top 2 ของพอร์ตที่น่าสะสมเพิ่ม ตั้งรับซื้อในกรอบแนวรับ $150.00 ถึง $153.00",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.227362"
+      },
+      {
+        "title": "The Call Airbnb Bulls Got Right",
+        "title_th": "วิเคราะห์สิ่งที่นักลงทุนกระทิง Airbnb มองถูก: กระแสเงินสดมหาศาลและการขยายตัวสู่บริการใหม่",
+        "source": "Simply Wall Street",
+        "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOUHBIRndjdE4wRklaUEFFc0dHS2NoNTkyamhkc2J5QnN3bWlDc0F0ZEdFc1dwR1Fmem1VSDJ5S05odmhLRkw1MXh5ZGd0TUJaZDRzUl9OX2k5Mk9zNzF3MzF6RGpjSG9GUUVRcTBROFZYZ19idlUwRTB6akY1dTAtcVo0ZnQ2VlVneVZJaURZVmJIUk91YWZNYlpFRmt2U0VfRUFhQVFNRnnSAa4BQVVfeXFMTWs0SzRJMkNrQVhPbDdfcUQzSGFHVUpZODU5dEFQNlFUT0xJLWY3S25ZbnJpRFVPREdnZ1lqU2JlQ0swSmExUTRuMlgyaWQtN1k3czJ5TWZobDhfRk9LRXR3VFRtR1JqaU9CZGt5SmFLNVZicEJDQVA5Mmw2RWVUWDRpQjk2WU56UU1HSTNyZHlQMmNNNlZiOHF1WFJxV1NUX2ZqLUVuTjVZNlhCSGFB?oc=5",
+        "published": "2h ago",
+        "sentiment": "bullish",
+        "topic": "การประเมินมูลค่าหุ้นและความสามารถทำกำไร",
+        "summary_th": "• นักวิเคราะห์ชี้ความสามารถในการสร้างกระแสเงินสดอิสระ (FCF) ของ Airbnb เหนือกว่ากลุ่มโรงแรมดั้งเดิมอย่างเห็นได้ชัด\n• อัตราผลตอบแทนต่อส่วนของผู้ถือหุ้น (ROE) อยู่ในระดับสูงถึง 35% ปราศจากภาระหนี้สินหนัก (D/E เพียง 0.3)\n• ตลาดเริ่มสะท้อนมูลค่าความเป็นผู้นำตลาดที่ยากจะถูกเลียนแบบ",
+        "impact_th": "🟢 คุณภาพงบการเงินยอดเยี่ยม (Fundamental Strength): ROE ระดับ Elite และกระแสเงินสดแกร่ง",
+        "action_th": "💡 แผนกลยุทธ์: ถือลงทุนระยะยาวได้อย่างมั่นใจ เป็นแกนหลักที่ช่วยกระจายความเสี่ยงให้พอร์ต",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.227372"
+      }
+    ]
+  },
+  "BAC": {
+    "updated_at": "2026-10-18T14:51:32.429192",
+    "articles": [
+      {
+        "title": "Bank of America shares drop after third-quarter revenue miss and regulatory penalty",
+        "source": "CNBC",
+        "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBPMXJOY0xGWTJDNzFZOE9zdFNUY2YzLWhfTFZxRzNXNEN1clVndlpIY2VLYjdjdjIweWZJT3dZUG5DMUhoajNIREJVR245VVNDR18zWXRmVGxxcEM0NjVrdkNKZ2ZZaW9DeUJnTjZBbGFETlRtV2k0RUxFUUJKQdIBgwFBVV95cUxNZVgtWWNFdU1VZmpTZWVsT25oa2VuTldmb3praDdHWFo0dl9Za1ZYcVFoZF93RW9kVy1WZzdNUk5QRXhoa196am1JN3dQTFUyM3g5cHV4bTZXMW95REZpSFdyNEI0bExXNlFqVzNlSVNtaTY1VEFCaGhTX0o5QnJZU3hRMA?oc=5",
+        "published": "3d ago",
+        "title_th": "หุ้น Bank of America ย่อตัวหลังรับรู้ค่าปรับทางกฎหมายและรายได้ชะลอตัวระยะสั้นในไตรมาส 3",
+        "summary_th": "• ราคาหุ้น BAC เผชิญแรงขายระยะสั้นจากผลกระทบของค่าปรับจากหน่วยงานกำกับดูแลและรายได้จากสายงานเทรดดิ้งที่ชะลอตัว\n• รายการค่าปรับเป็นค่าใช้จ่ายแบบครั้งเดียว (One-time Settlement) ซึ่งไม่กระทบต่อเสถียรภาพของเงินกองทุน (CET1 Ratio)\n• พอร์ตเงินฝากคุณภาพสูงและรายได้ดอกเบี้ยสุทธิ (Net Interest Income) มีสัญญาณเริ่มแตะจุดต่ำสุดและพร้อมฟื้นตัว",
+        "impact_th": "ข่าวลบระยะสั้นกดดันราคาจนเกิดภาวะ Oversold ทางเทคนิค แต่โครงสร้างพื้นฐานของธนาคารยังแข็งแกร่ง",
+        "action_th": "ไม่จำเป็นต้องตื่นตระหนกขายตัดขาดทุน เป็นจังหวะรอให้ราคาพักฐานเพื่อพิจารณา Smart DCA",
+        "sentiment": "bearish",
+        "topic": "รายงานผลประกอบการและประเด็นทางกฎหมาย (Earnings & Regulatory Updates)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348816"
+      },
+      {
+        "title": "BofA misses profit estimates on trading weakness, books .2 billion charge",
+        "source": "Reuters",
+        "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPSERjcDdENDA2c180cFVhdW01WTVBaEdQdjRvejB6eGpkNklKUE8xM05mX1YybXZmMExUUXVkVDhMZUxGS0g5MWN0S3NtOHk1TjBISzBTWHB6VElZSjFjTHFUdU5sZXZtcHFxa0VybC1qR2Y2R0doZThnbGJoQVE5LVg5bHBDZmFvUm9ONGVUdUszODFvWV9aWlROdnE4NWs5R0FYZmJIVFAxaHZCQlJVRmtidS1IUlhVM1ZIM09MeEk?oc=5",
+        "published": "3d ago",
+        "title_th": "Bank of America รับรู้ภาระค่าใช้จ่าย 1.2 พันล้านดอลลาร์ ตลาดซึมซับข่าวด้านลบไปแล้ว",
+        "summary_th": "• การบันทึกค่าใช้จ่ายพิเศษ 1.2 พันล้านดอลลาร์ส่งผลให้กำไรสุทธิต่ำกว่าคาดการณ์ของตลาดเพียงชั่วคราว\n• นักวิเคราะห์มองว่าการสะสางปัญหาคดีความในอดีตทำให้ธนาคารหมดภาระผูกพันและมีความชัดเจนต่อผลการดำเนินงานในอนาคต\n• อัตราผลตอบแทนเงินปันผลยังคงมีความปลอดภัยและได้รับการสนับสนุนจากกระแสเงินสดที่สม่ำเสมอ",
+        "impact_th": "การรับรู้ค่าใช้จ่ายจบลงในไตรมาสนี้ ช่วยลดความไม่แน่นอนในงบการเงินงวดถัดไป",
+        "action_th": "ถือครองรับเงินปันผล และรอการดีดตัวกลับเมื่อตลาดหันกลับมาโฟกัสการเติบโตของกำไรปกติ",
+        "sentiment": "bearish",
+        "topic": "การวิเคราะห์งบการเงินและรายการพิเศษ (Special Charges & Core Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348817"
+      },
+      {
+        "title": "Bank of America stock falls after earnings miss and $1.2 billion penalty",
+        "title_th": "หุ้น Bank of America ย่อตัวหลังกำไรต่ำกว่าคาดและรับผลกระทบค่าปรับ 1.2 พันล้านดอลลาร์",
+        "source": "Quartz",
+        "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5zdmYtQWFhUmFkSE9EU2xPVXB6aWt4Ykc4aTl0OXoyMmpMZnV0OVU0VEJxczdZN2J2SzFQY1pHaXJSMUNFaW5ISVJ6aVMyZ3pxaDFoTHdGOUFYanl5ZnA0eVhUOFV1NU8wQVlfWkFmc1I?oc=5",
+        "published": "2d ago",
+        "sentiment": "bearish",
+        "topic": "รายงานผลประกอบการและค่าใช้จ่ายพิเศษ",
+        "summary_th": "• หุ้น Bank of America (BAC) เผชิญแรงเทขายหลังมีค่าปรับทางกฎหมายและข้อตกลงทางการเงิน 1.2 พันล้านดอลลาร์\n• ค่าใช้จ่ายดังกล่าวเป็นรายการพิเศษแบบครั้งเดียว (One-off Non-operating Item) ไม่ได้กระทบโครงสร้างการปล่อยสินเชื่อหลัก\n• รายได้ดอกเบี้ยสุทธิ (NII) และธุรกิจบริหารความมั่งคั่งยังคงรักษาการเติบโตได้ดี",
+        "impact_th": "🔴 ข่าวลบระยะสั้นที่มีผลกระทบจำกัด (One-off Event): กดดันราคาทางจิตวิทยา แต่ไม่กระทบความมั่นคงของฐานะเงินกองทุน",
+        "action_th": "💡 แผนกลยุทธ์: RSI เข้าสู่โซน Oversold ลึก (24.0) ตั้งรับที่กรอบแนวรับ $51.00 ห้ามไล่ราคา มีจุดตัดขาดทุนที่ $49.25",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.237342"
+      },
+      {
+        "title": "Bank of America stock sinks as $1.2 billion fine weighs on Q3 earnings",
+        "title_th": "วิเคราะห์งบ Q3 ของ Bank of America: ค่าปรับฉุดกำไรระยะสั้น แต่เป้าหมายสถาบันยังมี Upside เกิน 23%",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQeGhQZ2Y1QmVxYjNaMjZSTzlYcktKdktvMk5WSU8xVUFMRVdWQ1oxQldDbk1EeF83aHBFam8yblVyOXQyaVYyUFZ0QUpmSzdFXzNGcFpzSDZLZWlFbV81a3A5aVl2M0xzTm01S3hrYXFvUE9hcEJLUFlraERaa25Bc3ltcXd4VG1MOU1QSEdOb253WTBJUnhtaFlOTHhRZW9mNFhldzhDRVVwUlczak9OUC1iWUQ3SXFSNjdGUC1rbFNMaVE?oc=5",
+        "published": "3d ago",
+        "sentiment": "mixed",
+        "topic": "รายงานผลประกอบการและมุมมองนักวิเคราะห์",
+        "summary_th": "• นักวิเคราะห์วอลล์สตรีทมองว่าการปรับฐานของราคาหุ้นเป็นโอกาสสะสมของนักลงทุนที่เน้นคุณค่า\n• สถาบันการเงินส่วนใหญ่ยังคงคำแนะนำ Buy พร้อมราคาเป้าหมายเฉลี่ยที่สูงกว่าราคาตลาดกว่า +23.4%\n• คาดการณ์กำไรจะกลับมาเติบโตเป็นปกติในไตรมาส 4 เมื่อไม่มีภาระค่าปรับพิเศษซ้ำซ้อน",
+        "impact_th": "🟡 พลิกเป็นโอกาสสำหรับนักลงทุนระยะยาว (Deep Value Opportunity): ราคาเทรดด้วย PEG ต่ำ 0.9",
+        "action_th": "💡 แผนกลยุทธ์: แบ่งเงินสะสมตามแนวรับ Bollinger Band $51.00 ถือรอการฟื้นตัวสู่แนวต้านเป้าหมาย $59.00",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.237348"
+      }
+    ]
+  },
+  "MNST": {
+    "updated_at": "2026-10-18T14:51:32.439791",
+    "articles": [
+      {
+        "title": "Monster Beverage (MNST) Stock Looks Reasonably Priced On Future Cash Flow",
+        "source": "Simply Wall Street",
+        "link": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQRWlfZUt1WmRNY2VaY25tdHRtcmFLOUhQZWFpTkxTaHlOSFRmbVJMdnFXWXFETUpIZzNrczc4b0dHVG14QkJlcFJoZjJMRlRMd09uZm5KclhVZ3FGTW9uSnh0S1QtTGo5NVVYX1QwQ190Q0huSVRJSUZQRTVaMDBNbEJHUm1RRjVoNWVfQ0dTNlZDem9WNWZwMzM3UXl5UkVPWVA5R29JejRpTWY4cWducFVTM1Q5Zmg2WW9JbkRydXFDbDlQYmZhbWFXRTFvVW5OVHZyR3dId09xczh3bW16VlFn0gHnAUFVX3lxTE9tQktyT0lGNWEyWGNpU0k3Mm00LTdBY0RfZk1vbWdRZ2xCcmdSMXlVRXFaRVN4MjF3OEplOVFXTGVsUndQZFVhT3ctdUZjWFNoejZBQWMtaTh6OV8tdVkzVHdWY0dvQWFlT09tQ0UwZDg2UWRUeXB5ckxhNTNrQmFWT2t6UUdrdlRxdUVELXlNNzdSUHNpWWdacXFBQm9ZUU5jb0FIMW5fUXg1cE10OVh5LUtvNnJNRElPbzJFeFFlUTF5OEd2QVRSVWNsSUwyU2pvY1JBb1c5QmxCU2tNcWEyWDBpZGI3QQ?oc=5",
+        "published": "1d ago",
+        "title_th": "หุ้น Monster Beverage (MNST) มีระดับราคาที่สมเหตุสมผลเมื่อประเมินจากกระแสเงินสดในอนาคต",
+        "summary_th": "• แบบจำลองกระแสเงินสดคิดลด (Discounted Cash Flow) ชี้ว่าราคาหุ้น MNST ในปัจจุบันซื้อขายต่ำกว่ามูลค่าที่แท้จริง\n• บริษัทมีสถานะทางการเงินที่ไร้ความเสี่ยงด้านหนี้สินด้วยสัดส่วน D/E เท่ากับ 0.0 และมีเงินสดสำรองมหาศาล\n• ตลาดเครื่องดื่มพลังงานยังคงมีอัตรากำไรขั้นต้นสูงกว่า 53% และมีอำนาจในการกำหนดราคา (Pricing Power) ต่อเนื่อง",
+        "impact_th": "ช่วยยืนยันว่าหุ้นมีปัจจัยพื้นฐานรองรับและมี Margin of Safety สำหรับการลงทุนระยะยาว",
+        "action_th": "ถือครองเป็นหุ้นปลอดภัยต้านทานเงินเฟ้อในพอร์ต",
+        "sentiment": "bullish",
+        "topic": "การประเมินมูลค่าหุ้นจากกระแสเงินสด (Cash Flow & Valuation Model)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348819"
+      },
+      {
+        "title": "If You Invested  In Monster Beverage Stock 15 Years Ago, You Would Have This Much Today",
+        "source": "Benzinga",
+        "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPd09qM19WaXFWck5YYngzNGFyV3hSSHN2N2VrY05mdlBzdVYwT21NcS00N1pJdXd5NTlTSFlIWndTQ1owcEZVa0ladThob0U3YW1BaGYyckNIVl9jMGFnLUcwY2lrRTdlZFBWUTNIOEhGbHNfNnVMTUY3SXFuZzJXTmJEY1Rld3NsWGxQbVpVZHAyal9Na1ZwXy1aQnU4dUJMWTR3U2xDQ3BKMkxzbTR0UUhqb1VmUEx4LVB1YXdHaFVSNWZH?oc=5",
+        "published": "3d ago",
+        "title_th": "สถิติผลตอบแทนย้อนหลัง 15 ปีของ Monster Beverage สะท้อนพลังของการเติบโตแบบทบต้น",
+        "summary_th": "• Monster Beverage เป็นหนึ่งในหุ้นที่สร้างผลตอบแทนสูงสุดในประวัติศาสตร์ตลาดหุ้นสหรัฐฯ ด้วยผลตอบแทนทบต้นระดับปรากฏการณ์\n• ความสำเร็จเกิดจากแบรนด์ที่แข็งแกร่ง เครือข่ายการจัดจำหน่ายระดับโลกผ่านพันธมิตรกับ Coca-Cola\n• บริษัทยังคงเดินหน้ารักษาความได้เปรียบทางการแข่งขันและขยายส่วนแบ่งการตลาดในภูมิภาคใหม่ๆ ทั่วโลก",
+        "impact_th": "ย้ำเตือนถึงคุณค่าของการถือครองหุ้นผู้นำตลาดที่ยอดเยี่ยมในระยะยาวเพื่อสร้างความมั่งคั่ง",
+        "action_th": "คงสถานะการลงทุน ไม่ขายทำรอบตามความผันผวนระยะสั้น",
+        "sentiment": "bullish",
+        "topic": "ประวัติผลตอบแทนและความทนทานของแบรนด์ (Compounding Track Record & Brand Power)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348820"
+      },
+      {
+        "title": "Monster Beverage vs. PepsiCo: Which Consumer Goods Stock Is a Better Buy in 2026?",
+        "title_th": "เทียบมวย Monster Beverage กับ PepsiCo: หุ้นเครื่องดื่มตัวไหนน่าซื้อกว่ากันในปี 2026?",
+        "source": "The Motley Fool",
+        "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPZWh1T1lETzFJdlphLXFPdjU2d0duYU9UTlN3S1JtbU9vLW1rc0JqbTJSS3BMQmV0b0p2TGdTeGJObW1yQ09DSGRyWWZhenBsQ0gxc3dacWw5eFVuQUwwRGN5dXdiRDlrbDVWZi1IaWlnRmFfNW4zNzJ6WHNjRldzNWRwVVg3SC1tbFlEZDVNZVl4el80MGJwVVlrY2p0a0NOb2pfenJXaTR6bzJtbUxJNUl5QnNZM0Jnemw3RzNJZm9GNzc1djZnNnVRMA?oc=5",
+        "published": "2d ago",
+        "sentiment": "bullish",
+        "topic": "การเปรียบเทียบคู่แข่งในอุตสาหกรรม",
+        "summary_th": "• Monster Beverage (MNST) ชนะด้านอัตราการเติบโตของรายได้และกำไรสุทธิ โดยไม่มีภาระหนี้สินเลย (D/E เท่ากับ 0.0)\n• ส่วนแบ่งการตลาดเครื่องดื่มชูกำลังในระดับโลกยังคงขยายตัวได้ดี โดยเฉพาะในตลาดเอเชียและละตินอเมริกา\n• มีงบดุลแข็งแกร่งเป็นปราการป้องกันความผันผวนของภาวะเศรษฐกิจ",
+        "impact_th": "🟢 แข็งแกร่งเหนือคู่แข่ง (Competitive Advantage): ฐานะการเงินระดับป้อมปราการ (Zero Debt) และ ROE 26%",
+        "action_th": "💡 แผนกลยุทธ์: วันประกาศงบใกล้เข้ามาใน 11 วัน ห้ามซื้อเพิ่มก่อนงบออก ให้ถือรอประเมินผลงาน",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.245155"
+      },
+      {
+        "title": "State of Alaska Department of Revenue Acquires 65,514 Shares of Monster Beverage Corporation $MNST",
+        "title_th": "กองทุนรัฐอลาสกาเข้าซื้อหุ้น Monster Beverage เพิ่มกว่า 65,000 หุ้น สะท้อนความเชื่อมั่นกองทุนรัฐบาล",
+        "source": "MarketBeat",
+        "link": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxOSzgydy1KZS00NDBhUjdxeE10LXozSjg5X2lyN0V3Tjc2YnBBcEtGa2hVdnQwd3R2VXAtR09PT296bW9wbGxrclRRc0Q3WnFZVFFvMk9ObFIzVkhhVzFWMERNOUVVSXZ4RjlpVXZFbkg1ZXBEZWI5T3AtMHVnQWpBMDFsTEp0c3ZNazljS3VORHNzbm5MVGFVTURMR3BsZF9uWVNCUGx6dVFWSkQySHQ1UGFaYnZ1YXV2WFo3TUc0NEd4UVFNWFNhbWtFTHBETzhPTTNsTnQ2T2JldFY4Zkw4Q0xRTm9iWHBuRkQtdkVn?oc=5",
+        "published": "15h ago",
+        "sentiment": "bullish",
+        "topic": "การเข้าซื้อของกองทุนสถาบันรัฐ",
+        "summary_th": "• กองทุนเพื่อการลงทุนภาครัฐของรัฐอลาสกา (State of Alaska) เพิ่มสัดส่วนการถือครองหุ้น MNST อย่างมีนัยสำคัญ\n• กองทุนสถาบันยังคงเข้าสะสมหุ้นกลุ่มสินค้าอุปโภคบริโภคที่มีความทนทานต่อเงินเฟ้อ\n• เป็นสัญญาณบวกยืนยันความมั่นคงของการลงทุนระยะยาว",
+        "impact_th": "🟢 ความเชื่อมั่นจากสถาบัน (Institutional Inflow): มีเม็ดเงินกองทุนระยะยาวคอยรองรับแนวรับ",
+        "action_th": "💡 แผนกลยุทธ์: ถือสถานะทำกำไรต่อไปตามรอบเทคนิคัล รอลุ้นงบการเงินวันที่ 29 ต.ค.",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.245160"
+      }
+    ]
+  },
+  "APP": {
+    "updated_at": "2026-10-18T14:51:32.443736",
+    "articles": [
+      {
+        "title": "AppLovin Stock Has One Thing Left To Prove",
+        "source": "Trefis",
+        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPOHN0cDYwQkdqN3hoSV9rTlJjTUhId2xoNkFjenYwcnpMX0Y4bHh1NkFTZ3NyUXhyWTBQZWhLdFlleEFrZ2pRMVduMmRZX1dLdjhubXhNeGE1ZzBNT01nR2FqZlpqY2ZiSkgyeGI0cjdLNkhxTkdJbXRQN0ZxZXVIalA1RVRNSzRfR3JCRVg1VmZabUg5cXpvZDllaWllOXpHeEFBXw?oc=5",
+        "published": "2d ago",
+        "title_th": "สิ่งที่ AppLovin ต้องพิสูจน์เพื่อก้าวสู่การเป็นยักษ์ใหญ่แพลตฟอร์มโฆษณา AI เต็มตัว",
+        "summary_th": "• บทวิเคราะห์ระบุว่าหลังจากราคาหุ้นพุ่งขึ้นอย่างร้อนแรง AppLovin ต้องพิสูจน์การขยายโมเดล AI นอกเหนือจากตลาดเกมมือถือ\n• การเจาะตลาดโฆษณา E-commerce และ Connected TV เริ่มแสดงผลลัพธ์ที่เป็นรูปธรรมและมีตลาดรวม (TAM) ที่ใหญ่กว่าเดิมหลายเท่า\n• ตราบใดที่อัลกอริทึม AXON 2.0 ยังคงส่งมอบผลตอบแทนค่าโฆษณา (ROAS) ให้แก่ผู้ลงโฆษณาได้สูงสุด การเติบโตจะยังคงดำเนินต่อไป",
+        "impact_th": "ให้ภาพทั้งโอกาสการเติบโตมหาศาลและความคาดหวังสูงของตลาดที่บริษัทต้องส่งมอบผลงานให้ได้ตามนัด",
+        "action_th": "ถือครองพร้อมติดตามตัวเลขการเติบโตของรายได้นอกกลุ่มเกมในรายงานงบไตรมาสถัดไป",
+        "sentiment": "neutral",
+        "topic": "การขยายตัวของเทคโนโลยีและตลาดเป้าหมายใหม่ (AI Model Expansion & TAM)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348821"
+      },
+      {
+        "title": "AppLovin Stock Sinks To 52-Week Low - Here's Why",
+        "source": "Benzinga",
+        "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOOUotazFoTkp3RGdlVHRVbWhoTU9iN3pWVHNSSXh1WkYtc0l5ZGhoUGVxa2ZCZE1GS2Fva2ZXZ0FuTnBmSzNBeGRhYWt2V2stOFN2S3NQOVdPdTNxMGZscExWRjNXYjY2NmUzWE5sSmtpODNsWXpneE9kWWdBTHNta2N2c1NCSlBRdzdSa2pmNEJiLXY2bjdYVDVLemNMUzZhN2QzSllSalBQSlJz?oc=5",
+        "published": "2d ago",
+        "title_th": "ไขข้อข้องใจเบื้องหลังการพักฐานของหุ้น AppLovin และมุมมองต่อมูลค่าพื้นฐาน",
+        "summary_th": "• ข่าวการพักฐานสะท้อนการปรับสมดุลพอร์ตของกองทุนขนาดใหญ่หลังราคาหุ้นปรับตัวขึ้นมาอย่างรวดเร็วในปีนี้\n• ตัวเลขกำไรจากการดำเนินงานและกระแสเงินสดอิสระยังคงสร้างสถิติสูงสุดใหม่โดยไม่พบปัญหาการชะลอตัวเชิงโครงสร้าง\n• อัตราผลตอบแทนต่อส่วนของผู้ถือหุ้น (ROE) สูงกว่า 200% ชี้ว่าบริษัทมีประสิทธิภาพในการสร้างผลกำไรสูงสุดแห่งหนึ่งในตลาด",
+        "impact_th": "การพักฐานช่วยคลายความตึงตัวทางเทคนิคและสร้างฐานราคาใหม่ที่มั่นคงขึ้น",
+        "action_th": "ถือครองสถานะเดิมโดยอาศัยกำไรสะสมที่มีอยู่เป็นเบาะรองรับความผันผวน",
+        "sentiment": "neutral",
+        "topic": "การปรับฐานราคาและความสามารถในการทำกำไร (Technical Retracement & High ROE)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348821"
+      },
+      {
+        "title": "Are You Overpaying For AppLovin Stock Versus Its Rivals?",
+        "title_th": "วิเคราะห์ Valuation หุ้น AppLovin: ราคาปัจจุบันแพงเกินไปเมื่อเทียบกับคู่แข่งหรือไม่?",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNRUJLRm1SdWUwYl9RRGVoQ3FlaHc3TmpKaWpLanN0U1p6TkdVV202ODZHc1J5YmJFMVgtdUthb3B2OW1oVzhwNGxLbkdKSWR4bXBsNkNnRjNzVjZzYzFXMmRpM3AyUHN5S3Z2dllrUkVBal96a3d0dEVQWm9VQU1wcXE4RXE2N0FtLXZ5LVZpSjNiOWdDeUhBakJzUHVweG1wWG4zT0RYTQ?oc=5",
+        "published": "1d ago",
+        "sentiment": "mixed",
+        "topic": "การประเมินมูลค่าหุ้นและการแข่งขัน",
+        "summary_th": "• หุ้น AppLovin (APP) ทำผลตอบแทนอย่างก้าวกระโดดในปีนี้ จนทำให้เกิดการถกเถียงเรื่องความตึงตัวของ Valuation\n• อย่างไรก็ดี โมเดล AI ยิงโฆษณา AXON 2.0 สร้างกำไรสุทธิเติบโตเกือบ 90% YoY ส่งผลให้ค่า PEG ยังต่ำเพียง 0.23\n• มีความผันผวนสูงจากแรงเก็งกำไรและการปรับพอร์ตของกองทุนเฮดจ์ฟันด์",
+        "impact_th": "🟡 ราคาผันผวนสูง (High Beta Volatility): ธุรกิจเติบโตเร็วมาก แต่ต้องเผชิญแรงขายทำกำไรเป็นระยะ",
+        "action_th": "💡 แผนกลยุทธ์: หุ้นกำลังอยู่ในสถานะ Plunge Day ห้ามรีบร้อนตั้งรับมีดที่กำลังหล่น รอแท่งเทียนสร้างฐานนิ่งก่อน",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.249279"
+      },
+      {
+        "title": "AppLovin Corporation",
+        "title_th": "เจาะลึกระบบนิเวศ AppLovin: ธุรกิจเทคโนโลยีโฆษณาบนมือถือที่มี ROE ทะลุ 200%",
+        "source": "Simply Wall Street",
+        "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9vVnJhV25ESUJkWDY0cXpTanZpRFdBSU9INUs5amJYLVRYQ1BCWFdpbUhoY09kWElMZGhCNUZXNnpMVV9oUU9LaHFSRzVWalVFQmQ2cHV4UzVWbTFsdWI3ZFl3Q3Iyd0dL?oc=5",
+        "published": "3d ago",
+        "sentiment": "bullish",
+        "topic": "การเติบโตของธุรกิจและความสามารถในการทำกำไร",
+        "summary_th": "• AppLovin มีอัตรากำไรและ ROE สูงเป็นประวัติการณ์ (ROE สูงกว่า 200%) จากการขยายฐานลูกค้านอกกลุ่มเกมมือถือ\n• กระแสเงินสดอิสระระดับ $4.5 พันล้านดอลลาร์สะท้อนความสามารถในการแปลงรายได้เป็นเงินสดแท้จริง\n• นักวิเคราะห์วอลล์สตรีทกว่า 28 แห่งยังคงให้คำแนะนำ Buy พร้อมเป้าหมายเฉลี่ยที่สูงถึง $481",
+        "impact_th": "🟢 พื้นฐานเติบโตระดับสัตว์ประหลาด (Hyper Growth): กำไรเติบโตเด่น แต่ต้องบริหารความผันผวนอย่างเคร่งครัด",
+        "action_th": "💡 แผนกลยุทธ์: ถือครองตามแผนบริหารความเสี่ยง รักษาระดับ Stop Loss ไว้ที่ $244.72",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.249285"
+      }
+    ]
+  },
+  "VOO": {
+    "updated_at": "2026-10-18T14:51:32.451499",
+    "articles": [
+      {
+        "title": "The Top S&P 500 ETFs for October 2026: IVV, VOO, SPY and SPYM",
+        "source": "NerdWallet",
+        "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFAwOVFpQTBacEtRYlRMTWhJT0Ryb0pNNG9aXzVkLVBGTUF0cVNSRXIzS1lnZ0Y4UFI1cWUtM3JUbl9aT3p2RmYycnY2LTZuQS1XVDBGYzdCakl5b1BqcmNzQUtSN1k?oc=5",
+        "published": "17d ago",
+        "title_th": "สรุปสุดยอดกองทุนดัชนี S&P 500 ประจำเดือน: VOO ยังคงครองตำแหน่งกองทุนที่คุ้มค่าที่สุด",
+        "summary_th": "• NerdWallet เปรียบเทียบกองทุนดัชนี S&P 500 ชั้นนำ และยกให้ VOO เป็นตัวเลือกอันดับหนึ่งสำหรับนักลงทุนระยะยาว\n• ค่าธรรมเนียม Expense Ratio ที่ต่ำเพียง 0.03% ช่วยให้นักลงทุนประหยัดต้นทุนสะสมได้มหาศาลตลอดช่วงเวลาการลงทุน 10-20 ปี\n• การกระจายความเสี่ยงใน 500 บริษัทผู้นำของเศรษฐกิจสหรัฐฯ ให้เสถียรภาพและผลตอบแทนที่เหนือกว่าการเลือกหุ้นรายตัวส่วนใหญ่",
+        "impact_th": "ยืนยันว่า VOO คือเสาหลักที่มั่นคงที่สุดสำหรับการสร้างความมั่งคั่งระยะยาวในพอร์ต",
+        "action_th": "สบายใจถือครองและใช้วินัยสะสมเพิ่มทุกรอบเงินออม",
+        "sentiment": "bullish",
+        "topic": "การเปรียบเทียบกองทุนดัชนีและต้นทุนการถือครอง (Index Fund Comparison & Low Expense Ratio)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348824"
+      },
+      {
+        "title": "Is VOO Still the Best S&P 500 ETF You Can Own? Here's How It Stacks Up Against the Alternatives.",
+        "source": "The Motley Fool",
+        "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPb2R5Nl9jQ0hkVm9uS0twVUpZU3FrNjlfRl9LR2NyVHJfc0ZLaVhCQjhPY1ppclRNbEJrVXl2V1M3bUc5b1BuLUE2WF9qVVIwWTFIXzRULUs4RkRSY0VyaDU5N1c4WFJobC16UF9XMGdvWlhuZS1peHZaMjNjWngyZ0ZZd2RUV29JRm16bHBRaElMNlFSWjF0bg?oc=5",
+        "published": "12d ago",
+        "title_th": "VOO ยังคงเป็นกองทุน ETF S&P 500 ที่ดีที่สุดหรือไม่ เมื่อเทียบกับทางเลือกอื่นในตลาด",
+        "summary_th": "• บทวิเคราะห์เปรียบเทียบชี้ชัดว่าโครงสร้างกองทุนแบบร่วมทุนของ Vanguard ทำให้ไม่มีแรงกดดันเรื่องผลกำไรส่วนต่างของผู้จัดการกองทุน\n• อัตราผลตอบแทนหลังหักค่าใช้จ่ายของ VOO ยังคงอยู่ในเกณฑ์ยอดเยี่ยมและมี Tracking Error ที่ต่ำมากเกือบเป็นศูนย์\n• เหมาะอย่างยิ่งสำหรับการเป็นเครื่องยนต์ผลิตผลตอบแทนทบต้น (Compounding Machine) ประจำพอร์ตโฟลิโอ",
+        "impact_th": "ตอกย้ำความเชื่อมั่นว่าพอร์ตมีสินทรัพย์แกนกลางที่แข็งแกร่งและปลอดภัยที่สุดในตลาดโลก",
+        "action_th": "รักษาเป็นสัดส่วนหลักของพอร์ตเพื่อถ่วงดุลความเสี่ยงจากหุ้นเติบโต",
+        "sentiment": "bullish",
+        "topic": "ประสิทธิภาพของกองทุนและความได้เปรียบระยะยาว (Vanguard Structure & Tracking Efficiency)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:51:32.348825"
+      },
+      {
+        "title": "3 Reasons the Vanguard S&P 500 ETF Could Be Worth Holding for the Next 20 Years",
+        "title_th": "3 เหตุผลที่กองทุน Vanguard S&P 500 ETF (VOO) คุ้มค่าที่จะถือครองต่อเนื่องในอีก 20 ปีข้างหน้า",
+        "source": "The Globe and Mail",
+        "link": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxNRW9rcGFfcFM3WU5GeGV3ekt5RVBTS09Hc0ptZXpCWHFObTRSdVRzTUVQaE1zOGQ3cE1kcWNtQXY0VS1sYjcwTERMY3pYeWdxSnVuM3NVTGtwRjcteUFSaGt2QWdiYkh1NVJWOEpkQlQ0S1pKZUFQaVN4NXB2LVBQQ3Q3bk1xMFk2TkZnY20tMF8ta3k4X3JGaHdibTVyUkJvOUc4ak9XM3ZYUlprS1lxdWREaWFvUWtLdFQ5WTBZWmhxTGotUlIyYzdfZlhWMjV1T1BYR29ORDBSWW12OFE1dWswUllJWHZwcGRSdHZmd2RvVVY5clNr?oc=5",
+        "published": "10h ago",
+        "sentiment": "bullish",
+        "topic": "การลงทุนระยะยาวและกองทุนดัชนีรวม",
+        "summary_th": "• VOO เป็นเครื่องมือลงทุนที่คัดกรอง 500 บริษัทผู้นำทางเศรษฐกิจที่ดีที่สุดของโลกโดยอัตโนมัติ\n• ค่าธรรมเนียมการบริหารต่ำมากเพียง 0.03% ต่อปี ช่วยรักษาผลตอบแทนทบต้นในระยะยาวได้อย่างเต็มเม็ดเต็มหน่วย\n• มีสถิติสร้างผลตอบแทนเฉลี่ยย้อนหลัง 10% ต่อปี ชนะผู้จัดการกองทุนส่วนใหญ่ในตลาด",
+        "impact_th": "🟢 ความปลอดภัยสูงสุด (Core Anchor): เป็นกระดูกสันหลังที่ช่วยลดความผันผวนให้พอร์ตลงทุน",
+        "action_th": "💡 แผนกลยุทธ์: อันดับ 1 ของพอร์ตสำหรับการเติมเงินใหม่เพื่อกระจายความเสี่ยง ตั้งรับซื้อในโซน $666 ถึง $680",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.261455"
+      },
+      {
+        "title": "Prediction: This Is What a $5,000 Investment in the Vanguard S&P 500 ETF (VOO) Will Be Worth by 2040",
+        "title_th": "ประเมินผลตอบแทนเงินลงทุน 5,000 ดอลลาร์ใน VOO จะเติบโตเป็นเท่าใดในปี 2040 ด้วยพลังดอกเบี้ยทบต้น",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQeURQUU43UzY2MWpoNEJ0Z0l5eWw4ZWR4V0N5cnN6RGE0R0hoOTlhZW5nNFJUOXY4NHJNOUFjRVozc0VvbVFmNHp6dUFOb2QyRXJ6dWwyOVc2dkViMFFnbnE5RUlkT2FDWG9rLWJJNFpSbTR4R0JQcGZLY09XM3YtV0tZaTVFN1R3eXJ5TWZQOVdxWGJFTmVYNDlsOUxtZUxVN1g0?oc=5",
+        "published": "7d ago",
+        "sentiment": "bullish",
+        "topic": "พลังผลตอบแทนทบต้นระยะยาว",
+        "summary_th": "• การคำนวณเชิงสถิติจากผลตอบแทนในอดีตชี้ว่าเงินลงทุนใน VOO มีโอกาสเติบโตขึ้น 3 ถึง 4 เท่าในระยะ 15 ปีข้างหน้า\n• การสร้างวินัยสะสมแบบสม่ำเสมอ (DCA) ช่วยลดความเสี่ยงจากจังหวะการจับเวลาตลาด (Market Timing)\n• เป็นทางเลือกที่ดีที่สุดในการสร้างความมั่งคั่งที่ยั่งยืน",
+        "impact_th": "🟢 เสริมสร้างวินัยการเงินระยะยาว (Wealth Compounding): ลดความเครียดและเพิ่มเสถียรภาพเงินลงทุน",
+        "action_th": "💡 แผนกลยุทธ์: ทยอยสะสมเพิ่มทุกครั้งที่ตลาดหุ้นย่อตัวเพื่อถ่วงน้ำหนักพอร์ตให้สมดุล",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-18T14:45:29.261460"
       }
     ]
   }

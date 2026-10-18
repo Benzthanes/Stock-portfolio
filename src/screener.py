@@ -29,6 +29,18 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     Returns computed signals, score points, and risk metrics.
     """
     close = data.get("close") or 0.0
+    open_price = data.get("open")
+    if open_price is None or open_price <= 0:
+        open_price = close
+    low = data.get("low") or close
+    high = data.get("high") or close
+    change_pct = data.get("change") or 0.0
+
+    # Candle & Momentum Confirmation (Falling Knife Shield)
+    is_green_candle = (close >= open_price)
+    is_red_candle = (close < open_price)
+    is_plunge_day = (change_pct <= -3.0) or (is_red_candle and change_pct <= -1.5)
+
     rsi = data.get("RSI")
     rsi_prev = data.get("RSI[1]")
     rsi_weekly = data.get("RSI|1W")
@@ -49,14 +61,15 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     atr = data.get("ATR")
     vol = data.get("volume") or 0.0
     avg_vol_30 = data.get("average_volume_30d_calc") or 1.0
-    change_pct = data.get("change") or 0.0
-    low = data.get("low") or close
 
     # Fundamentals
     rev_growth_yoy = data.get("total_revenue_yoy_growth_ttm")
     net_inc_growth_yoy = data.get("net_income_yoy_growth_ttm")
     peg = data.get("price_earnings_growth_ttm")
     pe = data.get("price_earnings_ttm")
+    roe = data.get("return_on_equity_fq")
+    debt_to_equity = data.get("debt_to_equity_fq")
+    fcf = data.get("free_cash_flow_ttm")
     rec_mark = data.get("recommendation_mark")
 
     # 1. 200-Day Macro Trend
@@ -81,18 +94,22 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     # 2. Multi-Indicator Momentum & Confluence
     rsi_hook_up = (rsi > rsi_prev) if (rsi is not None and rsi_prev is not None) else False
 
-    # Stochastic RSI Crossover
+    # Stochastic RSI Crossover (require stoch_k >= 10.0 to filter false crosses at sub-10 floor)
     stoch_cross_up = False
     fresh_stoch_cross = False
     if stoch_k is not None and stoch_d is not None:
         stoch_cross_up = (stoch_k > stoch_d)
         if stoch_k_prev is not None and stoch_d_prev is not None:
-            fresh_stoch_cross = (stoch_k_prev <= stoch_d_prev) and (stoch_k > stoch_d) and (stoch_k <= 35.0)
+            fresh_stoch_cross = (stoch_k_prev <= stoch_d_prev) and (stoch_k > stoch_d) and (10.0 <= stoch_k <= 35.0)
 
-    stoch_bullish = stoch_cross_up and (stoch_k is not None and stoch_k <= 40.0)
+    stoch_bullish = stoch_cross_up and (stoch_k is not None and 10.0 <= stoch_k <= 40.0)
     macd_tick_up = (macd_hist > macd_hist_prev) if (macd_hist is not None and macd_hist_prev is not None) else False
     mfi_oversold = (mfi <= 30.0) if mfi is not None else False
     mfi_extreme = (mfi <= 20.0) if mfi is not None else False
+
+    # Actionable Confirmation: Needs green candle or RSI hook up, and not in active plunge
+    has_reversal_confirmation = is_green_candle or rsi_hook_up
+    is_actionable = has_reversal_confirmation and not is_plunge_day
 
     # Falling Knife Filter (ADX > 35 indicates strong trending plunge)
     adx_falling_knife = (adx > 35.0) if adx is not None else False
@@ -115,7 +132,7 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     rr_ratio = round(reward / risk, 1)
 
     # Key Support & Resistance Levels
-    if sma200 and sma200 > 0 and abs(close - sma200) / close <= 0.08:
+    if sma200 and sma200 > 0 and sma200 < close and (close - sma200) / close <= 0.08:
         key_support = round(sma200, 2)
         support_desc = "เส้น 200 วัน (SMA 200)"
     elif bb_lower and bb_lower > 0 and bb_lower < close:
@@ -129,6 +146,9 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     if target_ma and target_ma > close:
         key_resistance = round(target_ma, 2)
         resistance_desc = "เส้น 50 วัน (Mean Reversion)"
+    elif sma200 and sma200 > close:
+        key_resistance = round(sma200, 2)
+        resistance_desc = "เส้น 200 วัน (SMA 200)"
     elif bb_upper and bb_upper > close:
         key_resistance = round(bb_upper, 2)
         resistance_desc = "ขอบบน Bollinger Band"
@@ -218,17 +238,60 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         score_points += 0.5
         signal_tags.append(f"High Vol ({vol_ratio:.1f}x)")
 
-    # Fundamental bonuses / penalties
-    if rev_growth_yoy is not None and rev_growth_yoy >= 15.0:
+    # Candle price action signals
+    if is_green_candle:
         score_points += 0.5
-        signal_tags.append(f"Rev Growth +{rev_growth_yoy:.0f}% 🚀")
-    elif rev_growth_yoy is not None and rev_growth_yoy < 0.0:
+        signal_tags.append("Green Reversal Candle 🕯️🟢")
+    elif is_plunge_day:
         score_points -= 1.0
-        signal_tags.append("⚠️ Neg Rev Growth")
+        signal_tags.append("⚠️ Plunge Day (มีดยังหล่น)")
 
-    if peg is not None and 0.0 < peg <= 1.5:
+    # Universal Long-Term Value & Fundamental Quality (Across All Sectors)
+    if roe is not None:
+        if roe >= 25.0:
+            score_points += 1.5
+            signal_tags.append(f"Elite ROE ({roe:.0f}%) 🏆")
+        elif roe >= 15.0:
+            score_points += 1.0
+            signal_tags.append(f"High ROE ({roe:.0f}%) 💎")
+        elif roe < 0.0:
+            score_points -= 1.5
+            signal_tags.append("⚠️ Neg ROE Trap")
+
+    if fcf is not None and fcf > 0:
         score_points += 0.5
-        signal_tags.append(f"Attractive PEG {peg:.1f} 💎")
+        signal_tags.append("FCF Cash Cow 💵")
+
+    if rev_growth_yoy is not None:
+        if rev_growth_yoy >= 15.0:
+            score_points += 1.0
+            signal_tags.append(f"Rev Growth +{rev_growth_yoy:.0f}% 🚀")
+        elif rev_growth_yoy >= 5.0:
+            score_points += 0.5
+            signal_tags.append(f"Rev Growth +{rev_growth_yoy:.0f}%")
+        elif rev_growth_yoy < 0.0:
+            score_points -= 1.5
+            signal_tags.append("⚠️ Neg Rev Trap")
+
+    if peg is not None:
+        if 0.0 < peg <= 1.2:
+            score_points += 1.0
+            signal_tags.append(f"Attractive PEG {peg:.1f} 💎")
+        elif 1.2 < peg <= 1.8:
+            score_points += 0.5
+            signal_tags.append(f"Fair PEG {peg:.1f}")
+        elif peg > 3.0:
+            score_points -= 1.0
+            signal_tags.append("⚠️ High PEG Overvalued")
+
+    sec = data.get("sector") or ""
+    if debt_to_equity is not None and sec != "Finance":
+        if 0.0 <= debt_to_equity <= 1.0:
+            score_points += 0.5
+            signal_tags.append(f"Safe Debt (D/E {debt_to_equity:.1f}) 🛡️")
+        elif debt_to_equity > 3.0:
+            score_points -= 1.0
+            signal_tags.append("⚠️ High Debt Risk")
 
     if rec_mark is not None and rec_mark <= 1.5:
         score_points += 0.5
@@ -238,13 +301,22 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         score_points -= 1.5
         signal_tags.append("⚠️ High ADX Falling Knife")
 
-    # Rating Tier
+    # Rating Tier with Reversal Confirmation Guard
     if score_points >= 4.5:
-        tier = "⭐⭐⭐ Strong Dip Buy"
+        if is_actionable:
+            tier = "⭐⭐⭐ Actionable Dip Buy 🎯"
+        else:
+            tier = "👀 รอสร้างฐาน (Forming Base - วันทิ้งตัว)"
     elif score_points >= 3.0:
-        tier = "⭐⭐ Good Setup"
+        if is_actionable:
+            tier = "⭐⭐ Good Setup (Actionable) 🎯"
+        else:
+            tier = "⭐ Watchlist (รอแท่งกลับตัว)"
     else:
-        tier = "⭐ Watchlist"
+        if is_plunge_day:
+            tier = "👀 รอสร้างฐาน (Forming Base - วันทิ้งตัว)"
+        else:
+            tier = "⭐ Watchlist"
         
     exchange = data.get("exchange", "NASDAQ")
     ticker = data.get("ticker", data.get("name", ""))
@@ -299,6 +371,12 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         "rr_ratio": rr_ratio,
         "touch_bb_lower": touch_bb_lower,
         "vol_ratio": round(vol_ratio, 2),
+        "open": open_price,
+        "is_green_candle": is_green_candle,
+        "is_red_candle": is_red_candle,
+        "is_plunge_day": is_plunge_day,
+        "has_reversal_confirmation": has_reversal_confirmation,
+        "is_actionable": is_actionable,
         "days_to_earnings": days_to_earnings,
         "earnings_date_str": earnings_date_str,
         "is_earnings_near": is_earnings_near,
@@ -310,6 +388,9 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         "net_inc_growth_yoy": round(net_inc_growth_yoy, 1) if net_inc_growth_yoy is not None else None,
         "peg": round(peg, 2) if peg is not None else None,
         "pe": round(pe, 1) if pe is not None else None,
+        "roe": round(roe, 1) if roe is not None else None,
+        "debt_to_equity": round(debt_to_equity, 2) if debt_to_equity is not None else None,
+        "fcf": fcf,
         "rec_mark": round(rec_mark, 2) if rec_mark is not None else None,
         "price_target_average": round(data.get("price_target_average"), 2) if data.get("price_target_average") else None,
         "price_target_high": round(data.get("price_target_high"), 2) if data.get("price_target_high") else None,
@@ -366,7 +447,8 @@ def filter_stocks(
     exclude_falling_knife: bool = True,
     require_growth: bool = False,
     max_peg: Optional[float] = None,
-    require_strong_buy: bool = False
+    require_strong_buy: bool = False,
+    require_reversal: bool = False
 ) -> List[Dict[str, Any]]:
     """
     Filter and rank evaluated stocks based on strategy and fundamental criteria.
@@ -406,6 +488,9 @@ def filter_stocks(
         if exclude_falling_knife and stock.get("adx_falling_knife"):
             continue
 
+        if require_reversal and not stock.get("is_actionable"):
+            continue
+
         if min_rr_ratio is not None and stock.get("rr_ratio") is not None:
             if stock["rr_ratio"] < min_rr_ratio:
                 continue
@@ -426,15 +511,62 @@ def filter_stocks(
 
         filtered.append(stock)
 
-    # Sort primarily by score_points (descending), then by R:R ratio (descending), then by RSI (ascending)
+    # Sort primarily by is_actionable (actionable first), then score_points, then R:R ratio, then RSI
     filtered.sort(
         key=lambda x: (
+            -int(x.get("is_actionable", False)),
             -x["score_points"],
             -(x["rr_ratio"] if x["rr_ratio"] is not None else 0),
             x["rsi"] if x["rsi"] is not None else 999
         )
     )
     return filtered
+
+
+def fetch_macro_market_regime(timeout: int = 10) -> Dict[str, Any]:
+    """
+    Fetch SPY and QQQ technical indicators to gauge market-wide pullback pressure.
+    """
+    try:
+        from src.tradingview import fetch_screener_data
+        data = fetch_screener_data(["AMEX:SPY", "NASDAQ:QQQ"], timeout=timeout)
+        spy_d = next((d for d in data if d.get("ticker") == "SPY"), {})
+        qqq_d = next((d for d in data if d.get("ticker") == "QQQ"), {})
+
+        spy_chg = spy_d.get("change") or 0.0
+        qqq_chg = qqq_d.get("change") or 0.0
+        spy_rsi = spy_d.get("RSI")
+        qqq_rsi = qqq_d.get("RSI")
+        spy_sma50 = spy_d.get("SMA50")
+        qqq_sma50 = qqq_d.get("SMA50")
+        spy_close = spy_d.get("close") or 0.0
+        qqq_close = qqq_d.get("close") or 0.0
+
+        spy_below_50 = (spy_close < spy_sma50) if (spy_close and spy_sma50) else False
+        qqq_below_50 = (qqq_close < qqq_sma50) if (qqq_close and qqq_sma50) else False
+
+        is_macro_pullback = (
+            spy_below_50 or qqq_below_50 or
+            spy_chg <= -1.2 or qqq_chg <= -1.8 or
+            (spy_rsi is not None and spy_rsi < 40) or
+            (qqq_rsi is not None and qqq_rsi < 38)
+        )
+
+        return {
+            "is_macro_pullback": is_macro_pullback,
+            "status": "⚠️ PULLBACK REGIME" if is_macro_pullback else "🟢 HEALTHY BULL REGIME",
+            "spy": {"close": spy_close, "change": spy_chg, "rsi": round(spy_rsi, 1) if spy_rsi else None, "below_sma50": spy_below_50},
+            "qqq": {"close": qqq_close, "change": qqq_chg, "rsi": round(qqq_rsi, 1) if qqq_rsi else None, "below_sma50": qqq_below_50},
+            "warning": "ตลาดรวม (SPY/QQQ) กำลังปรับฐานหลุดต่ำกว่าเส้น SMA 50 วัน สถาบันกำลังลดพอร์ตเทขายในภาพรวม ควรงดรีบช้อนรับมีดในแท่งแดง และรอแท่งกลับตัวยืนยันก่อนเข้าซื้อเสมอ!" if is_macro_pullback else "ตลาดรวมอยู่ในเกณฑ์ปกติ สามารถพิจารณาช้อนซื้อตามแนวรับได้ตามแผน"
+        }
+    except Exception:
+        return {
+            "is_macro_pullback": False,
+            "status": "⚪ UNKNOWN",
+            "spy": {},
+            "qqq": {},
+            "warning": "ไม่สามารถตรวจสอบดัชนีตลาดรวมได้"
+        }
 
 
 def generate_markdown_report(
@@ -447,17 +579,44 @@ def generate_markdown_report(
     sector_name: Optional[str] = None,
     require_ema200: bool = False,
     min_rr_ratio: Optional[float] = None,
-    require_growth: bool = False
+    require_growth: bool = False,
+    macro_regime: Optional[Dict[str, Any]] = None
 ) -> str:
     """
     Format screened results into a clean, detailed Markdown report with TradingView links and live news.
     """
+    if macro_regime is None:
+        macro_regime = fetch_macro_market_regime()
+
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     lines = []
     lines.append(f"# 📊 US Stock Dip Screener Report")
     lines.append(f"*Generated at: {now_str} | Total Scanned: {total_scanned} stocks ({universe_name})*\n")
 
-    lines.append("### 🎯 Criteria Applied (Super Pullback in Uptrend):")
+    if macro_regime and macro_regime.get("status"):
+        spy_info = macro_regime.get("spy", {})
+        qqq_info = macro_regime.get("qqq", {})
+        spy_parts = []
+        if spy_info.get("close"):
+            spy_parts.append(f"${spy_info['close']:.2f}")
+        if spy_info.get("change") is not None:
+            spy_parts.append(f"({spy_info['change']:+.2f}%)")
+        spy_str = f"SPY {' '.join(spy_parts)}" if spy_parts else "SPY -"
+
+        qqq_parts = []
+        if qqq_info.get("close"):
+            qqq_parts.append(f"${qqq_info['close']:.2f}")
+        if qqq_info.get("change") is not None:
+            qqq_parts.append(f"({qqq_info['change']:+.2f}%)")
+        qqq_str = f"QQQ {' '.join(qqq_parts)}" if qqq_parts else "QQQ -"
+
+        alert_type = "WARNING" if macro_regime.get("is_macro_pullback") else "NOTE"
+        lines.append(f"> [!{alert_type}]")
+        lines.append(f"> **ภาวะตลาดรวม (Macro Guard):** {macro_regime.get('status')} [{spy_str} | {qqq_str}]")
+        lines.append(f"> {macro_regime.get('warning')}")
+        lines.append("")
+
+    lines.append("### 🎯 Criteria Applied (Super Pullback in Uptrend & Knife Guard):")
     lines.append(f"- **Daily RSI:** ≤ {rsi_max} (Oversold)")
     trend_rules = []
     if require_sma200:
@@ -470,6 +629,7 @@ def generate_markdown_report(
     
     if weekly_rsi_min:
         lines.append(f"- **Weekly RSI Filter:** ≥ {weekly_rsi_min} (Weekly Bull Cycle)")
+    lines.append("- **Falling Knife Guard:** กรองแท่งเทียนทิ้งตัวแดงหนัก (Plunge Day) และคัดแยกสถานะจุดเข้าซื้อ (Actionable vs Wait for Base)")
     if min_rr_ratio:
         lines.append(f"- **Min R:R Ratio:** ≥ {min_rr_ratio}x")
     if require_growth:
@@ -530,12 +690,15 @@ def generate_markdown_report(
         elif mfi_val is not None and mfi_val <= 30.0:
             mfi_str += " 💧"
 
-        # Fundamentals & Analyst target display
+        # Fundamentals & Analyst target display (Quality & Value across all sectors)
         rev_g = f"{s['rev_growth_yoy']:+.0f}%" if s['rev_growth_yoy'] is not None else "-"
-        peg_s = f"{s['peg']:.1f}" if s['peg'] is not None else "-"
+        roe_s = f"ROE {s['roe']:.0f}%" if s.get('roe') is not None else ""
+        peg_s = f"PEG {s['peg']:.1f}" if s['peg'] is not None else "PEG -"
         t_avg = f"${s['price_target_average']:.0f}" if s.get('price_target_average') else "-"
         t_up = f"({s['target_upside_pct']:+.0f}%)" if s.get('target_upside_pct') is not None else ""
-        fund_str = f"Rev {rev_g} | PEG {peg_s}<br>🎯 {t_avg} {t_up}"
+        fund_line1 = f"Rev {rev_g}" + (f" | {roe_s}" if roe_s else "")
+        fund_line2 = f"{peg_s} | 🎯 {t_avg} {t_up}"
+        fund_str = f"<small>{fund_line1}<br>{fund_line2}</small>"
             
         # Trade plan: Support, Resistance, and Stop Loss
         sl_val = s.get("stop_loss", 0.0)
@@ -607,7 +770,10 @@ def generate_markdown_report(
             close_p = s_item.get("close")
             atr_pct = (atr / close_p * 100.0) if (atr and close_p and close_p > 0) else None
 
-            if atr_pct is None:
+            if s_item.get("is_plunge_day"):
+                chg_val = s_item.get("change_pct", 0)
+                suitability_badge = f"🔴 เสี่ยงสูงมาก (แท่งแดงทิ้งตัวแรง {chg_val:+.1f}% มีดยังไม่หยุดตก แนะนำให้อยู่เฉยๆ รอแท่งกลับตัว)"
+            elif atr_pct is None:
                 suitability_badge = "⚪ ไม่มีข้อมูลความผันผวน (-) ประเมินความเหมาะสมไม่ได้"
             elif atr_pct <= 2.5 and sec in ("Finance", "Health Technology", "Consumer Non-Durables", "Utilities"):
                 suitability_badge = f"🟢 เหมาะกับมือใหม่มาก (ความผันผวนต่ำเพียง {atr_pct:.1f}%/วัน พื้นฐานมั่นคง)"
@@ -638,19 +804,23 @@ def generate_markdown_report(
             res_p = s_item.get("key_resistance", plan_tp)
             res_d = s_item.get("resistance_desc", "จุดขายทำกำไร")
 
+            action_note = ""
+            if s_item.get("is_plunge_day"):
+                action_note = " ⚠️ **คำเตือนมือใหม่:** วันนี้เป็นแท่งทิ้งตัวแดงหนัก ห้ามรีบกดซื้อไม้ใหญ่ ควรรอดูพรุ่งนี้ว่าปิดเขียวหรือหยุดลงหรือไม่ก่อนตัดสินใจ."
+
             lines.append(
                 f"- หุ้น {t} ทำธุรกิจ{biz_desc}. "
                 f"ราคาลงมาในโซนรับทางเทคนิค RSI อยู่ที่ {s_item.get('rsi')} และ{growth_txt}.{target_txt} "
                 f"สำหรับมือใหม่: แนวรับสำคัญอยู่ที่ **${supp_p:.2f}** ({supp_d}), "
                 f"แนวต้านเป้าหมายทำกำไรอยู่ที่ **${res_p:.2f}** ({res_d}), "
-                f"และตั้งจุดยอมแพ้ตัดขาดทุน (Stop Loss) ที่ **${plan_sl:.2f}**."
+                f"และตั้งจุดยอมแพ้ตัดขาดทุน (Stop Loss) ที่ **${plan_sl:.2f}**.{action_note}"
             )
 
     lines.append("\n---")
     lines.append("### 🗡️ เช็กลิสต์ 3 ข้อ ป้องกันการรับมีดหล่น (Falling Knife Protection Checklist)")
-    lines.append("1. **งบการเงินไม่ติดลบ:** รายได้ YoY ต้องไม่ติดลบรุนแรง หรือกำไรสุทธิยังเติบโตได้ดี.")
-    lines.append("2. **สถาบันไม่เทขาย:** มตินักวิเคราะห์สถาบันต้องแนะนำซื้อมากกว่าขาย.")
-    lines.append("3. **ไม่มีคดีความหรือข่าวฟ้องร้องร้ายแรง:** ราคาที่ย่อตัวต้องเกิดจากการปรับฐานตามตลาด ไม่ใช่เกิดจากปัญหาวิกฤตของบริษัท.")
+    lines.append("1. **ไม่ซื้อในวันที่แท่งเทียนเป็นสีแดงทึบ:** รอให้มีแท่งกลับตัวปิดเขียว (Close >= Open) หรือ RSI Hook Up ยืนยันแรงรับก่อน.")
+    lines.append("2. **งบการเงินไม่ติดลบและสถาบันไม่เทขาย:** รายได้ YoY ต้องไม่ติดลบรุนแรง และมตินักวิเคราะห์สถาบันต้องแนะนำซื้อมากกว่าขาย.")
+    lines.append("3. **ระวังตลาดรวม (SPY/QQQ):** หากดัชนีหลักหลุดเส้น 50 วันพร้อมกัน ให้ชะลอการเข้าซื้อหรือลดขนาดไม้ลงครึ่งหนึ่งเสมอ.")
 
     lines.append("\n---")
     lines.append("### 🪜 สูตรแบ่ง 3 ไม้ช้อนซื้อ สำหรับมือใหม่ (3-Step Dip Money Management)")

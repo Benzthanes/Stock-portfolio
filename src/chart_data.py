@@ -236,19 +236,18 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             neck_p = max(mid_peaks, key=lambda x: x["price"])
             price_diff = abs(t1["price"] - t2["price"]) / t1["price"]
             bounce = (neck_p["price"] - min(t1["price"], t2["price"])) / min(t1["price"], t2["price"])
-            if price_diff <= 0.045 and bounce >= 0.035:
-                # Find drop start (swing high before t1)
-                prior_peaks = [p for p in peaks if p["idx"] < t1["idx"]]
-                if prior_peaks:
-                    start_p = prior_peaks[-1]
-                else:
-                    win = recent[max(0, t1["idx"] - 12): t1["idx"]]
-                    if win:
-                        max_h = max(c["high"] for c in win)
-                        start_c = [c for c in win if c["high"] == max_h][0]
-                        start_p = {"name": "Drop Start", "time": start_c["time"], "price": start_c["high"]}
-                    else:
-                        start_p = {"name": "Drop Start", "time": t1["time"], "price": round(t1["price"] * 1.05, 2)}
+            pattern_h = neck_p["price"] - min(t1["price"], t2["price"])
+            width = t2["idx"] - t1["idx"]
+            if price_diff <= 0.045 and bounce >= 0.038 and width >= 3:
+                # Find left rim of W (must be near neck_p in price and within 3-10 bars before t1)
+                win_len = min(10, t1["idx"])
+                left_win = recent[t1["idx"] - win_len: t1["idx"]] if win_len >= 2 else []
+                start_p = None
+                if left_win:
+                    candidates = [c for c in left_win if c["high"] >= min(t1["price"], t2["price"]) + pattern_h * 0.7 and c["high"] <= neck_p["price"] + pattern_h * 1.25]
+                    if candidates:
+                        best_c = min(candidates, key=lambda c: abs(c["high"] - neck_p["price"]))
+                        start_p = {"name": "Left Rim (ขอบซ้าย W)", "time": best_c["time"], "price": best_c["high"]}
 
                 # Find post-bounce swing high after t2
                 post_peaks = [p for p in peaks if p["idx"] > t2["idx"]]
@@ -263,7 +262,21 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     else:
                         end_p = {"name": "Rebound High", "time": times[-1], "price": closes[-1]}
 
-                target = round(neck_p["price"] + (neck_p["price"] - min(t1["price"], t2["price"])), 2)
+                key_pts = []
+                if start_p:
+                    key_pts.append({"name": start_p["name"], "time": start_p["time"], "price": start_p["price"], "role": "start"})
+                    start_time = start_p["time"]
+                else:
+                    start_time = t1["time"]
+
+                key_pts.extend([
+                    {"name": "Bottom 1 (ฐานแรก)", "time": t1["time"], "price": t1["price"], "role": "" if start_p else "start"},
+                    {"name": "Neckline Peak (ยอดกลาง W)", "time": neck_p["time"], "price": neck_p["price"]},
+                    {"name": "Bottom 2 (ฐานที่สอง)", "time": t2["time"], "price": t2["price"]},
+                    {"name": "Rebound (ขาขวาดีดตัว)", "time": end_p["time"], "price": end_p["price"]},
+                ])
+
+                target = round(neck_p["price"] + pattern_h, 2)
                 detected = {
                     "name": "Bullish Double Bottom (W-Shape)",
                     "type": "Bullish Reversal",
@@ -274,20 +287,14 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "target": target,
                     "upside_pct": round((target - current_price) / current_price * 100, 1),
                     "psychology": "หลังการทดสอบจุดต่ำสุดครั้งแรก เกิดการดีดตัวและลงมาทดสอบจุดเดิมอีกครั้ง แต่ผู้ขายไม่สามารถทำ Lower Low ได้ ผู้ซื้อสถาบันชิงเข้าซื้อตัดหน้า ทำให้เกิดฐานคู่ทรง W พร้อมแรงส่งขาขึ้นรอบใหม่",
-                    "structure": f"จุดเริ่มทิ้งตัว (${start_p['price']:.2f}) ➔ ฐานแรก (${t1['price']:.2f}) ➔ ยอดกลาง Neckline (${neck_p['price']:.2f}) ➔ ฐานที่สอง (${t2['price']:.2f}) ➔ แรงส่งดีดตัว (${end_p['price']:.2f})",
+                    "structure": f"ฐานแรก (${t1['price']:.2f}) ➔ ยอดกลาง Neckline (${neck_p['price']:.2f}) ➔ ฐานที่สอง (${t2['price']:.2f}) ➔ แรงส่งดีดตัว (${end_p['price']:.2f})",
                     "action_plan": f"เข้าซื้อเมื่อแท่งเทียนปิดทะลุ Neckline ${neck_p['price']:.2f} ด้วย Volume หนาแน่น เป้าหมาย ${target:.2f}",
                     "invalidation": f"รูปแบบจะล้มเหลวหากราคาปิดหลุดต่ำกว่าฐานที่ 2 (${t2['price']:.2f})",
                     "win_rate": PATTERN_WIN_RATE_NOTE,
-                    "target_calc": f"วัดส่วนสูงฐานคู่ถึงยอดกลาง (${neck_p['price'] - min(t1['price'], t2['price']):.2f}) บวกเพิ่มจากยอด Neckline",
-                    "key_points": [
-                        {"name": "Left High (จุดเริ่มทิ้งตัว)", "time": start_p["time"], "price": start_p["price"], "role": "start"},
-                        {"name": "Bottom 1 (ฐานแรก)", "time": t1["time"], "price": t1["price"]},
-                        {"name": "Neckline Peak (ยอดกลาง W)", "time": neck_p["time"], "price": neck_p["price"]},
-                        {"name": "Bottom 2 (ฐานที่สอง)", "time": t2["time"], "price": t2["price"]},
-                        {"name": "Rebound (ขาขวาดีดตัว)", "time": end_p["time"], "price": end_p["price"]},
-                    ],
+                    "target_calc": f"วัดส่วนสูงฐานคู่ถึงยอดกลาง (${pattern_h:.2f}) บวกเพิ่มจากยอด Neckline",
+                    "key_points": key_pts,
                     "lines": [
-                        {"name": "Neckline Breakout", "color": "#38bdf8", "style": 2, "points": [{"time": start_p["time"], "value": neck_p["price"]}, {"time": times[-1], "value": neck_p["price"]}]},
+                        {"name": "Neckline Breakout", "color": "#38bdf8", "style": 2, "points": [{"time": start_time, "value": neck_p["price"]}, {"time": times[-1], "value": neck_p["price"]}]},
                         {"name": "Double Bottom Support Floor", "color": "#10b981", "style": 1, "points": [{"time": t1["time"], "value": min(t1["price"], t2["price"])}, {"time": times[-1], "value": min(t1["price"], t2["price"])}]}
                     ]
                 }
@@ -300,19 +307,18 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             neck_t = min(mid_troughs, key=lambda x: x["price"])
             price_diff = abs(p1["price"] - p2["price"]) / p1["price"]
             drop = (max(p1["price"], p2["price"]) - neck_t["price"]) / max(p1["price"], p2["price"])
-            if price_diff <= 0.045 and drop >= 0.035:
-                # Find rally start (swing low before p1)
-                prior_troughs = [t for t in troughs if t["idx"] < p1["idx"]]
-                if prior_troughs:
-                    start_t = prior_troughs[-1]
-                else:
-                    win = recent[max(0, p1["idx"] - 12): p1["idx"]]
-                    if win:
-                        min_l = min(c["low"] for c in win)
-                        start_c = [c for c in win if c["low"] == min_l][0]
-                        start_t = {"name": "Rally Start", "time": start_c["time"], "price": start_c["low"]}
-                    else:
-                        start_t = {"name": "Rally Start", "time": p1["time"], "price": round(p1["price"] * 0.95, 2)}
+            pattern_h = max(p1["price"], p2["price"]) - neck_t["price"]
+            width = p2["idx"] - p1["idx"]
+            if price_diff <= 0.045 and drop >= 0.038 and width >= 3:
+                # Find left base of M (must be near neck_t in price and within 3-10 bars before p1)
+                win_len = min(10, p1["idx"])
+                left_win = recent[p1["idx"] - win_len: p1["idx"]] if win_len >= 2 else []
+                start_t = None
+                if left_win:
+                    candidates = [c for c in left_win if c["low"] <= max(p1["price"], p2["price"]) - pattern_h * 0.7 and c["low"] >= neck_t["price"] - pattern_h * 1.25]
+                    if candidates:
+                        best_c = min(candidates, key=lambda c: abs(c["low"] - neck_t["price"]))
+                        start_t = {"name": "Left Base (ฐานซ้าย M)", "time": best_c["time"], "price": best_c["low"]}
 
                 # Find post-drop swing low after p2
                 post_troughs = [t for t in troughs if t["idx"] > p2["idx"]]
@@ -327,7 +333,21 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     else:
                         end_t = {"name": "Drop Low", "time": times[-1], "price": closes[-1]}
 
-                target = round(neck_t["price"] - (max(p1["price"], p2["price"]) - neck_t["price"]), 2)
+                key_pts = []
+                if start_t:
+                    key_pts.append({"name": start_t["name"], "time": start_t["time"], "price": start_t["price"], "role": "start"})
+                    start_time = start_t["time"]
+                else:
+                    start_time = p1["time"]
+
+                key_pts.extend([
+                    {"name": "Peak 1 (ยอดแรก)", "time": p1["time"], "price": p1["price"], "role": "" if start_t else "start"},
+                    {"name": "Neckline Trough (ฐานกลาง M)", "time": neck_t["time"], "price": neck_t["price"]},
+                    {"name": "Peak 2 (ยอดที่สอง)", "time": p2["time"], "price": p2["price"]},
+                    {"name": "Breakdown (ขาขวาทิ้งตัว)", "time": end_t["time"], "price": end_t["price"]},
+                ])
+
+                target = round(neck_t["price"] - pattern_h, 2)
                 detected = {
                     "name": "Bearish Double Top (M-Shape)",
                     "type": "Bearish Reversal",
@@ -338,20 +358,14 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     "target": target,
                     "upside_pct": round((target - current_price) / current_price * 100, 1),
                     "psychology": "ราคาพยายามทดสอบจุดสูงสุดเดิมเป็นครั้งที่สองแต่ถูกแรงขายเททับสะท้อนว่าผู้ซื้อหมดแรงขับเคลื่อน (Buyer Exhaustion) และเกิดการกระจายหุ้นของสถาบันก่อนทิ้งตัวลง",
-                    "structure": f"จุดเริ่มยกตัว (${start_t['price']:.2f}) ➔ ยอดแรก (${p1['price']:.2f}) ➔ ฐานรับกลาง Neckline (${neck_t['price']:.2f}) ➔ ยอดที่สอง (${p2['price']:.2f}) ➔ ขาขวาทิ้งตัว (${end_t['price']:.2f})",
+                    "structure": f"ยอดแรก (${p1['price']:.2f}) ➔ ฐานรับกลาง Neckline (${neck_t['price']:.2f}) ➔ ยอดที่สอง (${p2['price']:.2f}) ➔ ขาขวาทิ้งตัว (${end_t['price']:.2f})",
                     "action_plan": f"ขายทำกำไร (Trim/TP) หรือตั้ง Stop Loss เมื่อราคาหลุด Neckline ${neck_t['price']:.2f} เป้าหมายขาลง ${target:.2f}",
                     "invalidation": f"รูปแบบล้มเหลวหากราคาเบรกทะลุยอดสูงสุด ${max(p1['price'], p2['price']):.2f}",
                     "win_rate": PATTERN_WIN_RATE_NOTE,
                     "target_calc": f"วัดส่วนสูงของยอดคู่แล้วหักลบออกจาก Neckline ${neck_t['price']:.2f}",
-                    "key_points": [
-                        {"name": "Left Low (จุดเริ่มยกตัว)", "time": start_t["time"], "price": start_t["price"], "role": "start"},
-                        {"name": "Peak 1 (ยอดแรก)", "time": p1["time"], "price": p1["price"]},
-                        {"name": "Neckline Trough (ฐานกลาง M)", "time": neck_t["time"], "price": neck_t["price"]},
-                        {"name": "Peak 2 (ยอดที่สอง)", "time": p2["time"], "price": p2["price"]},
-                        {"name": "Breakdown (ขาขวาทิ้งตัว)", "time": end_t["time"], "price": end_t["price"]},
-                    ],
+                    "key_points": key_pts,
                     "lines": [
-                        {"name": "Neckline Support", "color": "#38bdf8", "style": 2, "points": [{"time": start_t["time"], "value": neck_t["price"]}, {"time": times[-1], "value": neck_t["price"]}]},
+                        {"name": "Neckline Support", "color": "#38bdf8", "style": 2, "points": [{"time": start_time, "value": neck_t["price"]}, {"time": times[-1], "value": neck_t["price"]}]},
                         {"name": "Double Top Resistance Ceiling", "color": "#f43f5e", "style": 1, "points": [{"time": p1["time"], "value": max(p1["price"], p2["price"])}, {"time": times[-1], "value": max(p1["price"], p2["price"])}]}
                     ]
                 }
@@ -654,6 +668,108 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                 {"name": "Box Support", "color": "#10b981", "style": 2, "points": [{"time": times[-30], "value": recent_low}, {"time": times[-1], "value": recent_low}]}
             ]
         }
+
+    # Universal Pattern Lifecycle & Invalidation Guard
+    if detected:
+        pat_name = detected.get("name", "")
+        pat_type = detected.get("type", "")
+        is_bullish = "bullish" in pat_type.lower() or "inv" in pat_name.lower() or "flag" in pat_name.lower() or "ascending" in pat_name.lower()
+        is_bearish = "bearish" in pat_type.lower() or "descending" in pat_name.lower()
+
+        support_level = None
+        resistance_level = None
+
+        # 1. Determine key support and resistance / breakout levels
+        if "Double Bottom" in pat_name or "Triple Bottom" in pat_name:
+            floor_lines = [l for l in detected.get("lines", []) if "support" in l["name"].lower() or "floor" in l["name"].lower()]
+            if floor_lines:
+                support_level = floor_lines[0]["points"][0]["value"]
+            resistance_level = detected.get("neckline")
+        elif "Double Top" in pat_name:
+            ceil_lines = [l for l in detected.get("lines", []) if "ceiling" in l["name"].lower() or "resistance" in l["name"].lower()]
+            if ceil_lines:
+                resistance_level = ceil_lines[0]["points"][0]["value"]
+            support_level = detected.get("neckline")
+        elif "Head & Shoulders" in pat_name and "Inverted" not in pat_name:
+            support_level = detected.get("neckline")
+            r_shoulder = [kp for kp in detected.get("key_points", []) if "right shoulder" in kp["name"].lower()]
+            if r_shoulder:
+                resistance_level = r_shoulder[0]["price"]
+        elif "Inverted Head & Shoulders" in pat_name:
+            resistance_level = detected.get("neckline")
+            r_shoulder = [kp for kp in detected.get("key_points", []) if "right shoulder" in kp["name"].lower()]
+            if r_shoulder:
+                support_level = r_shoulder[0]["price"]
+        elif any(k in pat_name for k in ["Triangle", "Wedge", "Flag", "Channel"]):
+            resistance_level = detected.get("breakout") or detected.get("neckline")
+            sup_lines = [l for l in detected.get("lines", []) if "support" in l["name"].lower()]
+            if sup_lines:
+                support_level = min(p["value"] for p in sup_lines[0]["points"])
+
+        # 2. Find post-pattern candle slice (from the last key point time)
+        kp_indices = []
+        for kp in detected.get("key_points", []):
+            if "idx" in kp:
+                kp_indices.append(kp["idx"])
+            elif "time" in kp:
+                matching = [i for i, tm in enumerate(times) if tm == kp["time"]]
+                if matching:
+                    kp_indices.append(matching[-1])
+        latest_kp_idx = max(kp_indices) if kp_indices else max(0, n - 6)
+
+        post_candles = recent[latest_kp_idx:]
+        post_closes = [c["close"] for c in post_candles]
+
+        # 3. Evaluate Bullish Patterns
+        if is_bullish and support_level is not None:
+            breakdown_indices = [i for i, c in enumerate(post_candles) if c["close"] < support_level * 0.995 or c["low"] < support_level * 0.985]
+            if breakdown_indices:
+                first_break_idx = latest_kp_idx + breakdown_indices[0]
+                bars_since_break = n - 1 - first_break_idx
+                if bars_since_break > 12:
+                    detected = None
+                else:
+                    detected["status"] = "failed"
+                    detected["badge"] = f"🔴 รูปแบบล้มเหลว (Pattern Failed - หลุด ${support_level:.2f})"
+                    detected["type"] = "Failed Pattern (เสียทรง)"
+                    detected["summary"] = f"รูปแบบ {detected['name']} ล้มเหลวเนื่องจากราคาปิดหลุดแนวรับ ${support_level:.2f} (ราคาปิดล่าสุด ${current_price:.2f})"
+                    detected["action_plan"] = f"⚠️ รูปแบบเสียทรง ห้ามเข้าซื้อหรือให้ Stop Loss ทันที ราคาปิดหลุดแนวรับสำคัญ ${support_level:.2f} กลายเป็นขาลงต่อเนื่อง"
+                    detected["target"] = None
+                    detected["upside_pct"] = None
+                    detected["lines"].append({
+                        "name": f"Breakdown Floor (${support_level:.2f})",
+                        "color": "#ef4444",
+                        "style": 2,
+                        "points": [{"time": times[first_break_idx], "value": support_level}, {"time": times[-1], "value": support_level}]
+                    })
+            else:
+                if resistance_level and any(c >= resistance_level * 1.002 for c in post_closes):
+                    detected["status"] = "confirmed"
+                    detected["badge"] = detected.get("badge", "").replace("🟢", "🚀").replace("รูปแบบกระทิง", "ยืนยันเบรกเอาท์ (Confirmed)")
+                else:
+                    detected["status"] = "forming"
+                    detected["badge"] = detected.get("badge", "").replace("🟢", "🟡").replace("รูปแบบกระทิง", "กำลังก่อตัว (Forming - รอเบรก)")
+                    detected["action_plan"] = f"ราคากำลังทดสอบแนวต้าน Neckline ${resistance_level:.2f} ห้ามชิงซื้อจนกว่าแท่งเทียนจะปิดทะลุแนวต้านยืนยัน"
+
+        # 4. Evaluate Bearish Patterns
+        elif is_bearish and resistance_level is not None:
+            breakout_indices = [i for i, c in enumerate(post_candles) if c["close"] > resistance_level * 1.008]
+            if breakout_indices:
+                first_break_idx = latest_kp_idx + breakout_indices[0]
+                bars_since_break = n - 1 - first_break_idx
+                if bars_since_break > 12:
+                    detected = None
+                else:
+                    detected["status"] = "failed"
+                    detected["badge"] = f"🟢 รูปแบบหมีล้มเหลว (Bear Failed - ทะลุ ${resistance_level:.2f})"
+                    detected["type"] = "Failed Pattern (เบรกทะลุต้าน)"
+                    detected["target"] = None
+                    detected["upside_pct"] = None
+            else:
+                if support_level and any(c <= support_level * 0.998 for c in post_closes):
+                    detected["status"] = "confirmed"
+                else:
+                    detected["status"] = "forming"
 
     return detected
 

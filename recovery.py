@@ -166,7 +166,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
     target_rebound_2atr = close + (2.0 * atr)
     hard_stop_loss = round(close - (1.5 * atr), 2)
 
-    if sma200 > 0 and abs(close - sma200) / close <= 0.08:
+    if sma200 > 0 and sma200 < close and (close - sma200) / close <= 0.08:
         key_support = round(sma200, 2)
         support_desc = "เส้น 200 วัน (SMA 200)"
     elif bb_lower > 0 and bb_lower < close:
@@ -178,7 +178,10 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
 
     # Key Resistance Levels
     bb_upper = data.get("BB.upper") or 0.0
-    if sma20 > 0 and sma20 > close:
+    if sma200 > 0 and sma200 > close:
+        key_resistance = round(sma200, 2)
+        resistance_desc = "เส้น 200 วัน (SMA 200)"
+    elif sma20 > 0 and sma20 > close:
         key_resistance = round(sma20, 2)
         resistance_desc = "เส้น 20 วัน (SMA 20)"
     elif sma50 > 0 and sma50 > close:

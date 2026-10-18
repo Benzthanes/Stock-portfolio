@@ -75,6 +75,21 @@ class NewsHtmlTest(unittest.TestCase):
     def test_empty(self):
         self.assertEqual(_news_items_html([], "none"), "<li><span class='text-muted'>none</span></li>")
 
+    def test_title_th_and_ai_badge(self):
+        out = _news_items_html([{
+            "title": "Raw English Title",
+            "title_th": "พาดหัวข่าวภาษาไทย",
+            "source": "Bloomberg",
+            "link": "https://bloomberg.com/news/1",
+            "published": "2h ago",
+            "ai_analyzed": True,
+        }], "none")
+        self.assertIn("พาดหัวข่าวภาษาไทย", out)
+        self.assertIn("🤖 AI Verified", out)
+        self.assertIn("Raw English Title ↗", out)
+        self.assertIn("href='https://bloomberg.com/news/1'", out)
+
+
     def test_onclick_safe_in_double_quoted_attribute(self):
         js = _make_chart_onclick({"ticker": "X", "name": 'A "B" O\'Neil <i>', "sector": "Tech", "close_price": 1.5})
         self.assertNotIn('"', js)

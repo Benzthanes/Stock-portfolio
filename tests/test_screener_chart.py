@@ -270,6 +270,38 @@ class SuperInvestorsAsOfTest(unittest.TestCase):
             self.assertTrue(all(w["as_of"] == SUPER_INVESTORS_AS_OF for w in get_super_investors(ticker)))
 
 
+class FallingKnifeShieldTest(unittest.TestCase):
+    def test_red_plunge_day_is_not_actionable_and_gets_forming_base_tier(self):
+        # A stock plunging -6.5% on a red candle
+        data = _row(open=105.0, close=98.0, change=-6.6, RSI=30.0, RSI_prev=36.0, SMA200=90.0)
+        eval_res = evaluate_stock(data)
+        self.assertFalse(eval_res["is_actionable"])
+        self.assertTrue(eval_res["is_plunge_day"])
+        self.assertIn("รอสร้างฐาน", eval_res["tier"])
+        self.assertIn("⚠️ Plunge Day (มีดยังหล่น)", eval_res["signal_tags"])
+
+    def test_green_reversal_candle_is_actionable(self):
+        # A stock rebounding with green candle and RSI hook up
+        data = _row(open=95.0, close=98.0, change=1.5, RSI=34.0, **{"RSI[1]": 31.0, "SMA200": 90.0})
+        eval_res = evaluate_stock(data)
+        self.assertTrue(eval_res["is_actionable"])
+        self.assertFalse(eval_res["is_plunge_day"])
+        self.assertIn("Actionable", eval_res["tier"])
+        self.assertIn("Green Reversal Candle 🕯️🟢", eval_res["signal_tags"])
+
+    def test_stoch_rsi_floor_noise_is_filtered(self):
+        # Stoch RSI pinned at 4 vs 3 should NOT trigger fresh_stoch_cross
+        data = _row(**{"Stoch.RSI.K": 4.5, "Stoch.RSI.D": 3.0, "Stoch.RSI.K[1]": 2.5, "Stoch.RSI.D[1]": 3.0})
+        eval_res = evaluate_stock(data)
+        self.assertFalse(eval_res["fresh_stoch_cross"])
+
+    def test_filter_stocks_require_reversal_excludes_falling_knives(self):
+        knife = _row(ticker="KNIFE", open=100.0, close=93.0, change=-7.0, RSI=30.0)
+        reversal = _row(ticker="REV", open=92.0, close=95.0, change=1.0, RSI=34.0, **{"RSI[1]": 31.0})
+        filtered = filter_stocks([knife, reversal], rsi_max=40.0, require_reversal=True)
+        self.assertEqual([s["ticker"] for s in filtered], ["REV"])
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -856,11 +856,15 @@
             if (skelData && skelData.length >= 2) {
                 try {
                     const isBear = pat.type && pat.type.toLowerCase().includes('bear');
+                    const isFailed = pat.status === 'failed';
+                    const isForming = pat.status === 'forming';
+                    const skelColor = isFailed ? '#ef4444' : (isBear ? '#fb7185' : (isForming ? '#fbbf24' : '#34d399'));
+                    const skelTitle = isFailed ? ('⚠️ ' + pat.name + ' (ล้มเหลว/หลุดรับ)') : ('🏛️ ' + pat.name + (isForming ? ' (กำลังฟอร์มตัว)' : ' (ยืนยันแล้ว)'));
                     const skelSeries = chart.addLineSeries({
-                        color: isBear ? '#fb7185' : '#34d399',
+                        color: skelColor,
                         lineWidth: 2.5,
-                        lineStyle: LightweightCharts.LineStyle.Solid,
-                        title: '🏛️ ' + pat.name + ' (โครงสร้าง)',
+                        lineStyle: isFailed ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Solid,
+                        title: skelTitle,
                         visible: true,
                     });
                     skelSeries.setData(skelData);
@@ -883,16 +887,17 @@
             } catch(e) {}
         }
 
-        if (pat.target && pat.target > 0) {
+        if (pat.target && pat.target > 0 && pat.status !== 'failed') {
             try {
                 const isUp = (pat.upside_pct || 0) >= 0;
+                const isForming = pat.status === 'forming';
                 priceLines.push(series.createPriceLine({
                     price: Number(pat.target),
                     color: isUp ? '#10b981' : '#f43f5e',
                     lineWidth: 2,
-                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    lineStyle: isForming ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
-                    title: '🎯 Target $' + Number(pat.target).toFixed(2) + ' (' + (isUp ? '+' : '') + (pat.upside_pct || 0) + '%)',
+                    title: '🎯 Target $' + Number(pat.target).toFixed(2) + (isForming ? ' (รอเบรก)' : (' (' + (isUp ? '+' : '') + (pat.upside_pct || 0) + '%)')),
                 }));
             } catch(e) {}
         }
@@ -2567,8 +2572,41 @@
 
         let body = '';
 
+        const isFailed = pat && pat.status === 'failed';
         if (patName.includes('double bottom') || patName.includes('w-shape')) {
-            body = `
+            if (isFailed) {
+                body = `
+                <!-- Failed Double Bottom Breakdown Blueprint -->
+                <line x1="70" y1="70" x2="465" y2="70" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4,4" />
+                <rect x="80" y="52" width="130" height="18" rx="4" fill="rgba(56, 189, 248, 0.15)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1"/>
+                <text x="145" y="65" fill="#38bdf8" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">Neckline ต้าน ${neckVal}</text>
+
+                <!-- Broken Support Floor -->
+                <line x1="70" y1="145" x2="465" y2="145" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="3,3" />
+                <rect x="80" y="150" width="180" height="18" rx="4" fill="rgba(239, 68, 68, 0.15)" stroke="rgba(239, 68, 68, 0.4)" stroke-width="1"/>
+                <text x="170" y="163" fill="#f87171" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">⚠️ แนวรับที่หลุด (Broken Floor)</text>
+
+                <path d="M 60 75 L 130 145 L 225 70 L 320 145 L 380 95 L 450 205" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#pdd-glow)" />
+                <line x1="380" y1="95" x2="450" y2="205" stroke="#ef4444" stroke-width="3" stroke-linecap="round" marker-end="url(#pdd-arr-rose)" />
+
+                <!-- Swing Nodes -->
+                <circle cx="130" cy="145" r="5" fill="#f87171" stroke="#ffffff" stroke-width="1.5" />
+                <text x="130" y="133" fill="#fca5a5" font-size="11" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">Bottom 1</text>
+
+                <circle cx="225" cy="70" r="5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+                <text x="225" y="52" fill="#7dd3fc" font-size="11" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">ยอด Neckline</text>
+
+                <circle cx="320" cy="145" r="5" fill="#f87171" stroke="#ffffff" stroke-width="1.5" />
+                <text x="320" y="133" fill="#fca5a5" font-size="11" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">Bottom 2</text>
+
+                <circle cx="380" cy="95" r="5" fill="#fbbf24" stroke="#ffffff" stroke-width="1.5" />
+                <text x="380" y="80" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">ไม่ผ่าน</text>
+
+                <circle cx="410" cy="155" r="5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                <text x="445" y="185" fill="#fca5a5" font-size="11" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakdown ⚠️</text>
+            `;
+            } else {
+                body = `
                 <!-- Double Bottom W-Shape Blueprint -->
                 <line x1="70" y1="85" x2="465" y2="85" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4,4" />
                 <rect x="80" y="68" width="130" height="18" rx="4" fill="rgba(56, 189, 248, 0.15)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1"/>
@@ -2600,6 +2638,7 @@
                 <line x1="415" y1="85" x2="415" y2="32" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,2" />
                 <text x="425" y="60" fill="#94a3b8" font-size="10" font-family="'JetBrains Mono', monospace">+H</text>
             `;
+            }
         } else if (patName.includes('double top') || patName.includes('m-shape')) {
             body = `
                 <!-- Double Top M-Shape Blueprint -->
@@ -2848,27 +2887,48 @@
         }
 
         const isBear = pat.type && pat.type.toLowerCase().includes('bear');
+        const isFailed = pat.status === 'failed';
+        const isForming = pat.status === 'forming';
+
         if (badge) {
             badge.textContent = pat.badge || pat.name;
-            badge.style.color = isBear ? '#fb7185' : '#34d399';
-            badge.style.borderColor = isBear ? 'rgba(251, 113, 133, 0.4)' : 'rgba(52, 211, 153, 0.4)';
-            badge.style.background = isBear ? 'rgba(251, 113, 133, 0.15)' : 'rgba(52, 211, 153, 0.15)';
+            if (isFailed) {
+                badge.style.color = '#ef4444';
+                badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                badge.style.background = 'rgba(239, 68, 68, 0.15)';
+            } else if (isForming) {
+                badge.style.color = '#facc15';
+                badge.style.borderColor = 'rgba(250, 204, 21, 0.4)';
+                badge.style.background = 'rgba(250, 204, 21, 0.15)';
+            } else {
+                badge.style.color = isBear ? '#fb7185' : '#34d399';
+                badge.style.borderColor = isBear ? 'rgba(251, 113, 133, 0.4)' : 'rgba(52, 211, 153, 0.4)';
+                badge.style.background = isBear ? 'rgba(251, 113, 133, 0.15)' : 'rgba(52, 211, 153, 0.15)';
+            }
         }
         if (winrate) winrate.textContent = '🎯 สถิติความแม่นยำ: ' + (pat.win_rate || 'ไม่มีสถิติยืนยัน (heuristic)');
-        if (dTitle) dTitle.textContent = 'แผนผัง ' + pat.name + ' (Visual Pattern Blueprint)';
+        if (dTitle) dTitle.textContent = (isFailed ? '⚠️ ' : 'แผนผัง ') + pat.name + ' (Visual Pattern Blueprint)';
         if (dType) {
             dType.textContent = pat.type || 'Technical Model';
-            dType.style.color = isBear ? '#fb7185' : '#34d399';
-            dType.style.borderColor = isBear ? 'rgba(251, 113, 133, 0.3)' : 'rgba(52, 211, 153, 0.3)';
+            if (isFailed) {
+                dType.style.color = '#ef4444';
+                dType.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            } else if (isForming) {
+                dType.style.color = '#facc15';
+                dType.style.borderColor = 'rgba(250, 204, 21, 0.3)';
+            } else {
+                dType.style.color = isBear ? '#fb7185' : '#34d399';
+                dType.style.borderColor = isBear ? 'rgba(251, 113, 133, 0.3)' : 'rgba(52, 211, 153, 0.3)';
+            }
         }
         if (dContainer) dContainer.innerHTML = getPatternDiagramSvg(pat);
         if (caption) {
-            const upsideTxt = pat.upside_pct !== undefined ? ((pat.upside_pct >= 0 ? '+' : '') + pat.upside_pct + '%') : '-';
+            const upsideTxt = pat.upside_pct !== undefined && pat.upside_pct !== null ? ((pat.upside_pct >= 0 ? '+' : '') + pat.upside_pct + '%') : '-';
             const neckTxt = pat.neckline ? ('$' + Number(pat.neckline).toFixed(2)) : '-';
-            const tgtTxt = pat.target ? ('$' + Number(pat.target).toFixed(2)) : '-';
+            const tgtTxt = isFailed ? '<span style="color:#ef4444;font-weight:700;">ยกเลิกเป้าหมาย (แพทเทิร์นล้มเหลว)</span>' : (pat.target ? ('$' + Number(pat.target).toFixed(2) + ' (' + upsideTxt + ')') : '-');
             const startPt = pat.key_points && pat.key_points.length > 0 ? pat.key_points[0] : null;
             const startTxt = startPt ? (' | 🚩 <strong>จุดเริ่มแพทเทิร์น:</strong> ' + startPt.time + ' ที่ $' + Number(startPt.price).toFixed(2) + ' (' + (startPt.name || 'Start') + ')') : '';
-            caption.innerHTML = `📐 <strong>สรุปสัญญาณ:</strong> ${pat.summary || pat.name}${startTxt} | <strong>Neckline:</strong> ${neckTxt} | <strong>เป้าหมาย (Measured Target):</strong> ${tgtTxt} (${upsideTxt}) | <strong>วิธีคำนวณเป้า:</strong> ${pat.target_calc || '-'}`;
+            caption.innerHTML = `📐 <strong>สรุปสัญญาณ:</strong> ${pat.summary || pat.name}${startTxt} | <strong>Neckline:</strong> ${neckTxt} | <strong>เป้าหมาย (Measured Target):</strong> ${tgtTxt} | <strong>วิธีคำนวณเป้า:</strong> ${pat.target_calc || '-'}`;
         }
         if (struct) {
             let structTxt = pat.structure || pat.summary || '-';

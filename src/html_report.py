@@ -42,8 +42,20 @@ def _news_items_html(items: List[Dict[str, Any]], empty_msg: str) -> str:
         if link.lower().startswith(("http://", "https://")):
             title = f"<a href='{escape(link, quote=True)}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{title} ↗</a>"
         published = f" <span class='text-muted small'>({escape(b['published'], quote=True)})</span>" if b.get("published") else ""
-        rows.append(f"<li><strong class='source-tag'>[{escape(b.get('source', ''), quote=True)}]</strong> {title}{published}</li>")
+        
+        title_th = b.get("title_th")
+        if title_th:
+            title_th_escaped = escape(title_th, quote=True)
+            ai_badge = " <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>🤖 AI Verified</span>" if b.get("ai_analyzed") else ""
+            rows.append(
+                f"<li style='margin-bottom: 8px;'><strong class='source-tag'>[{escape(b.get('source', ''), quote=True)}]</strong> "
+                f"<span style='font-weight: 600; color: #f1f5f9;'>{title_th_escaped}</span>{ai_badge}"
+                f"<div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ {title}{published}</div></li>"
+            )
+        else:
+            rows.append(f"<li><strong class='source-tag'>[{escape(b.get('source', ''), quote=True)}]</strong> {title}{published}</li>")
     return "".join(rows)
+
 
 
 def get_chart_modal_component(tickers: Optional[List[str]] = None) -> str:
@@ -274,6 +286,28 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         peg_str = f"{p['peg']:.2f}" if p.get('peg') is not None else "-"
         pe_str = f"{p['pe']:.1f}x" if p.get('pe') is not None else "-"
 
+        roe_val = p.get('roe')
+        if roe_val is not None:
+            if roe_val >= 20.0:
+                roe_html = f"<span class='text-emerald fw-bold'>{roe_val:+.1f}% 🏆</span>"
+            elif roe_val > 0:
+                roe_html = f"<span class='text-emerald'>{roe_val:+.1f}%</span>"
+            else:
+                roe_html = f"<span class='text-rose fw-bold'>{roe_val:+.1f}% 🔻</span>"
+        else:
+            roe_html = "-"
+
+        de_val = p.get('debt_to_equity')
+        if de_val is not None:
+            if de_val <= 0.8:
+                de_html = f"<span class='text-emerald fw-bold'>{de_val:.2f} 🛡️</span>"
+            elif de_val <= 1.5:
+                de_html = f"<span>{de_val:.2f}</span>"
+            else:
+                de_html = f"<span class='text-amber fw-bold'>{de_val:.2f} ⚠️</span>"
+        else:
+            de_html = "-"
+
         t_avg = money(p['price_target_average'], ccy) if p.get('price_target_average') else "-"
         t_up = f"({pct(p['target_upside_pct'])})" if p.get('target_upside_pct') is not None else ""
         t_target_html = f"<strong>{t_avg}</strong> <span class='text-emerald small'>{t_up}</span>" if p.get('price_target_average') else "-"
@@ -301,6 +335,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             <td>{badge_html}</td>
             <td style="text-align: right; font-weight: 600;">{rev_g}</td>
             <td style="text-align: right; font-weight: 600;">{net_g}</td>
+            <td style="text-align: right; font-weight: 600;">{roe_html}</td>
+            <td style="text-align: right; font-weight: 600;">{de_html}</td>
             <td style="text-align: right;">
                 <div class="fw-bold">{peg_str}</div>
                 <div class="text-muted small">{peg_verdict}</div>
@@ -327,8 +363,13 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         w = pick["weight_pct"]
         c = pick["close_price"]
         sl = pick.get("stop_loss") or (c * 0.95)
-        buy_low = c * 0.98
-        buy_high = c * 1.01
+        buy_supp = pick.get("key_support")
+        if buy_supp and buy_supp < c:
+            buy_low = buy_supp
+            buy_high = min(c, round(buy_supp * 1.02, 2))
+        else:
+            buy_low = round(c * 0.97, 2)
+            buy_high = round(c * 0.99, 2)
         biz = escape(pick.get("business_summary") or "")
 
         target_upside = pick.get("target_upside_pct")
@@ -1210,6 +1251,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                         <th>สุขภาพงบ</th>
                         <th style="text-align: right;">Rev YoY</th>
                         <th style="text-align: right;">Net YoY</th>
+                        <th style="text-align: right;">ROE (%)</th>
+                        <th style="text-align: right;">D/E (หนี้/ทุน)</th>
                         <th style="text-align: right;">PEG Ratio</th>
                         <th style="text-align: right;">P/E</th>
                         <th style="text-align: right;">FCF กระแสเงินสด</th>

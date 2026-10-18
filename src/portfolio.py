@@ -73,6 +73,8 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
     net_g = pos.get("net_inc_growth_yoy")
     rec_mark = pos.get("rec_mark")
     is_earnings_near = pos.get("is_earnings_near", False)
+    roe = pos.get("roe")
+    debt_to_equity = pos.get("debt_to_equity")
 
     is_etf = ticker in ("VOO", "SPY", "QQQ") or (pos.get("sector") in ("Miscellaneous", "Other / Diversified") and not rev_g)
 
@@ -104,7 +106,7 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
         else:
             score -= 0.3
 
-    # 3. Fundamental Growth & Consensus
+    # 3. Fundamental Growth, Capital Efficiency & Consensus
     if is_etf:
         score += 0.6
     else:
@@ -118,6 +120,21 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
             score += 0.2
         elif net_g is not None and net_g < 0.0:
             score -= 0.6
+
+        # ROE and Debt Safety
+        if roe is not None:
+            if roe >= 20.0:
+                score += 0.4
+            elif roe >= 12.0:
+                score += 0.2
+            elif roe < 0.0:
+                score -= 0.5
+
+        if debt_to_equity is not None:
+            if debt_to_equity <= 0.8:
+                score += 0.2
+            elif debt_to_equity > 2.5:
+                score -= 0.3
 
         if rec_mark is not None and rec_mark <= 1.5:
             score += 0.3
@@ -187,6 +204,10 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
         strengths.append("กองทุนดัชนีชั้นนำ กระจายความเสี่ยงสูง")
     elif net_g is not None and net_g > 15.0:
         strengths.append(f"กำไรเติบโตเด่น YoY {net_g:+.1f}%")
+    if not is_etf and roe is not None and roe >= 20.0:
+        strengths.append(f"ROE คุณภาพสูง {roe:.1f}% 🏆")
+    if not is_etf and debt_to_equity is not None and debt_to_equity <= 0.8:
+        strengths.append(f"หนี้สินต่ำ ปลอดภัย D/E {debt_to_equity:.2f} 🛡️")
     if rec_mark is not None and rec_mark <= 1.5:
         strengths.append("ฉันทามติตลาด Strong Buy")
     strength_desc = ", ".join(strengths) if strengths else "ราคาทรงตัวในกรอบสะสมพลัง."
@@ -203,6 +224,10 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
         risks.append(f"วันประกาศงบใกล้เข้ามา ({pos.get('days_to_earnings')} วัน)")
     if not is_etf and net_g is not None and net_g < 0:
         risks.append(f"กำไรสุทธิหดตัว YoY {net_g:.1f}%")
+    if not is_etf and roe is not None and roe < 0:
+        risks.append(f"ผลตอบแทนผู้ถือหุ้นติดลบ (ROE {roe:.1f}%)")
+    if not is_etf and debt_to_equity is not None and debt_to_equity > 2.5:
+        risks.append(f"ภาระหนี้สินต่อทุนสูง (D/E {debt_to_equity:.2f})")
     risk_desc = ", ".join(risks) if risks else "ไม่มีสัญญาณความเสี่ยงผิดปกติ."
 
     return {
@@ -219,7 +244,7 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
 def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
     """
     Evaluates corporate fundamental health using YoY Revenue Growth,
-    YoY Net Income Growth, PEG ratio valuation, and Free Cash Flow (FCF).
+    YoY Net Income Growth, ROE, Debt/Equity, PEG ratio valuation, and Free Cash Flow (FCF).
     """
     ticker = pos["ticker"]
     if ticker in ("VOO", "SPY", "QQQ") or (pos.get("sector") in ("Miscellaneous", "Other / Diversified") and not pos.get("rev_growth_yoy")):
@@ -228,6 +253,8 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
             "health_badge": "🏛️ กองทุนดัชนี",
             "peg_verdict": "N/A (กระจาย 500 บ.)",
             "fcf_str": "-",
+            "roe_str": "-",
+            "de_str": "-",
             "summary": "กองทุนดัชนีรวมกระจายความเสี่ยงข้าม 500 บริษัทชั้นนำสหรัฐฯ ไร้ความเสี่ยงงบการเงินรายตัว.",
             "score": 5
         }
@@ -236,6 +263,8 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
     net_g = pos.get("net_inc_growth_yoy")
     peg = pos.get("peg")
     fcf = pos.get("fcf")
+    roe = pos.get("roe")
+    debt_to_equity = pos.get("debt_to_equity")
 
     fcf_str = "-"
     if fcf is not None:
@@ -245,6 +274,9 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
             fcf_str = f"${fcf / 1e6:.1f}M"
         else:
             fcf_str = f"${fcf:,.0f}"
+
+    roe_str = f"{roe:+.1f}%" if roe is not None else "-"
+    de_str = f"{debt_to_equity:.2f}" if debt_to_equity is not None else "-"
 
     score = 0
     # 1. Revenue Growth Score
@@ -273,7 +305,34 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
         else:
             score -= 1
 
-    # 3. PEG Valuation Assessment
+    # 3. ROE Quality Score
+    if roe is not None:
+        if roe >= 25.0:
+            score += 3
+        elif roe >= 15.0:
+            score += 2
+        elif roe > 0:
+            score += 1
+        else:
+            score -= 2
+
+    # 4. Debt-to-Equity Financial Health Score
+    if debt_to_equity is not None:
+        if debt_to_equity <= 0.8:
+            score += 2
+        elif debt_to_equity <= 1.5:
+            score += 1
+        elif debt_to_equity > 2.5:
+            score -= 2
+
+    # 5. Free Cash Flow
+    if fcf is not None:
+        if fcf > 0:
+            score += 1
+        else:
+            score -= 1
+
+    # 6. PEG Valuation Assessment
     if peg is not None:
         if 0 < peg <= 0.5:
             peg_verdict = f"ถูกมาก ({peg:.2f} 💎)"
@@ -292,20 +351,22 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
             score -= 1
         else:
             peg_verdict = f"ติดลบ ({peg:.2f})"
+            score -= 1
     else:
         peg_verdict = "-"
 
     # Final Health Grade & Narrative
-    if score >= 6:
+    rev_str = f"{rev_g:+.1f}%" if rev_g is not None else "-"
+    net_str = f"{net_g:+.1f}%" if net_g is not None else "-"
+
+    if score >= 8:
         grade = "เกรด A+ (ยอดเยี่ยม 🟢)"
         health_badge = "🟢 ยอดเยี่ยม"
-        rev_str = f"{rev_g:+.1f}%" if rev_g is not None else "-"
-        net_str = f"{net_g:+.1f}%" if net_g is not None else "-"
-        summary = f"รายได้เติบโต {rev_str}, กำไรสุทธิขยายตัว {net_str}, กระแสเงินสด {fcf_str}, PEG {peg_verdict}."
-    elif score >= 4:
+        summary = f"รายได้เติบโต {rev_str}, กำไรขยายตัว {net_str}, ROE คุณภาพสูง {roe_str}, หนี้สินต่ำ D/E {de_str}, กระแสเงินสด {fcf_str}, PEG {peg_verdict}."
+    elif score >= 5:
         grade = "เกรด A (แข็งแกร่ง 🟢)"
         health_badge = "🟢 สุขภาพดี"
-        summary = f"รายได้และกำไรเติบโตต่อเนื่อง, กระแสเงินสดอิสระ {fcf_str}, ภาพรวมงบการเงินมั่นคง."
+        summary = f"งบการเงินแข็งแกร่งต่อเนื่อง, ROE {roe_str}, กระแสเงินสด {fcf_str}, หนี้สินคุมได้ D/E {de_str}."
     elif score >= 2:
         grade = "เกรด B (ปานกลาง 🟡)"
         health_badge = "🟡 ปานกลาง"
@@ -313,11 +374,10 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
     elif score >= 0:
         grade = "เกรด C (เฝ้าระวัง 🟠)"
         health_badge = "🟠 เฝ้าระวัง"
-        summary = f"รายได้หรือกำไรชะลอตัวลง ควรติดตามทิศทางผลประกอบการไตรมาสถัดไปอย่างใกล้ชิด."
+        summary = f"รายได้หรือกำไรชะลอตัวลง หรือมีภาระหนี้สินเพิ่มขึ้น ควรติดตามทิศทางงบการเงินไตรมาสถัดไป."
     else:
         grade = "เกรด D (น่าเป็นห่วง 🔴)"
         health_badge = "🔴 กำไรหดตัว"
-        net_str = f"{net_g:+.1f}%" if net_g is not None else "-"
         summary = f"กำไรสุทธิหดตัวลง ({net_str}), ขาดแรงหนุนด้านพื้นฐาน ควรระมัดระวัง."
 
     return {
@@ -325,6 +385,8 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
         "health_badge": health_badge,
         "peg_verdict": peg_verdict,
         "fcf_str": fcf_str,
+        "roe_str": roe_str,
+        "de_str": de_str,
         "summary": summary,
         "score": score
     }
@@ -426,6 +488,8 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         pe = live_row.get("price_earnings_ttm")
         rec_mark = live_row.get("recommendation_mark")
         fcf = live_row.get("free_cash_flow_ttm")
+        roe = live_row.get("return_on_equity_fq")
+        debt_to_equity = live_row.get("debt_to_equity_fq")
 
         target_avg = live_row.get("price_target_average")
         target_high = live_row.get("price_target_high")
@@ -451,10 +515,10 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
             sl_calc = eval_result.get("stop_loss") or round(close_price - (1.5 * atr), 2)
             tp_calc = eval_result.get("take_profit") or round(close_price * 1.08, 2)
 
-            if eval_result.get("key_support"):
+            if eval_result.get("key_support") and eval_result["key_support"] < close_price:
                 key_support = eval_result["key_support"]
                 support_desc = eval_result.get("support_desc", "แนวรับทางเทคนิค")
-            elif sma200 > 0 and abs(close_price - sma200) / close_price <= 0.08:
+            elif sma200 > 0 and sma200 < close_price and (close_price - sma200) / close_price <= 0.08:
                 key_support = round(sma200, 2)
                 support_desc = "เส้น 200 วัน (SMA 200)"
             elif bb_lower > 0 and bb_lower < close_price:
@@ -464,15 +528,18 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
                 key_support = round(sl_calc, 2)
                 support_desc = "แนวรับความผันผวน 1.5 ATR"
 
-            if eval_result.get("key_resistance"):
+            if eval_result.get("key_resistance") and eval_result["key_resistance"] > close_price:
                 key_resistance = eval_result["key_resistance"]
                 resistance_desc = eval_result.get("resistance_desc", "แนวต้านทางเทคนิค")
-            elif sma20 > 0 and sma20 > close_price:
-                key_resistance = round(sma20, 2)
-                resistance_desc = "เส้น 20 วัน (SMA 20)"
+            elif sma200 > 0 and sma200 > close_price:
+                key_resistance = round(sma200, 2)
+                resistance_desc = "เส้น 200 วัน (SMA 200)"
             elif sma50 > 0 and sma50 > close_price:
                 key_resistance = round(sma50, 2)
                 resistance_desc = "เส้น 50 วัน (SMA 50)"
+            elif sma20 > 0 and sma20 > close_price:
+                key_resistance = round(sma20, 2)
+                resistance_desc = "เส้น 20 วัน (SMA 20)"
             elif bb_upper > 0 and bb_upper > close_price:
                 key_resistance = round(bb_upper, 2)
                 resistance_desc = "ขอบบน Bollinger Band"
@@ -514,6 +581,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
             "dist_sma200_pct": eval_result.get("dist_sma200_pct"),
             "dist_ema200_pct": eval_result.get("dist_ema200_pct"),
             "in_value_zone": eval_result.get("in_value_zone", False),
+            "is_plunge_day": eval_result.get("is_plunge_day", False),
             "score": eval_result.get("score_points", 0.0),
             "tier": eval_result.get("tier", "Watchlist"),
             "signal_tags": eval_result.get("signal_tags", []),
@@ -530,6 +598,8 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
             "tv_url": eval_result.get("tv_url", f"https://www.tradingview.com/chart/?symbol={h.get('exchange', 'NASDAQ')}:{ticker}"),
             "rev_growth_yoy": round(rev_g, 2) if rev_g is not None else None,
             "net_inc_growth_yoy": round(net_g, 2) if net_g is not None else None,
+            "roe": round(roe, 2) if roe is not None else None,
+            "debt_to_equity": round(debt_to_equity, 2) if debt_to_equity is not None else None,
             "peg": round(peg, 2) if peg is not None else None,
             "pe": round(pe, 2) if pe is not None else None,
             "rec_mark": round(rec_mark, 2) if rec_mark is not None else None,
@@ -721,6 +791,10 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         dist_200 = p.get("dist_sma200_pct")
         upside = p.get("target_upside_pct") or 0.0
         
+        is_plunge = p.get("is_plunge_day", False)
+        roe = p.get("roe")
+        de = p.get("debt_to_equity")
+        
         # Disqualification checks
         if w >= 25.0:
             forbidden_buys.append({
@@ -743,6 +817,27 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
                 "reason": f"กำไรสุทธิหดตัวแรง ({net_g:+.1f}% YoY) ยังไม่ควรเติมเงินเพิ่มจนกว่าพื้นฐานจะกลับมาเติบโต."
             })
             continue
+        if is_plunge:
+            forbidden_buys.append({
+                "ticker": t,
+                "name": p["name"],
+                "reason": "ราคาปรับตัวลดลงรุนแรงในวันนี้ (Plunge Day) ยังไม่มีแท่งเทียนยืนยันการกลับตัว ห้ามตั้งรับมีดที่กำลังหล่น."
+            })
+            continue
+        if roe is not None and roe < -10.0:
+            forbidden_buys.append({
+                "ticker": t,
+                "name": p["name"],
+                "reason": f"ผลตอบแทนต่อส่วนของผู้ถือหุ้นติดลบลึก (ROE {roe:+.1f}%) บริษัทกำลังสูญเสียมูลค่าส่วนทุน ห้ามซื้อเพิ่ม."
+            })
+            continue
+        if de is not None and de > 3.0:
+            forbidden_buys.append({
+                "ticker": t,
+                "name": p["name"],
+                "reason": f"ภาระหนี้สินต่อทุนสูงเกินเกณฑ์ความปลอดภัย (D/E {de:.2f}) มีความเสี่ยงด้านโครงสร้างทางการเงิน."
+            })
+            continue
 
         # Score eligible holding for fresh cash
         score = float(stars) * 2.5
@@ -755,6 +850,16 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         if w < 5.0:
             score += 2.0  # Room to increase allocation
         if upside > 15.0:
+            score += 1.5
+        if roe is not None and roe >= 20.0:
+            score += 2.0
+        elif roe is not None and roe >= 12.0:
+            score += 1.0
+        if de is not None and de <= 0.8:
+            score += 1.5
+        if p.get("fcf") is not None and p["fcf"] > 0:
+            score += 1.0
+        if p.get("peg") is not None and 0 < p["peg"] <= 1.2:
             score += 1.5
 
         p_copy = dict(p)
@@ -1037,8 +1142,8 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
         "",
         "## 🔬 4. ภาพรวมงบการเงินและราคาเป้าหมายจากสถาบัน (Fundamentals & Institutional Target Prices)",
         "",
-        "| Ticker | บริษัท | สุขภาพงบ | Rev YoY | Net Inc YoY | PEG | ประเมิน PEG | P/E | กระแสเงินสด (FCF) | เป้าหมายสถาบัน (Upside) | มติสถาบัน | ปฏิทินงบ |",
-        "| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |"
+        "| Ticker | บริษัท | สุขภาพงบ | Rev YoY | Net Inc YoY | ROE | D/E | PEG | ประเมิน PEG | P/E | กระแสเงินสด (FCF) | เป้าหมายสถาบัน (Upside) | มติสถาบัน | ปฏิทินงบ |",
+        "| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |"
     ])
 
     for p in summary["positions"]:
@@ -1050,6 +1155,8 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
         fcf_str = fh.get("fcf_str", "-")
         rev_g = f"{p['rev_growth_yoy']:+.1f}%" if p['rev_growth_yoy'] is not None else "-"
         net_g = f"{p['net_inc_growth_yoy']:+.1f}%" if p['net_inc_growth_yoy'] is not None else "-"
+        roe_val = f"{p['roe']:+.1f}%" if p.get('roe') is not None else "-"
+        de_val = f"{p['debt_to_equity']:.2f}" if p.get('debt_to_equity') is not None else "-"
         peg_str = f"{p['peg']:.2f}" if p['peg'] is not None else "-"
         pe_str = f"{p['pe']:.1f}x" if p['pe'] is not None else "-"
 
@@ -1070,7 +1177,7 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
             earn_str = f"⚠️ **{earn_str}**"
 
         lines.append(
-            f"| **[{t}]({p['tv_url']})** | {name} | {h_badge} | {rev_g} | {net_g} | {peg_str} | {peg_verdict} | {pe_str} | {fcf_str} | {target_str} | {votes_str} | {earn_str} |"
+            f"| **[{t}]({p['tv_url']})** | {name} | {h_badge} | {rev_g} | {net_g} | {roe_val} | {de_val} | {peg_str} | {peg_verdict} | {pe_str} | {fcf_str} | {target_str} | {votes_str} | {earn_str} |"
         )
 
     # Beginner Cheat Sheet & 5 Golden Rules
@@ -1205,8 +1312,12 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
             w = pick["weight_pct"]
             c = pick["close_price"]
             sl = pick.get("stop_loss") or (c * 0.95)
-            buy_supp = pick.get("key_support", c * 0.98)
-            res_tp = pick.get("key_resistance", c * 1.08)
+            buy_supp = pick.get("key_support")
+            if not buy_supp or buy_supp >= c:
+                buy_supp = round(c * 0.98, 2)
+            res_tp = pick.get("key_resistance")
+            if not res_tp or res_tp <= c:
+                res_tp = round(c * 1.08, 2)
             biz = pick.get("business_summary", "")
 
             # Beginner Reason

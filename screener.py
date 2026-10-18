@@ -83,6 +83,11 @@ def main():
         help="Require Stochastic RSI bullish crossover in oversold zone"
     )
     parser.add_argument(
+        "--actionable", "--require-reversal",
+        action="store_true",
+        help="Strictly filter for actionable dip setups with green candle or RSI hook up (exclude active plunge days)"
+    )
+    parser.add_argument(
         "--auto-fallback",
         action="store_true",
         help="Automatically broaden scan (RSI <= 40) if strict criteria yields 0 results"
@@ -91,6 +96,11 @@ def main():
         "--require-growth",
         action="store_true",
         help="Enforce Quality Growth filter (require YoY Revenue Growth > 0%%)"
+    )
+    parser.add_argument(
+        "--allow-declining-growth",
+        action="store_true",
+        help="Allow stocks with zero or negative YoY revenue growth (disabled by default for quality dip buys)"
     )
     parser.add_argument(
         "--max-peg",
@@ -148,6 +158,7 @@ def main():
     weekly_rsi_min = None if (args.tickers or args.no_weekly_filter) else args.weekly_rsi_min
     exclude_falling_knife = False if args.tickers else (not args.allow_falling_knife)
     effective_rsi = 100.0 if (args.tickers and args.rsi_max == 35.0) else args.rsi_max
+    enforce_growth = False if (args.tickers or args.allow_declining_growth) else True
 
     filtered_results = filter_stocks(
         raw_stock_data=raw_data,
@@ -159,9 +170,10 @@ def main():
         sector_filter=args.sector,
         min_rr_ratio=args.min_rr,
         exclude_falling_knife=exclude_falling_knife,
-        require_growth=args.require_growth,
+        require_growth=enforce_growth,
         max_peg=args.max_peg,
-        require_strong_buy=args.strong_buy
+        require_strong_buy=args.strong_buy,
+        require_reversal=args.actionable
     )
 
     effective_rsi_max = effective_rsi
@@ -178,9 +190,10 @@ def main():
             sector_filter=args.sector,
             min_rr_ratio=args.min_rr,
             exclude_falling_knife=exclude_falling_knife,
-            require_growth=args.require_growth,
+            require_growth=enforce_growth,
             max_peg=args.max_peg,
-            require_strong_buy=args.strong_buy
+            require_strong_buy=args.strong_buy,
+            require_reversal=args.actionable
         )
         effective_rsi_max = fallback_rsi
 
