@@ -37,11 +37,22 @@
         },
         pivots: {
             icon: '🎯',
-            title: 'Classic Floor Pivots (แนวรับ-แนวต้านสากล)',
-            cat: 'Key Price Levels',
-            desc: 'ระดับราคาทางคณิตศาสตร์ที่คำนวณจากราคา High, Low และ Close ของรอบก่อนหน้า ประกอบด้วยจุดศูนย์กลาง (P) แนวรับ (S1, S2) และแนวต้าน (R1, R2).',
-            usage: 'ใช้เป็นกรอบวางแผนเทรดอย่างเป็นระบบ เช่น ใช้ R1 และ R2 เป็นเป้าหมายขายทำกำไร (Take Profit) และใช้ S1 กับ S2 เป็นแนวรับตั้งซื้อหรือจุดตัดขาดทุน (Stop Loss).',
-            tip: 'หากราคาทะลุผ่านแนวต้าน R1 ไปได้ R1 จะเปลี่ยนสถานะกลายเป็นแนวรับใหม่ตามหลักจิตวิทยาตลาด (Support/Resistance Flip).'
+            title: 'Support and Resistance Levels with Breaks [LuxAlgo]',
+            cat: 'Dynamic Pivot S/R & Volume Breakouts',
+            desc: 'ระบบระบุแนวรับและแนวต้านเชิงสวิงตามโมเมนตัมแบบไดนามิก พัฒนาตามอัลกอริทึมของ LuxAlgo บน TradingView (Left Bars 15, Right Bars 12) พร้อมตรวจจับแท่งเทียนที่ระเบิดแนวต้าน (Breakout) หลุดแนวรับ (Breakdown) และแท่งเทียนกับดักหลอก (Bull Wick / Bear Wick).',
+            usage: '🟢 <strong>Breakout (Vol):</strong> ราคาปิดทะลุแนวต้านพร้อมปริมาณ Volume Oscillator พุ่งเกิน +20% เป็นจุดตามน้ำ.<br>' +
+                   '🔴 <strong>Breakdown (Vol):</strong> ราคาปิดหลุดแนวรับพร้อม Volume พุ่งสูง เป็นจุดตัดขาดทุนหรือเผ่น.<br>' +
+                   '⚠️ <strong>Bull/Bear Wick (Trap):</strong> ราคาทะลุหรือหลุดแนวสำคัญแต่โดนแรงสถาบันกดดันจนทิ้งไส้ยาว เป็นกับดักราคาหลอก.',
+            tip: 'ใช้ Volume Oscillator เป็นตัวกรอง Fakeout หากราคาเบรกแนวแต่ไม่มีวอลุ่มยืนยัน ให้ระวังการดึงกลับทันที.'
+        },
+        smc: {
+            icon: '🏛️',
+            title: 'Smart Money Concepts (SMC) [LuxAlgo]',
+            cat: 'Institutional Order Flow & Gaps',
+            desc: 'ระบบตรวจจับร่องรอยการเข้าซื้อและกระจายหุ้นของนักลงทุนสถาบัน (Smart Money) ตามมาตรฐาน LuxAlgo TradingView ครอบคลุม Fair Value Gaps (FVG) และ Order Blocks (OB).',
+            usage: '🟢 <strong>Demand FVG & Bullish OB:</strong> โซนช่องว่างราคาที่ราคายังไม่ได้กลับมาแตะ (Unmitigated) ทำหน้าที่เป็นแม่เหล็กดึงดูดราคาให้ย่อลงมาทดสอบเพื่อเปิดสถานะซื้อ.<br>' +
+                   '🔴 <strong>Supply FVG & Bearish OB:</strong> โซนช่องว่างราคาฝั่งขาย ทำหน้าที่เป็นแนวต้านสำคัญที่สถาบันรอเทขายทำกำไร.',
+            tip: 'เมื่อราคาลงมาแตะกล่อง Fair Value Gap สีเขียว (Demand) โดยมี RSI ต่ำ มักเกิดการดีดตัวกลับอย่างรุนแรง.'
         },
         ew: {
             icon: '🌊',
@@ -67,15 +78,16 @@
                   '<li><span style="color:#38bdf8; font-weight:700;">📐 Wave (D) & (E) [คลื่นสามเหลี่ยมพักฐาน]:</span> เกิดในโครงสร้างสามเหลี่ยมบีบอัด (Triangle Correction A-B-C-D-E) โดย <span style="color:#34d399; font-weight:700;">Wave (D) [🟢 คลื่นขึ้น ไม่ผ่านไฮเดิม]</span> และ <span style="color:#fb7185; font-weight:700;">Wave (E) [🔴 คลื่นลง ไม่หลุดโลว์เดิม]</span> เป็นจุดเขย่าครั้งสุดท้ายก่อนระเบิดเทรนด์ใหม่.</li>' +
                   '</ul>' +
                   '</div>',
-            usage: '<div style="margin-bottom:8px;"><strong>🎯 วิธีดูจังหวะเทรดและกฎเหล็ก 3 ข้อ (Three Cardinal Rules):</strong></div>' +
+            usage: '<div style="margin-bottom:8px;"><strong>🎯 วิธีดูจังหวะเทรดและกฎเหล็ก 3 ข้อ (LuxAlgo Three Cardinal Rules):</strong></div>' +
                    '<div style="line-height:1.7;">' +
-                   '• <strong>จุดซื้อที่ได้เปรียบสูงสุด:</strong> ดักสะสมที่ปลาย <span style="color:#fbbf24; font-weight:700;">Wave (2)</span> และปลาย <span style="color:#fbbf24; font-weight:700;">Wave (4)</span> เพราะมี Risk/Reward สูงมาก.<br>' +
-                   '• <strong>จุดทำกำไรคำโตที่สุด:</strong> รันเทรนด์ใน <span style="color:#34d399; font-weight:700;">Wave (3)</span> และใช้ Fibonacci Extension 1.618 หรือ 2.618 เป็นเป้าหมาย.<br>' +
-                   '• <strong>จุดระวังขายทำกำไร:</strong> ปลาย <span style="color:#38bdf8; font-weight:700;">Wave (5)</span> เมื่อเริ่มเห็นแท่งเทียนกลับตัวหรือ Volume แผ่ว.<br>' +
-                   '• <strong>จุดอันตรายห้ามรับมีด:</strong> <span style="color:#fb7185; font-weight:700;">Wave (A)</span> และ <span style="color:#fb7185; font-weight:700;">Wave (C)</span> ควรรอให้เกิดการสร้างฐานกลับตัวชัดเจนก่อนเข้าซื้อ.' +
+                   '• <strong>กฎข้อ 1:</strong> Wave (2) ห้ามย่อทะลุจุดเริ่มต้น Wave (0) หรือ Wave (1).<br>' +
+                   '• <strong>กฎข้อ 2:</strong> Wave (4) ห้ามย่อเหลื่อมทับ (Overlap) อาณาเขตราคาของ Wave (1).<br>' +
+                   '• <strong>กฎข้อ 3 (สำคัญที่สุด):</strong> Wave (3) ห้ามเป็นคลื่นที่สั้นที่สุดในบรรดาคลื่น Motive (1, 3, 5).<br>' +
+                   '• <strong>LuxAlgo Golden Pocket (61.8%):</strong> หลังจบรอบ Wave (5) ระบบจะกางสัดส่วน Fibonacci 50.0%, 61.8% (Golden Pocket), 76.4% และ 85.4% Invalidation Floor เพื่อดักจับรอบพักฐาน.<br>' +
+                   '• <strong>🟢 New Cycle Breakout:</strong> เมื่อราคาปรับฐาน A-B-C เสร็จและระเบิดผ่านยอดดอยเดิม ระบบจะยิงสัญญาณเริ่มคลื่นลูกใหม่ทันที.' +
                    '</div>',
             tip: '<div style="line-height:1.7;">' +
-                 '⚠️ <strong>ข้อเท็จจริงสำคัญ:</strong> ตลาดหุ้นไม่ได้มีคลื่น Elliott Wave ที่สมบูรณ์ตลอดเวลา หุ้นกว่า 60% มักอยู่ในสภาวะแกว่งตัวไซด์เวย์ไร้ทิศทาง หากฝืนนับคลื่นจะกลายเป็นการเดาสุ่ม (Hindsight Bias) วันที่ตลาดไร้คลื่นชัดเจน นักเทรดมืออาชีพจะใช้ <strong>Classical Patterns</strong> หรือ <strong>EMA 50 / EMA 200</strong> แทน.' +
+                 '⚠️ <strong>มาตรฐาน LuxAlgo:</strong> ระบบรองรับทั้งคลื่นขาขึ้น (Bullish Motive) และคลื่นขาลง (Bearish Motive) พร้อมตรวจจับสถานะ Invalidation (เส้นประ Dotted) เมื่อราคาละเมิดกฎเหล็ก เพื่อป้องกันการติดดอยและช่วยให้จับจังหวะเทรดได้อย่างแม่นยำ.' +
                  '</div>'
         },
         earn: {
@@ -83,7 +95,7 @@
             title: 'ผลงบการเงินย้อนหลัง (Historical Earnings Reaction)',
             cat: 'Fundamental Catalyst',
             desc: 'ป้าย Vol ±xx% คือแท่งที่ Volume สูงสุดในแต่ละช่วงประมาณ 1 ไตรมาส (ย้อนหลัง 3 ปี) ใช้ประมาณวันประกาศงบ แต่ไม่ได้ยืนยันกับปฏิทินงบจริง อาจเป็นวัน rebalance ดัชนีหรือข่าวใหญ่อื่น ตัวเลขคือ % เปลี่ยนแปลงเทียบวันก่อนหน้า.',
-            usage: 'ป้ายสีเขียว Vol +xx% คือวัน Volume พุ่งพร้อมราคาขึ้น ส่วนป้ายสีชมพู Vol -xx% คือวัน Volume พุ่งพร้อมแรงขาย ควรเทียบกับวันประกาศงบจริงก่อนสรุปว่าเป็นผลจากงบ.',
+            usage: 'ป้ายสีเหลืองทอง Vol +xx% คือวัน Volume พุ่งพร้อมราคาบวกรับงบ ส่วนป้ายสีชมพูมาเจนต้า Vol -xx% คือวัน Volume พุ่งพร้อมแรงขาย เพื่อให้ตัดกับสีแท่งเทียนชัดเจน.',
             tip: 'ช่วยให้เห็นประวัติและพฤติกรรมความผันผวนของหุ้นตัวนี้ในวันงบออก เพื่อใช้วางแผนบริหารความเสี่ยงก่อนถึงวันประกาศงบรอบถัดไป.'
         },
         fibo: {
@@ -157,6 +169,92 @@
             desc: 'ดัชนีวัดโมเมนตัมความเร็วและขนาดของการเคลื่อนไหวของราคา บนมาตรวัด 0 ถึง 100 ในกรอบเวลา 14 วัน.',
             usage: 'RSI < 30 บ่งชี้ภาวะขายมากเกินไป (Oversold โซนดักช้อนซื้อ) ส่วน RSI > 70 บ่งชี้ภาวะซื้อมากเกินไป (Overbought โซนระวังแรงขาย).',
             tip: 'สัญญาณที่แม่นยำที่สุดคือ Bullish Divergence เมื่อราคาหุ้นทำจุดต่ำสุดใหม่ (Lower Low) แต่ RSI ยกจุดต่ำสุดสูงขึ้น (Higher Low) มักเกิดการกลับตัวขึ้นแรง.'
+        },
+        sqz: {
+            icon: '🎯',
+            title: 'Squeeze Momentum Indicator [LazyBear]',
+            cat: 'Volatility Compression & Momentum Explosion',
+            desc: 'อินดิเคเตอร์ยอดนิยมอันดับ 1 ตลอดกาลบน TradingView ของ LazyBear พัฒนาจากทฤษฎี John Carter TTM Squeeze วัดการบีบอัดตัวของ Bollinger Bands ภายใน Keltner Channels เพื่อจับจังหวะสะสมพลังก่อนระเบิดเทรนด์.',
+            usage: '🟠 <strong>จุดสีส้ม/ดำ (Squeeze ON):</strong> ความผันผวนบีบตัวต่ำผิดปกติ เป็นจังหวะสะสมพลังของเจ้ามือ.<br>' +
+                   '🟢 <strong>จุดสีเขียว/เทา (Squeeze FIRED):</strong> เกิดการระเบิดของกรอบความผันผวน พร้อมแท่งโมเมนตัมพุ่งขึ้น (เขียวสว่าง = ขาขึ้นเร่งตัว, แดงสว่าง = ขาลงเร่งตัว).',
+            tip: 'เมื่อเห็นจุดสีส้มเกิดขึ้นติดต่อกันหลายแท่ง แล้วเปลี่ยนเป็นจุดสีเขียวพร้อมแท่งโมเมนตัมสีเขียวสว่าง มักตามมาด้วยแท่งเทียนพุ่งกระฉูดทันที.'
+        },
+        wae: {
+            icon: '💥',
+            title: 'Waddah Attar Explosion (WAE) [Shayankm]',
+            cat: 'Volume & Momentum Breakout Filter',
+            desc: 'ระบบตรวจจับการระเบิดตัวของราคาและปริมาณการซื้อขายในจังหวะเดียว (Explosion) ผสานความไวของ MACD ทวีคูณเข้ากับกรอบการระเบิด Bollinger Bands และเส้น Dead Zone.',
+            usage: '🟢 <strong>แท่งเขียวเหนือ Explosion Line:</strong> เกิด Bullish Explosion แรงซื้อสถาบันระเบิดดันราคา เป็นจุดเข้าซื้อตามน้ำที่แม่นยำสูง.<br>' +
+                   '🔴 <strong>แท่งแดงเหนือ Explosion Line:</strong> เกิด Bearish Explosion แรงเทขายทะลัก เป็นจุดหนีตายทันที.<br>' +
+                   '⚪ <strong>ต่ำกว่า Dead Zone:</strong> ตลาดซึมตัว ไร้โวลุ่ม ไม่ควรเข้าเทรด.',
+            tip: 'ใช้กรอง False Breakout ได้อย่างสมบูรณ์แบบ หากราคาทำ New High แต่แท่ง WAE ไม่ข้าม Explosion Line มักเป็นเพียงการล่อซื้อหลอก.'
+        },
+        vfi: {
+            icon: '🌊',
+            title: 'Volume Flow Indicator (VFI) [LazyBear]',
+            cat: 'Institutional Volume Accumulation',
+            desc: 'ตัวชี้วัดกระแสเงินไหลเข้า-ออกของสถาบัน (Markos Katsanos VFI) ที่เหนือกว่า OBV ทั่วไป โดยตัดความผันผวนที่เป็นสัญญาณรบกวนออก และถ่วงน้ำหนักเฉพาะแท่งที่มีนัยสำคัญทางสถิติ.',
+            usage: '🟢 <strong>VFI > 0 & เหนือ Signal:</strong> สถาบันสะสมหุ้นสุทธิ (Accumulation) เงินก้อนใหญ่กำลังไหลเข้าหนุนราคา.<br>' +
+                   '🔴 <strong>VFI < 0 & ต่ำกว่า Signal:</strong> สถาบันกระจายของสุทธิ (Distribution) แรงขายทยอยระบายของ.<br>' +
+                   '⚡ <strong>Golden Cross เหนือเส้น 0:</strong> สัญญาณจุดเปลี่ยนวัฏจักรเงินไหลเข้ารอบใหม่.',
+            tip: 'หากราคาหุ้นกำลังสร้างฐานไซด์เวย์ แต่เส้น VFI ชันขึ้นตัด 0 สะท้อนว่าสถาบันกำลังแอบกวาดซื้อหุ้นเก็บไว้เงียบๆ ก่อนดันราคาขึ้นจริง.'
+        },
+        utbot: {
+            icon: '🤖',
+            title: 'UT Bot Alerts [QuantNomad]',
+            cat: 'ATR Trailing Stop & Actionable Alerts',
+            desc: 'หนึ่งในสคริปต์แจ้งเตือนยอดนิยมสูงสุดกว่า 45,000+ Boosts บน TradingView ใช้คำนวณเส้น Trailing Stop ตามค่าความผันผวน ATR เพื่อสร้างสัญญาณเข้าซื้อ (BUY) และขายล็อคกำไร (SELL) ไร้ความล่าช้า.',
+            usage: '🟢 <strong>UT BUY:</strong> แท่งเทียนทะลุผ่านเส้น Trailing Stop ขึ้นมา เป็นจุดเข้าซื้อรันเทรนด์.<br>' +
+                   '🔴 <strong>UT SELL:</strong> แท่งเทียนหลุดเส้น Trailing Stop เป็นจุดขายลดความเสี่ยงหรือล็อคกำไร.',
+            tip: 'ใช้เส้นจุดประสีเขียว/แดงบนกราฟเป็นจุดตั้ง Stop Loss แบบเลื่อนตามราคา (Trailing Stop) ไม่ต้องเดาจุดตัดขาดทุนเอง.'
+        },
+        chand: {
+            icon: '🪔',
+            title: 'Chandelier Exit [everget]',
+            cat: 'Volatility Trailing Stop',
+            desc: 'ระบบ Trailing Stop-Loss ระดับตำนานของ Charles Le Beau ช่วยแก้ปัญหาการขายหมูหรือตกรถกลางทาง โดยคำนวณจุดหยุดการขาดทุนจากจุดสูงสุด Highest High ลบด้วย 3 เท่าของ ATR.',
+            usage: '🟢 <strong>Long Stop (เส้นประ):</strong> ถือหุ้นรันเทรนด์ไปได้เรื่อยๆ ตราบใดที่ราคาปิดยังยืนเหนือเส้นนี้.<br>' +
+                   '🔴 <strong>Sell / Flip to Short:</strong> เมื่อราคาปิดหลุดเส้น Long Stop ระบบจะสั่งปิดสถานะทันทีเพื่อล็อคกำไรก้อนใหญ่.',
+            tip: 'เหมาะมากสำหรับนักลงทุนที่ต้องการรันเทรนด์ใหญ่ให้สุดทาง โดยปล่อยให้เส้น Chandelier Exit ขยับตามจุดสูงสุดใหม่ของหุ้น.'
+        },
+        hull: {
+            icon: '🎨',
+            title: 'Hull Suite [InSilico]',
+            cat: 'Zero-Lag Trend Ribbon',
+            desc: 'การรวมพลังของเส้นค่าเฉลี่ยเคลื่อนที่ตระกูล Hull (HMA) ที่โด่งดังกว่า 30,000+ Boosts ช่วยขจัดความหน่วง (Lag) ของเส้นค่าเฉลี่ยธรรมดาได้เกือบ 100% พร้อมปรับสีตามโมเมนตัมแบบเรียลไทม์.',
+            usage: '🟢 <strong>ริบบอนสีเขียว (Bullish Trend):</strong> ความชันของราคาเป็นบวก เทรนด์แข็งแกร่ง น่าถือรันเทรนด์หรือดักซื้อเมื่อย่อตัว.<br>' +
+                   '🔴 <strong>ริบบอนสีแดง (Bearish Trend):</strong> ความชันหักหัวลง เตือนแรงขายทำกำไร ชะลอการเข้าซื้อ.',
+            tip: 'เมื่อ Hull Suite เปลี่ยนสีจากแดงเป็นเขียว มักส่งสัญญาณเร็วกว่า Golden Cross ของ EMA ทั่วไปถึงหลายวัน.'
+        },
+        wt: {
+            icon: '🌊',
+            title: 'WaveTrend Oscillator [LazyBear]',
+            cat: 'Momentum Waves & Reversal Cycles',
+            desc: 'ออสซิลเลเตอร์ยอดนิยมระดับตำนาน 35,000+ Boosts ของ LazyBear ดัดแปลงจากสูตร Commodity Channel Index (CCI) และคำนวณ EMA สองชั้น เพื่อดักจับจุดกลับตัวต้นรอบที่ไวกว่า MACD.',
+            usage: '🟢 <strong>WT1 ตัดขึ้นเหนือ WT2 ในโซน Oversold (ต่ำกว่า -50):</strong> จุดช้อนซื้อต้นรอบที่มีแต้มต่อสูงสุด (Oversold Buy).<br>' +
+                   '🔴 <strong>WT1 ตัดลงใต้ WT2 ในโซน Overbought (สูงกว่า +50):</strong> จุดขายทำกำไรปลายรอบ (Overbought Sell).<br>' +
+                   '⚪ <strong>เส้น 0:</strong> ระดับแบ่งโซนกระทิง (แดนบวก) และโซนหมี (แดนลบ).',
+            tip: 'สัญญาณ Golden Cross ของ WaveTrend ในโซนต่ำกว่า -50 เป็นหนึ่งในสัญญาณกลับตัวที่แม่นยำที่สุดในหมวด Momentum.'
+        },
+        lorentzian: {
+            icon: '🤖',
+            title: 'Machine Learning: Lorentzian Classification [jdehorty]',
+            cat: 'Algorithmic AI Market Regime Prediction',
+            desc: 'สคริปต์ Machine Learning อันดับ 1 ตลอดกาลบน TradingView (42,000+ Boosts) ของ jdehorty คำนวณระยะห่างทางคณิตศาสตร์แบบ Lorentzian Warped Metric Space ด้วยอัลกอริทึม k-Nearest Neighbors (KNN, k=8) ข้าม 4 มิติทางเทคนิค (RSI 14, ROC 10, Normalized True Range, CCI 20).',
+            usage: '🟢 <strong>STRONG BUY / BUY (สีม่วง/เขียว):</strong> โมเดล AI ทำนายความน่าจะเป็นที่ราคาจะปรับตัวขึ้น พร้อมระบุค่าความเชื่อมั่น (Confidence %).<br>' +
+                   '🔴 <strong>STRONG SELL / SELL (สีแดง):</strong> โมเดล AI ตรวจพบสภาวะตลาดที่มีความเสี่ยงปรับฐานสูง.<br>' +
+                   '⚪ <strong>NEUTRAL:</strong> สภาวะตลาดสมดุล แนะนำรอความชัดเจน.',
+            tip: 'ใช้คะแนนความเชื่อมั่นของ Lorentzian ML ยืนยันร่วมกับสัญญาณเบรกเอาต์ของทรงกราฟหรือ Golden Pocket ของ Fibonacci เพื่อเพิ่ม Win Rate สูงสุด.'
+        },
+        aisig: {
+            icon: '🤖',
+            title: 'Rule-based Decision Signals (BUY / DCA / TP)',
+            cat: 'Algorithmic Signal System',
+            desc: 'ระบบป้ายสัญญาณซื้อขายอัจฉริยะ (Rule-based Multi-Factor Engine) วิเคราะห์ร่วมกันระหว่างโมเมนตัม RSI, การตัดกันของเส้น EMA, สภาพคล่อง Order Block และ Fibonacci Golden Pocket.',
+            usage: '🟢 <strong>BUY (1-5/5):</strong> สัญญาณจุดเข้าซื้อตามโมเมนตัม ยิ่งคะแนนสูงยิ่งมีความน่าเชื่อถือ.<br>' +
+                   '🔵 <strong>DCA (1-5/5):</strong> สัญญาณจุดสะสมหุ้นเพิ่มเมื่อราคาย่อตัวลงมาแตะแนวรับสำคัญ.<br>' +
+                   '🔴 <strong>TP (1-5/5):</strong> สัญญาณทยอยแบ่งขายทำกำไรเมื่อราคาเข้าใกล้เป้าหมาย Fibonacci หรือแนวต้าน.',
+            tip: 'ใช้สัญญาณคะแนน 4/5 หรือ 5/5 เพื่อหาจุดเข้าที่ปลอดภัยและมีแต้มต่อ Risk-to-Reward สูงที่สุด.'
         }
     };
 
@@ -177,7 +275,8 @@
         document.getElementById('im_usage').innerHTML = g.usage;
         document.getElementById('im_tip').innerHTML = g.tip;
 
-        const isVis = indKey === 'rsi' ? indicatorVisibility.rsiPane : indicatorVisibility[indKey];
+        const isSubpane = ['rsi', 'sqz', 'wae', 'vfi', 'wt'].includes(indKey);
+        const isVis = isSubpane ? activeSubpaneOscs.includes(indKey) : indicatorVisibility[indKey];
         const btn = document.getElementById('im_toggle_btn');
         if (btn) {
             btn.textContent = isVis ? '👁️ ปิดเส้นนี้บนกราฟ' : '⚡ เปิดเส้นนี้บนกราฟ';
@@ -198,12 +297,13 @@
 
     function toggleFromModal() {
         if (!currentModalInd) return;
-        if (currentModalInd === 'rsi') {
-            toggleRsiPane();
+        const isSubpane = ['rsi', 'sqz', 'wae', 'vfi', 'wt'].includes(currentModalInd);
+        if (isSubpane) {
+            toggleSubpane(currentModalInd);
         } else {
             toggleIndicator(currentModalInd);
         }
-        const isVis = currentModalInd === 'rsi' ? indicatorVisibility.rsiPane : indicatorVisibility[currentModalInd];
+        const isVis = isSubpane ? activeSubpaneOscs.includes(currentModalInd) : indicatorVisibility[currentModalInd];
         const btn = document.getElementById('im_toggle_btn');
         if (btn) {
             btn.textContent = isVis ? '👁️ ปิดเส้นนี้บนกราฟ' : '⚡ เปิดเส้นนี้บนกราฟ';
@@ -349,6 +449,8 @@
 
     let activeLwChart = null;
     let activeRsiChart = null;
+    let activeSubpaneCharts = [];
+    let activeSubpaneOscs = ['rsi'];
     let activeCandleSeries = null;
     let activeRsiSeries = null;
     let currentStockTicker = '__DEFAULT_TICKER__';
@@ -366,15 +468,21 @@
         cdc: false,
         rsiPane: true, // RSI sub-pane defaults to active!
         pivots: false,
+        smc: false,
         ew: false,
-        earn: false,
+        earn: true,
         vwap: false,
         st: false,
         sar: false,
         ichi: false,
         bb: false,
-        pat: true,
+        pat: false,
         fibo: false,
+        utbot: false,
+        chand: false,
+        hull: false,
+        lorentzian: false,
+        aisig: false,
     };
 
     const chartSeriesRegistry = {
@@ -392,8 +500,12 @@
         patPriceLines: [],
         ew: [],
         pivotLines: [],
+        smcLines: [],
         ewPriceLines: [],
-        fiboLines: []
+        fiboLines: [],
+        utbot: [],
+        chand: [],
+        hull: []
     };
 
     const ALL_TICKERS = __SORTED_TICKERS_JSON__;
@@ -644,39 +756,79 @@
         const s2Val = tData.pivots ? tData.pivots.s2 : 0;
         const slVal = (m && m.sl) || (tData.atr14 ? (lastP - 1.5 * tData.atr14.value) : 0);
 
+        // LuxAlgo Support & Resistance Levels (Left 15, Right 12)
+        const luxSr = tData.luxalgo_sr;
+        if (luxSr && luxSr.resistance && Number(luxSr.resistance) > 0) {
+            try {
+                lines.push(series.createPriceLine({
+                    price: Number(luxSr.resistance),
+                    color: '#ec4899',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    axisLabelVisible: true,
+                    title: '🟣 Lux Resistance $' + Number(luxSr.resistance).toFixed(2),
+                }));
+            } catch(e) {}
+        }
+        if (luxSr && luxSr.support && Number(luxSr.support) > 0) {
+            try {
+                lines.push(series.createPriceLine({
+                    price: Number(luxSr.support),
+                    color: '#38bdf8',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    axisLabelVisible: true,
+                    title: '🔵 Lux Support $' + Number(luxSr.support).toFixed(2),
+                }));
+            } catch(e) {}
+        }
+
         if (r2Val > 0) {
             try {
                 lines.push(series.createPriceLine({
                     price: Number(r2Val),
-                    color: 'rgba(251, 113, 133, 0.75)',
+                    color: 'rgba(236, 72, 153, 0.75)',
                     lineWidth: 1,
                     lineStyle: LightweightCharts.LineStyle.Dashed,
                     axisLabelVisible: true,
-                    title: '🔴 R2 $' + Number(r2Val).toFixed(2),
+                    title: '🟣 R2 $' + Number(r2Val).toFixed(2),
                 }));
             } catch(e) {}
         }
-        if (r1Val > 0) {
+        if (r1Val > 0 && (!luxSr || !luxSr.resistance)) {
             try {
                 lines.push(series.createPriceLine({
                     price: Number(r1Val),
-                    color: '#fb7185',
+                    color: '#ec4899',
                     lineWidth: 1.5,
                     lineStyle: LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
-                    title: '🔴 R1 $' + Number(r1Val).toFixed(2),
+                    title: '🟣 R1 $' + Number(r1Val).toFixed(2),
                 }));
             } catch(e) {}
         }
-        if (s1Val > 0) {
+        const ppVal = tData.pivots ? tData.pivots.pivot : 0;
+        if (ppVal > 0) {
+            try {
+                lines.push(series.createPriceLine({
+                    price: Number(ppVal),
+                    color: '#facc15',
+                    lineWidth: 1.5,
+                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: '🟡 PP $' + Number(ppVal).toFixed(2),
+                }));
+            } catch(e) {}
+        }
+        if (s1Val > 0 && (!luxSr || !luxSr.support)) {
             try {
                 lines.push(series.createPriceLine({
                     price: Number(s1Val),
-                    color: '#10b981',
+                    color: '#38bdf8',
                     lineWidth: 1.5,
                     lineStyle: LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
-                    title: '🟢 S1 $' + Number(s1Val).toFixed(2),
+                    title: '🔵 S1 $' + Number(s1Val).toFixed(2),
                 }));
             } catch(e) {}
         }
@@ -684,7 +836,7 @@
             try {
                 lines.push(series.createPriceLine({
                     price: Number(s2Val),
-                    color: 'rgba(52, 211, 153, 0.75)',
+                    color: 'rgba(56, 189, 248, 0.75)',
                     lineWidth: 1,
                     lineStyle: LightweightCharts.LineStyle.Dashed,
                     axisLabelVisible: true,
@@ -696,7 +848,7 @@
             try {
                 lines.push(series.createPriceLine({
                     price: Number(slVal),
-                    color: '#f43f5e',
+                    color: '#f97316',
                     lineWidth: 1.5,
                     lineStyle: LightweightCharts.LineStyle.Dotted,
                     axisLabelVisible: true,
@@ -704,6 +856,54 @@
                 }));
             } catch(e) {}
         }
+        return lines;
+    }
+
+    function drawSmcPriceLines(series, tData) {
+        if (!series || !tData || !tData.smc) return [];
+        const lines = [];
+        const smc = tData.smc;
+        const fvgs = smc.unmitigated_fvgs || [];
+        fvgs.forEach(f => {
+            const isBull = f.type === 'BULLISH_FVG';
+            const fvgCol = isBull ? 'rgba(56, 189, 248, 0.75)' : 'rgba(236, 72, 153, 0.75)';
+            try {
+                lines.push(series.createPriceLine({
+                    price: Number(f.top),
+                    color: fvgCol,
+                    lineWidth: 1,
+                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: (isBull ? '🔵 FVG Demand Top $' : '🟣 FVG Supply Top $') + Number(f.top).toFixed(2),
+                }));
+                lines.push(series.createPriceLine({
+                    price: Number(f.bottom),
+                    color: fvgCol,
+                    lineWidth: 1,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    axisLabelVisible: true,
+                    title: (isBull ? '🔵 FVG Demand Low $' : '🟣 FVG Supply Low $') + Number(f.bottom).toFixed(2),
+                }));
+            } catch(e) {}
+        });
+        const obs = smc.order_blocks || [];
+        obs.forEach(ob => {
+            const isBull = ob.type === 'BULLISH_OB';
+            const obBottom = ob.bottom != null ? Number(ob.bottom) : null;
+            const obTop = ob.top != null ? Number(ob.top) : null;
+            const obLevel = ob.level != null ? Number(ob.level) : ((obBottom != null && obTop != null) ? (obBottom + obTop) / 2 : null);
+            if (obLevel == null || isNaN(obLevel)) return;
+            try {
+                lines.push(series.createPriceLine({
+                    price: obLevel,
+                    color: isBull ? '#facc15' : '#ec4899',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    axisLabelVisible: true,
+                    title: (isBull ? '🟡 Bullish OB $' : '🟣 Bearish OB $') + obLevel.toFixed(2),
+                }));
+            } catch(e) {}
+        });
         return lines;
     }
 
@@ -721,17 +921,49 @@
         const ewSeriesList = [];
         const priceLines = [];
 
+        const isBear = ew.direction === 'bearish';
+        const isInvalid = ew.status === 'invalidated';
+        const waveColor = isBear ? '#f43f5e' : '#818cf8';
+        const waveStyle = isInvalid ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Solid;
+
         if (ew.lines && ew.lines.length >= 2) {
             try {
                 const s = chart.addLineSeries({
-                    color: '#818cf8',
+                    color: waveColor,
                     lineWidth: 2.5,
-                    lineStyle: LightweightCharts.LineStyle.Solid,
-                    title: (currentFiboMode === 'macro' ? '🏔️ EW Macro' : '🌊 EW Cycle'),
+                    lineStyle: waveStyle,
+                    title: (currentFiboMode === 'macro' ? '🏔️ EW Macro' : '🌊 EW Cycle') + (isBear ? ' (Bearish)' : ''),
                     visible: true,
                 });
                 s.setData(interpolatePatternPoints(ew.lines, currentCandles));
                 ewSeriesList.push(s);
+            } catch(e) {}
+        }
+
+        // LuxAlgo Post-Impulse Fibonacci Retracement Grid (Golden Pocket 61.8% & 85.4% Invalidation Floor)
+        if (ew.fibo_pullback) {
+            try {
+                if (ew.fibo_pullback.fib_618) {
+                    priceLines.push(series.createPriceLine({
+                        price: Number(ew.fibo_pullback.fib_618),
+                        color: '#f59e0b',
+                        lineWidth: 1.5,
+                        lineStyle: LightweightCharts.LineStyle.Dashed,
+                        axisLabelVisible: true,
+                        title: '🟡 EW Golden Pocket (61.8%) $' + Number(ew.fibo_pullback.fib_618).toFixed(2),
+                    }));
+                }
+                if (ew.fibo_pullback.fib_854) {
+                    const broken = ew.fibo_pullback.floor_broken;
+                    priceLines.push(series.createPriceLine({
+                        price: Number(ew.fibo_pullback.fib_854),
+                        color: broken ? '#ef4444' : '#64748b',
+                        lineWidth: 1.5,
+                        lineStyle: LightweightCharts.LineStyle.Dotted,
+                        axisLabelVisible: true,
+                        title: (broken ? '❌ EW 85.4% Breached $' : '🛡️ EW 85.4% Floor $') + Number(ew.fibo_pullback.fib_854).toFixed(2),
+                    }));
+                }
             } catch(e) {}
         }
 
@@ -740,11 +972,11 @@
                 const badge = ew.current_wave_badge || 'Target';
                 priceLines.push(series.createPriceLine({
                     price: Number(ew.target),
-                    color: '#38bdf8',
+                    color: isBear ? '#f43f5e' : '#38bdf8',
                     lineWidth: 1.5,
                     lineStyle: LightweightCharts.LineStyle.Dashed,
                     axisLabelVisible: true,
-                    title: '🎯 ' + badge + ' Target $' + Number(ew.target).toFixed(2),
+                    title: (isBear ? '🎯 Bearish Target $' : '🎯 ' + badge + ' Target $') + Number(ew.target).toFixed(2),
                 }));
             } catch(e) {}
         }
@@ -757,7 +989,7 @@
                     lineWidth: 1.5,
                     lineStyle: LightweightCharts.LineStyle.Dotted,
                     axisLabelVisible: true,
-                    title: '🚫 EW Floor $' + Number(ew.invalidation).toFixed(2),
+                    title: (isBear ? '🛑 EW Roof $' : '🚫 EW Floor $') + Number(ew.invalidation).toFixed(2),
                 }));
             } catch(e) {}
         }
@@ -893,7 +1125,7 @@
                 const isForming = pat.status === 'forming';
                 priceLines.push(series.createPriceLine({
                     price: Number(pat.target),
-                    color: isUp ? '#10b981' : '#f43f5e',
+                    color: isUp ? '#facc15' : '#ec4899',
                     lineWidth: 2,
                     lineStyle: isForming ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
@@ -905,17 +1137,188 @@
         return { series: patSeriesList, priceLines: priceLines };
     }
 
+    function parseEarningsDateToIso(str) {
+        if (!str || str === '-' || str === 'None') return null;
+        const parts = str.trim().split(/\s+/);
+        if (parts.length === 3) {
+            const months = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
+            const day = parts[0].padStart(2, '0');
+            const m = months[parts[1].toLowerCase().slice(0, 3)] || '01';
+            const y = parts[2];
+            return y + '-' + m + '-' + day;
+        }
+        return null;
+    }
+
+    function getBusinessDaysBetween(startDateStr, endDateStr) {
+        const dates = [];
+        let cur = new Date(startDateStr + 'T00:00:00Z');
+        const end = new Date(endDateStr + 'T00:00:00Z');
+
+        cur.setUTCDate(cur.getUTCDate() + 1);
+        while (cur < end) {
+            const day = cur.getUTCDay();
+            if (day !== 0 && day !== 6) {
+                dates.push(cur.toISOString().split('T')[0]);
+            }
+            cur.setUTCDate(cur.getUTCDate() + 1);
+        }
+        dates.push(endDateStr);
+        return dates;
+    }
+
+    let upcomingEarningsSeries = null;
+    let currentEarningsIso = null;
+
+    function ensureEarningsOverlay() {
+        let overlay = document.getElementById('earnings_vertical_line_overlay');
+        if (!overlay) {
+            const wrap = document.getElementById('chart_container_wrap') || (document.getElementById('chart_container') ? document.getElementById('chart_container').parentElement : null);
+            if (!wrap) return null;
+            overlay = document.createElement('div');
+            overlay.id = 'earnings_vertical_line_overlay';
+            overlay.style.cssText = 'position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; z-index: 10; display: none; overflow: hidden;';
+            overlay.innerHTML = `
+                <div id="v_earn_line" style="position: absolute; top: 0; bottom: 26px; width: 0px; border-left: 2px dashed #facc15; box-shadow: 0 0 10px rgba(250, 204, 21, 0.5); pointer-events: auto;">
+                    <div id="v_earn_badge" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: #12182b; border: 1.5px solid #facc15; color: #facc15; border-radius: 6px; padding: 4px 8px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 4px;">
+                        <span style="font-size: 0.85rem;">🗓️</span>
+                        <span id="v_earn_text">วันประกาศงบ</span>
+                    </div>
+                    <div style="position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); background: #facc15; color: #060810; font-size: 0.62rem; font-weight: 800; border-radius: 3px; padding: 1px 4px; white-space: nowrap; letter-spacing: 0.5px;">
+                        EARNINGS
+                    </div>
+                </div>
+            `;
+            wrap.appendChild(overlay);
+        }
+        return overlay;
+    }
+
+    function syncVerticalEarningsPosition() {
+        const overlay = ensureEarningsOverlay();
+        if (!overlay || !activeLwChart || !currentEarningsIso || !indicatorVisibility.earn || currentChartMode !== 'tech') {
+            if (overlay) overlay.style.display = 'none';
+            return;
+        }
+        const timeScale = activeLwChart.timeScale();
+        let coord = null;
+        try {
+            coord = timeScale.timeToCoordinate(currentEarningsIso);
+            if (coord === null && typeof currentEarningsIso === 'string') {
+                const parts = currentEarningsIso.split('-');
+                if (parts.length === 3) {
+                    coord = timeScale.timeToCoordinate({ year: parseInt(parts[0], 10), month: parseInt(parts[1], 10), day: parseInt(parts[2], 10) });
+                }
+            }
+        } catch(e) {}
+
+        if (coord === null || coord === undefined || isNaN(coord)) {
+            overlay.style.display = 'none';
+            return;
+        }
+        const container = document.getElementById('chart_container');
+        const maxW = container ? container.clientWidth : 1000;
+        if (coord < -20 || coord > maxW - 35) {
+            overlay.style.display = 'none';
+            return;
+        }
+        overlay.style.display = 'block';
+        const vLine = document.getElementById('v_earn_line');
+        if (vLine) {
+            vLine.style.left = Math.round(coord) + 'px';
+        }
+    }
+
+    function updateUpcomingEarnings(ticker) {
+        if (!indicatorVisibility.earn) {
+            currentEarningsIso = null;
+            syncVerticalEarningsPosition();
+            if (upcomingEarningsSeries && activeLwChart) {
+                try { activeLwChart.removeSeries(upcomingEarningsSeries); } catch(e) {}
+                upcomingEarningsSeries = null;
+            }
+            return;
+        }
+
+        const mInfo = STOCKS_META[ticker] || {};
+        let dEarn = mInfo.days_to_earnings;
+        const earnIso = parseEarningsDateToIso(mInfo.earnings_date);
+        const lastBar = (currentCandles && currentCandles.length > 0) ? currentCandles[currentCandles.length - 1] : null;
+
+        if (!lastBar || !earnIso || earnIso <= lastBar.time) {
+            currentEarningsIso = null;
+            syncVerticalEarningsPosition();
+            if (upcomingEarningsSeries && activeLwChart) {
+                try { activeLwChart.removeSeries(upcomingEarningsSeries); } catch(e) {}
+                upcomingEarningsSeries = null;
+            }
+            return;
+        }
+
+        if (dEarn === null || dEarn === undefined) {
+            const diffMs = new Date(earnIso) - new Date(lastBar.time);
+            dEarn = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        }
+
+        if (dEarn < 0 || dEarn > 90) {
+            currentEarningsIso = null;
+            syncVerticalEarningsPosition();
+            if (upcomingEarningsSeries && activeLwChart) {
+                try { activeLwChart.removeSeries(upcomingEarningsSeries); } catch(e) {}
+                upcomingEarningsSeries = null;
+            }
+            return;
+        }
+
+        currentEarningsIso = earnIso;
+
+        ensureEarningsOverlay();
+        const vText = document.getElementById('v_earn_text');
+        if (vText) {
+            vText.textContent = 'วันประกาศงบ: ' + (mInfo.earnings_date || '') + ' (อีก ' + (Math.round(dEarn * 10) / 10) + ' วัน)';
+        }
+
+        try {
+            if (upcomingEarningsSeries && activeLwChart) {
+                try { activeLwChart.removeSeries(upcomingEarningsSeries); } catch(e) {}
+                upcomingEarningsSeries = null;
+            }
+            if (activeLwChart) {
+                upcomingEarningsSeries = activeLwChart.addLineSeries({
+                    color: 'transparent',
+                    lineWidth: 1,
+                    priceLineVisible: false,
+                    lastValueVisible: false,
+                    crosshairMarkerVisible: false,
+                });
+                const bDays = getBusinessDaysBetween(lastBar.time, earnIso);
+                const timelineData = [
+                    { time: lastBar.time, value: lastBar.close },
+                    ...bDays.map(d => ({ time: d, value: lastBar.close }))
+                ];
+                upcomingEarningsSeries.setData(timelineData);
+            }
+        } catch(e) {
+            console.warn('Could not set timeline data for earnings:', e);
+        }
+
+        syncVerticalEarningsPosition();
+        requestAnimationFrame(syncVerticalEarningsPosition);
+        setTimeout(syncVerticalEarningsPosition, 60);
+    }
+
     function updateChartMarkers(series, ticker) {
         if (!series) return;
         const tData = CHARTS_DATA[ticker] || {};
         const mInfo = STOCKS_META[ticker] || {};
         const markers = [];
 
+        // 1. High and Low Swing Points (Default ON)
         if (tData.swing_high && tData.swing_high.time) {
             markers.push({
                 time: tData.swing_high.time,
                 position: 'aboveBar',
-                color: '#f43f5e',
+                color: '#ec4899',
                 shape: 'arrowDown',
                 text: 'High $' + tData.swing_high.price,
             });
@@ -924,64 +1327,71 @@
             markers.push({
                 time: tData.swing_low.time,
                 position: 'belowBar',
-                color: '#10b981',
+                color: '#38bdf8',
                 shape: 'arrowUp',
                 text: 'Low $' + tData.swing_low.price,
             });
         }
 
-        const aiSignals = tData.ai_signals || [];
-        aiSignals.forEach(sig => {
-            const isBuy = sig.action === 'BUY';
-            const isDca = sig.action === 'DCA';
-            const isSell = sig.action === 'SELL';
-            markers.push({
-                time: sig.time,
-                position: (isBuy || isDca) ? 'belowBar' : 'aboveBar',
-                color: sig.marker_color || (isBuy ? '#10b981' : (isDca ? '#38bdf8' : '#f43f5e')),
-                shape: sig.marker_shape || (isBuy ? 'arrowUp' : (isDca ? 'circle' : 'arrowDown')),
-                text: (isBuy ? '🤖 BUY ' : (isDca ? '🤖 DCA ' : (isSell ? '🤖 TP ' : '🤖 '))) + sig.score + '/5',
-                id: 'sig_' + sig.time,
-            });
-        });
-
-        // Upcoming Earnings Shock Guard Marker
-        const dEarn = mInfo.days_to_earnings;
-        if (dEarn !== null && dEarn !== undefined && dEarn >= 0 && dEarn <= 30 && currentCandles.length > 0) {
-            const lastBar = currentCandles[currentCandles.length - 1];
-            markers.push({
-                time: lastBar.time,
-                position: 'aboveBar',
-                color: dEarn <= 14 ? '#fb7185' : '#facc15',
-                shape: 'circle',
-                text: '🗓️ งบ ' + dEarn + 'd (' + (mInfo.earnings_date || '') + ')',
+        // 2. AI Decision Signals (BUY / DCA / TP) - Only shown when toggled ON
+        if (indicatorVisibility.aisig && tData.ai_signals) {
+            const aiSignals = tData.ai_signals || [];
+            aiSignals.forEach(sig => {
+                const isBuy = sig.action === 'BUY';
+                const isDca = sig.action === 'DCA';
+                const isSell = sig.action === 'SELL';
+                markers.push({
+                    time: sig.time,
+                    position: (isBuy || isDca) ? 'belowBar' : 'aboveBar',
+                    color: sig.marker_color || (isBuy ? '#10b981' : (isDca ? '#38bdf8' : '#f43f5e')),
+                    shape: sig.marker_shape || (isBuy ? 'arrowUp' : (isDca ? 'circle' : 'arrowDown')),
+                    text: (isBuy ? '🤖 BUY ' : (isDca ? '🤖 DCA ' : (isSell ? '🤖 TP ' : '🤖 '))) + sig.score + '/5',
+                    id: 'sig_' + sig.time,
+                });
             });
         }
 
         // Historical Earnings Reaction Markers (Rocket Tool Style: 'งบ +xx.x%')
         if (indicatorVisibility.earn && tData.earnings_history) {
             tData.earnings_history.forEach(e => {
+                const isPos = (e.reaction_pct >= 0);
                 markers.push({
                     time: e.time,
-                    position: e.position || (e.reaction_pct >= 0 ? 'belowBar' : 'aboveBar'),
-                    color: e.color || (e.reaction_pct >= 0 ? '#10b981' : '#f43f5e'),
+                    position: e.position || (isPos ? 'belowBar' : 'aboveBar'),
+                    color: isPos ? '#facc15' : '#ec4899',
                     shape: 'circle',
-                    text: e.text || ('📊 Vol ' + ((e.reaction_pct || 0) >= 0 ? '+' : '') + Number(e.reaction_pct || 0).toFixed(1) + '%'),
+                    size: 2,
+                    text: '🗓️ ' + ((e.reaction_pct || 0) >= 0 ? '+' : '') + Number(e.reaction_pct || 0).toFixed(1) + '%',
                 });
             });
         }
 
-        // Elliott Wave Markers (0, 1, 2, 3, 4, 5, Live Current Bar)
+        // Elliott Wave Markers (0, 1, 2, 3, 4, 5, Live Current Bar, New Motive Cycle Breakout)
         const ew = getActiveElliottWave(tData);
         if (indicatorVisibility.ew && ew && ew.detected && ew.points) {
+            const isBear = ew.direction === 'bearish';
             ew.points.forEach(pt => {
-                const isPeak = pt.wave === '(1)' || pt.wave === '(3)' || pt.wave === '(5)';
+                const isNewCycle = pt.label && (pt.label.includes('New Cycle') || pt.label.includes('Breakout'));
+                const isOddWave = pt.wave === '(1)' || pt.wave === '(3)' || pt.wave === '(5)';
+                const isPeak = isBear ? !isOddWave : isOddWave;
                 const isCurrent = pt.label && pt.label.includes('ปัจจุบัน');
+
+                let mColor = isCurrent ? '#f59e0b' : (isBear ? '#f43f5e' : '#818cf8');
+                let mShape = isCurrent ? 'circle' : (isPeak ? 'arrowDown' : 'arrowUp');
+                let mSize = 1;
+
+                if (isNewCycle) {
+                    mColor = '#10b981';
+                    mShape = 'circle';
+                    mSize = 2;
+                }
+
                 markers.push({
                     time: pt.time,
                     position: isPeak ? 'aboveBar' : 'belowBar',
-                    color: isCurrent ? '#f59e0b' : '#818cf8',
-                    shape: isCurrent ? 'circle' : (isPeak ? 'arrowDown' : 'arrowUp'),
+                    color: mColor,
+                    shape: mShape,
+                    size: mSize,
                     text: pt.label || (pt.wave + ' $' + Number(pt.price).toFixed(2)),
                 });
             });
@@ -1035,6 +1445,161 @@
             });
         }
 
+        // LuxAlgo Support and Resistance Levels with Breaks & Wicks
+        if (indicatorVisibility.pivots && tData.luxalgo_sr && tData.luxalgo_sr.recent_breaks) {
+            tData.luxalgo_sr.recent_breaks.forEach(b => {
+                const isBull = b.type === 'BREAKOUT_VOL' || b.type === 'BEAR_WICK';
+                markers.push({
+                    time: b.time,
+                    position: isBull ? 'belowBar' : 'aboveBar',
+                    color: b.type === 'BREAKOUT_VOL' ? '#10b981' : (b.type === 'BREAKDOWN_VOL' ? '#f43f5e' : '#f59e0b'),
+                    shape: b.type === 'BREAKOUT_VOL' ? 'arrowUp' : (b.type === 'BREAKDOWN_VOL' ? 'arrowDown' : 'circle'),
+                    size: b.type.includes('VOL') ? 2 : 1,
+                    text: b.label + ' $' + Number(b.level).toFixed(2),
+                });
+            });
+        }
+
+        // Smart Money Concepts (SMC) Unmitigated FVGs & Order Blocks
+        if (indicatorVisibility.smc && tData.smc) {
+            if (tData.smc.unmitigated_fvgs) {
+                tData.smc.unmitigated_fvgs.forEach(f => {
+                    const isDemand = f.type === 'BULLISH_FVG';
+                    markers.push({
+                        time: f.time,
+                        position: isDemand ? 'belowBar' : 'aboveBar',
+                        color: isDemand ? '#38bdf8' : '#ec4899',
+                        shape: 'circle',
+                        size: 1,
+                        text: (isDemand ? '🔵 Demand FVG' : '🟣 Supply FVG') + ' $' + Number(f.bottom).toFixed(2) + ' - $' + Number(f.top).toFixed(2),
+                    });
+                });
+            }
+            if (tData.smc.order_blocks) {
+                tData.smc.order_blocks.forEach(ob => {
+                    const isBull = ob.type === 'BULLISH_OB';
+                    const obBottom = ob.bottom != null ? Number(ob.bottom) : null;
+                    const obTop = ob.top != null ? Number(ob.top) : null;
+                    const obLevel = ob.level != null ? Number(ob.level) : ((obBottom != null && obTop != null) ? (obBottom + obTop) / 2 : null);
+                    markers.push({
+                        time: ob.time,
+                        position: isBull ? 'belowBar' : 'aboveBar',
+                        color: isBull ? '#facc15' : '#ec4899',
+                        shape: isBull ? 'arrowUp' : 'arrowDown',
+                        size: 2,
+                        text: ob.label || ((isBull ? '🟡 Demand OB $' : '🟣 Supply OB $') + (obLevel != null ? obLevel.toFixed(2) : '')),
+                    });
+                });
+            }
+        }
+
+        // Squeeze Fired & WAE Explosion Markers on Candles (Only when their sub-pane oscillator is active)
+        if (activeSubpaneOscs.includes('sqz') && tData.squeeze_momentum && tData.squeeze_momentum.squeeze_fired && currentCandles.length > 0) {
+            const lastBar = currentCandles[currentCandles.length - 1];
+            const isBull = tData.squeeze_momentum.direction === 'BULLISH';
+            markers.push({
+                time: lastBar.time,
+                position: isBull ? 'belowBar' : 'aboveBar',
+                color: isBull ? '#facc15' : '#ec4899',
+                shape: isBull ? 'arrowUp' : 'arrowDown',
+                size: 2,
+                text: '🎯 SQZ FIRED (' + (isBull ? 'Bull 🚀' : 'Bear ⚠️') + ')',
+            });
+        }
+        if (activeSubpaneOscs.includes('wae') && tData.wae && tData.wae.is_explosion && currentCandles.length > 0) {
+            const lastBar = currentCandles[currentCandles.length - 1];
+            const isBullExp = tData.wae.status === 'BULL_EXPLOSION';
+            markers.push({
+                time: lastBar.time,
+                position: isBullExp ? 'belowBar' : 'aboveBar',
+                color: isBullExp ? '#facc15' : '#ec4899',
+                shape: 'circle',
+                size: 2,
+                text: '💥 WAE ' + (isBullExp ? 'Bull Exp 🟡' : 'Bear Exp 🟣'),
+            });
+        }
+
+        // UT Bot Alerts markers
+        if (indicatorVisibility.utbot && tData.ut_bot && tData.ut_bot.alerts) {
+            tData.ut_bot.alerts.forEach(a => {
+                const isBuy = a.action === 'BUY';
+                markers.push({
+                    time: a.time,
+                    position: isBuy ? 'belowBar' : 'aboveBar',
+                    color: isBuy ? '#10b981' : '#f43f5e',
+                    shape: isBuy ? 'arrowUp' : 'arrowDown',
+                    size: 2,
+                    text: '🤖 UT ' + a.action + ' $' + Number(a.price).toFixed(2),
+                });
+            });
+        }
+
+        // Chandelier Exit flip markers
+        if (indicatorVisibility.chand && tData.chandelier_exit && currentCandles.length > 0) {
+            const ch = tData.chandelier_exit;
+            if (ch.buy_signal) {
+                markers.push({
+                    time: currentCandles[currentCandles.length - 1].time,
+                    position: 'belowBar',
+                    color: '#10b981',
+                    shape: 'arrowUp',
+                    size: 2,
+                    text: '🪔 CHAND BUY $' + Number(ch.long_stop).toFixed(2),
+                });
+            } else if (ch.sell_signal) {
+                markers.push({
+                    time: currentCandles[currentCandles.length - 1].time,
+                    position: 'aboveBar',
+                    color: '#f43f5e',
+                    shape: 'arrowDown',
+                    size: 2,
+                    text: '🪔 CHAND SELL $' + Number(ch.short_stop).toFixed(2),
+                });
+            }
+        }
+
+        // WaveTrend reversal markers
+        if (activeSubpaneOscs.includes('wt') && tData.wavetrend && currentCandles.length > 0) {
+            const wt = tData.wavetrend;
+            if (wt.status === 'OVERSOLD_BUY') {
+                markers.push({
+                    time: currentCandles[currentCandles.length - 1].time,
+                    position: 'belowBar',
+                    color: '#34d399',
+                    shape: 'circle',
+                    size: 2,
+                    text: '🌊 WT OVERSOLD BUY',
+                });
+            } else if (wt.status === 'OVERBOUGHT_SELL') {
+                markers.push({
+                    time: currentCandles[currentCandles.length - 1].time,
+                    position: 'aboveBar',
+                    color: '#fb7185',
+                    shape: 'circle',
+                    size: 2,
+                    text: '🌊 WT OVERBOUGHT SELL',
+                });
+            }
+        }
+
+        // Lorentzian ML Prediction Marker
+        if (indicatorVisibility.lorentzian && tData.lorentzian_ml && currentCandles.length > 0) {
+            const ml = tData.lorentzian_ml;
+            const lastBar = currentCandles[currentCandles.length - 1];
+            const isBull = ml.direction === 'BULLISH';
+            const isBear = ml.direction === 'BEARISH';
+            if (isBull || isBear) {
+                markers.push({
+                    time: lastBar.time,
+                    position: isBull ? 'belowBar' : 'aboveBar',
+                    color: isBull ? '#c084fc' : '#f43f5e',
+                    shape: isBull ? 'arrowUp' : 'arrowDown',
+                    size: 2,
+                    text: '🤖 ML ' + ml.status + ' (' + ml.confidence + '%)',
+                });
+            }
+        }
+
         markers.sort((a, b) => new Date(a.time) - new Date(b.time));
         try {
             series.setMarkers(markers);
@@ -1048,6 +1613,11 @@
         if (btn) {
             if (indicatorVisibility[key]) btn.classList.add('active');
             else btn.classList.remove('active');
+        }
+
+        if (key === 'lorentzian' || key === 'aisig') {
+            updateChartMarkers(activeCandleSeries, currentStockTicker);
+            return;
         }
 
         if (key === 'pivots') {
@@ -1065,6 +1635,25 @@
                     chartSeriesRegistry.pivotLines = [];
                 }
             }
+            updateChartMarkers(activeCandleSeries, currentStockTicker);
+            return;
+        }
+
+        if (key === 'smc') {
+            const tData = CHARTS_DATA[currentStockTicker] || {};
+            if (indicatorVisibility.smc) {
+                if (activeCandleSeries && (!chartSeriesRegistry.smcLines || chartSeriesRegistry.smcLines.length === 0)) {
+                    chartSeriesRegistry.smcLines = drawSmcPriceLines(activeCandleSeries, tData);
+                }
+            } else {
+                if (activeCandleSeries && chartSeriesRegistry.smcLines) {
+                    chartSeriesRegistry.smcLines.forEach(pl => {
+                        try { activeCandleSeries.removePriceLine(pl); } catch(e) {}
+                    });
+                    chartSeriesRegistry.smcLines = [];
+                }
+            }
+            updateChartMarkers(activeCandleSeries, currentStockTicker);
             return;
         }
 
@@ -1095,6 +1684,8 @@
         }
 
         if (key === 'earn') {
+            indicatorVisibility.upcomingEarn = indicatorVisibility.earn;
+            updateUpcomingEarnings(currentStockTicker);
             updateChartMarkers(activeCandleSeries, currentStockTicker);
             return;
         }
@@ -1169,6 +1760,13 @@
             return;
         }
 
+        if (key === 'utbot' || key === 'chand' || key === 'hull') {
+            if (activeCandleSeries) {
+                renderLightweightChart(currentStockTicker);
+            }
+            return;
+        }
+
         const seriesList = chartSeriesRegistry[key] || [];
         seriesList.forEach(s => {
             try {
@@ -1177,15 +1775,35 @@
         });
     }
 
-    function toggleRsiPane() {
-        indicatorVisibility.rsiPane = !indicatorVisibility.rsiPane;
-        const btn = document.getElementById('tog_rsi_pane');
-        const paneWrap = document.getElementById('rsi_subpane_wrap');
-        if (btn) btn.classList.toggle('active', indicatorVisibility.rsiPane);
-        if (paneWrap) {
-            paneWrap.style.display = indicatorVisibility.rsiPane ? 'flex' : 'none';
+    // Sub-pane toggle and multi-selection logic
+    function toggleSubpane(oscKey) {
+        const idx = activeSubpaneOscs.indexOf(oscKey);
+        if (idx >= 0) {
+            activeSubpaneOscs.splice(idx, 1);
+        } else {
+            activeSubpaneOscs.push(oscKey);
         }
+        indicatorVisibility.rsiPane = (activeSubpaneOscs.length > 0);
+        updateSubpaneButtons();
         renderLightweightChart(currentStockTicker);
+    }
+
+    function switchOscillatorPane(oscKey) {
+        toggleSubpane(oscKey);
+    }
+
+    function toggleRsiPane() {
+        toggleSubpane('rsi');
+    }
+
+    function updateSubpaneButtons() {
+        ['rsi', 'sqz', 'wae', 'vfi', 'wt'].forEach(k => {
+            const btn = document.getElementById('tog_osc_' + k);
+            if (btn) {
+                if (activeSubpaneOscs.includes(k)) btn.classList.add('active');
+                else btn.classList.remove('active');
+            }
+        });
     }
 
     function resetAllIndicators() {
@@ -1196,6 +1814,9 @@
                 if (btn) btn.classList.remove('active');
             }
         });
+        activeSubpaneOscs = [];
+        indicatorVisibility.rsiPane = false;
+        updateSubpaneButtons();
 
         if (activeCandleSeries) {
             activeCandleSeries.setData(currentCandles);
@@ -1210,6 +1831,12 @@
                     try { activeCandleSeries.removePriceLine(pl); } catch(e) {}
                 });
                 chartSeriesRegistry.pivotLines = [];
+            }
+            if (chartSeriesRegistry.smcLines) {
+                chartSeriesRegistry.smcLines.forEach(pl => {
+                    try { activeCandleSeries.removePriceLine(pl); } catch(e) {}
+                });
+                chartSeriesRegistry.smcLines = [];
             }
             if (chartSeriesRegistry.ewPriceLines) {
                 chartSeriesRegistry.ewPriceLines.forEach(pl => {
@@ -1242,12 +1869,19 @@
             patBtn.textContent = '⚡ ตีเส้นแพทเทิร์นบนกราฟ';
         }
         Object.keys(chartSeriesRegistry).forEach(k => {
-            if (k !== 'fiboLines' && k !== 'pivotLines' && k !== 'ewPriceLines' && k !== 'ew' && k !== 'pat' && k !== 'patPriceLines') {
+            if (k !== 'fiboLines' && k !== 'pivotLines' && k !== 'smcLines' && k !== 'ewPriceLines' && k !== 'ew' && k !== 'pat' && k !== 'patPriceLines') {
                 (chartSeriesRegistry[k] || []).forEach(s => {
                     try { s.applyOptions({ visible: false }); } catch(e) {}
                 });
             }
         });
+        indicatorVisibility.upcomingEarn = false;
+        currentEarningsIso = null;
+        if (upcomingEarningsSeries && activeLwChart) {
+            try { activeLwChart.removeSeries(upcomingEarningsSeries); } catch(e) {}
+            upcomingEarningsSeries = null;
+        }
+        syncVerticalEarningsPosition();
         updateChartMarkers(activeCandleSeries, currentStockTicker);
     }
 
@@ -1277,13 +1911,21 @@
         const targetStr = ew.target ? ('$' + Number(ew.target).toFixed(2)) : '-';
         const invalStr = ew.invalidation ? ('$' + Number(ew.invalidation).toFixed(2)) : '-';
         const waveBadge = ew.current_wave_badge || ew.current_wave || '(3) กำลังขึ้น';
-        const wavePhase = ew.current_wave_phase || 'Impulse Wave Expansion';
+        const wavePhase = ew.current_wave_phase || (ew.direction === 'bearish' ? 'Bearish Motive Expansion' : 'Impulse Wave Expansion');
 
         let badgeCol = '#818cf8';
         let badgeBg = 'rgba(129, 140, 248, 0.15)';
         let badgeBorder = 'rgba(129, 140, 248, 0.35)';
 
-        if (waveBadge.includes('5')) {
+        if (waveBadge.includes('New Cycle') || (ew.cycle_signal && ew.cycle_signal.includes('New'))) {
+            badgeCol = '#10b981';
+            badgeBg = 'rgba(16, 185, 129, 0.15)';
+            badgeBorder = 'rgba(16, 185, 129, 0.35)';
+        } else if (ew.direction === 'bearish' || waveBadge.includes('Bear')) {
+            badgeCol = '#f43f5e';
+            badgeBg = 'rgba(244, 63, 94, 0.15)';
+            badgeBorder = 'rgba(244, 63, 94, 0.35)';
+        } else if (waveBadge.includes('5')) {
             badgeCol = '#38bdf8';
             badgeBg = 'rgba(56, 189, 248, 0.15)';
             badgeBorder = 'rgba(56, 189, 248, 0.35)';
@@ -1301,6 +1943,23 @@
             badgeBorder = 'rgba(244, 63, 94, 0.35)';
         }
 
+        let fiboRowsHtml = '';
+        if (ew.fibo_pullback) {
+            const f618 = ew.fibo_pullback.fib_618 ? ('$' + Number(ew.fibo_pullback.fib_618).toFixed(2)) : '-';
+            const f854 = ew.fibo_pullback.fib_854 ? ('$' + Number(ew.fibo_pullback.fib_854).toFixed(2)) : '-';
+            const broken = ew.fibo_pullback.floor_broken;
+            fiboRowsHtml = `
+                <tr>
+                    <td class="kl-name" style="color:#f59e0b;">🟡 Golden Pocket (61.8%)</td>
+                    <td class="kl-val" style="color:#f59e0b; font-weight:700;">${f618}</td>
+                </tr>
+                <tr>
+                    <td class="kl-name" style="color:${broken ? '#ef4444' : '#94a3b8'};">🛡️ LuxAlgo Floor (85.4%)</td>
+                    <td class="kl-val" style="color:${broken ? '#ef4444' : '#94a3b8'}; font-weight:700;">${f854}${broken ? ' ⚠️ Breached' : ''}</td>
+                </tr>
+            `;
+        }
+
         ewBody.innerHTML = `
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
                 <span style="font-size:0.75rem; font-weight:800; padding:3px 9px; border-radius:6px; color:${badgeCol}; background:${badgeBg}; border:1px solid ${badgeBorder};">
@@ -1314,17 +1973,321 @@
             <table class="kl-table" style="margin-top:6px;">
                 <tbody>
                     <tr>
-                        <td class="kl-name" style="color:#38bdf8;">🎯 เป้าหมาย Wave (5)</td>
-                        <td class="kl-val" style="color:#38bdf8; font-weight:700;">${targetStr}</td>
+                        <td class="kl-name" style="color:${ew.direction === 'bearish' ? '#f43f5e' : '#38bdf8'};">🎯 เป้าหมาย ${ew.direction === 'bearish' ? 'Bear Target' : 'Wave (5)'}</td>
+                        <td class="kl-val" style="color:${ew.direction === 'bearish' ? '#f43f5e' : '#38bdf8'}; font-weight:700;">${targetStr}</td>
                     </tr>
                     <tr>
-                        <td class="kl-name" style="color:#fb7185;">🛑 จุดเสียทรง (Invalidation)</td>
+                        <td class="kl-name" style="color:#fb7185;">🛑 จุดเสียทรง (${ew.direction === 'bearish' ? 'Roof' : 'Floor'})</td>
                         <td class="kl-val" style="color:#fb7185; font-weight:700;">${invalStr}</td>
                     </tr>
+                    ${fiboRowsHtml}
                 </tbody>
             </table>
             <div style="margin-top:8px; font-size:0.70rem; color:#94a3b8;">
-                💡 เส้นคลื่นลากเชื่อมต่อจนถึงแท่งราคาปัจจุบัน (Live Candle) อัตโนมัติ
+                💡 ถอดแบบตรรกะ LuxAlgo 3 Cardinal Rules & Fibonacci Retracement Grid ลากเชื่อมต่อ Live Candle อัตโนมัติ
+            </div>
+        `;
+    }
+
+    function updateSmcSidebar(ticker) {
+        const tData = CHARTS_DATA[ticker] || {};
+        const smcBody = document.getElementById('smc_sidebar_body');
+        const msBadge = document.getElementById('smc_ms_badge');
+        if (!smcBody) return;
+
+        const smc = tData.smc;
+        const luxSr = tData.luxalgo_sr;
+
+        if (!smc && !luxSr) {
+            smcBody.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8;">ไม่พบข้อมูลโครงสร้างสถาบัน</div>';
+            return;
+        }
+
+        const ms = (smc && smc.market_structure) || 'Neutral';
+        if (msBadge) {
+            msBadge.textContent = ms === 'Bullish' ? '🟢 Bullish Structure' : (ms === 'Bearish' ? '🔴 Bearish Structure' : '⚪ Neutral Flow');
+        }
+
+        const fvgs = (smc && smc.unmitigated_fvgs) || [];
+        const obs = (smc && smc.order_blocks) || [];
+        const breaks = (luxSr && luxSr.recent_breaks) || [];
+
+        let fvgHtml = '';
+        if (fvgs.length > 0) {
+            fvgHtml = fvgs.slice(-2).map(f => {
+                const isBull = f.type === 'BULLISH_FVG';
+                const col = isBull ? '#34d399' : '#fb7185';
+                const bg = isBull ? 'rgba(52, 211, 153, 0.12)' : 'rgba(251, 113, 133, 0.12)';
+                return `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:${bg}; border-radius:6px; padding:4px 8px; margin-bottom:4px; font-size:0.75rem;">
+                        <span style="color:${col}; font-weight:700;">${isBull ? '🟢 Demand FVG' : '🔴 Supply FVG'}</span>
+                        <span style="color:#f8fafc; font-family:monospace; font-weight:600;">$${f.bottom.toFixed(2)} - $${f.top.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            fvgHtml = '<div style="font-size:0.72rem; color:#94a3b8; margin-bottom:4px;">ไม่มี Unmitigated FVG ตกค้าง</div>';
+        }
+
+        let obHtml = '';
+        if (obs.length > 0) {
+            const lastOb = obs[obs.length - 1];
+            const isBull = lastOb.type === 'BULLISH_OB';
+            const obBottom = lastOb.bottom != null ? Number(lastOb.bottom) : null;
+            const obTop = lastOb.top != null ? Number(lastOb.top) : null;
+            const obLevel = lastOb.level != null ? Number(lastOb.level) : ((obBottom != null && obTop != null) ? (obBottom + obTop) / 2 : 0);
+            const rangeText = (obBottom != null && obTop != null)
+                ? `$${obBottom.toFixed(2)} - $${obTop.toFixed(2)}`
+                : `$${obLevel.toFixed(2)}`;
+            obHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:${isBull ? 'rgba(56, 189, 248, 0.12)' : 'rgba(244, 63, 94, 0.12)'}; border-radius:6px; padding:4px 8px; margin-bottom:4px; font-size:0.75rem;">
+                    <span style="color:${isBull ? '#38bdf8' : '#f43f5e'}; font-weight:700;">${lastOb.label || (isBull ? '🛡️ Demand OB' : '🛑 Supply OB')}</span>
+                    <span style="color:#f8fafc; font-family:monospace; font-weight:600;">${rangeText} (${lastOb.time})</span>
+                </div>
+            `;
+        }
+
+        let breaksHtml = '';
+        if (breaks.length > 0) {
+            const lastBreak = breaks[breaks.length - 1];
+            breaksHtml = `
+                <div style="margin-top:6px; font-size:0.73rem; color:#cbd5e1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 8px;">
+                    <div style="font-weight:700; color:#facc15; margin-bottom:2px;">🎯 สัญญาณ Lux S/R ล่าสุด:</div>
+                    <div>${lastBreak.label} ที่ $${Number(lastBreak.level).toFixed(2)} <span style="color:#94a3b8;">(${lastBreak.time})</span></div>
+                    <div style="color:#94a3b8; font-size:0.68rem; margin-top:2px;">${lastBreak.desc}</div>
+                </div>
+            `;
+        }
+
+        smcBody.innerHTML = `
+            <div style="margin-bottom:6px;">
+                <div style="font-size:0.70rem; color:#94a3b8; font-weight:700; margin-bottom:4px;">โซนช่องว่างราคาของสถาบัน (Fair Value Gaps):</div>
+                ${fvgHtml}
+            </div>
+            ${obHtml ? `
+            <div style="margin-bottom:6px;">
+                <div style="font-size:0.70rem; color:#94a3b8; font-weight:700; margin-bottom:4px;">โซนต้นทุนบล็อกคำสั่ง (Order Block):</div>
+                ${obHtml}
+            </div>` : ''}
+            ${breaksHtml}
+            <div style="margin-top:6px; font-size:0.68rem; color:#64748b;">
+                ⚡ ตรวจจับ Fair Value Gaps, Order Blocks และ Breakouts ด้วยปริมาณ Volume Oscillator ตามสคริปต์ LuxAlgo
+            </div>
+        `;
+    }
+
+    function updateOscillatorsSidebar(ticker) {
+        const tData = CHARTS_DATA[ticker] || {};
+        const container = document.getElementById('osc_sidebar_body');
+        const badge = document.getElementById('osc_sidebar_badge');
+        if (!container) return;
+
+        const sqz = tData.squeeze_momentum;
+        const wae = tData.wae;
+        const vfi = tData.vfi;
+
+        if (!sqz && !wae && !vfi) {
+            container.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8;">ไม่พบข้อมูลโมเมนตัม</div>';
+            return;
+        }
+
+        let sqzStatusText = '⚪ ปกติ';
+        let sqzColor = '#94a3b8';
+        let sqzBg = 'rgba(148, 163, 184, 0.12)';
+        if (sqz) {
+            if (sqz.squeeze_on) {
+                sqzStatusText = '🟠 Squeeze ON (สะสมพลัง)';
+                sqzColor = '#f97316';
+                sqzBg = 'rgba(249, 115, 22, 0.15)';
+            } else if (sqz.squeeze_fired) {
+                sqzStatusText = '🟢 Squeeze FIRED (ระเบิดเทรนด์)';
+                sqzColor = '#10b981';
+                sqzBg = 'rgba(16, 185, 129, 0.15)';
+            }
+        }
+
+        let waeStatusText = '⚪ ปกติ';
+        let waeColor = '#94a3b8';
+        let waeBg = 'rgba(148, 163, 184, 0.12)';
+        if (wae) {
+            if (wae.status === 'BULL_EXPLOSION') {
+                waeStatusText = '💥 Bull Explosion (แรงซื้อทะลัก)';
+                waeColor = '#10b981';
+                waeBg = 'rgba(16, 185, 129, 0.15)';
+            } else if (wae.status === 'BEAR_EXPLOSION') {
+                waeStatusText = '💥 Bear Explosion (แรงขายทะลัก)';
+                waeColor = '#f43f5e';
+                waeBg = 'rgba(244, 63, 94, 0.15)';
+            } else if (wae.status === 'DEAD_ZONE') {
+                waeStatusText = '💤 Dead Zone (ตลาดซึม)';
+                waeColor = '#64748b';
+                waeBg = 'rgba(100, 116, 139, 0.12)';
+            }
+        }
+
+        let vfiStatusText = '⚪ ปกติ';
+        let vfiColor = '#94a3b8';
+        let vfiBg = 'rgba(148, 163, 184, 0.12)';
+        if (vfi && vfi.vfi != null) {
+            const vfiVal = Number(vfi.vfi);
+            if (vfi.status === 'ACCUMULATION') {
+                vfiStatusText = `🟢 Accumulation (+${vfiVal.toFixed(1)})`;
+                vfiColor = '#34d399';
+                vfiBg = 'rgba(52, 211, 153, 0.15)';
+            } else if (vfi.status === 'DISTRIBUTION') {
+                vfiStatusText = `🔴 Distribution (${vfiVal.toFixed(1)})`;
+                vfiColor = '#fb7185';
+                vfiBg = 'rgba(251, 113, 133, 0.15)';
+            }
+        }
+
+        const wt = tData.wavetrend;
+        let wtStatusText = '⚪ ปกติ';
+        let wtColor = '#94a3b8';
+        let wtBg = 'rgba(148, 163, 184, 0.12)';
+        if (wt && wt.wt1 != null) {
+            const wtVal = Number(wt.wt1);
+            if (wt.status === 'OVERSOLD_BUY') {
+                wtStatusText = `🟢 Oversold Buy (${wtVal.toFixed(1)})`;
+                wtColor = '#34d399';
+                wtBg = 'rgba(52, 211, 153, 0.15)';
+            } else if (wt.status === 'OVERBOUGHT_SELL') {
+                wtStatusText = `🔴 Overbought Sell (${wtVal.toFixed(1)})`;
+                wtColor = '#fb7185';
+                wtBg = 'rgba(251, 113, 133, 0.15)';
+            } else if (wt.direction === 'BULLISH') {
+                wtStatusText = `🟢 Bullish (${wtVal.toFixed(1)})`;
+                wtColor = '#818cf8';
+                wtBg = 'rgba(129, 140, 248, 0.15)';
+            } else {
+                wtStatusText = `🔴 Bearish (${wtVal.toFixed(1)})`;
+                wtColor = '#f43f5e';
+                wtBg = 'rgba(244, 63, 94, 0.15)';
+            }
+        }
+
+        if (badge) {
+            badge.textContent = sqz && sqz.squeeze_fired ? '🔥 High Volatility' : (wae && wae.is_explosion ? '⚡ Explosion Active' : 'Multi-Engine Pro');
+        }
+
+        container.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="background:${sqzBg}; border:1px solid ${sqzColor}40; border-radius:6px; padding:6px 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                        <span style="font-weight:700; color:${sqzColor}; font-size:0.75rem;">🎯 LazyBear Squeeze</span>
+                        <span style="font-weight:800; color:${sqzColor}; font-size:0.72rem;">${sqzStatusText}</span>
+                    </div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${sqz ? sqz.summary : ''}</div>
+                </div>
+
+                <div style="background:${waeBg}; border:1px solid ${waeColor}40; border-radius:6px; padding:6px 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                        <span style="font-weight:700; color:${waeColor}; font-size:0.75rem;">💥 Waddah Attar (WAE)</span>
+                        <span style="font-weight:800; color:${waeColor}; font-size:0.72rem;">${waeStatusText}</span>
+                    </div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${wae ? wae.summary : ''}</div>
+                </div>
+
+                <div style="background:${vfiBg}; border:1px solid ${vfiColor}40; border-radius:6px; padding:6px 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                        <span style="font-weight:700; color:${vfiColor}; font-size:0.75rem;">🌊 LazyBear VFI Flow</span>
+                        <span style="font-weight:800; color:${vfiColor}; font-size:0.72rem;">${vfiStatusText}</span>
+                    </div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${vfi ? vfi.summary : ''}</div>
+                </div>
+
+                <div style="background:${wtBg}; border:1px solid ${wtColor}40; border-radius:6px; padding:6px 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                        <span style="font-weight:700; color:${wtColor}; font-size:0.75rem;">🌊 WaveTrend [LazyBear]</span>
+                        <span style="font-weight:800; color:${wtColor}; font-size:0.72rem;">${wtStatusText}</span>
+                    </div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${wt ? wt.summary : ''}</div>
+                </div>
+            </div>
+            <div style="margin-top:8px; font-size:0.68rem; color:#64748b;">
+                💡 สลับดูกราฟย่อยได้ทันทีด้วยปุ่ม SUB-PANE ด้านบน (⚡ RSI | 🎯 Squeeze | 💥 WAE | 🌊 VFI | 🌊 WaveTrend)
+            </div>
+        `;
+    }
+
+    function updateMlSidebar(ticker) {
+        const tData = CHARTS_DATA[ticker] || {};
+        const container = document.getElementById('ml_sidebar_body');
+        const badge = document.getElementById('ml_sidebar_badge');
+        if (!container) return;
+
+        const ml = tData.lorentzian_ml;
+        const ut = tData.ut_bot;
+        const ch = tData.chandelier_exit;
+        const hl = tData.hull_suite;
+
+        if (!ml && !ut && !ch && !hl) {
+            container.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8;">ไม่พบข้อมูล Machine Learning & Trend Armor</div>';
+            return;
+        }
+
+        let mlColor = '#94a3b8';
+        let mlBg = 'rgba(148, 163, 184, 0.12)';
+        let mlText = '⚪ NEUTRAL';
+        if (ml) {
+            if (ml.direction === 'BULLISH') {
+                mlColor = '#10b981';
+                mlBg = 'rgba(16, 185, 129, 0.15)';
+                mlText = `🟢 ${ml.status} (${ml.confidence}%)`;
+            } else if (ml.direction === 'BEARISH') {
+                mlColor = '#f43f5e';
+                mlBg = 'rgba(244, 63, 94, 0.15)';
+                mlText = `🔴 ${ml.status} (${(100 - ml.confidence).toFixed(1)}%)`;
+            }
+        }
+
+        let utColor = ut && ut.position === 'BUY' ? '#10b981' : '#f43f5e';
+        let utBg = ut && ut.position === 'BUY' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
+        let utText = (ut && ut.trailing_stop != null) ? `${ut.position} (Stop $${Number(ut.trailing_stop).toFixed(2)})` : (ut ? `${ut.position}` : '-');
+
+        let chColor = ch && ch.direction === 'LONG' ? '#10b981' : '#f43f5e';
+        let chBg = ch && ch.direction === 'LONG' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
+        let chText = (ch && ch.trailing_stop != null) ? `${ch.direction} (Stop $${Number(ch.trailing_stop).toFixed(2)})` : (ch ? `${ch.direction}` : '-');
+
+        let hlColor = hl && hl.trend === 'BULLISH' ? '#2dd4bf' : '#f43f5e';
+        let hlBg = hl && hl.trend === 'BULLISH' ? 'rgba(45, 212, 191, 0.12)' : 'rgba(244, 63, 94, 0.12)';
+        let hlText = (hl && hl.value != null) ? `${hl.trend} ($${Number(hl.value).toFixed(2)})` : (hl ? `${hl.trend}` : '-');
+
+        if (badge) {
+            badge.textContent = ml ? `KNN ${ml.bull_votes}/${ml.k} • Score ${ml.score > 0 ? '+' : ''}${ml.score}` : 'Trend Armor';
+        }
+
+        container.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="background:${mlBg}; border:1px solid ${mlColor}40; border-radius:6px; padding:6px 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                        <span style="font-weight:700; color:${mlColor}; font-size:0.75rem;">🤖 Lorentzian Classification [jdehorty]</span>
+                        <span style="font-weight:800; color:${mlColor}; font-size:0.72rem;">${mlText}</span>
+                    </div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${ml ? ml.summary : ''}</div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                    <div style="background:${utBg}; border:1px solid ${utColor}40; border-radius:6px; padding:6px 8px;">
+                        <div style="font-size:0.68rem; font-weight:700; color:${utColor}; margin-bottom:2px;">🤖 UT Bot Alerts</div>
+                        <div style="font-size:0.72rem; font-weight:800; color:#f8fafc;">${utText}</div>
+                    </div>
+                    <div style="background:${chBg}; border:1px solid ${chColor}40; border-radius:6px; padding:6px 8px;">
+                        <div style="font-size:0.68rem; font-weight:700; color:${chColor}; margin-bottom:2px;">🪔 Chandelier Exit</div>
+                        <div style="font-size:0.72rem; font-weight:800; color:#f8fafc;">${chText}</div>
+                    </div>
+                </div>
+
+                <div style="background:${hlBg}; border:1px solid ${hlColor}40; border-radius:6px; padding:6px 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                        <span style="font-weight:700; color:${hlColor}; font-size:0.75rem;">🎨 Hull Suite [InSilico]</span>
+                        <span style="font-weight:800; color:${hlColor}; font-size:0.72rem;">${hlText}</span>
+                    </div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${hl ? hl.summary : ''}</div>
+                </div>
+            </div>
+            <div style="margin-top:8px; font-size:0.68rem; color:#64748b;">
+                💡 เปิด/ปิดเส้น UT Bot, Chandelier และ Hull Suite ได้ที่แถบ Toolbar ด้านบนกราฟ
             </div>
         `;
     }
@@ -1628,14 +2591,346 @@
         });
     }
 
-    // Render Dual-Pane Charts (Candles + Synchronized RSI 14)
+    // Render Single Sub-Pane Chart Component (TradingView Multi-Pane Stacking)
+    function renderSingleSubpane(oscKey, container, tData, candles, width, height, isLast) {
+        const wrap = document.createElement('div');
+        wrap.className = 'rsi-subpane-wrap';
+        wrap.id = 'subpane_wrap_' + oscKey;
+
+        const header = document.createElement('div');
+        header.className = 'rsi-pane-header';
+
+        const chartDiv = document.createElement('div');
+        chartDiv.id = 'subpane_chart_' + oscKey;
+        chartDiv.className = 'rsi-container';
+
+        wrap.appendChild(header);
+        wrap.appendChild(chartDiv);
+        container.appendChild(wrap);
+
+        const subChart = LightweightCharts.createChart(chartDiv, {
+            width: width,
+            height: height,
+            layout: {
+                background: { type: 'solid', color: '#080c16' },
+                textColor: '#94a3b8',
+                fontFamily: "'Inter', sans-serif",
+            },
+            grid: {
+                vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
+                horzLines: { color: 'rgba(255, 255, 255, 0.03)' },
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+            },
+            rightPriceScale: {
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                scaleMargins: { top: 0.1, bottom: 0.1 },
+                autoScale: true,
+            },
+            timeScale: {
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                timeVisible: false,
+                secondsVisible: false,
+                visible: isLast,
+                rightOffset: 15,
+            },
+            handleScroll: {
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: false,
+            },
+            handleScale: {
+                mouseWheel: true,
+                pinch: true,
+                axisPressedMouseMove: true,
+                axisDoubleClickReset: true,
+            },
+        });
+
+        let updateHover = null;
+
+        if (oscKey === 'sqz') {
+            header.innerHTML = `
+                <span class="rsi-pane-title" style="color:#f59e0b; font-weight:700;">🎯 Squeeze Momentum [LazyBear]</span>
+                <span class="rsi-ref-label" style="color:#f97316;">🟠 Squeeze ON</span>
+                <span class="rsi-ref-label" style="color:#10b981;">🟢 Squeeze FIRED</span>
+                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
+                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
+            `;
+            const sqzHist = (tData.squeeze_momentum && tData.squeeze_momentum.histogram) || [];
+            const sqzSeries = subChart.addHistogramSeries({
+                priceLineVisible: false,
+                lastValueVisible: true,
+            });
+            sqzSeries.createPriceLine({
+                price: 0,
+                color: 'rgba(255, 255, 255, 0.25)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+            });
+            const sqzByTime = new Map(sqzHist.map(h => [h.time, h]));
+            sqzSeries.setData(candles.map(c => {
+                const entry = sqzByTime.get(c.time);
+                return entry ? { time: c.time, value: entry.value, color: entry.color } : { time: c.time, value: 0 };
+            }));
+
+            const valElem = document.getElementById('sub_hover_' + oscKey);
+            if (tData.squeeze_momentum && valElem) {
+                const m = tData.squeeze_momentum.momentum;
+                const statusStr = tData.squeeze_momentum.status;
+                const col = m > 0 ? '#10b981' : '#f43f5e';
+                valElem.innerHTML = `<span style="color:${col}">${m.toFixed(2)} (${statusStr})</span>`;
+            }
+
+            updateHover = (timeStr) => {
+                const h = sqzByTime.get(timeStr);
+                if (h && valElem) {
+                    const col = h.value >= 0 ? '#10b981' : '#f43f5e';
+                    valElem.innerHTML = `<span style="color:${col}">M: ${h.value.toFixed(2)}</span>`;
+                }
+            };
+        } else if (oscKey === 'wae') {
+            header.innerHTML = `
+                <span class="rsi-pane-title" style="color:#10b981; font-weight:700;">💥 Waddah Attar Explosion (WAE)</span>
+                <span class="rsi-ref-label" style="color:#facc15;">🟡 Explosion</span>
+                <span class="rsi-ref-label" style="color:#94a3b8;">⚪ Dead Zone</span>
+                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
+                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
+            `;
+            const waeSeriesList = (tData.wae && tData.wae.series) || [];
+            const waeByTime = new Map(waeSeriesList.map(w => [w.time, w]));
+
+            const waeHist = subChart.addHistogramSeries({
+                priceLineVisible: false,
+                lastValueVisible: true,
+            });
+            const expLine = subChart.addLineSeries({
+                color: '#facc15',
+                lineWidth: 1.5,
+                title: 'Explosion',
+                priceLineVisible: false,
+            });
+            const deadLine = subChart.addLineSeries({
+                color: '#94a3b8',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: 'Dead Zone',
+                priceLineVisible: false,
+            });
+
+            waeHist.setData(candles.map(c => {
+                const w = waeByTime.get(c.time);
+                if (!w) return { time: c.time, value: 0 };
+                const isBull = w.trend_up > 0;
+                return {
+                    time: c.time,
+                    value: isBull ? w.trend_up : w.trend_down,
+                    color: isBull ? (w.bull_explosion ? '#10b981' : '#047857') : (w.bear_explosion ? '#f43f5e' : '#881337')
+                };
+            }));
+            expLine.setData(candles.map(c => {
+                const w = waeByTime.get(c.time);
+                return { time: c.time, value: w ? w.explosion_line : 0 };
+            }));
+            deadLine.setData(candles.map(c => {
+                const w = waeByTime.get(c.time);
+                return { time: c.time, value: w ? w.dead_zone : 0 };
+            }));
+
+            const valElem = document.getElementById('sub_hover_' + oscKey);
+            if (tData.wae && valElem) {
+                const w = tData.wae;
+                const col = w.status === 'BULL_EXPLOSION' ? '#10b981' : (w.status === 'BEAR_EXPLOSION' ? '#f43f5e' : '#94a3b8');
+                valElem.innerHTML = `<span style="color:${col}">${w.status}</span>`;
+            }
+
+            updateHover = (timeStr) => {
+                const w = waeByTime.get(timeStr);
+                if (w && valElem) {
+                    const isBull = w.trend_up > 0;
+                    const val = isBull ? w.trend_up : w.trend_down;
+                    const col = isBull ? '#10b981' : '#f43f5e';
+                    valElem.innerHTML = `<span style="color:${col}">${isBull ? 'Bull' : 'Bear'}: ${val.toFixed(2)}</span>`;
+                }
+            };
+        } else if (oscKey === 'vfi') {
+            header.innerHTML = `
+                <span class="rsi-pane-title" style="color:#38bdf8; font-weight:700;">🌊 Volume Flow Indicator (VFI) [LazyBear]</span>
+                <span class="rsi-ref-label" style="color:#10b981;">🟢 Accumulation</span>
+                <span class="rsi-ref-label" style="color:#fb7185;">🔴 Distribution</span>
+                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
+                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
+            `;
+            const vfiSeriesList = (tData.vfi && tData.vfi.series) || [];
+            const vfiByTime = new Map(vfiSeriesList.map(v => [v.time, v]));
+
+            const vfiLine = subChart.addLineSeries({
+                color: '#38bdf8',
+                lineWidth: 2,
+                title: 'VFI',
+                priceLineVisible: false,
+                lastValueVisible: true,
+            });
+            const vfiSigLine = subChart.addLineSeries({
+                color: '#f59e0b',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: 'Signal',
+                priceLineVisible: false,
+            });
+            vfiLine.createPriceLine({
+                price: 0,
+                color: 'rgba(255, 255, 255, 0.35)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                title: '0.0',
+            });
+            vfiLine.setData(candles.map(c => {
+                const v = vfiByTime.get(c.time);
+                return { time: c.time, value: v ? v.vfi : 0 };
+            }));
+            vfiSigLine.setData(candles.map(c => {
+                const v = vfiByTime.get(c.time);
+                return { time: c.time, value: v ? v.signal : 0 };
+            }));
+
+            const valElem = document.getElementById('sub_hover_' + oscKey);
+            if (tData.vfi && valElem) {
+                const v = tData.vfi;
+                const col = v.vfi > 0 ? '#10b981' : '#fb7185';
+                valElem.innerHTML = `<span style="color:${col}">VFI ${v.vfi > 0 ? '+' : ''}${v.vfi.toFixed(1)} (${v.status})</span>`;
+            }
+
+            updateHover = (timeStr) => {
+                const v = vfiByTime.get(timeStr);
+                if (v && valElem) {
+                    const col = v.vfi > 0 ? '#10b981' : '#fb7185';
+                    valElem.innerHTML = `<span style="color:${col}">VFI: ${v.vfi.toFixed(1)} / Sig: ${v.signal.toFixed(1)}</span>`;
+                }
+            };
+        } else if (oscKey === 'wt') {
+            header.innerHTML = `
+                <span class="rsi-pane-title" style="color:#818cf8; font-weight:700;">🌊 WaveTrend Oscillator [LazyBear]</span>
+                <span class="rsi-ref-label" style="color:#fb7185;">Overbought: +50 / +60</span>
+                <span class="rsi-ref-label" style="color:#34d399;">Oversold: -50 / -60</span>
+                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
+                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
+            `;
+            const wtSeriesList = (tData.wavetrend && tData.wavetrend.series) || [];
+            const wtByTime = new Map(wtSeriesList.map(w => [w.time, w]));
+
+            const wt1Line = subChart.addLineSeries({
+                color: '#818cf8',
+                lineWidth: 2,
+                title: 'WT1',
+                priceLineVisible: false,
+                lastValueVisible: true,
+            });
+            const wt2Line = subChart.addLineSeries({
+                color: '#f59e0b',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: 'WT2',
+                priceLineVisible: false,
+            });
+            wt1Line.createPriceLine({ price: 60, color: 'rgba(244, 63, 94, 0.4)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '+60' });
+            wt1Line.createPriceLine({ price: 50, color: 'rgba(244, 63, 94, 0.25)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '+50' });
+            wt1Line.createPriceLine({ price: 0, color: 'rgba(255, 255, 255, 0.2)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Solid, title: '0' });
+            wt1Line.createPriceLine({ price: -50, color: 'rgba(16, 185, 129, 0.25)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '-50' });
+            wt1Line.createPriceLine({ price: -60, color: 'rgba(16, 185, 129, 0.4)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '-60' });
+
+            wt1Line.setData(candles.map(c => {
+                const w = wtByTime.get(c.time);
+                return { time: c.time, value: w ? w.wt1 : 0 };
+            }));
+            wt2Line.setData(candles.map(c => {
+                const w = wtByTime.get(c.time);
+                return { time: c.time, value: w ? w.wt2 : 0 };
+            }));
+
+            const valElem = document.getElementById('sub_hover_' + oscKey);
+            if (tData.wavetrend && valElem) {
+                const w = tData.wavetrend;
+                const col = w.direction === 'BULLISH' ? '#10b981' : '#fb7185';
+                valElem.innerHTML = `<span style="color:${col}">WT1 ${w.wt1.toFixed(1)} / WT2 ${w.wt2.toFixed(1)} (${w.status})</span>`;
+            }
+
+            updateHover = (timeStr) => {
+                const w = wtByTime.get(timeStr);
+                if (w && valElem) {
+                    const col = w.wt1 >= w.wt2 ? '#10b981' : '#fb7185';
+                    valElem.innerHTML = `<span style="color:${col}">WT1: ${w.wt1.toFixed(1)} / WT2: ${w.wt2.toFixed(1)}</span>`;
+                }
+            };
+        } else {
+            // Default: 'rsi'
+            header.innerHTML = `
+                <span class="rsi-pane-title" style="color:#c084fc; font-weight:700;">⚡ RSI (14)</span>
+                <span class="rsi-ref-label" style="color:#fb7185;">Overbought: 70</span>
+                <span class="rsi-ref-label" style="color:#34d399;">Oversold: 30</span>
+                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
+                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
+            `;
+            const rsiSeries = subChart.addLineSeries({
+                color: '#c084fc',
+                lineWidth: 1.5,
+                priceLineVisible: false,
+                lastValueVisible: true,
+            });
+            rsiSeries.createPriceLine({
+                price: 70,
+                color: 'rgba(251, 113, 133, 0.65)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: '70',
+            });
+            rsiSeries.createPriceLine({
+                price: 50,
+                color: 'rgba(255, 255, 255, 0.18)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+                title: '50',
+            });
+            rsiSeries.createPriceLine({
+                price: 30,
+                color: 'rgba(52, 211, 153, 0.65)',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: '30',
+            });
+
+            const rsiData = calcRSI(candles, 14);
+            const rsiByTime = new Map(rsiData.map(r => [r.time, r.value]));
+            rsiSeries.setData(candles.map(c => rsiByTime.has(c.time) ? { time: c.time, value: rsiByTime.get(c.time) } : { time: c.time }));
+
+            const valElem = document.getElementById('sub_hover_' + oscKey);
+            if (rsiData.length > 0 && valElem) {
+                const latestR = rsiData[rsiData.length - 1].value;
+                const c = latestR >= 70 ? '#fb7185' : (latestR <= 30 ? '#34d399' : '#f8fafc');
+                valElem.innerHTML = `<span style="color:${c}">${latestR.toFixed(1)}</span>`;
+            }
+
+            updateHover = (timeStr) => {
+                const rVal = rsiByTime.get(timeStr);
+                if (rVal !== undefined && valElem) {
+                    const c = rVal >= 70 ? '#fb7185' : (rVal <= 30 ? '#34d399' : '#f8fafc');
+                    valElem.innerHTML = `<span style="color:${c}">RSI: ${rVal.toFixed(1)}</span>`;
+                }
+            };
+        }
+
+        return { key: oscKey, chart: subChart, updateHover };
+    }
+
+    // Render Multi-Pane Charts (Candles + Stacked Oscillators)
     function renderLightweightChart(ticker) {
         const mainContainer = document.getElementById('chart_container');
-        const rsiContainer = document.getElementById('rsi_container');
-        const rsiWrap = document.getElementById('rsi_subpane_wrap');
+        const stackContainer = document.getElementById('subpanes_stack');
         if (!mainContainer) return;
         mainContainer.innerHTML = '';
-        if (rsiContainer) rsiContainer.innerHTML = '';
+        if (stackContainer) stackContainer.innerHTML = '';
 
         const tData = CHARTS_DATA[ticker];
         if (!tData || !tData.candles || tData.candles.length === 0) {
@@ -1652,14 +2947,32 @@
             try { activeLwChart.remove(); } catch(e) {}
             activeLwChart = null;
         }
-        if (activeRsiChart) {
-            try { activeRsiChart.remove(); } catch(e) {}
-            activeRsiChart = null;
+        if (activeSubpaneCharts && activeSubpaneCharts.length > 0) {
+            activeSubpaneCharts.forEach(item => {
+                try { if (item.chart) item.chart.remove(); } catch(e) {}
+            });
         }
+        activeSubpaneCharts = [];
+        activeRsiChart = null;
 
         currentCandles = aggregateCandles(tData.candles, currentAggTimeframe);
 
-        const mainHeight = indicatorVisibility.rsiPane ? 480 : 620;
+        const numSubpanes = activeSubpaneOscs.length;
+        let mainHeight = 620;
+        let subHeight = 130;
+        if (numSubpanes === 1) {
+            mainHeight = 480;
+            subHeight = 140;
+        } else if (numSubpanes === 2) {
+            mainHeight = 400;
+            subHeight = 125;
+        } else if (numSubpanes === 3) {
+            mainHeight = 350;
+            subHeight = 115;
+        } else if (numSubpanes >= 4) {
+            mainHeight = 300;
+            subHeight = 105;
+        }
         mainContainer.style.height = mainHeight + 'px';
 
         // 1. Create Main Candlestick Chart
@@ -1688,6 +3001,7 @@
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
+                visible: (numSubpanes === 0),
                 rightOffset: 15,
             },
             handleScroll: {
@@ -1704,6 +3018,10 @@
             },
         });
         activeLwChart = chart;
+
+        chart.timeScale().subscribeVisibleLogicalRangeChange(() => {
+            syncVerticalEarningsPosition();
+        });
 
         // Candlestick Series
         const candleSeries = chart.addCandlestickSeries({
@@ -1880,6 +3198,65 @@
             chartSeriesRegistry.ichi.push(kijunSeries);
         }
 
+        // Hull Suite [InSilico]
+        chartSeriesRegistry.hull = [];
+        if (tData.hull_suite && tData.hull_suite.series) {
+            const hlList = tData.hull_suite.series;
+            const hlByTime = new Map(hlList.map(h => [h.time, h]));
+            const isBullHl = tData.hull_suite.trend === 'BULLISH';
+            const hlSeries = chart.addLineSeries({
+                color: isBullHl ? '#2dd4bf' : '#f43f5e',
+                lineWidth: 2.5,
+                title: 'Hull Suite (55)',
+                visible: indicatorVisibility.hull,
+            });
+            hlSeries.setData(currentCandles.map(c => {
+                const h = hlByTime.get(c.time);
+                return { time: c.time, value: h ? h.value : c.close };
+            }));
+            chartSeriesRegistry.hull = [hlSeries];
+        }
+
+        // Chandelier Exit [everget]
+        chartSeriesRegistry.chand = [];
+        if (tData.chandelier_exit && tData.chandelier_exit.series) {
+            const chList = tData.chandelier_exit.series;
+            const chByTime = new Map(chList.map(ch => [ch.time, ch]));
+            const isLongCh = tData.chandelier_exit.direction === 'LONG';
+            const chSeries = chart.addLineSeries({
+                color: isLongCh ? '#10b981' : '#f43f5e',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                title: 'Chandelier Stop',
+                visible: indicatorVisibility.chand,
+            });
+            chSeries.setData(currentCandles.map(c => {
+                const ch = chByTime.get(c.time);
+                return { time: c.time, value: ch ? ch.stop : c.close };
+            }));
+            chartSeriesRegistry.chand = [chSeries];
+        }
+
+        // UT Bot Alerts [QuantNomad]
+        chartSeriesRegistry.utbot = [];
+        if (tData.ut_bot && tData.ut_bot.series) {
+            const utList = tData.ut_bot.series;
+            const utByTime = new Map(utList.map(u => [u.time, u]));
+            const isBuyUt = tData.ut_bot.position === 'BUY';
+            const utSeries = chart.addLineSeries({
+                color: isBuyUt ? '#10b981' : '#f43f5e',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+                title: 'UT Bot Stop',
+                visible: indicatorVisibility.utbot,
+            });
+            utSeries.setData(currentCandles.map(c => {
+                const u = utByTime.get(c.time);
+                return { time: c.time, value: u ? u.stop : c.close };
+            }));
+            chartSeriesRegistry.utbot = [utSeries];
+        }
+
         // Classical Chart Pattern Lines & Neckline/Target Price Lines (Only drawn when toggled ON!)
         chartSeriesRegistry.pat = [];
         chartSeriesRegistry.patPriceLines = [];
@@ -1889,8 +3266,11 @@
             chartSeriesRegistry.patPriceLines = patRes.priceLines;
         }
 
-        // Synchronized Markers (AI Decisions, Swings, Earnings Countdown, Reaction 'งบ +xx%', Elliott Wave)
+        // Synchronized Markers (Swings, AI Decisions, Elliott Wave, etc.)
         updateChartMarkers(candleSeries, ticker);
+
+        // Upcoming Earnings Future Timeline Projection
+        updateUpcomingEarnings(ticker);
 
         // Fibonacci Lines
         chartSeriesRegistry.fiboLines = [];
@@ -1918,6 +3298,12 @@
             chartSeriesRegistry.pivotLines = drawPivotPriceLines(candleSeries, tData, m);
         }
 
+        // Smart Money Concepts (SMC) Price Lines (Only drawn when toggled ON!)
+        chartSeriesRegistry.smcLines = [];
+        if (indicatorVisibility.smc) {
+            chartSeriesRegistry.smcLines = drawSmcPriceLines(candleSeries, tData);
+        }
+
         // Elliott Wave Zigzag & Target/Floor Lines (Only drawn when toggled ON!)
         chartSeriesRegistry.ew = [];
         chartSeriesRegistry.ewPriceLines = [];
@@ -1937,112 +3323,55 @@
             }
         });
 
-        // 2. Create Synchronized RSI (14) Sub-Pane
-        if (indicatorVisibility.rsiPane && rsiContainer) {
-            if (rsiWrap) rsiWrap.style.display = 'flex';
-            const rsiChart = LightweightCharts.createChart(rsiContainer, {
-                width: mainContainer.clientWidth || 980,
-                height: 140,
-                layout: {
-                    background: { type: 'solid', color: '#080c16' },
-                    textColor: '#94a3b8',
-                    fontFamily: "'Inter', sans-serif",
-                },
-                grid: {
-                    vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
-                    horzLines: { color: 'rgba(255, 255, 255, 0.03)' },
-                },
-                crosshair: {
-                    mode: LightweightCharts.CrosshairMode.Normal,
-                },
-                rightPriceScale: {
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    scaleMargins: { top: 0.1, bottom: 0.1 },
-                    autoScale: true,
-                },
-                timeScale: {
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    timeVisible: false,
-                    visible: true,
-                    rightOffset: 15,
-                },
-            });
-            activeRsiChart = rsiChart;
+        // 2. Create Multi-Pane Stacked Sub-Charts
+        if (stackContainer) {
+            stackContainer.style.display = (numSubpanes > 0) ? 'flex' : 'none';
+        }
 
-            const rsiSeries = rsiChart.addLineSeries({
-                color: '#c084fc',
-                lineWidth: 1.5,
-                priceLineVisible: false,
-                lastValueVisible: true,
-            });
-            activeRsiSeries = rsiSeries;
-
-            // Overbought (70) & Oversold (30) reference lines
-            rsiSeries.createPriceLine({
-                price: 70,
-                color: 'rgba(251, 113, 133, 0.65)',
-                lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
-                title: '70',
-            });
-            rsiSeries.createPriceLine({
-                price: 50,
-                color: 'rgba(255, 255, 255, 0.18)',
-                lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Dotted,
-                title: '50',
-            });
-            rsiSeries.createPriceLine({
-                price: 30,
-                color: 'rgba(52, 211, 153, 0.65)',
-                lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
-                title: '30',
-            });
-
-            const rsiData = calcRSI(currentCandles, 14);
-            const rsiByTime = new Map(rsiData.map(r => [r.time, r.value]));
-            rsiSeries.setData(currentCandles.map(c => rsiByTime.has(c.time) ? { time: c.time, value: rsiByTime.get(c.time) } : { time: c.time }));
-
-            if (rsiData.length > 0) {
-                const latestR = rsiData[rsiData.length - 1].value;
-                const rValElem = document.getElementById('rsi_hover_val');
-                if (rValElem) {
-                    const c = latestR >= 70 ? '#fb7185' : (latestR <= 30 ? '#34d399' : '#f8fafc');
-                    rValElem.innerHTML = `<span style="color:${c}">${latestR.toFixed(1)}</span>`;
-                }
-            }
-
-            // Bidirectional time scale synchronization
-            let isSyncingTimeScale = false;
-            chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
-                if (isSyncingTimeScale || !range || !rsiChart) return;
-                isSyncingTimeScale = true;
-                try { rsiChart.timeScale().setVisibleLogicalRange(range); } catch(e) {}
-                isSyncingTimeScale = false;
-            });
-            rsiChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
-                if (isSyncingTimeScale || !range || !chart) return;
-                isSyncingTimeScale = true;
-                try { chart.timeScale().setVisibleLogicalRange(range); } catch(e) {}
-                isSyncingTimeScale = false;
-            });
-
-            // Synchronized Crosshair Hover
-            const rsiValElem = document.getElementById('rsi_hover_val');
-            chart.subscribeCrosshairMove(param => {
-                if (!param || !param.time) return;
-                if (activeRsiSeries) {
-                    const rVal = rsiByTime.get(typeof param.time === 'object' ? `${param.time.year}-${String(param.time.month).padStart(2, '0')}-${String(param.time.day).padStart(2, '0')}` : param.time);
-                    if (rVal !== undefined && rsiValElem) {
-                        const c = rVal >= 70 ? '#fb7185' : (rVal <= 30 ? '#34d399' : '#f8fafc');
-                        rsiValElem.innerHTML = `<span style="color:${c}">${rVal.toFixed(1)}</span>`;
+        if (numSubpanes > 0 && stackContainer) {
+            const chartWidth = mainContainer.clientWidth || 980;
+            activeSubpaneOscs.forEach((oscKey, idx) => {
+                const isLast = (idx === numSubpanes - 1);
+                const subObj = renderSingleSubpane(oscKey, stackContainer, tData, currentCandles, chartWidth, subHeight, isLast);
+                if (subObj) {
+                    activeSubpaneCharts.push(subObj);
+                    if (oscKey === 'rsi') {
+                        activeRsiChart = subObj.chart;
                     }
                 }
             });
-        } else {
-            if (rsiWrap) rsiWrap.style.display = 'none';
         }
+
+        // 3. Bidirectional N-Chart TimeScale & Crosshair Synchronization
+        const allCharts = [chart, ...activeSubpaneCharts.map(item => item.chart)];
+        let isSyncingTimeScale = false;
+
+        allCharts.forEach(c => {
+            c.timeScale().subscribeVisibleLogicalRangeChange(range => {
+                if (isSyncingTimeScale || !range) return;
+                isSyncingTimeScale = true;
+                allCharts.forEach(other => {
+                    if (other !== c) {
+                        try { other.timeScale().setVisibleLogicalRange(range); } catch(e) {}
+                    }
+                });
+                isSyncingTimeScale = false;
+            });
+        });
+
+        const handleCrosshair = (param) => {
+            if (!param || !param.time) return;
+            const tStr = (typeof param.time === 'object')
+                ? `${param.time.year}-${String(param.time.month).padStart(2, '0')}-${String(param.time.day).padStart(2, '0')}`
+                : param.time;
+            activeSubpaneCharts.forEach(item => {
+                if (item.updateHover) item.updateHover(tStr);
+            });
+        };
+
+        allCharts.forEach(c => {
+            c.subscribeCrosshairMove(handleCrosshair);
+        });
 
         // Set Default 1Y View with Right Offset after layout
         requestAnimationFrame(() => {
@@ -2052,16 +3381,18 @@
         });
     }
 
-    // Responsive Auto-Resize
+    // Responsive Auto-Resize for Main & All Subpane Charts
     window.addEventListener('resize', () => {
         const mainContainer = document.getElementById('chart_container');
-        const rsiContainer = document.getElementById('rsi_container');
         if (activeLwChart && mainContainer) {
             activeLwChart.applyOptions({ width: mainContainer.clientWidth });
         }
-        if (activeRsiChart && rsiContainer) {
-            activeRsiChart.applyOptions({ width: mainContainer.clientWidth });
+        if (activeSubpaneCharts && activeSubpaneCharts.length > 0 && mainContainer) {
+            activeSubpaneCharts.forEach(item => {
+                if (item.chart) item.chart.applyOptions({ width: mainContainer.clientWidth });
+            });
         }
+        syncVerticalEarningsPosition();
     });
 
     // Timeframe Zoom Presets with Right Margin Offset
@@ -2095,13 +3426,14 @@
         }
 
         const visibleBars = Math.min(n, Math.max(10, barCount));
-        const rightBuffer = 15;
+        const rightBuffer = (indicatorVisibility.earn && currentEarningsIso) ? 22 : 15;
 
         try {
             activeLwChart.timeScale().setVisibleLogicalRange({
                 from: n - visibleBars,
                 to: n + rightBuffer,
             });
+            setTimeout(syncVerticalEarningsPosition, 50);
         } catch(e) {}
     }
 
@@ -2464,6 +3796,9 @@
         updateKeyLevelsRadar(ticker);
         updateEarningsRadar(ticker);
         updateElliottWaveSidebar(ticker);
+        updateSmcSidebar(ticker);
+        updateOscillatorsSidebar(ticker);
+        updateMlSidebar(ticker);
         updateWhalesSidebar(ticker);
         updateNewsSidebar(ticker);
 
@@ -2968,26 +4303,31 @@
         currentChartMode = mode;
         const btnTech = document.getElementById('tab_tech');
         const btnTv = document.getElementById('tab_tv');
+        const lwWrap = document.getElementById('chart_container_wrap');
         const lwMain = document.getElementById('chart_container');
-        const rsiWrap = document.getElementById('rsi_subpane_wrap');
+        const stackWrap = document.getElementById('subpanes_stack');
         const botBar = document.querySelector('.chart-botbar');
         const tvBox = document.getElementById('tv_widget_container');
 
         if (mode === 'tech') {
             if (btnTech) btnTech.classList.add('active');
             if (btnTv) btnTv.classList.remove('active');
+            if (lwWrap) lwWrap.style.display = 'block';
             if (lwMain) lwMain.style.display = 'block';
-            if (rsiWrap) rsiWrap.style.display = indicatorVisibility.rsiPane ? 'flex' : 'none';
+            if (stackWrap) stackWrap.style.display = (activeSubpaneOscs.length > 0) ? 'flex' : 'none';
             if (botBar) botBar.style.display = 'flex';
             if (tvBox) tvBox.style.display = 'none';
             renderLightweightChart(currentStockTicker);
         } else {
             if (btnTech) btnTech.classList.remove('active');
             if (btnTv) btnTv.classList.add('active');
+            if (lwWrap) lwWrap.style.display = 'none';
             if (lwMain) lwMain.style.display = 'none';
-            if (rsiWrap) rsiWrap.style.display = 'none';
+            if (stackWrap) stackWrap.style.display = 'none';
             if (botBar) botBar.style.display = 'none';
             if (tvBox) tvBox.style.display = 'block';
+            const overlay = document.getElementById('earnings_vertical_line_overlay');
+            if (overlay) overlay.style.display = 'none';
             renderTradingViewWidget(currentStockTicker);
         }
     }

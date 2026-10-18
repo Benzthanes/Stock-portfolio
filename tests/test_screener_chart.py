@@ -199,8 +199,8 @@ class ChartPageGenerationTest(unittest.TestCase):
         # Elliott Wave Macro & Active Wave Engine
         self.assertIn("getActiveElliottWave", html)
         self.assertIn("current_wave_badge", str(html))
-        # Classical Chart Pattern Auto-Enable & Start Marker
-        self.assertIn("pat: true", html)
+        # Classical Chart Pattern Toggle & Start Marker
+        self.assertIn("pat: false", html)
         self.assertIn('id="tog_pat"', html)
         self.assertIn('id="btn_toggle_pat_chart"', html)
         self.assertIn("🚩 จุดเริ่มแพทเทิร์น", html)
@@ -263,12 +263,49 @@ class ConfluenceScoringTest(unittest.TestCase):
         impulse = self._score(elliott_wave={"detected": True, "type": "Bullish Impulse (1-2-3-4-5)", "current_wave": "Wave (5)", "target": 120.0})
         self.assertEqual(impulse["score"], baseline["score"] + 1)
 
+    def test_new_cycle_breakout_adds_buy_score(self):
+        baseline = self._score()
+        new_cycle = self._score(elliott_wave={"detected": True, "type": "New Cycle Wave (1) Breakout", "current_wave": "New Cycle (1)", "target": 150.0})
+        self.assertEqual(new_cycle["score"], baseline["score"] + 1)
+
+    def test_bearish_impulse_does_not_add_buy_score(self):
+        baseline = self._score()
+        bearish = self._score(elliott_wave={"detected": True, "type": "Bearish Impulse (1-2-3-4-5)", "current_wave": "Bear Wave (5)", "target": 70.0})
+        self.assertEqual(bearish["score"], baseline["score"])
+
     def test_pivot_s1_only_counts_when_price_holds_above_support(self):
         baseline = self._score()
         below = self._score(pivots={"r1": 200.0, "s1": 102.0})
         above = self._score(pivots={"r1": 200.0, "s1": 98.0})
         self.assertEqual(below["score"], baseline["score"])
         self.assertEqual(above["score"], baseline["score"] + 1)
+
+    def test_luxalgo_elliott_wave_detection_and_fibo_grid(self):
+        from src.chart_data import detect_elliott_wave
+        # Construct synthetic candles exhibiting a 5-wave impulse: 100 -> 120 -> 110 -> 145 -> 130 -> 160
+        candles = []
+        prices = (
+            [100.0 + i * 2.0 for i in range(11)] +      # W1: 100 to 120
+            [120.0 - i * 1.0 for i in range(1, 11)] +   # W2: 120 to 110
+            [110.0 + i * 3.5 for i in range(1, 11)] +   # W3: 110 to 145
+            [145.0 - i * 1.5 for i in range(1, 11)] +   # W4: 145 to 130
+            [130.0 + i * 3.0 for i in range(1, 11)]     # W5: 130 to 160
+        )
+        for i, p in enumerate(prices):
+            candles.append({
+                "time": f"2024-01-{(i % 28) + 1:02d}",
+                "open": p - 0.5,
+                "high": p + 1.0,
+                "low": p - 1.0,
+                "close": p,
+                "volume": 1000 + i * 10
+            })
+        ew = detect_elliott_wave(candles)
+        self.assertTrue(ew["detected"])
+        self.assertIn("Impulse", ew["type"])
+        self.assertIsNotNone(ew["fibo_pullback"])
+        self.assertIn("fib_618", ew["fibo_pullback"])
+        self.assertIn("fib_854", ew["fibo_pullback"])
 
 
 class EarningsHistoryEdgeTest(unittest.TestCase):
@@ -321,6 +358,346 @@ class FallingKnifeShieldTest(unittest.TestCase):
         self.assertEqual([s["ticker"] for s in filtered], ["REV"])
 
 
+class LuxAlgoSupportResistanceTest(unittest.TestCase):
+    def test_luxalgo_sr_insufficient_bars(self):
+        from src.chart_data import compute_luxalgo_support_resistance
+        res = compute_luxalgo_support_resistance([])
+        self.assertIsNone(res["resistance"])
+        self.assertIsNone(res["support"])
+
+    def test_luxalgo_sr_detects_levels_and_breaks(self):
+        from src.chart_data import compute_luxalgo_support_resistance
+        candles = []
+        for i in range(50):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0,
+                "high": 105.0 if i == 20 else 102.0,
+                "low": 95.0 if i == 30 else 98.0,
+                "close": 100.0,
+                "volume": 1000000
+            })
+        # Last candle breaks out above 105 with volume surge
+        candles.append({
+            "time": "2026-02-21",
+            "open": 103.0,
+            "high": 110.0,
+            "low": 103.0,
+            "close": 108.0,
+            "volume": 5000000
+        })
+        res = compute_luxalgo_support_resistance(candles, left_bars=5, right_bars=5)
+        self.assertIsNotNone(res["resistance"])
+        self.assertIsNotNone(res["support"])
+        self.assertTrue(len(res["recent_breaks"]) > 0)
+
+
+class SmartMoneyConceptsTest(unittest.TestCase):
+    def test_smc_insufficient_candles(self):
+        from src.chart_data import compute_smart_money_concepts
+        res = compute_smart_money_concepts([])
+        self.assertEqual(res["unmitigated_fvgs"], [])
+        self.assertEqual(res["order_blocks"], [])
+
+    def test_smc_detects_bullish_fvg(self):
+        from src.chart_data import compute_smart_money_concepts
+        candles = []
+        for i in range(25):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i,
+                "high": 102.0 + i,
+                "low": 99.0 + i,
+                "close": 101.0 + i,
+                "volume": 1000000
+            })
+        # Create a Bullish FVG: candle[22].low > candle[20].high
+        candles[20] = {"time": "2026-01-21", "open": 120.0, "high": 122.0, "low": 119.0, "close": 121.0, "volume": 1000000}
+        candles[21] = {"time": "2026-01-22", "open": 122.0, "high": 130.0, "low": 122.0, "close": 129.0, "volume": 3000000}
+        candles[22] = {"time": "2026-01-23", "open": 129.0, "high": 132.0, "low": 125.0, "close": 131.0, "volume": 2000000}
+        res = compute_smart_money_concepts(candles)
+        self.assertIn("unmitigated_fvgs", res)
+        bullish_fvgs = [f for f in res["unmitigated_fvgs"] if f["type"] == "BULLISH_FVG"]
+        self.assertTrue(len(bullish_fvgs) > 0)
+
+
+class SqueezeMomentumTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_squeeze_momentum
+        res = compute_squeeze_momentum([])
+        self.assertEqual(res["status"], "NO_SQUEEZE")
+        self.assertFalse(res["squeeze_on"])
+        self.assertFalse(res["squeeze_fired"])
+        self.assertEqual(res["momentum"], 0.0)
+        self.assertEqual(res["histogram"], [])
+
+    def test_squeeze_compression_and_structure(self):
+        from src.chart_data import compute_squeeze_momentum
+        # 30 tight range candles to induce volatility compression
+        candles = []
+        for i in range(35):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0,
+                "high": 100.2,
+                "low": 99.8,
+                "close": 100.0,
+                "volume": 100000
+            })
+        res = compute_squeeze_momentum(candles)
+        self.assertIn(res["status"], ["SQUEEZE_ON", "SQUEEZE_FIRED", "NORMAL"])
+        self.assertIn("momentum", res)
+        self.assertIn("direction", res)
+        self.assertIn("histogram", res)
+        self.assertTrue(len(res["histogram"]) > 0)
+        entry = res["histogram"][-1]
+        self.assertIn("time", entry)
+        self.assertIn("value", entry)
+        self.assertIn("color", entry)
+        self.assertIn("sqz_on", entry)
+        self.assertIn("sqz_off", entry)
+        self.assertIn("dot_color", entry)
+
+
+class WaddahAttarExplosionTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_waddah_attar_explosion
+        res = compute_waddah_attar_explosion([])
+        self.assertEqual(res["status"], "DEAD_ZONE")
+        self.assertFalse(res["is_explosion"])
+        self.assertEqual(res["trend_up"], 0.0)
+        self.assertEqual(res["series"], [])
+
+    def test_wae_explosion_detection(self):
+        from src.chart_data import compute_waddah_attar_explosion
+        candles = []
+        # 30 steady candles then a massive upside price explosion
+        for i in range(30):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1000000
+            })
+        # Massive bullish spike
+        for i in range(5):
+            candles.append({
+                "time": f"2026-02-{i+1:02d}",
+                "open": 100.0 + i * 15.0,
+                "high": 115.0 + i * 15.0,
+                "low": 100.0 + i * 15.0,
+                "close": 114.0 + i * 15.0,
+                "volume": 5000000
+            })
+        res = compute_waddah_attar_explosion(candles)
+        self.assertIn(res["status"], ["BULL_EXPLOSION", "BEAR_EXPLOSION", "DEAD_ZONE", "NORMAL"])
+        self.assertIn("is_explosion", res)
+        self.assertIn("trend_up", res)
+        self.assertIn("trend_down", res)
+        self.assertIn("explosion_line", res)
+        self.assertIn("dead_zone", res)
+        self.assertIn("series", res)
+        self.assertTrue(len(res["series"]) > 0)
+        # Should have triggered bull explosion due to huge upward momentum spike
+        self.assertTrue(res["trend_up"] > 0)
+
+
+class VolumeFlowIndicatorTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_volume_flow_indicator
+        res = compute_volume_flow_indicator([])
+        self.assertEqual(res["status"], "NEUTRAL")
+        self.assertEqual(res["vfi"], 0.0)
+        self.assertEqual(res["series"], [])
+
+    def test_vfi_accumulation_detection(self):
+        from src.chart_data import compute_volume_flow_indicator
+        candles = []
+        # 40 candles with rising prices and heavy volume
+        for i in range(40):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i * 0.5,
+                "high": 101.0 + i * 0.5,
+                "low": 99.5 + i * 0.5,
+                "close": 100.8 + i * 0.5,
+                "volume": 2000000 + i * 50000
+            })
+        res = compute_volume_flow_indicator(candles)
+        self.assertIn(res["status"], ["ACCUMULATION", "WEAKENING_FLOW", "DISTRIBUTION", "REBOUNDING_FLOW", "NEUTRAL"])
+        self.assertIn("vfi", res)
+        self.assertIn("signal", res)
+        self.assertIn("summary", res)
+        self.assertIn("series", res)
+        self.assertTrue(len(res["series"]) > 0)
+        entry = res["series"][-1]
+        self.assertIn("vfi", entry)
+        self.assertIn("signal", entry)
+        self.assertIn("is_bull", entry)
+
+
+class WaveTrendOscillatorTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_wavetrend_oscillator
+        res = compute_wavetrend_oscillator([])
+        self.assertEqual(res["status"], "NEUTRAL")
+        self.assertEqual(res["wt1"], 0.0)
+        self.assertEqual(res["wt2"], 0.0)
+        self.assertEqual(res["series"], [])
+
+    def test_wavetrend_calculation(self):
+        from src.chart_data import compute_wavetrend_oscillator
+        candles = []
+        for i in range(40):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i,
+                "high": 102.0 + i,
+                "low": 99.0 + i,
+                "close": 101.5 + i,
+                "volume": 1000000
+            })
+        res = compute_wavetrend_oscillator(candles)
+        self.assertIn(res["status"], ["OVERSOLD_BUY", "OVERBOUGHT_SELL", "BULLISH_CROSS", "BEARISH_CROSS", "OVERSOLD", "OVERBOUGHT", "BULLISH", "BEARISH"])
+        self.assertIn("wt1", res)
+        self.assertIn("wt2", res)
+        self.assertIn("direction", res)
+        self.assertIn("series", res)
+        self.assertTrue(len(res["series"]) > 0)
+        entry = res["series"][-1]
+        self.assertIn("wt1", entry)
+        self.assertIn("wt2", entry)
+        self.assertIn("bull_cross", entry)
+        self.assertIn("bear_cross", entry)
+
+
+class UTBotAlertsTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_ut_bot_alerts
+        res = compute_ut_bot_alerts([])
+        self.assertEqual(res["status"], "NEUTRAL")
+        self.assertEqual(res["trailing_stop"], 0.0)
+        self.assertEqual(res["alerts"], [])
+
+    def test_ut_bot_signals(self):
+        from src.chart_data import compute_ut_bot_alerts
+        candles = []
+        for i in range(40):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i,
+                "high": 102.0 + i,
+                "low": 99.0 + i,
+                "close": 101.5 + i,
+                "volume": 1000000
+            })
+        res = compute_ut_bot_alerts(candles)
+        self.assertIn(res["status"], ["BUY_ALERT", "SELL_ALERT", "BULLISH_HOLD", "BEARISH_HOLD", "NEUTRAL"])
+        self.assertIn(res["position"], ["BUY", "SELL"])
+        self.assertGreater(res["trailing_stop"], 0.0)
+        self.assertIn("summary", res)
+        self.assertIn("series", res)
+        self.assertTrue(len(res["series"]) > 0)
+        entry = res["series"][-1]
+        self.assertIn("stop", entry)
+        self.assertIn("pos", entry)
+
+
+class ChandelierExitTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_chandelier_exit
+        res = compute_chandelier_exit([])
+        self.assertEqual(res["status"], "NEUTRAL")
+        self.assertEqual(res["direction"], "NEUTRAL")
+        self.assertEqual(res["trailing_stop"], 0.0)
+        self.assertEqual(res["series"], [])
+
+    def test_chandelier_calculation(self):
+        from src.chart_data import compute_chandelier_exit
+        candles = []
+        for i in range(40):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i,
+                "high": 102.0 + i,
+                "low": 99.0 + i,
+                "close": 101.5 + i,
+                "volume": 1000000
+            })
+        res = compute_chandelier_exit(candles)
+        self.assertIn(res["status"], ["BUY_SIGNAL", "SELL_SIGNAL", "LONG", "SHORT"])
+        self.assertIn(res["direction"], ["LONG", "SHORT"])
+        self.assertGreater(res["trailing_stop"], 0.0)
+        self.assertGreater(res["long_stop"], 0.0)
+        self.assertGreater(res["short_stop"], 0.0)
+        self.assertIn("series", res)
+        self.assertTrue(len(res["series"]) > 0)
+
+
+class HullSuiteTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_hull_suite
+        res = compute_hull_suite([])
+        self.assertEqual(res["status"], "NEUTRAL")
+        self.assertEqual(res["trend"], "NEUTRAL")
+        self.assertEqual(res["value"], 0.0)
+        self.assertEqual(res["series"], [])
+
+    def test_hull_calculation(self):
+        from src.chart_data import compute_hull_suite
+        candles = []
+        for i in range(40):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i,
+                "high": 102.0 + i,
+                "low": 99.0 + i,
+                "close": 101.5 + i,
+                "volume": 1000000
+            })
+        res = compute_hull_suite(candles)
+        self.assertIn(res["status"], ["BULLISH", "BEARISH"])
+        self.assertIn(res["trend"], ["BULLISH", "BEARISH"])
+        self.assertGreater(res["value"], 0.0)
+        self.assertIn("color", res)
+        self.assertIn("series", res)
+        self.assertTrue(len(res["series"]) > 0)
+
+
+class LorentzianClassificationTest(unittest.TestCase):
+    def test_insufficient_candles(self):
+        from src.chart_data import compute_lorentzian_classification
+        res = compute_lorentzian_classification([])
+        self.assertEqual(res["status"], "NEUTRAL")
+        self.assertEqual(res["direction"], "NEUTRAL")
+        self.assertEqual(res["confidence"], 50.0)
+
+    def test_lorentzian_classification_model(self):
+        from src.chart_data import compute_lorentzian_classification
+        candles = []
+        for i in range(60):
+            candles.append({
+                "time": f"2026-01-{(i%28)+1:02d}",
+                "open": 100.0 + i * 0.5,
+                "high": 102.0 + i * 0.5,
+                "low": 99.0 + i * 0.5,
+                "close": 101.5 + i * 0.5,
+                "volume": 1000000
+            })
+        res = compute_lorentzian_classification(candles, k=8)
+        self.assertIn(res["status"], ["STRONG_BUY", "BUY", "NEUTRAL", "SELL", "STRONG_SELL"])
+        self.assertIn(res["direction"], ["BULLISH", "BEARISH", "NEUTRAL"])
+        self.assertGreaterEqual(res["confidence"], 0.0)
+        self.assertLessEqual(res["confidence"], 100.0)
+        self.assertEqual(res["k"], 8)
+        self.assertIn("score", res)
+        self.assertIn("summary", res)
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
 

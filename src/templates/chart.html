@@ -151,15 +151,21 @@ __CHART_CSS__    </style>
 
                         <div class="tb-group">
                             <span class="tb-group-title">LEVELS & SIGNALS:</span>
-                            <button class="ema-pill" id="tog_pivots" style="color: #fb7185;" onclick="toggleIndicator('pivots')">🎯 Pivots (S/R) <span class="help-q" onclick="openIndicatorHelp('pivots', event)" title="วิธีดู Pivots (S/R)">?</span></button>
+                            <button class="ema-pill" id="tog_aisig" style="color: #38bdf8;" onclick="toggleIndicator('aisig')">🤖 AI Signals <span class="help-q" onclick="openIndicatorHelp('aisig', event)" title="วิธีดู AI Signals (BUY/DCA/TP)">?</span></button>
+                            <button class="ema-pill" id="tog_lorentzian" style="color: #c084fc;" onclick="toggleIndicator('lorentzian')">🤖 Lorentzian ML <span class="help-q" onclick="openIndicatorHelp('lorentzian', event)" title="วิธีดู Lorentzian Classification [jdehorty]">?</span></button>
+                            <button class="ema-pill" id="tog_utbot" style="color: #10b981;" onclick="toggleIndicator('utbot')">🤖 UT Bot <span class="help-q" onclick="openIndicatorHelp('utbot', event)" title="วิธีดู UT Bot Alerts [QuantNomad]">?</span></button>
+                            <button class="ema-pill" id="tog_chand" style="color: #f59e0b;" onclick="toggleIndicator('chand')">🪔 Chandelier <span class="help-q" onclick="openIndicatorHelp('chand', event)" title="วิธีดู Chandelier Exit [everget]">?</span></button>
+                            <button class="ema-pill" id="tog_pivots" style="color: #fb7185;" onclick="toggleIndicator('pivots')">🎯 Lux S/R (Breaks) <span class="help-q" onclick="openIndicatorHelp('pivots', event)" title="วิธีดู Support/Resistance Levels with Breaks [LuxAlgo]">?</span></button>
+                            <button class="ema-pill" id="tog_smc" style="color: #38bdf8;" onclick="toggleIndicator('smc')">🏛️ SMC (FVG/OB) <span class="help-q" onclick="openIndicatorHelp('smc', event)" title="วิธีดู Smart Money Concepts (FVG & Order Blocks)">?</span></button>
                             <button class="ema-pill" id="tog_ew" style="color: #818cf8;" onclick="toggleIndicator('ew')">🌊 Elliott Wave (1-5) <span class="help-q" onclick="openIndicatorHelp('ew', event)" title="วิธีดู Elliott Wave">?</span></button>
-                            <button class="ema-pill" id="tog_earn" style="color: #facc15;" onclick="toggleIndicator('earn')">🗓️ ผลงบ (Earnings) <span class="help-q" onclick="openIndicatorHelp('earn', event)" title="วิธีดู ผลงบย้อนหลัง">?</span></button>
+                            <button class="ema-pill active" id="tog_earn" style="color: #facc15;" onclick="toggleIndicator('earn')">🗓️ ผลงบ (Earnings) <span class="help-q" onclick="openIndicatorHelp('earn', event)" title="วิธีดู ผลงบและวันประกาศงบ">?</span></button>
                             <button class="ema-pill" id="tog_fibo" style="color: #38bdf8;" onclick="toggleIndicator('fibo')">📐 Fibo Cycle <span class="help-q" onclick="openIndicatorHelp('fibo', event)" title="วิธีดู Fibo Cycle">?</span></button>
-                            <button class="ema-pill active" id="tog_pat" style="color: #34d399;" onclick="toggleIndicator('pat')">🏛️ Patterns <span class="help-q" onclick="openIndicatorHelp('pat', event)" title="วิธีดู Chart Patterns">?</span></button>
+                            <button class="ema-pill" id="tog_pat" style="color: #34d399;" onclick="toggleIndicator('pat')">🏛️ Patterns <span class="help-q" onclick="openIndicatorHelp('pat', event)" title="วิธีดู Chart Patterns">?</span></button>
                         </div>
 
                         <div class="tb-group">
                             <span class="tb-group-title">BANDS & TREND:</span>
+                            <button class="ema-pill" id="tog_hull" style="color: #2dd4bf;" onclick="toggleIndicator('hull')">🎨 Hull Suite <span class="help-q" onclick="openIndicatorHelp('hull', event)" title="วิธีดู Hull Suite [InSilico]">?</span></button>
                             <button class="ema-pill" id="tog_cdc" style="color: #22c55e;" onclick="toggleIndicator('cdc')">🚦 CDC ActionZone <span class="help-q" onclick="openIndicatorHelp('cdc', event)" title="วิธีดู CDC ActionZone V3">?</span></button>
                             <button class="ema-pill" id="tog_bb" style="color: #06b6d4;" onclick="toggleIndicator('bb')">Bollinger <span class="help-q" onclick="openIndicatorHelp('bb', event)" title="วิธีดู Bollinger Bands">?</span></button>
                             <button class="ema-pill" id="tog_st" style="color: #34d399;" onclick="toggleIndicator('st')">Supertrend <span class="help-q" onclick="openIndicatorHelp('st', event)" title="วิธีดู Supertrend">?</span></button>
@@ -168,25 +174,39 @@ __CHART_CSS__    </style>
                             <button class="ema-pill" id="tog_vwap" style="color: #eab308;" onclick="toggleIndicator('vwap')">VWAP <span class="help-q" onclick="openIndicatorHelp('vwap', event)" title="วิธีดู VWAP">?</span></button>
                         </div>
 
+                        <div class="tb-group">
+                            <span class="tb-group-title">SUB-PANE:</span>
+                            <button class="ema-pill active" id="tog_osc_rsi" style="color: #c084fc;" onclick="switchOscillatorPane('rsi')">⚡ RSI <span class="help-q" onclick="openIndicatorHelp('rsi', event)" title="วิธีดู RSI (14)">?</span></button>
+                            <button class="ema-pill" id="tog_osc_sqz" style="color: #f59e0b;" onclick="switchOscillatorPane('sqz')">🎯 Squeeze Mom <span class="help-q" onclick="openIndicatorHelp('sqz', event)" title="วิธีดู Squeeze Momentum [LazyBear]">?</span></button>
+                            <button class="ema-pill" id="tog_osc_wae" style="color: #10b981;" onclick="switchOscillatorPane('wae')">💥 WAE Explosion <span class="help-q" onclick="openIndicatorHelp('wae', event)" title="วิธีดู Waddah Attar Explosion">?</span></button>
+                            <button class="ema-pill" id="tog_osc_vfi" style="color: #38bdf8;" onclick="switchOscillatorPane('vfi')">🌊 VFI Flow <span class="help-q" onclick="openIndicatorHelp('vfi', event)" title="วิธีดู Volume Flow Indicator [LazyBear]">?</span></button>
+                            <button class="ema-pill" id="tog_osc_wt" style="color: #818cf8;" onclick="switchOscillatorPane('wt')">🌊 WaveTrend <span class="help-q" onclick="openIndicatorHelp('wt', event)" title="วิธีดู WaveTrend [LazyBear]">?</span></button>
+                        </div>
+
                         <div class="tb-group tb-actions">
-                            <button class="ema-pill active" id="tog_rsi_pane" style="color: #c084fc;" onclick="toggleRsiPane()">⚡ RSI (14) <span class="help-q" onclick="openIndicatorHelp('rsi', event)" title="วิธีดู RSI (14)">?</span></button>
                             <button class="reset-ind-btn" onclick="resetAllIndicators()">🔄 ล้างเส้น</button>
                         </div>
                     </div>
 
                     <!-- Main Chart Canvas Body -->
-                    <div id="chart_container" class="main-chart-pane"></div>
-
-                    <!-- Synchronized RSI (14) Sub-Pane -->
-                    <div id="rsi_subpane_wrap" class="rsi-subpane-wrap">
-                        <div class="rsi-pane-header">
-                            <b style="color: #c084fc;">RSI (14)</b>
-                            <span>ค่าล่าสุด: <span id="rsi_hover_val" style="color: #f8fafc; font-weight: 700;">-</span></span>
-                            <span style="color: #fb7185;">Overbought: 70</span>
-                            <span style="color: #34d399;">Oversold: 30</span>
+                    <div id="chart_container_wrap" style="position: relative; width: 100%;">
+                        <div id="chart_container" class="main-chart-pane"></div>
+                        <!-- Vertical Earnings Line Overlay (Perpendicular to time axis) -->
+                        <div id="earnings_vertical_line_overlay" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; z-index: 10; display: none; overflow: hidden;">
+                            <div id="v_earn_line" style="position: absolute; top: 0; bottom: 26px; width: 0px; border-left: 2px dashed #facc15; box-shadow: 0 0 10px rgba(250, 204, 21, 0.5); pointer-events: auto;">
+                                <div id="v_earn_badge" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: #12182b; border: 1.5px solid #facc15; color: #facc15; border-radius: 6px; padding: 4px 8px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 4px;">
+                                    <span style="font-size: 0.85rem;">🗓️</span>
+                                    <span id="v_earn_text">วันประกาศงบ: 29 Oct 2026</span>
+                                </div>
+                                <div style="position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); background: #facc15; color: #060810; font-size: 0.62rem; font-weight: 800; border-radius: 3px; padding: 1px 4px; white-space: nowrap; letter-spacing: 0.5px;">
+                                    EARNINGS
+                                </div>
+                            </div>
                         </div>
-                        <div id="rsi_container" class="rsi-pane-canvas"></div>
                     </div>
+
+                    <!-- Synchronized Sub-Pane Stack (Multi-Pane Stacking for RSI, Squeeze, WAE, VFI, WaveTrend) -->
+                    <div id="subpanes_stack" class="subpanes-stack"></div>
 
                     <!-- Bottom Bar (Timeframe & Zoom Presets like Rocket Tool) -->
                     <div class="chart-botbar">
@@ -413,6 +433,45 @@ __CHART_CSS__    </style>
                     </div>
                     <div id="ew_sidebar_body">
                         กำลังคำนวณโครงสร้างคลื่น...
+                    </div>
+                </div>
+
+                <!-- Card 4.5: Smart Money Concepts (SMC) & Lux S/R -->
+                <div class="sidebar-card" id="smc_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🏛️ Smart Money (SMC) & Lux S/R</span>
+                        </div>
+                        <span class="sc-subtitle" id="smc_ms_badge">Institutional Flow</span>
+                    </div>
+                    <div id="smc_sidebar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
+                        กำลังคำนวณโครงสร้างสถาบัน (FVG / OB)...
+                    </div>
+                </div>
+
+                <!-- Card 4.7: TradingView Pro Oscillators (Squeeze, WAE, VFI, WaveTrend) -->
+                <div class="sidebar-card" id="osc_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>⚡ TradingView Pro Oscillators</span>
+                        </div>
+                        <span class="sc-subtitle" id="osc_sidebar_badge">Squeeze • WAE • VFI • WT</span>
+                    </div>
+                    <div id="osc_sidebar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
+                        กำลังคำนวณโมเมนตัม Squeeze, WAE, VFI & WaveTrend...
+                    </div>
+                </div>
+
+                <!-- Card 4.8: AI Machine Learning & Trend Armor (Lorentzian, UT Bot, Chandelier, Hull) -->
+                <div class="sidebar-card" id="ml_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🤖 AI Machine Learning (Lorentzian)</span>
+                        </div>
+                        <span class="sc-subtitle" id="ml_sidebar_badge">KNN Classifier • Trend Armor</span>
+                    </div>
+                    <div id="ml_sidebar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
+                        กำลังประมวลผลโมเดล AI Lorentzian ML & Trend Trailing Stops...
                     </div>
                 </div>
 

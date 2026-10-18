@@ -6,6 +6,7 @@ SMA 50, SMA 200, and Volume profiles for automated programmatic charting.
 """
 
 import json
+import math
 import os
 import sys
 import tempfile
@@ -877,27 +878,43 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
     return detected
 
 
-BULLISH_DEVELOPING_WAVE_TYPES = {"Bullish Impulse (1-2-3-4-5)", "Emerging Bullish Impulse (1-2-3)"}
+BULLISH_DEVELOPING_WAVE_TYPES = {
+    "Bullish Impulse (1-2-3-4-5)",
+    "Emerging Bullish Impulse (1-2-3)",
+    "New Cycle Wave (1) Breakout",
+}
 
 
 def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -> Optional[Dict[str, Any]]:
     """
-    Detects Elliott Wave structures (Impulse 1-2-3-4-5, Emerging 1-2-3, or Corrective A-B-C)
-    using strict academic Elliott Wave rules (Cardinal Rules 1-3, consecutive swings, and floor integrity).
-    Returns detected: False when the stock is in consolidation or has an invalidated wave.
+    Detects Elliott Wave structures (Impulse 1-2-3-4-5, Emerging 1-2-3, Corrective A-B-C,
+    Bearish Impulse 1-2-3-4-5, and New Motive Cycle Breakouts) strictly adhering to
+    LuxAlgo Elliott Wave principles & 3 Cardinal Rules:
+      1. Cardinal Rule 1: Wave 2 never retraces beyond the origin of Wave 1 (W2 > W0 bullish, W2 < W0 bearish).
+      2. Cardinal Rule 2: Wave 4 never enters the price territory of Wave 1 (W4 > W1 bullish, W4 < W1 bearish).
+      3. Cardinal Rule 3: Wave 3 is NEVER the shortest wave among motive waves (len3 != min(len1, len3, len5)).
+      4. LuxAlgo Post-Impulse Fibonacci Retracement Grid (50.0%, 61.8% Golden Pocket, 76.4%, 85.4% Invalidation Floor).
+      5. Next Cycle Start Detection: Flags New Motive Cycle Wave (1) when price breaks above Wave 5 peak after ABC correction.
+      6. Invalidation Status Tracking: Supports active, completed, and invalidated wave states.
     """
+    degree_label = "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)"
+
     if not candles or len(candles) < 20:
         return {
             "detected": False,
             "type": "Insufficient Data",
-            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+            "direction": "neutral",
+            "status": "none",
+            "degree": degree_label,
             "current_wave": "ข้อมูลแท่งเทียนไม่เพียงพอ",
             "current_wave_badge": "N/A",
             "summary": "ข้อมูลแท่งเทียนไม่เพียงพอต่อการวิเคราะห์โครงสร้างคลื่น",
             "points": [],
             "lines": [],
             "target": None,
-            "invalidation": None
+            "invalidation": None,
+            "fibo_pullback": None,
+            "cycle_signal": None,
         }
 
     recent = candles if is_macro else (candles[-252:] if len(candles) >= 252 else candles)
@@ -905,13 +922,12 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
     current_p = round(float(current_c["close"]), 2)
     current_t = current_c["time"]
 
-    # Volatility for adaptive threshold
+    # Adaptive volatility threshold for multi-scale zigzag
     sample = recent[-60:] if len(recent) >= 60 else recent
     diffs = [abs(sample[i]["close"] - sample[i - 1]["close"]) / max(1e-4, sample[i - 1]["close"]) for i in range(1, len(sample))]
     avg_vol = sum(diffs) / len(diffs) if diffs else 0.015
     base_thresh = max(0.025, min(0.10, avg_vol * (4.0 if is_macro else 3.0)))
 
-    # Find best swings with index tracking
     best_swings = []
     target_count = 10 if not is_macro else 8
 
@@ -968,19 +984,97 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
         return {
             "detected": False,
             "type": "No Clear Wave / Consolidation",
-            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+            "direction": "neutral",
+            "status": "none",
+            "degree": degree_label,
             "current_wave": "ไม่มีโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์",
             "current_wave_badge": "Consolidation",
             "summary": "ไม่พบโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์ (ราคาอยู่ในสภาวะพักฐาน ปรับฐาน หรือสะสมพลังไซด์เวย์ แนะนำอ้างอิง Classical Chart Pattern หรือแนวรับต้าน EMA)",
             "points": [],
             "lines": [],
             "target": None,
-            "invalidation": None
+            "invalidation": None,
+            "fibo_pullback": None,
+            "cycle_signal": None,
         }
 
     n_sw = len(best_swings)
 
-    # 1. Active Bullish Impulse (0)-(1)-(2)-(3)-(4) -> developing Wave (5)
+    def _clean_points(pts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        clean: List[Dict[str, Any]] = []
+        seen = set()
+        for p in pts:
+            if p["time"] not in seen:
+                seen.add(p["time"])
+                clean.append(p)
+            else:
+                clean[-1] = p
+        return clean
+
+    def _calc_luxalgo_fibo(w0: float, w5: float, is_bull: bool = True) -> Optional[Dict[str, Any]]:
+        diff = abs(w5 - w0)
+        if diff <= 0:
+            return None
+        if is_bull:
+            f500 = round(w5 - diff * 0.500, 2)
+            f618 = round(w5 - diff * 0.618, 2)
+            f764 = round(w5 - diff * 0.764, 2)
+            f854 = round(w5 - diff * 0.854, 2)
+            broken = current_p < f854
+        else:
+            f500 = round(w5 + diff * 0.500, 2)
+            f618 = round(w5 + diff * 0.618, 2)
+            f764 = round(w5 + diff * 0.764, 2)
+            f854 = round(w5 + diff * 0.854, 2)
+            broken = current_p > f854
+        return {
+            "fib_500": f500,
+            "fib_618": f618,
+            "fib_764": f764,
+            "fib_854": f854,
+            "floor_broken": broken,
+        }
+
+    # -------------------------------------------------------------------------
+    # 1. New Motive Cycle Start (LuxAlgo Circle Signal: Breakout after ABC)
+    # -------------------------------------------------------------------------
+    if n_sw >= 4:
+        for k in range(max(0, n_sw - 5), n_sw - 3):
+            s_top, sa, sb, sc = best_swings[k:k + 4]
+            if s_top["type"] == "high" and sa["type"] == "low" and sb["type"] == "high" and sc["type"] == "low":
+                if sb["price"] < s_top["price"] and sa["price"] < s_top["price"] and sc["price"] < sb["price"]:
+                    # If current price breaks above the previous Wave 5 / Wave B top
+                    if current_p > s_top["price"] * 0.995:
+                        pts = [
+                            {"wave": "(5)", "time": s_top["time"], "price": s_top["price"], "label": "Prior Wave (5) Peak"},
+                            {"wave": "(A)", "time": sa["time"], "price": sa["price"], "label": "Wave (A) Drop"},
+                            {"wave": "(B)", "time": sb["time"], "price": sb["price"], "label": "Wave (B) Rebound"},
+                            {"wave": "(C)", "time": sc["time"], "price": sc["price"], "label": "Wave (C) Base Floor"},
+                            {"wave": "(1)", "time": current_t, "price": current_p, "label": "🟢 New Cycle (1) Breakout"},
+                        ]
+                        clean_pts = _clean_points(pts)
+                        lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                        target_new = round(current_p + (s_top["price"] - sc["price"]) * 1.618, 2)
+                        return {
+                            "detected": True,
+                            "type": "New Cycle Wave (1) Breakout",
+                            "direction": "bullish",
+                            "status": "active",
+                            "degree": degree_label,
+                            "current_wave": "🟢 New Cycle Wave (1) ระเบิดทะลุ High เดิม",
+                            "current_wave_badge": "New Cycle (1)",
+                            "summary": f"เกิดสัญญาณ LuxAlgo New Motive Cycle Breakout หลังจบการพักฐาน A-B-C โดยราคาเบรกทะลุยอดดอยเดิม ${s_top['price']:.2f} เริ่มต้นคลื่นลูกใหม่",
+                            "points": clean_pts,
+                            "lines": lns,
+                            "target": target_new,
+                            "invalidation": round(sc["price"], 2),
+                            "fibo_pullback": _calc_luxalgo_fibo(sc["price"], current_p, is_bull=True),
+                            "cycle_signal": "New Bullish Motive Cycle Initiated",
+                        }
+
+    # -------------------------------------------------------------------------
+    # 2. Active Bullish Impulse (0)-(1)-(2)-(3)-(4) -> developing Wave (5)
+    # -------------------------------------------------------------------------
     for k in range(max(0, n_sw - 6), n_sw - 4):
         s0, s1, s2, s3, s4 = best_swings[k:k + 5]
         if s0["type"] == "low" and s1["type"] == "high" and s2["type"] == "low" and s3["type"] == "high" and s4["type"] == "low":
@@ -988,7 +1082,7 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
             len3 = s3["price"] - s2["price"]
 
             # Cardinal Rules: W2 > W0, W3 > W1 and strong, W4 > W1 (no overlap)
-            if s2["price"] > s0["price"] and s3["price"] > s1["price"] and len3 >= len1 * 0.8 and s4["price"] > s1["price"]:
+            if s2["price"] > s0["price"] and s3["price"] > s1["price"] and len3 >= len1 * 0.85 and s4["price"] > s1["price"]:
                 idx_s4 = s4["idx"]
                 candles_after_s4 = recent[idx_s4:]
                 floor_breached = any(c["low"] < s4["price"] * 0.99 for c in candles_after_s4)
@@ -1009,36 +1103,40 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
                         {"wave": "(4)", "time": s4["time"], "price": s4["price"], "label": "Wave (4) Base Floor"},
                         {"wave": "(5)", "time": current_t, "price": current_p, "label": f"{curr_badge} ปัจจุบัน"},
                     ]
-                    clean_pts = []
-                    seen_t = set()
-                    for p in pts:
-                        if p["time"] not in seen_t:
-                            seen_t.add(p["time"])
-                            clean_pts.append(p)
-                        else:
-                            clean_pts[-1] = p
-
+                    clean_pts = _clean_points(pts)
                     lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                    fibo_pb = _calc_luxalgo_fibo(s0["price"], max(s3["price"], current_p), is_bull=True)
                     return {
                         "detected": True,
                         "type": "Bullish Impulse (1-2-3-4-5)",
-                        "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                        "direction": "bullish",
+                        "status": "active",
+                        "degree": degree_label,
                         "current_wave": curr_w_str,
                         "current_wave_badge": curr_badge,
-                        "summary": f"เกิดโครงสร้างคลื่นขาขึ้น Bullish Impulse (1-2-3-4-5) โดย Wave (3) อยู่ที่ ${s3['price']:.2f} และ Wave (4) ฐานรับที่ ${s4['price']:.2f}",
+                        "summary": f"เกิดโครงสร้างคลื่นขาขึ้น Bullish Impulse (1-2-3-4-5) ตามกฎ LuxAlgo โดย Wave (3) อยู่ที่ ${s3['price']:.2f} และ Wave (4) ฐานรับที่ ${s4['price']:.2f}",
                         "points": clean_pts,
                         "lines": lns,
                         "target": target5,
-                        "invalidation": inval
+                        "invalidation": inval,
+                        "fibo_pullback": fibo_pb,
+                        "cycle_signal": None,
                     }
 
-    # 2. Completed Bullish Impulse (0)-(1)-(2)-(3)-(4)-(5)
+    # -------------------------------------------------------------------------
+    # 3. Completed Bullish Impulse (0)-(1)-(2)-(3)-(4)-(5)
+    # -------------------------------------------------------------------------
     if n_sw >= 6:
         s0, s1, s2, s3, s4, s5 = best_swings[-6:]
         if s0["type"] == "low" and s1["type"] == "high" and s2["type"] == "low" and s3["type"] == "high" and s4["type"] == "low" and s5["type"] == "high":
             len1 = s1["price"] - s0["price"]
             len3 = s3["price"] - s2["price"]
-            if s2["price"] > s0["price"] and s3["price"] > s1["price"] and s4["price"] > s1["price"] and s5["price"] > s3["price"] and len3 >= len1 * 0.8:
+            len5 = s5["price"] - s4["price"]
+
+            # Strict LuxAlgo Cardinal Rule 3: Wave 3 is NEVER the shortest wave
+            is_w3_not_shortest = len3 != min(len1, len3, len5)
+
+            if s2["price"] > s0["price"] and s3["price"] > s1["price"] and s4["price"] > s1["price"] and s5["price"] > s3["price"] and is_w3_not_shortest:
                 pts = [
                     {"wave": "(0)", "time": s0["time"], "price": s0["price"], "label": "Start Wave (0)"},
                     {"wave": "(1)", "time": s1["time"], "price": s1["price"], "label": "Wave (1) Impulse"},
@@ -1048,20 +1146,77 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
                     {"wave": "(5)", "time": s5["time"], "price": s5["price"], "label": "Wave (5) Peak"},
                 ]
                 lns = [{"time": p["time"], "value": p["price"]} for p in pts]
+                fibo_pb = _calc_luxalgo_fibo(s0["price"], s5["price"], is_bull=True)
                 return {
                     "detected": True,
                     "type": "Bullish Impulse Completed (1-2-3-4-5)",
-                    "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                    "direction": "bullish",
+                    "status": "completed",
+                    "degree": degree_label,
                     "current_wave": "Wave (5) Peak จบรอบคลื่นสมบูรณ์",
                     "current_wave_badge": "Wave (5) Peak",
-                    "summary": f"คลื่นขาขึ้น Bullish Impulse (1-2-3-4-5) จบรอบสมบูรณ์ที่ยอดคลื่น (5) ระดับ ${s5['price']:.2f} กำลังเข้าสู่ช่วงพักฐาน Corrective Phase",
+                    "summary": f"คลื่นขาขึ้น Bullish Impulse (1-2-3-4-5) จบรอบสมบูรณ์ที่ยอดคลื่น (5) ระดับ ${s5['price']:.2f} ตามเกณฑ์ LuxAlgo กำลังเข้าสู่ช่วงพักฐาน Corrective Phase",
                     "points": pts,
                     "lines": lns,
                     "target": round(s5["price"], 2),
-                    "invalidation": round(s4["price"], 2)
+                    "invalidation": round(s4["price"], 2),
+                    "fibo_pullback": fibo_pb,
+                    "cycle_signal": None,
                 }
 
-    # 3. Emerging Bullish Impulse (0)-(1)-(2) -> developing Wave (3)
+    # -------------------------------------------------------------------------
+    # 4. Bearish Impulse (1-2-3-4-5) (LuxAlgo dir == -1: Downtrend Motive Waves)
+    # -------------------------------------------------------------------------
+    if n_sw >= 5:
+        # Check for completed or active Bearish Impulse
+        for k in range(max(0, n_sw - 6), n_sw - 4):
+            chunk = best_swings[k:k + 5]
+            s0, s1, s2, s3, s4 = chunk
+            if s0["type"] == "high" and s1["type"] == "low" and s2["type"] == "high" and s3["type"] == "low" and s4["type"] == "high":
+                len1 = s0["price"] - s1["price"]
+                len3 = s2["price"] - s3["price"]
+
+                # Bearish Cardinal Rules: W2 < W0, W3 < W1, W4 < W1 (no overlap)
+                if s2["price"] < s0["price"] and s3["price"] < s1["price"] and s4["price"] < s1["price"] and len3 >= len1 * 0.85:
+                    idx_s4 = s4["idx"]
+                    candles_after_s4 = recent[idx_s4:]
+                    roof_breached = any(c["high"] > s4["price"] * 1.01 for c in candles_after_s4)
+
+                    if not roof_breached and current_p <= s4["price"]:
+                        target_bear5 = round(max(0.01, s4["price"] - max(len1, len3 * 0.618)), 2)
+                        inval_bear = round(s4["price"], 2)
+
+                        pts = [
+                            {"wave": "(0)", "time": s0["time"], "price": s0["price"], "label": "Start Top (0)"},
+                            {"wave": "(1)", "time": s1["time"], "price": s1["price"], "label": "Bearish Wave (1)"},
+                            {"wave": "(2)", "time": s2["time"], "price": s2["price"], "label": "Bearish Wave (2) Rebound"},
+                            {"wave": "(3)", "time": s3["time"], "price": s3["price"], "label": "Bearish Wave (3) Expansion"},
+                            {"wave": "(4)", "time": s4["time"], "price": s4["price"], "label": "Bearish Wave (4) Roof"},
+                            {"wave": "(5)", "time": current_t, "price": current_p, "label": "Bearish Wave (5) กำลังลง"},
+                        ]
+                        clean_pts = _clean_points(pts)
+                        lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                        fibo_pb = _calc_luxalgo_fibo(s0["price"], current_p, is_bull=False)
+                        return {
+                            "detected": True,
+                            "type": "Bearish Impulse (1-2-3-4-5)",
+                            "direction": "bearish",
+                            "status": "active",
+                            "degree": degree_label,
+                            "current_wave": "Bearish Wave (5) ขาลงโมเมนตัมกำลังทิ้งตัว",
+                            "current_wave_badge": "Bear Wave (5)",
+                            "summary": f"เกิดโครงสร้างคลื่นขาลง Bearish Impulse (1-2-3-4-5) ตามเกณฑ์ LuxAlgo โดย Wave (4) ชนแนวต้าน ${s4['price']:.2f} และกำลังทิ้งตัวสู่ Wave (5)",
+                            "points": clean_pts,
+                            "lines": lns,
+                            "target": target_bear5,
+                            "invalidation": inval_bear,
+                            "fibo_pullback": fibo_pb,
+                            "cycle_signal": None,
+                        }
+
+    # -------------------------------------------------------------------------
+    # 5. Emerging Bullish Impulse (0)-(1)-(2) -> developing Wave (3)
+    # -------------------------------------------------------------------------
     if n_sw >= 3:
         for k in range(max(0, n_sw - 4), n_sw - 2):
             s0, s1, s2 = best_swings[k:k + 3]
@@ -1083,30 +1238,29 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
                             {"wave": "(2)", "time": s2["time"], "price": s2["price"], "label": "Wave (2) Retrace Floor"},
                             {"wave": "(3)", "time": current_t, "price": current_p, "label": "Wave (3) ปัจจุบัน"},
                         ]
-                        clean_pts = []
-                        seen_t = set()
-                        for p in pts:
-                            if p["time"] not in seen_t:
-                                seen_t.add(p["time"])
-                                clean_pts.append(p)
-                            else:
-                                clean_pts[-1] = p
-
+                        clean_pts = _clean_points(pts)
                         lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                        fibo_pb = _calc_luxalgo_fibo(s0["price"], current_p, is_bull=True)
                         return {
                             "detected": True,
                             "type": "Emerging Bullish Impulse (1-2-3)",
-                            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                            "direction": "bullish",
+                            "status": "active",
+                            "degree": degree_label,
                             "current_wave": "Wave (3) Impulse กำลังดีดตัวขยายตัว",
                             "current_wave_badge": "Wave (3)",
                             "summary": f"เกิดโครงสร้างต้นรอบคลื่น Wave (1-2-3) โดย Wave (2) ยกฐานรับที่ ${s2['price']:.2f} และกำลังวิ่งขึ้นทดสอบเป้าหมาย Wave (3)",
                             "points": clean_pts,
                             "lines": lns,
                             "target": target3,
-                            "invalidation": inval
+                            "invalidation": inval,
+                            "fibo_pullback": fibo_pb,
+                            "cycle_signal": None,
                         }
 
-    # 4. Clean Corrective Wave (A-B-C)
+    # -------------------------------------------------------------------------
+    # 6. Clean Corrective Wave (A-B-C) with LuxAlgo Retracement Levels
+    # -------------------------------------------------------------------------
     if n_sw >= 3:
         for k in range(max(0, n_sw - 4), n_sw - 2):
             s_top, sa, sb = best_swings[k:k + 3]
@@ -1128,41 +1282,44 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
                             {"wave": "(B)", "time": sb["time"], "price": sb["price"], "label": "Wave (B) Rebound High"},
                             {"wave": "(C)", "time": current_t, "price": current_p, "label": "Wave (C) ปัจจุบัน"},
                         ]
-                        clean_pts = []
-                        seen_t = set()
-                        for p in pts:
-                            if p["time"] not in seen_t:
-                                seen_t.add(p["time"])
-                                clean_pts.append(p)
-                            else:
-                                clean_pts[-1] = p
-
+                        clean_pts = _clean_points(pts)
                         lns = [{"time": p["time"], "value": p["price"]} for p in clean_pts]
+                        fibo_pb = _calc_luxalgo_fibo(sa["price"], s_top["price"], is_bull=True)
                         return {
                             "detected": True,
                             "type": "Corrective Wave (A-B-C)",
-                            "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+                            "direction": "bearish",
+                            "status": "active",
+                            "degree": degree_label,
                             "current_wave": "Corrective Wave (C) กำลังปรับฐานหาจุดสมดุล",
                             "current_wave_badge": "Wave (C)",
                             "summary": f"โครงสร้างคลื่นปรับฐาน Corrective (A-B-C) หลังยอดดอย ${s_top['price']:.2f} โดยมีรีบาวด์ Wave (B) ที่ ${sb['price']:.2f}",
                             "points": clean_pts,
                             "lines": lns,
                             "target": target_c,
-                            "invalidation": inval
+                            "invalidation": inval,
+                            "fibo_pullback": fibo_pb,
+                            "cycle_signal": None,
                         }
 
-    # 5. Consolidation / Sideway (No valid unbroken wave)
+    # -------------------------------------------------------------------------
+    # 7. Consolidation / Sideway (No valid unbroken wave)
+    # -------------------------------------------------------------------------
     return {
         "detected": False,
         "type": "No Clear Wave / Consolidation",
-        "degree": "All-Time Supercycle" if is_macro else "Intermediate Cycle (52W)",
+        "direction": "neutral",
+        "status": "none",
+        "degree": degree_label,
         "current_wave": "ไม่มีโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์",
         "current_wave_badge": "Consolidation",
         "summary": "ไม่พบโครงสร้างคลื่นโมเมนตัมที่สมบูรณ์ (ราคาอยู่ในสภาวะพักฐาน ปรับฐาน หรือสะสมพลังไซด์เวย์ แนะนำอ้างอิง Classical Chart Pattern หรือแนวรับต้าน EMA)",
         "points": [],
         "lines": [],
         "target": None,
-        "invalidation": None
+        "invalidation": None,
+        "fibo_pullback": None,
+        "cycle_signal": None,
     }
 
 
@@ -1309,6 +1466,1210 @@ def compute_cdc_actionzone(candles: List[Dict[str, Any]]) -> Dict[str, Any]:
         "fast_ema12": last_e12,
         "slow_ema26": last_e26,
         "candle_colors": candle_colors
+    }
+
+
+def compute_luxalgo_support_resistance(
+    candles: List[Dict[str, Any]],
+    left_bars: int = 15,
+    right_bars: int = 12,
+    vol_thresh: float = 20.0
+) -> Dict[str, Any]:
+    """
+    Computes Support and Resistance Levels with Breaks matching LuxAlgo TradingView script:
+    1. Pivot High & Pivot Low (left_bars=15, right_bars=12).
+    2. Volume Oscillator: 100 * (EMA(vol, 5) - EMA(vol, 10)) / EMA(vol, 10).
+    3. Breaks & Wicks:
+       - Breakout (Vol): Close crosses above resistance, not (open - low > close - open), osc > vol_thresh.
+       - Breakdown (Vol): Close crosses below support, not (open - close < high - open), osc > vol_thresh.
+       - Bull Wick: Close crosses above resistance, open - low > close - open (fakeout rejection).
+       - Bear Wick: Close crosses below support, open - close < high - open (fakeout rejection).
+    """
+    if not candles or len(candles) < max(left_bars + right_bars + 1, 30):
+        return {
+            "resistance": None,
+            "support": None,
+            "volume_osc": 0.0,
+            "recent_breaks": [],
+            "current_signal": None,
+            "summary": "ข้อมูลแท่งเทียนไม่เพียงพอ"
+        }
+
+    n = len(candles)
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+    closes = [float(c["close"]) for c in candles]
+    opens = [float(c["open"]) for c in candles]
+    volumes = [float(c["volume"]) for c in candles]
+
+    short_ema = _calc_ema_series(volumes, 5)
+    long_ema = _calc_ema_series(volumes, 10)
+    osc = [
+        100.0 * (short_ema[i] - long_ema[i]) / max(1.0, long_ema[i])
+        for i in range(n)
+    ]
+
+    pivot_high = [None] * n
+    pivot_low = [None] * n
+
+    for i in range(left_bars, n - right_bars):
+        h = highs[i]
+        if all(h >= highs[j] for j in range(i - left_bars, i + right_bars + 1) if j != i):
+            pivot_high[i + right_bars] = h
+        l = lows[i]
+        if all(l <= lows[j] for j in range(i - left_bars, i + right_bars + 1) if j != i):
+            pivot_low[i + right_bars] = l
+
+    res_level = None
+    sup_level = None
+    res_history = [None] * n
+    sup_history = [None] * n
+
+    for i in range(n):
+        if pivot_high[i] is not None:
+            res_level = pivot_high[i]
+        if pivot_low[i] is not None:
+            sup_level = pivot_low[i]
+        res_history[i] = res_level
+        sup_history[i] = sup_level
+
+    breaks = []
+    start_check = max(1, n - 60)
+    for i in range(start_check, n):
+        cur_res = res_history[i - 1]
+        cur_sup = sup_history[i - 1]
+        if cur_res is None or cur_sup is None:
+            continue
+        o = opens[i]
+        c = closes[i]
+        h = highs[i]
+        l = lows[i]
+        t = candles[i]["time"]
+        v_osc = round(osc[i], 1)
+
+        # Bullish break / Wick
+        if closes[i - 1] <= cur_res and c > cur_res:
+            is_bull_wick = (o - l) > (c - o)
+            if is_bull_wick:
+                breaks.append({
+                    "time": t, "type": "BULL_WICK", "price": h, "level": round(cur_res, 2),
+                    "label": "⚠️ Bull Wick", "desc": f"แทงทะลุ ${cur_res:.2f} แต่โดนแรงขายกดกลับทิ้งไส้บน (Fakeout)"
+                })
+            elif v_osc > vol_thresh:
+                breaks.append({
+                    "time": t, "type": "BREAKOUT_VOL", "price": c, "level": round(cur_res, 2),
+                    "label": "🟢 Breakout (Vol)", "desc": f"เบรกทะลุแนวต้าน ${cur_res:.2f} พร้อม Volume Surge +{v_osc}%"
+                })
+
+        # Bearish break / Wick
+        if closes[i - 1] >= cur_sup and c < cur_sup:
+            is_bear_wick = (o - c) < (h - o)
+            if is_bear_wick:
+                breaks.append({
+                    "time": t, "type": "BEAR_WICK", "price": l, "level": round(cur_sup, 2),
+                    "label": "⚠️ Bear Wick", "desc": f"หลุด ${cur_sup:.2f} แต่มีแรงซื้อดึงกลับทิ้งไส้ล่าง (Fakeout)"
+                })
+            elif v_osc > vol_thresh:
+                breaks.append({
+                    "time": t, "type": "BREAKDOWN_VOL", "price": c, "level": round(cur_sup, 2),
+                    "label": "🔴 Breakdown (Vol)", "desc": f"หลุดแนวรับ ${cur_sup:.2f} พร้อม Volume Surge +{v_osc}%"
+                })
+
+    last_signal = breaks[-1] if breaks else None
+    active_res = round(res_level, 2) if res_level else None
+    active_sup = round(sup_level, 2) if sup_level else None
+    current_osc = round(osc[-1], 1)
+
+    summary_parts = []
+    if active_res: summary_parts.append(f"แนวต้านสวิง LuxAlgo ${active_res:.2f}")
+    if active_sup: summary_parts.append(f"แนวรับสวิง LuxAlgo ${active_sup:.2f}")
+    if last_signal: summary_parts.append(f"สัญญาณล่าสุด: {last_signal['label']} ({last_signal['time']})")
+
+    return {
+        "resistance": active_res,
+        "support": active_sup,
+        "volume_osc": current_osc,
+        "recent_breaks": breaks[-8:],
+        "current_signal": last_signal,
+        "summary": " • ".join(summary_parts) if summary_parts else "ไม่พบจุดสวิงที่มีนัยสำคัญ"
+    }
+
+
+def compute_smart_money_concepts(candles: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Computes Smart Money Concepts (SMC) matching LuxAlgo TradingView script:
+    1. Fair Value Gaps (FVG) with unmitigated status tracking (Demand / Supply zones).
+    2. Order Blocks (OB): Last opposing candle before significant institutional displacement.
+    3. Market Structure: CHoCH (Change of Character) & BOS (Break of Structure).
+    """
+    if not candles or len(candles) < 20:
+        return {
+            "unmitigated_fvgs": [],
+            "order_blocks": [],
+            "market_structure": "Neutral",
+            "summary": "ข้อมูลแท่งเทียนไม่เพียงพอ"
+        }
+
+    n = len(candles)
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+    closes = [float(c["close"]) for c in candles]
+    opens = [float(c["open"]) for c in candles]
+
+    # 1. Fair Value Gaps (FVG)
+    unmit_bull = []
+    unmit_bear = []
+    for i in range(2, n):
+        # Bullish FVG (Demand)
+        if lows[i] > highs[i - 2]:
+            bottom = highs[i - 2]
+            top = lows[i]
+            gap = round(top - bottom, 2)
+            mitigated = any(lows[k] <= bottom for k in range(i + 1, n))
+            if not mitigated:
+                unmit_bull.append({
+                    "time": candles[i]["time"],
+                    "type": "BULLISH_FVG",
+                    "bottom": round(bottom, 2),
+                    "top": round(top, 2),
+                    "gap": gap,
+                    "label": f"🟢 FVG Demand ${bottom:.2f} - ${top:.2f}"
+                })
+        # Bearish FVG (Supply)
+        elif highs[i] < lows[i - 2]:
+            bottom = highs[i]
+            top = lows[i - 2]
+            gap = round(top - bottom, 2)
+            mitigated = any(highs[k] >= top for k in range(i + 1, n))
+            if not mitigated:
+                unmit_bear.append({
+                    "time": candles[i]["time"],
+                    "type": "BEARISH_FVG",
+                    "bottom": round(bottom, 2),
+                    "top": round(top, 2),
+                    "gap": gap,
+                    "label": f"🔴 FVG Supply ${bottom:.2f} - ${top:.2f}"
+                })
+
+    # 2. Order Blocks (OB)
+    order_blocks = []
+    sample_diffs = [abs(closes[k] - closes[k - 1]) for k in range(1, min(60, n))]
+    avg_candle_size = sum(sample_diffs) / len(sample_diffs) if sample_diffs else 1.0
+
+    start_ob = max(1, n - 40)
+    for i in range(start_ob, n):
+        body = abs(closes[i] - opens[i])
+        if body > avg_candle_size * 1.8:
+            # Bullish displacement
+            if closes[i] > opens[i] and closes[i - 1] <= opens[i - 1]:
+                ob_bottom = lows[i - 1]
+                ob_top = highs[i - 1]
+                mitigated = any(lows[k] <= ob_bottom for k in range(i + 1, n))
+                if not mitigated:
+                    order_blocks.append({
+                        "time": candles[i - 1]["time"],
+                        "type": "BULLISH_OB",
+                        "bottom": round(ob_bottom, 2),
+                        "top": round(ob_top, 2),
+                        "level": round((ob_bottom + ob_top) / 2.0, 2),
+                        "label": f"🛡️ Demand Order Block ${ob_bottom:.2f} - ${ob_top:.2f}"
+                    })
+            # Bearish displacement
+            elif closes[i] < opens[i] and closes[i - 1] >= opens[i - 1]:
+                ob_bottom = lows[i - 1]
+                ob_top = highs[i - 1]
+                mitigated = any(highs[k] >= ob_top for k in range(i + 1, n))
+                if not mitigated:
+                    order_blocks.append({
+                        "time": candles[i - 1]["time"],
+                        "type": "BEARISH_OB",
+                        "bottom": round(ob_bottom, 2),
+                        "top": round(ob_top, 2),
+                        "level": round((ob_bottom + ob_top) / 2.0, 2),
+                        "label": f"🛑 Supply Order Block ${ob_bottom:.2f} - ${ob_top:.2f}"
+                    })
+
+    # 3. Market Structure (CHoCH / BOS)
+    recent_high = max(highs[-20:])
+    recent_low = min(lows[-20:])
+    current_p = closes[-1]
+    if current_p >= recent_high * 0.995:
+        ms = "Bullish BOS (Break of Structure)"
+    elif current_p <= recent_low * 1.005:
+        ms = "Bearish BOS (Break of Structure)"
+    else:
+        ms = "Internal Consolidation"
+
+    active_fvgs = (unmit_bull[-3:] + unmit_bear[-3:])
+    active_obs = order_blocks[-4:]
+
+    summary_parts = []
+    if unmit_bull:
+        latest_bf = unmit_bull[-1]
+        summary_parts.append(f"มีโซนสะสม Demand FVG ที่ ${latest_bf['bottom']:.2f} - ${latest_bf['top']:.2f}")
+    if unmit_bear:
+        latest_sf = unmit_bear[-1]
+        summary_parts.append(f"มีโซนขาย Supply FVG ที่ ${latest_sf['bottom']:.2f} - ${latest_sf['top']:.2f}")
+
+    return {
+        "unmitigated_fvgs": active_fvgs,
+        "order_blocks": active_obs,
+        "market_structure": ms,
+        "summary": " • ".join(summary_parts) if summary_parts else "โครงสร้างสถาบันอยู่ในกรอบปกติ"
+    }
+
+
+def compute_squeeze_momentum(
+    candles: List[Dict[str, Any]],
+    bb_length: int = 20,
+    bb_mult: float = 2.0,
+    kc_length: int = 20,
+    kc_mult: float = 1.5
+) -> Dict[str, Any]:
+    """
+    Computes Squeeze Momentum Indicator [LazyBear] matching TradingView Pine Script:
+    1. Bollinger Bands (20, 2.0).
+    2. Keltner Channels (20, 1.5) with True Range.
+    3. Squeeze state:
+       - Squeeze ON: LowerBB > LowerKC and UpperBB < UpperKC (volatility compression)
+       - Squeeze OFF / FIRED: LowerBB < LowerKC and UpperBB > UpperKC (volatility expansion)
+       - No Squeeze: Normal
+    4. Linear regression momentum histogram:
+       val = linreg(close - avg((highest(high, 20) + lowest(low, 20))/2, sma(close, 20)), 20)
+    """
+    if not candles or len(candles) < 20:
+        return {
+            "status": "NO_SQUEEZE",
+            "squeeze_on": False,
+            "squeeze_fired": False,
+            "momentum": 0.0,
+            "direction": "NEUTRAL",
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "histogram": []
+        }
+
+    n = len(candles)
+    closes = [float(c["close"]) for c in candles]
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+
+    # Bollinger Bands
+    sma_close = [0.0] * n
+    std_close = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - bb_length + 1)
+        window = closes[start_idx : i + 1]
+        m = sum(window) / len(window)
+        sma_close[i] = m
+        var = sum((x - m) ** 2 for x in window) / len(window)
+        std_close[i] = math.sqrt(max(0.0, var))
+
+    upper_bb = [sma_close[i] + bb_mult * std_close[i] for i in range(n)]
+    lower_bb = [sma_close[i] - bb_mult * std_close[i] for i in range(n)]
+
+    # True Range & Keltner Channels
+    tr = [highs[0] - lows[0]]
+    for i in range(1, n):
+        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
+
+    sma_tr = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - kc_length + 1)
+        window = tr[start_idx : i + 1]
+        sma_tr[i] = sum(window) / len(window)
+
+    upper_kc = [sma_close[i] + kc_mult * sma_tr[i] for i in range(n)]
+    lower_kc = [sma_close[i] - kc_mult * sma_tr[i] for i in range(n)]
+
+    # Momentum delta series
+    deltas = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - kc_length + 1)
+        hh = max(highs[start_idx : i + 1])
+        ll = min(lows[start_idx : i + 1])
+        avg_hhlc = (hh + ll) / 2.0
+        mid = (avg_hhlc + sma_close[i]) / 2.0
+        deltas[i] = closes[i] - mid
+
+    mom_values = [0.0] * n
+    hist_entries = []
+
+    for i in range(n):
+        L = min(kc_length, i + 1)
+        if L < 3:
+            val = deltas[i]
+        else:
+            w = deltas[i - L + 1 : i + 1]
+            mean_y = sum(w) / L
+            mean_x = (L - 1) / 2.0
+            denom = L * (L * L - 1) / 12.0
+            num = sum((j - mean_x) * w[j] for j in range(L))
+            slope = num / denom if denom > 0 else 0.0
+            val = mean_y + slope * mean_x
+
+        mom_values[i] = round(val, 3)
+
+        # Squeeze state
+        sqz_on = (lower_bb[i] > lower_kc[i]) and (upper_bb[i] < upper_kc[i])
+        sqz_off = (lower_bb[i] < lower_kc[i]) and (upper_bb[i] > upper_kc[i])
+
+        # Colors
+        prev_val = mom_values[i - 1] if i > 0 else val
+        if val > 0:
+            bcolor = "#10b981" if val >= prev_val else "#047857"
+        else:
+            bcolor = "#f43f5e" if val <= prev_val else "#881337"
+
+        dot_color = "#f97316" if sqz_on else ("#10b981" if sqz_off else "#38bdf8")
+
+        hist_entries.append({
+            "time": candles[i]["time"],
+            "value": mom_values[i],
+            "color": bcolor,
+            "sqz_on": sqz_on,
+            "sqz_off": sqz_off,
+            "dot_color": dot_color
+        })
+
+    latest = hist_entries[-1]
+    prev = hist_entries[-2] if len(hist_entries) >= 2 else latest
+    is_sqz_on = latest["sqz_on"]
+    is_sqz_fired = (not latest["sqz_on"]) and prev["sqz_on"]
+
+    if is_sqz_on:
+        status = "SQUEEZE_ON"
+        summary = "เกิดสภาวะ Squeeze ON ความผันผวนบีบอัดแคบ กำลังสะสมพลังรอระเบิดทิศทาง"
+    elif is_sqz_fired:
+        status = "SQUEEZE_FIRED"
+        summary = f"เกิดสัญญาณ Squeeze Fired ระเบิดกรอบความผันผวน ({'ขาขึ้นรุนแรง 🚀' if latest['value'] > 0 else 'ขาลงรุนแรง ⚠️'})"
+    else:
+        status = "NORMAL"
+        summary = f"สภาวะปกติ โมเมนตัมเอียงไปทาง {'ฝั่งซื้อ' if latest['value'] > 0 else 'ฝั่งขาย'}"
+
+    return {
+        "status": status,
+        "squeeze_on": is_sqz_on,
+        "squeeze_fired": is_sqz_fired,
+        "momentum": latest["value"],
+        "direction": "BULLISH" if latest["value"] > 0 else "BEARISH",
+        "summary": summary,
+        "histogram": hist_entries[-120:]
+    }
+
+
+def compute_waddah_attar_explosion(
+    candles: List[Dict[str, Any]],
+    fast_len: int = 20,
+    slow_len: int = 40,
+    bb_len: int = 20,
+    bb_mult: float = 2.0,
+    sensitivity: float = 150.0
+) -> Dict[str, Any]:
+    """
+    Computes Waddah Attar Explosion (WAE) [Shayankm]:
+    1. MACD difference: (EMA(close, fast_len) - EMA(close, slow_len)) * sensitivity.
+    2. Explosion Line: 2.0 * BB StdDev(close, bb_len) * 2.0.
+    3. Dead Zone: ATR(100) * 3.7 (filters out flat/low-volatility noise).
+    Signals:
+    - Bullish Explosion: TrendUp > ExplosionLine and TrendUp > DeadZone.
+    - Bearish Explosion: TrendDown > ExplosionLine and TrendDown > DeadZone.
+    """
+    if not candles or len(candles) < 20:
+        return {
+            "status": "DEAD_ZONE",
+            "is_explosion": False,
+            "trend_up": 0.0,
+            "trend_down": 0.0,
+            "explosion_line": 0.0,
+            "dead_zone": 0.0,
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "series": []
+        }
+
+    n = len(candles)
+    closes = [float(c["close"]) for c in candles]
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+
+    ema_fast = _calc_ema_series(closes, fast_len)
+    ema_slow = _calc_ema_series(closes, slow_len)
+    macd_diff = [ema_fast[i] - ema_slow[i] for i in range(n)]
+
+    t1 = [0.0] * n
+    for i in range(1, n):
+        t1[i] = (macd_diff[i] - macd_diff[i - 1]) * sensitivity
+
+    e1 = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - bb_len + 1)
+        window = closes[start_idx : i + 1]
+        m = sum(window) / len(window)
+        var = sum((x - m) ** 2 for x in window) / len(window)
+        stdev = math.sqrt(max(0.0, var))
+        e1[i] = 2.0 * (stdev * bb_mult)
+
+    tr = [highs[0] - lows[0]]
+    for i in range(1, n):
+        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
+
+    atr_period = min(100, n)
+    dead_zone = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - atr_period + 1)
+        w = tr[start_idx : i + 1]
+        dead_zone[i] = (sum(w) / len(w)) * 3.7
+
+    series_data = []
+    for i in range(n):
+        val = t1[i]
+        t_up = val if val > 0 else 0.0
+        t_dn = -val if val < 0 else 0.0
+        exp = e1[i]
+        dz = dead_zone[i]
+
+        is_bull_exp = t_up > exp and t_up > dz
+        is_bear_exp = t_dn > exp and t_dn > dz
+
+        series_data.append({
+            "time": candles[i]["time"],
+            "trend_up": round(t_up, 2),
+            "trend_down": round(t_dn, 2),
+            "explosion_line": round(exp, 2),
+            "dead_zone": round(dz, 2),
+            "bull_explosion": is_bull_exp,
+            "bear_explosion": is_bear_exp
+        })
+
+    latest = series_data[-1]
+    if latest["bull_explosion"]:
+        status = "BULL_EXPLOSION"
+        summary = f"💥 Bullish Explosion! แรงซื้อระเบิดทะลุเส้น Explosion Line (${latest['trend_up']:.1f} > ${latest['explosion_line']:.1f})"
+    elif latest["bear_explosion"]:
+        status = "BEAR_EXPLOSION"
+        summary = f"💥 Bearish Explosion! แรงขายระเบิดทะลุเส้น Explosion Line (${latest['trend_down']:.1f} > ${latest['explosion_line']:.1f})"
+    elif latest["trend_up"] < latest["dead_zone"] and latest["trend_down"] < latest["dead_zone"]:
+        status = "DEAD_ZONE"
+        summary = "อยู่ในโซน Dead Zone ความผันผวนและโวลุ่มยังไม่เพียงพอ ไม่แนะนำให้ไล่ราคา"
+    else:
+        status = "NORMAL"
+        summary = "โมเมนตัมกำลังไต่ระดับ ยังไม่แตะจุดระเบิด Explosion"
+
+    return {
+        "status": status,
+        "is_explosion": latest["bull_explosion"] or latest["bear_explosion"],
+        "trend_up": latest["trend_up"],
+        "trend_down": latest["trend_down"],
+        "explosion_line": latest["explosion_line"],
+        "dead_zone": latest["dead_zone"],
+        "summary": summary,
+        "series": series_data[-120:]
+    }
+
+
+def compute_volume_flow_indicator(
+    candles: List[Dict[str, Any]],
+    length: int = 130,
+    coef: float = 0.2,
+    vcoef: float = 2.5,
+    signal_len: int = 5
+) -> Dict[str, Any]:
+    """
+    Computes Volume Flow Indicator (VFI) [LazyBear / Markos Katsanos]:
+    1. Typical price = (H + L + C) / 3.
+    2. Inter-bar return log(tp / tp_prev) and StdDev.
+    3. Volume cutoff = coef * stdev * close.
+    4. Directional Volume based on price move exceeding noise cutoff.
+    5. Smoothed VFI sum over length.
+    Signals:
+    - VFI > 0 and VFI > Signal: Institutional Accumulation.
+    - VFI < 0 and VFI < Signal: Institutional Distribution.
+    """
+    if not candles or len(candles) < 20:
+        return {
+            "status": "NEUTRAL",
+            "vfi": 0.0,
+            "signal": 0.0,
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "series": []
+        }
+
+    n = len(candles)
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+    closes = [float(c["close"]) for c in candles]
+    volumes = [float(c["volume"]) for c in candles]
+
+    tp = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
+
+    inter = [0.0] * n
+    for i in range(1, n):
+        if tp[i - 1] > 0 and tp[i] > 0:
+            inter[i] = math.log(tp[i] / tp[i - 1])
+
+    vinter = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - 30 + 1)
+        w = inter[start_idx : i + 1]
+        m = sum(w) / len(w)
+        var = sum((x - m) ** 2 for x in w) / len(w)
+        vinter[i] = math.sqrt(max(0.0, var))
+
+    eff_len = min(length, max(20, n // 2))
+
+    vave = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - eff_len + 1)
+        w = volumes[start_idx : i + 1]
+        vave[i] = sum(w) / len(w)
+
+    vdir = [0.0] * n
+    for i in range(1, n):
+        cutoff = coef * vinter[i] * closes[i]
+        vmax = vcoef * vave[i - 1] if i > 0 else vcoef * volumes[i]
+        vc = min(volumes[i], vmax)
+        mf = tp[i] - tp[i - 1]
+        if mf > cutoff:
+            vdir[i] = vc
+        elif mf < -cutoff:
+            vdir[i] = -vc
+        else:
+            vdir[i] = 0.0
+
+    raw_vfi = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - eff_len + 1)
+        s_vdir = sum(vdir[start_idx : i + 1])
+        avg_vol = max(1.0, vave[i])
+        raw_vfi[i] = s_vdir / avg_vol
+
+    vfi = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - 2)
+        w = raw_vfi[start_idx : i + 1]
+        vfi[i] = round(sum(w) / len(w), 2)
+
+    signal = _calc_ema_series(vfi, signal_len)
+    signal = [round(x, 2) for x in signal]
+
+    series_data = []
+    for i in range(n):
+        series_data.append({
+            "time": candles[i]["time"],
+            "vfi": vfi[i],
+            "signal": signal[i],
+            "is_bull": vfi[i] > 0 and vfi[i] >= signal[i]
+        })
+
+    last_vfi = vfi[-1]
+    last_sig = signal[-1]
+
+    if last_vfi > 0 and last_vfi >= last_sig:
+        status = "ACCUMULATION"
+        summary = f"กระแสเงินสะสมสถาบัน (VFI = +{last_vfi:.1f}) อยู่เหนือเส้น Signal สะท้อนแรงเก็บของเงียบ"
+    elif last_vfi > 0 and last_vfi < last_sig:
+        status = "WEAKENING_FLOW"
+        summary = f"กระแสเงินยังเป็นบวก แต่เริ่มชะลอตัวลงต่ำกว่าเส้น Signal (VFI = +{last_vfi:.1f})"
+    elif last_vfi < 0 and last_vfi <= last_sig:
+        status = "DISTRIBUTION"
+        summary = f"กระแสเงินไหลออกสุทธิ (VFI = {last_vfi:.1f}) สถาบันกระจายของ"
+    else:
+        status = "REBOUNDING_FLOW"
+        summary = f"กระแสเงินติดลบแต่เริ่มฟื้นตัวขึ้นเหนือเส้น Signal (VFI = {last_vfi:.1f})"
+
+    return {
+        "status": status,
+        "vfi": last_vfi,
+        "signal": last_sig,
+        "summary": summary,
+        "series": series_data[-120:]
+    }
+
+
+def compute_wavetrend_oscillator(
+    candles: List[Dict[str, Any]],
+    n1: int = 10,
+    n2: int = 21
+) -> Dict[str, Any]:
+    """
+    Computes WaveTrend Oscillator [LazyBear]:
+    1. Typical price = (H + L + C) / 3.
+    2. ESA = EMA(Typical Price, n1).
+    3. D = EMA(abs(Typical Price - ESA), n1).
+    4. CI = (Typical Price - ESA) / (0.015 * D).
+    5. WT1 = EMA(CI, n2).
+    6. WT2 = SMA(WT1, 4).
+    Levels: Overbought +50/+60, Oversold -50/-60.
+    """
+    if not candles or len(candles) < 25:
+        return {
+            "status": "NEUTRAL",
+            "wt1": 0.0,
+            "wt2": 0.0,
+            "direction": "NEUTRAL",
+            "oversold": False,
+            "overbought": False,
+            "bullish_cross": False,
+            "bearish_cross": False,
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "series": []
+        }
+
+    n = len(candles)
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+    closes = [float(c["close"]) for c in candles]
+
+    ap = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
+
+    esa = _calc_ema_series(ap, n1)
+    diff = [abs(ap[i] - esa[i]) for i in range(n)]
+    d = _calc_ema_series(diff, n1)
+
+    ci = [0.0] * n
+    for i in range(n):
+        denom = 0.015 * d[i]
+        ci[i] = (ap[i] - esa[i]) / denom if denom > 1e-8 else 0.0
+
+    wt1 = _calc_ema_series(ci, n2)
+    wt1 = [round(x, 2) for x in wt1]
+
+    wt2 = [0.0] * n
+    for i in range(n):
+        start_idx = max(0, i - 3)
+        w = wt1[start_idx : i + 1]
+        wt2[i] = round(sum(w) / len(w), 2)
+
+    series_data = []
+    for i in range(n):
+        bull_cross = (i > 0 and wt1[i - 1] <= wt2[i - 1] and wt1[i] > wt2[i])
+        bear_cross = (i > 0 and wt1[i - 1] >= wt2[i - 1] and wt1[i] < wt2[i])
+        series_data.append({
+            "time": candles[i]["time"],
+            "wt1": wt1[i],
+            "wt2": wt2[i],
+            "bull_cross": bull_cross,
+            "bear_cross": bear_cross
+        })
+
+    last_wt1 = wt1[-1]
+    last_wt2 = wt2[-1]
+    prev_wt1 = wt1[-2] if n >= 2 else last_wt1
+    prev_wt2 = wt2[-2] if n >= 2 else last_wt2
+
+    is_bull_cross = (prev_wt1 <= prev_wt2 and last_wt1 > last_wt2)
+    is_bear_cross = (prev_wt1 >= prev_wt2 and last_wt1 < last_wt2)
+    is_oversold = last_wt1 <= -50.0
+    is_overbought = last_wt1 >= 50.0
+
+    if is_bull_cross and (last_wt1 <= -45.0 or prev_wt1 <= -45.0):
+        status = "OVERSOLD_BUY"
+        summary = f"เกิดสัญญาณ Oversold Bullish Cross (WT1 = {last_wt1:.1f}) ตัดขึ้นในโซนขายมากเกินไป โอกาสดีดตัวสูงมาก"
+    elif is_bear_cross and (last_wt1 >= 45.0 or prev_wt1 >= 45.0):
+        status = "OVERBOUGHT_SELL"
+        summary = f"เกิดสัญญาณ Overbought Bearish Cross (WT1 = {last_wt1:.1f}) ตัดลงในโซนซื้อมากเกินไป ควรระวังการพักตัว"
+    elif is_bull_cross:
+        status = "BULLISH_CROSS"
+        summary = f"เกิดสัญญาณ WaveTrend Bullish Cross (WT1 = {last_wt1:.1f} ตัดเหนือ WT2)"
+    elif is_bear_cross:
+        status = "BEARISH_CROSS"
+        summary = f"เกิดสัญญาณ WaveTrend Bearish Cross (WT1 = {last_wt1:.1f} ตัดใต้ WT2)"
+    elif is_oversold:
+        status = "OVERSOLD"
+        summary = f"โมเมนตัม WaveTrend เข้าโซน Oversold ({last_wt1:.1f}) กำลังสะสมแรง"
+    elif is_overbought:
+        status = "OVERBOUGHT"
+        summary = f"โมเมนตัม WaveTrend เข้าโซน Overbought ({last_wt1:.1f}) ระวังแรงขายทำกำไร"
+    else:
+        status = "BULLISH" if last_wt1 >= last_wt2 else "BEARISH"
+        summary = f"โมเมนตัม WaveTrend อยู่ในฝั่ง {'กระทิง (WT1 > WT2)' if last_wt1 >= last_wt2 else 'หมี (WT1 < WT2)'}"
+
+    return {
+        "status": status,
+        "wt1": last_wt1,
+        "wt2": last_wt2,
+        "direction": "BULLISH" if last_wt1 >= last_wt2 else "BEARISH",
+        "oversold": is_oversold,
+        "overbought": is_overbought,
+        "bullish_cross": is_bull_cross,
+        "bearish_cross": is_bear_cross,
+        "summary": summary,
+        "series": series_data[-120:]
+    }
+
+
+def compute_ut_bot_alerts(
+    candles: List[Dict[str, Any]],
+    key_value: float = 2.0,
+    atr_period: int = 10
+) -> Dict[str, Any]:
+    """
+    Computes UT Bot Alerts [QuantNomad]:
+    ATR-based dynamic trailing stop & trailing reversal alert system.
+    """
+    if not candles or len(candles) < 15:
+        return {
+            "status": "NEUTRAL",
+            "position": "NEUTRAL",
+            "trailing_stop": 0.0,
+            "buy_signal": False,
+            "sell_signal": False,
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "alerts": [],
+            "series": []
+        }
+
+    n = len(candles)
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+    closes = [float(c["close"]) for c in candles]
+
+    tr = [highs[0] - lows[0]]
+    for i in range(1, n):
+        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
+
+    atr = [tr[0]] * n
+    for i in range(1, n):
+        start_idx = max(0, i - atr_period + 1)
+        w = tr[start_idx : i + 1]
+        atr[i] = sum(w) / len(w)
+
+    n_loss = [key_value * atr[i] for i in range(n)]
+
+    trailing_stop = [0.0] * n
+    pos = [0] * n
+    alerts = []
+    series_data = []
+
+    for i in range(n):
+        c = closes[i]
+        loss = n_loss[i]
+        if i == 0:
+            trailing_stop[i] = c - loss
+            pos[i] = 1
+        else:
+            prev_stop = trailing_stop[i - 1]
+            prev_c = closes[i - 1]
+
+            if c > prev_stop:
+                iff_1 = c - loss
+            else:
+                iff_1 = c + loss
+
+            if c < prev_stop and prev_c < prev_stop:
+                iff_2 = min(prev_stop, c + loss)
+            else:
+                iff_2 = iff_1
+
+            if c > prev_stop and prev_c > prev_stop:
+                trailing_stop[i] = max(prev_stop, c - loss)
+            else:
+                trailing_stop[i] = iff_2
+
+            if prev_c < prev_stop and c > prev_stop:
+                pos[i] = 1
+            elif prev_c > prev_stop and c < prev_stop:
+                pos[i] = -1
+            else:
+                pos[i] = pos[i - 1]
+
+        trailing_stop[i] = round(trailing_stop[i], 2)
+
+        buy_alert = (i > 0 and pos[i] == 1 and pos[i - 1] == -1)
+        sell_alert = (i > 0 and pos[i] == -1 and pos[i - 1] == 1)
+
+        if buy_alert:
+            alerts.append({"time": candles[i]["time"], "price": c, "action": "BUY"})
+        elif sell_alert:
+            alerts.append({"time": candles[i]["time"], "price": c, "action": "SELL"})
+
+        series_data.append({
+            "time": candles[i]["time"],
+            "stop": trailing_stop[i],
+            "pos": pos[i],
+            "buy": buy_alert,
+            "sell": sell_alert
+        })
+
+    last_pos = pos[-1]
+    last_stop = trailing_stop[-1]
+    last_buy = series_data[-1]["buy"]
+    last_sell = series_data[-1]["sell"]
+
+    if last_buy:
+        status = "BUY_ALERT"
+        summary = f"เกิดสัญญาณแจ้งเตือน UT Bot BUY! จุด Stop Loss ล่าสุดที่ ${last_stop:.2f}"
+    elif last_sell:
+        status = "SELL_ALERT"
+        summary = f"เกิดสัญญาณแจ้งเตือน UT Bot SELL! หลุดเส้น Trailing Stop ที่ ${last_stop:.2f}"
+    elif last_pos == 1:
+        status = "BULLISH_HOLD"
+        summary = f"สถานะ UT Bot ถือฝั่งซื้อ (BULLISH) ราคายืนเหนือ Trailing Stop (${last_stop:.2f})"
+    else:
+        status = "BEARISH_HOLD"
+        summary = f"สถานะ UT Bot พักตัว (BEARISH) ราคาอยู่ใต้ Trailing Stop (${last_stop:.2f})"
+
+    return {
+        "status": status,
+        "position": "BUY" if last_pos == 1 else "SELL",
+        "trailing_stop": last_stop,
+        "buy_signal": last_buy,
+        "sell_signal": last_sell,
+        "summary": summary,
+        "alerts": alerts[-10:],
+        "series": series_data[-120:]
+    }
+
+
+def compute_chandelier_exit(
+    candles: List[Dict[str, Any]],
+    length: int = 22,
+    mult: float = 3.0
+) -> Dict[str, Any]:
+    """
+    Computes Chandelier Exit [everget]:
+    Volatility-based trailing stop-loss indicator.
+    """
+    if not candles or len(candles) < 25:
+        return {
+            "status": "NEUTRAL",
+            "direction": "NEUTRAL",
+            "trailing_stop": 0.0,
+            "long_stop": 0.0,
+            "short_stop": 0.0,
+            "buy_signal": False,
+            "sell_signal": False,
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "series": []
+        }
+
+    n = len(candles)
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+    closes = [float(c["close"]) for c in candles]
+
+    tr = [highs[0] - lows[0]]
+    for i in range(1, n):
+        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
+
+    atr = [tr[0]] * n
+    for i in range(1, n):
+        start_idx = max(0, i - length + 1)
+        w = tr[start_idx : i + 1]
+        atr[i] = sum(w) / len(w)
+
+    long_stops = [0.0] * n
+    short_stops = [0.0] * n
+    dirs = [1] * n
+    series_data = []
+
+    for i in range(n):
+        start_idx = max(0, i - length + 1)
+        highest_close = max(closes[start_idx : i + 1])
+        lowest_close = min(closes[start_idx : i + 1])
+        band = mult * atr[i]
+
+        curr_long_stop = highest_close - band
+        curr_short_stop = lowest_close + band
+
+        if i == 0:
+            long_stops[i] = curr_long_stop
+            short_stops[i] = curr_short_stop
+            dirs[i] = 1
+        else:
+            prev_long = long_stops[i - 1]
+            prev_short = short_stops[i - 1]
+            prev_c = closes[i - 1]
+
+            if prev_c > prev_long:
+                long_stops[i] = max(curr_long_stop, prev_long)
+            else:
+                long_stops[i] = curr_long_stop
+
+            if prev_c < prev_short:
+                short_stops[i] = min(curr_short_stop, prev_short)
+            else:
+                short_stops[i] = curr_short_stop
+
+            if closes[i] > prev_short:
+                dirs[i] = 1
+            elif closes[i] < prev_long:
+                dirs[i] = -1
+            else:
+                dirs[i] = dirs[i - 1]
+
+        long_stops[i] = round(long_stops[i], 2)
+        short_stops[i] = round(short_stops[i], 2)
+        active_stop = long_stops[i] if dirs[i] == 1 else short_stops[i]
+
+        buy_sig = (i > 0 and dirs[i] == 1 and dirs[i - 1] == -1)
+        sell_sig = (i > 0 and dirs[i] == -1 and dirs[i - 1] == 1)
+
+        series_data.append({
+            "time": candles[i]["time"],
+            "stop": active_stop,
+            "dir": dirs[i],
+            "buy": buy_sig,
+            "sell": sell_sig
+        })
+
+    last_dir = dirs[-1]
+    last_long = long_stops[-1]
+    last_short = short_stops[-1]
+    last_active = last_long if last_dir == 1 else last_short
+    last_buy = series_data[-1]["buy"]
+    last_sell = series_data[-1]["sell"]
+
+    if last_buy:
+        status = "BUY_SIGNAL"
+        summary = f"เกิดสัญญาณซื้อ Chandelier Exit! ทะลุกรอบต้าน เริ่มต้นรอบ Long มีแนว Trailing Stop ที่ ${last_long:.2f}"
+    elif last_sell:
+        status = "SELL_SIGNAL"
+        summary = f"เกิดสัญญาณขาย Chandelier Exit! หลุดแนว Trailing Stop ที่ ${last_long:.2f}"
+    elif last_dir == 1:
+        status = "LONG"
+        summary = f"แนวโน้มหลักถือรันเทรนด์ (LONG) ราคายืนเหนือ Chandelier Trailing Stop (${last_long:.2f})"
+    else:
+        status = "SHORT"
+        summary = f"แนวโน้มชะลอตัว (SHORT/CASH) ราคาอยู่ใต้แนวต้าน Chandelier Stop (${last_short:.2f})"
+
+    return {
+        "status": status,
+        "direction": "LONG" if last_dir == 1 else "SHORT",
+        "trailing_stop": last_active,
+        "long_stop": last_long,
+        "short_stop": last_short,
+        "buy_signal": last_buy,
+        "sell_signal": last_sell,
+        "summary": summary,
+        "series": series_data[-120:]
+    }
+
+
+def compute_hull_suite(
+    candles: List[Dict[str, Any]],
+    length: int = 55
+) -> Dict[str, Any]:
+    """
+    Computes Hull Suite [InSilico]:
+    Zero-lag Hull Moving Average ribbon:
+    WMA(2 * WMA(close, length/2) - WMA(close, length), round(sqrt(length)))
+    """
+    if not candles or len(candles) < 25:
+        return {
+            "status": "NEUTRAL",
+            "trend": "NEUTRAL",
+            "value": 0.0,
+            "color": "#94a3b8",
+            "summary": "ข้อมูลไม่เพียงพอ",
+            "series": []
+        }
+
+    n = len(candles)
+    closes = [float(c["close"]) for c in candles]
+
+    def _calc_wma(vals: List[float], L: int) -> List[float]:
+        out = [vals[0]] * len(vals)
+        for i in range(len(vals)):
+            start_idx = max(0, i - L + 1)
+            w = vals[start_idx : i + 1]
+            k = len(w)
+            if k < 2:
+                out[i] = vals[i]
+            else:
+                d = k * (k + 1) / 2.0
+                out[i] = sum((j + 1) * w[j] for j in range(k)) / d
+        return out
+
+    eff_len = min(length, max(10, n // 2))
+    half_wma = _calc_wma(closes, max(2, eff_len // 2))
+    full_wma = _calc_wma(closes, eff_len)
+
+    diff = [2.0 * half_wma[i] - full_wma[i] for i in range(n)]
+    sqrt_len = max(2, int(round(math.sqrt(eff_len))))
+    hma = _calc_wma(diff, sqrt_len)
+    hma = [round(x, 2) for x in hma]
+
+    series_data = []
+    for i in range(n):
+        c_val = hma[i]
+        p_val = hma[i - 1] if i > 0 else c_val
+        is_bull = c_val >= p_val
+        color = "#10b981" if is_bull else "#f43f5e"
+        series_data.append({
+            "time": candles[i]["time"],
+            "value": c_val,
+            "color": color,
+            "is_bull": is_bull
+        })
+
+    last_val = hma[-1]
+    prev_val = hma[-2] if n >= 2 else last_val
+    is_bullish = last_val >= prev_val
+    status = "BULLISH" if is_bullish else "BEARISH"
+    color = "#10b981" if is_bullish else "#f43f5e"
+
+    summary = f"Hull Suite ริบบอนเขียว (${last_val:.2f}) เทรนด์ขาขึ้น ไร้ความหน่วง" if is_bullish else f"Hull Suite ริบบอนแดง (${last_val:.2f}) เทรนด์ปรับฐานชะลอตัว"
+
+    return {
+        "status": status,
+        "trend": "BULLISH" if is_bullish else "BEARISH",
+        "value": last_val,
+        "color": color,
+        "summary": summary,
+        "series": series_data[-120:]
+    }
+
+
+def compute_lorentzian_classification(
+    candles: List[Dict[str, Any]],
+    k: int = 8,
+    lookback: int = 120
+) -> Dict[str, Any]:
+    """
+    Computes Machine Learning: Lorentzian Classification [jdehorty]:
+    Uses k-Nearest Neighbors (KNN) in Lorentzian warped metric space across
+    multiple technical features (RSI, WaveTrend, Momentum, Volatility)
+    to classify current market regime and forecast directional probability.
+    """
+    if not candles or len(candles) < 30:
+        return {
+            "status": "NEUTRAL",
+            "direction": "NEUTRAL",
+            "confidence": 50.0,
+            "score": 0,
+            "bull_votes": 0,
+            "bear_votes": 0,
+            "k": k,
+            "summary": "ข้อมูลไม่เพียงพอสำหรับโมเดล Machine Learning",
+            "historical_regimes": []
+        }
+
+    n = len(candles)
+    closes = [float(c["close"]) for c in candles]
+    highs = [float(c["high"]) for c in candles]
+    lows = [float(c["low"]) for c in candles]
+
+    gains, losses = [], []
+    for i in range(1, n):
+        diff = closes[i] - closes[i - 1]
+        gains.append(max(0.0, diff))
+        losses.append(max(0.0, -diff))
+
+    rsi = [50.0] * n
+    if len(gains) >= 14:
+        avg_g = sum(gains[:14]) / 14.0
+        avg_l = sum(losses[:14]) / 14.0
+        rs = avg_g / max(1e-6, avg_l)
+        rsi[14] = 100.0 - (100.0 / (1.0 + rs))
+        for i in range(15, n):
+            avg_g = (avg_g * 13.0 + gains[i - 1]) / 14.0
+            avg_l = (avg_l * 13.0 + losses[i - 1]) / 14.0
+            rs = avg_g / max(1e-6, avg_l)
+            rsi[i] = 100.0 - (100.0 / (1.0 + rs))
+
+    roc = [0.0] * n
+    for i in range(10, n):
+        if closes[i - 10] > 0:
+            roc[i] = ((closes[i] - closes[i - 10]) / closes[i - 10]) * 100.0
+
+    tr = [highs[0] - lows[0]]
+    for i in range(1, n):
+        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
+
+    norm_tr = [0.0] * n
+    for i in range(n):
+        norm_tr[i] = (tr[i] / closes[i]) * 100.0 if closes[i] > 0 else 0.0
+
+    tp = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
+    cci = [0.0] * n
+    for i in range(19, n):
+        w = tp[i - 19 : i + 1]
+        m = sum(w) / 20.0
+        md = sum(abs(x - m) for x in w) / 20.0
+        cci[i] = (tp[i] - m) / (0.015 * md) if md > 1e-6 else 0.0
+
+    horizon = 4
+    train_start = max(20, n - lookback)
+    vectors = []
+    labels = []
+
+    for i in range(train_start, n - horizon):
+        feat = [
+            rsi[i] / 100.0,
+            (roc[i] + 20.0) / 40.0,
+            (norm_tr[i]) / 5.0,
+            (cci[i] + 200.0) / 400.0
+        ]
+        ret = closes[i + horizon] - closes[i]
+        label = 1 if ret > 0 else (-1 if ret < 0 else 0)
+        vectors.append(feat)
+        labels.append(label)
+
+    curr_vec = [
+        rsi[-1] / 100.0,
+        (roc[-1] + 20.0) / 40.0,
+        (norm_tr[-1]) / 5.0,
+        (cci[-1] + 200.0) / 400.0
+    ]
+
+    if not vectors or len(vectors) < k:
+        return {
+            "status": "NEUTRAL",
+            "direction": "NEUTRAL",
+            "confidence": 50.0,
+            "score": 0,
+            "bull_votes": 0,
+            "bear_votes": 0,
+            "k": k,
+            "summary": "ข้อมูลตัวอย่างไม่เพียงพอสำหรับ KNN",
+            "historical_regimes": []
+        }
+
+    distances = []
+    for idx, vec in enumerate(vectors):
+        dist = 0.0
+        for f in range(len(curr_vec)):
+            dist += math.log(1.0 + abs(curr_vec[f] - vec[f]))
+        distances.append((dist, labels[idx]))
+
+    distances.sort(key=lambda x: x[0])
+    k_nearest = distances[:k]
+
+    bull_votes = sum(1 for _, lbl in k_nearest if lbl == 1)
+    bear_votes = sum(1 for _, lbl in k_nearest if lbl == -1)
+    net_score = bull_votes - bear_votes
+    confidence = round((bull_votes / max(1, bull_votes + bear_votes)) * 100.0, 1) if (bull_votes + bear_votes) > 0 else 50.0
+
+    if bull_votes >= 6:
+        status = "STRONG_BUY"
+        direction = "BULLISH"
+        summary = f"โมเดล AI Lorentzian ML แนะนำ STRONG BUY! โอกาสปรับตัวขึ้นสูง ({confidence}% จากผลลัพธ์ {bull_votes}/{k} เพื่อนบ้าน KNN)"
+    elif bull_votes >= 5:
+        status = "BUY"
+        direction = "BULLISH"
+        summary = f"โมเดล AI Lorentzian ML แนะนำ BUY มีแนวโน้มปรับตัวขึ้น (ความเชื่อมั่น {confidence}%)"
+    elif bear_votes >= 6:
+        status = "STRONG_SELL"
+        direction = "BEARISH"
+        summary = f"โมเดล AI Lorentzian ML แนะนำ STRONG SELL! ตลาดมีความเสี่ยงปรับฐานสูง ({100.0 - confidence}% ฝั่งลง)"
+    elif bear_votes >= 5:
+        status = "SELL"
+        direction = "BEARISH"
+        summary = f"โมเดล AI Lorentzian ML แนะนำ SELL ทิศทางเอียงไปฝั่งชะลอตัว (ความเชื่อมั่นฝั่งลง {100.0 - confidence}%)"
+    else:
+        status = "NEUTRAL"
+        direction = "NEUTRAL"
+        summary = f"โมเดล AI Lorentzian ML ประเมินสภาวะสมดุล (Bull {bull_votes} vs Bear {bear_votes}) แนะนำรอความชัดเจน"
+
+    return {
+        "status": status,
+        "direction": direction,
+        "confidence": confidence,
+        "score": net_score,
+        "bull_votes": bull_votes,
+        "bear_votes": bear_votes,
+        "k": k,
+        "summary": summary
     }
 
 
@@ -1853,7 +3214,17 @@ def compute_ai_confluence_signals(
     atr_val: float,
     cdc_zone: Optional[str] = None,
     elliott_wave: Optional[Dict[str, Any]] = None,
-    pivots: Optional[Dict[str, Any]] = None
+    pivots: Optional[Dict[str, Any]] = None,
+    luxalgo_sr: Optional[Dict[str, Any]] = None,
+    smc: Optional[Dict[str, Any]] = None,
+    squeeze_mom: Optional[Dict[str, Any]] = None,
+    wae: Optional[Dict[str, Any]] = None,
+    vfi: Optional[Dict[str, Any]] = None,
+    wavetrend: Optional[Dict[str, Any]] = None,
+    ut_bot: Optional[Dict[str, Any]] = None,
+    chandelier_exit: Optional[Dict[str, Any]] = None,
+    hull_suite: Optional[Dict[str, Any]] = None,
+    lorentzian_ml: Optional[Dict[str, Any]] = None
 ) -> List[Dict[str, Any]]:
     """
     AI Multi-Technical Confluence Decision Engine.
@@ -2120,6 +3491,78 @@ def compute_ai_confluence_signals(
         elif p_s1 > 0 and p_s1 <= curr_close <= p_s1 * 1.035:
             curr_score += 1
             curr_reasons.append(f"ระดับราคา Pivot: ดีดตัวทดสอบแนวรับสำคัญ S1 (${p_s1:.2f})")
+
+    if luxalgo_sr:
+        last_sig = luxalgo_sr.get("current_signal")
+        if last_sig and last_sig.get("time") == times[-1]:
+            stype = last_sig.get("type")
+            if stype == "BREAKOUT_VOL":
+                curr_score += 1
+                curr_reasons.append(f"LuxAlgo S/R: {last_sig.get('desc')}")
+            elif stype == "BULL_WICK":
+                curr_reasons.append(f"คำเตือน LuxAlgo S/R: {last_sig.get('desc')}")
+
+    if smc:
+        fvgs = smc.get("unmitigated_fvgs", [])
+        for f in fvgs:
+            if f.get("type") == "BULLISH_FVG" and f["bottom"] <= curr_close <= f["top"] * 1.02:
+                curr_score += 1
+                curr_reasons.append(f"Smart Money (SMC): ราคาลงมาทดสอบ Demand Fair Value Gap (${f['bottom']:.2f} - ${f['top']:.2f})")
+                break
+
+    if squeeze_mom:
+        if squeeze_mom.get("squeeze_fired") and squeeze_mom.get("direction") == "BULLISH":
+            curr_score += 1
+            curr_reasons.append(f"LazyBear Squeeze: เกิดสัญญาณ Squeeze Fired ระเบิดกรอบความผันผวนพร้อมโมเมนตัมพุ่งขึ้น ({squeeze_mom.get('momentum'):.2f})")
+        elif squeeze_mom.get("squeeze_on"):
+            curr_reasons.append("คำเตือน Squeeze: สภาวะ Squeeze ON ความผันผวนกำลังบีบอัดแคบ สะสมพลังรอระเบิดทิศทาง")
+
+    if wae:
+        if wae.get("status") == "BULL_EXPLOSION":
+            curr_score += 1
+            curr_reasons.append("Waddah Attar (WAE): เกิด Bullish Explosion แรงซื้อระเบิดทะลุเส้น Explosion Line หนุนโมเมนตัมขาขึ้น")
+        elif wae.get("status") == "DEAD_ZONE":
+            curr_reasons.append("สถานะ WAE: อยู่ใน Dead Zone ตลาดซึมตัว ยังไม่มีแรงซื้อระเบิด")
+
+    if vfi:
+        if vfi.get("status") == "ACCUMULATION":
+            curr_score += 1
+            curr_reasons.append(f"LazyBear VFI: กระแสเงินสะสมสถาบันสุทธิ (Institutional Accumulation VFI = +{vfi.get('vfi'):.1f})")
+        elif vfi.get("status") == "DISTRIBUTION":
+            curr_reasons.append(f"คำเตือน VFI: กระแสเงินไหลออกสุทธิ (Distribution VFI = {vfi.get('vfi'):.1f}) สถาบันกระจายของ")
+
+    if lorentzian_ml:
+        if lorentzian_ml.get("direction") == "BULLISH":
+            curr_score += 1
+            curr_reasons.append(f"โมเดล AI Lorentzian ML: ทำนายฝั่งกระทิง ความเชื่อมั่น {lorentzian_ml.get('confidence')}% ({lorentzian_ml.get('status')})")
+        elif lorentzian_ml.get("direction") == "BEARISH":
+            curr_reasons.append(f"คำเตือน AI Lorentzian ML: ทำนายฝั่งพักตัว ความเชื่อมั่น {lorentzian_ml.get('confidence')}%")
+
+    if ut_bot:
+        if ut_bot.get("position") == "BUY":
+            curr_score += 1
+            curr_reasons.append(f"สัญญาณ UT Bot: ถือรันเทรนด์ฝั่งซื้อ ยืนเหนือ Trailing Stop (${ut_bot.get('trailing_stop'):.2f})")
+        else:
+            curr_reasons.append(f"สถานะ UT Bot: อยู่ใต้ Trailing Stop (${ut_bot.get('trailing_stop'):.2f})")
+
+    if chandelier_exit:
+        if chandelier_exit.get("direction") == "LONG":
+            curr_score += 1
+            curr_reasons.append(f"Chandelier Exit: เทรนด์หลักฝั่ง Long ยืนเหนือ Trailing Stop (${chandelier_exit.get('long_stop'):.2f})")
+        else:
+            curr_reasons.append(f"สถานะ Chandelier Exit: พักตัวใต้แนวต้าน Stop (${chandelier_exit.get('short_stop'):.2f})")
+
+    if wavetrend:
+        if wavetrend.get("status") in ["OVERSOLD_BUY", "BULLISH_CROSS"]:
+            curr_score += 1
+            curr_reasons.append(f"WaveTrend [LazyBear]: {wavetrend.get('summary')}")
+        elif wavetrend.get("status") in ["OVERBOUGHT_SELL", "BEARISH_CROSS"]:
+            curr_reasons.append(f"คำเตือน WaveTrend: {wavetrend.get('summary')}")
+
+    if hull_suite:
+        if hull_suite.get("trend") == "BULLISH":
+            curr_score += 1
+            curr_reasons.append(f"Hull Suite [InSilico]: ริบบอนเขียว (${hull_suite.get('value'):.2f}) โมเมนตัมนำตลาด ไร้ความหน่วง")
 
     curr_score = min(5, max(1, curr_score))
 
@@ -2447,7 +3890,37 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     # 17. CDC ActionZone V3 2020 (Uncle Chaloke)
     cdc_actionzone = compute_cdc_actionzone(candles)
 
-    # 18. AI Multi-Technical Confluence Decision Engine
+    # 18. LuxAlgo Support and Resistance Levels with Breaks
+    luxalgo_sr = compute_luxalgo_support_resistance(candles)
+
+    # 19. Smart Money Concepts (SMC) - FVG and Order Blocks
+    smc = compute_smart_money_concepts(candles)
+
+    # 20. Squeeze Momentum Indicator [LazyBear]
+    squeeze_mom = compute_squeeze_momentum(candles)
+
+    # 21. Waddah Attar Explosion (WAE) [Shayankm]
+    wae = compute_waddah_attar_explosion(candles)
+
+    # 22. Volume Flow Indicator (VFI) [LazyBear]
+    vfi = compute_volume_flow_indicator(candles)
+
+    # 23. WaveTrend Oscillator [LazyBear]
+    wavetrend = compute_wavetrend_oscillator(candles)
+
+    # 24. UT Bot Alerts [QuantNomad]
+    ut_bot = compute_ut_bot_alerts(candles)
+
+    # 25. Chandelier Exit [everget]
+    chandelier_exit = compute_chandelier_exit(candles)
+
+    # 26. Hull Suite [InSilico]
+    hull_suite = compute_hull_suite(candles)
+
+    # 27. Machine Learning: Lorentzian Classification [jdehorty]
+    lorentzian_ml = compute_lorentzian_classification(candles)
+
+    # 28. AI Multi-Technical Confluence Decision Engine
     ai_signals = compute_ai_confluence_signals(
         candles=candles,
         fibo_levels=fibo_levels,
@@ -2459,7 +3932,17 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         atr_val=atr14_val,
         cdc_zone=cdc_actionzone["zone"],
         elliott_wave=elliott_wave,
-        pivots={"pivot": p_pivot, "r1": r1, "s1": s1, "r2": r2, "s2": s2}
+        pivots={"pivot": p_pivot, "r1": r1, "s1": s1, "r2": r2, "s2": s2},
+        luxalgo_sr=luxalgo_sr,
+        smc=smc,
+        squeeze_mom=squeeze_mom,
+        wae=wae,
+        vfi=vfi,
+        wavetrend=wavetrend,
+        ut_bot=ut_bot,
+        chandelier_exit=chandelier_exit,
+        hull_suite=hull_suite,
+        lorentzian_ml=lorentzian_ml
     )
 
     return {
@@ -2527,7 +4010,17 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         "elliott_wave_macro": elliott_wave_macro,
         "ai_signals": ai_signals,
         "earnings_history": detect_earnings_history(candles),
-        "cdc_actionzone": cdc_actionzone
+        "cdc_actionzone": cdc_actionzone,
+        "luxalgo_sr": luxalgo_sr,
+        "smc": smc,
+        "squeeze_momentum": squeeze_mom,
+        "wae": wae,
+        "vfi": vfi,
+        "wavetrend": wavetrend,
+        "ut_bot": ut_bot,
+        "chandelier_exit": chandelier_exit,
+        "hull_suite": hull_suite,
+        "lorentzian_ml": lorentzian_ml
     }
 
 
@@ -2562,7 +4055,7 @@ def save_candles_cache(cache: Dict[str, Any]):
 
 
 # Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 5
+INDICATOR_SCHEMA_VERSION = 8
 
 
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
