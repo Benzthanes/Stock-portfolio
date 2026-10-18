@@ -837,7 +837,7 @@
                         const s = chart.addLineSeries({
                             color: lineDef.color || '#38bdf8',
                             lineWidth: 2,
-                            lineStyle: lineDef.style === 2 ? LightweightCharts.LineStyle.Dashed : (lineDef.style === 1 ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Solid),
+                            lineStyle: LightweightCharts.LineStyle.Solid,
                             title: '🏛️ ' + (lineDef.name || pat.name),
                             visible: true,
                         });
@@ -863,7 +863,7 @@
                     const skelSeries = chart.addLineSeries({
                         color: skelColor,
                         lineWidth: 2.5,
-                        lineStyle: isFailed ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Solid,
+                        lineStyle: LightweightCharts.LineStyle.Solid,
                         title: skelTitle,
                         visible: true,
                     });
@@ -880,7 +880,7 @@
                     price: Number(pat.neckline),
                     color: '#38bdf8',
                     lineWidth: 1.5,
-                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
                     title: '🏛️ Neckline $' + Number(pat.neckline).toFixed(2),
                 }));
@@ -994,6 +994,8 @@
             sortedKp.forEach((kp, idx) => {
                 const isStart = kp.role === 'start' || idx === 0;
                 const isHi = (kp.name && (kp.name.toLowerCase().includes('top') || kp.name.toLowerCase().includes('peak') || kp.name.toLowerCase().includes('head') || kp.name.toLowerCase().includes('shoulder') || kp.name.toLowerCase().includes('high') || kp.name.toLowerCase().includes('resistance') || kp.name.toLowerCase().includes('ceiling')));
+                const isBreakdown = kp.name && kp.name.toLowerCase().includes('breakdown');
+                const isBreakout = kp.name && kp.name.toLowerCase().includes('breakout');
                 if (isStart) {
                     markers.push({
                         time: kp.time,
@@ -1001,6 +1003,24 @@
                         color: '#facc15',
                         shape: 'circle',
                         text: '🚩 จุดเริ่มแพทเทิร์น: ' + (kp.name || 'Start') + ' $' + Number(kp.price).toFixed(2),
+                        size: 2,
+                    });
+                } else if (isBreakdown) {
+                    markers.push({
+                        time: kp.time,
+                        position: 'belowBar',
+                        color: '#ef4444',
+                        shape: 'arrowDown',
+                        text: '⚠️ ' + kp.name + ' $' + Number(kp.price).toFixed(2),
+                        size: 2,
+                    });
+                } else if (isBreakout) {
+                    markers.push({
+                        time: kp.time,
+                        position: 'aboveBar',
+                        color: '#10b981',
+                        shape: 'arrowUp',
+                        text: '🚀 ' + kp.name + ' $' + Number(kp.price).toFixed(2),
                         size: 2,
                     });
                 } else {

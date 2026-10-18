@@ -8,7 +8,14 @@ import json
 from html import escape
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from src.chart_data import compact_charts_for_page, load_candles_cache, get_super_investors
+from src.chart_data import (
+    compact_charts_for_page,
+    load_candles_cache,
+    save_candles_cache,
+    compute_fibo_and_indicators,
+    INDICATOR_SCHEMA_VERSION,
+    get_super_investors,
+)
 from src.nav import nav_bar_html
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
@@ -233,7 +240,22 @@ def generate_stock_chart_page_html() -> str:
     - Full Rule-based Confluence Decision Engine & Classical Pattern Deep-Dive Breakdown.
     """
     meta = get_all_stocks_metadata()
-    cache = compact_charts_for_page(load_candles_cache(), meta)
+    raw_cache = load_candles_cache()
+    updated_cache = False
+    for t, entry in raw_cache.items():
+        if isinstance(entry, dict) and entry.get("candles") and entry.get("schema_version") != INDICATOR_SCHEMA_VERSION:
+            try:
+                new_data = compute_fibo_and_indicators(entry["candles"])
+                new_data["timestamp"] = entry.get("timestamp", 0)
+                new_data["full_history"] = entry.get("full_history", True)
+                new_data["schema_version"] = INDICATOR_SCHEMA_VERSION
+                raw_cache[t] = new_data
+                updated_cache = True
+            except Exception:
+                pass
+    if updated_cache:
+        save_candles_cache(raw_cache)
+    cache = compact_charts_for_page(raw_cache, meta)
 
     # Ensure all cache entries have price and name if missing
     for t, entry in cache.items():

@@ -219,6 +219,25 @@ class ChartPageGenerationTest(unittest.TestCase):
         # Earliest key point has role: "start"
         self.assertEqual(pat["key_points"][0].get("role"), "start")
 
+    def test_failed_pattern_appends_breakdown_point(self):
+        from src.chart_data import detect_chart_patterns
+        # Pad with initial bars so len >= 25
+        pad = [55.0] * 15
+        prices = pad + [
+            55.0, 54.0, 53.0, 52.5, 52.0,  # t1
+            53.0, 54.0, 54.5, 53.5, 52.8, 52.0,  # neck, t2
+            53.2, 54.2, 54.8, 53.0, 49.0   # rebound, breakdown
+        ]
+        candles = [
+            {"time": f"2024-01-{(i % 28) + 1:02d}", "open": p, "high": p + 0.2, "low": p - 0.2, "close": p, "volume": 1000}
+            for i, p in enumerate(prices)
+        ]
+        pat = detect_chart_patterns(candles)
+        self.assertIsNotNone(pat)
+        self.assertEqual(pat.get("status"), "failed")
+        kp_names = [kp["name"] for kp in pat.get("key_points", [])]
+        self.assertTrue(any("Breakdown" in name for name in kp_names))
+
 
 class ConfluenceScoringTest(unittest.TestCase):
     def _score(self, **kwargs):

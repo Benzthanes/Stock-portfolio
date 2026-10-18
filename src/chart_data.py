@@ -109,14 +109,33 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             shoulder_diff = abs(p1["price"] - p3["price"]) / p1["price"]
             if shoulder_diff <= 0.055:
                 inter_troughs = [t for t in troughs if p1["idx"] < t["idx"] < p3["idx"]]
-                if inter_troughs:
-                    neck_val = min(t["price"] for t in inter_troughs)
+                t_left = [t for t in inter_troughs if p1["idx"] < t["idx"] < p2["idx"]]
+                t_right = [t for t in inter_troughs if p2["idx"] < t["idx"] < p3["idx"]]
+
+                if t_left:
+                    tl = min(t_left, key=lambda x: x["price"])
+                else:
+                    b1 = recent[p1["idx"] + 1: p2["idx"]]
+                    if b1:
+                        c_min = min(b1, key=lambda c: c["low"])
+                        tl = {"idx": p1["idx"] + 1 + b1.index(c_min), "time": c_min["time"], "price": c_min["low"]}
+                    else:
+                        tl = None
+
+                if t_right:
+                    tr = min(t_right, key=lambda x: x["price"])
+                else:
+                    b2 = recent[p2["idx"] + 1: p3["idx"]]
+                    if b2:
+                        c_min = min(b2, key=lambda c: c["low"])
+                        tr = {"idx": p2["idx"] + 1 + b2.index(c_min), "time": c_min["time"], "price": c_min["low"]}
+                    else:
+                        tr = None
+
+                if tl and tr and p1["idx"] < tl["idx"] < p2["idx"] < tr["idx"] < p3["idx"]:
+                    neck_val = min(tl["price"], tr["price"])
                     head_h = p2["price"] - neck_val
                     target = round(neck_val - head_h, 2)
-                    t_left = [t for t in inter_troughs if p1["idx"] < t["idx"] < p2["idx"]]
-                    t_right = [t for t in inter_troughs if p2["idx"] < t["idx"] < p3["idx"]]
-                    tl = min(t_left, key=lambda x: x["price"]) if t_left else inter_troughs[0]
-                    tr = min(t_right, key=lambda x: x["price"]) if t_right else inter_troughs[-1]
                     detected = {
                         "name": "Head & Shoulders (หัวและไหล่กลับทิศ)",
                         "type": "Bearish Reversal",
@@ -151,14 +170,33 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             shoulder_diff = abs(t1["price"] - t3["price"]) / t1["price"]
             if shoulder_diff <= 0.055:
                 inter_peaks = [p for p in peaks if t1["idx"] < p["idx"] < t3["idx"]]
-                if inter_peaks:
-                    neck_val = max(p["price"] for p in inter_peaks)
+                p_left = [p for p in inter_peaks if t1["idx"] < p["idx"] < t2["idx"]]
+                p_right = [p for p in inter_peaks if t2["idx"] < p["idx"] < t3["idx"]]
+
+                if p_left:
+                    pl = max(p_left, key=lambda x: x["price"])
+                else:
+                    b1 = recent[t1["idx"] + 1: t2["idx"]]
+                    if b1:
+                        c_max = max(b1, key=lambda c: c["high"])
+                        pl = {"idx": t1["idx"] + 1 + b1.index(c_max), "time": c_max["time"], "price": c_max["high"]}
+                    else:
+                        pl = None
+
+                if p_right:
+                    pr = max(p_right, key=lambda x: x["price"])
+                else:
+                    b2 = recent[t2["idx"] + 1: t3["idx"]]
+                    if b2:
+                        c_max = max(b2, key=lambda c: c["high"])
+                        pr = {"idx": t2["idx"] + 1 + b2.index(c_max), "time": c_max["time"], "price": c_max["high"]}
+                    else:
+                        pr = None
+
+                if pl and pr and t1["idx"] < pl["idx"] < t2["idx"] < pr["idx"] < t3["idx"]:
+                    neck_val = max(pl["price"], pr["price"])
                     head_h = neck_val - t2["price"]
                     target = round(neck_val + head_h, 2)
-                    p_left = [p for p in inter_peaks if t1["idx"] < p["idx"] < t2["idx"]]
-                    p_right = [p for p in inter_peaks if t2["idx"] < p["idx"] < t3["idx"]]
-                    pl = max(p_left, key=lambda x: x["price"]) if p_left else inter_peaks[0]
-                    pr = max(p_right, key=lambda x: x["price"]) if p_right else inter_peaks[-1]
                     detected = {
                         "name": "Inverted Head & Shoulders (หัวไหล่กลับหัว)",
                         "type": "Bullish Reversal",
@@ -192,38 +230,75 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         diffs = [abs(t1["price"] - t2["price"]) / t1["price"], abs(t2["price"] - t3["price"]) / t2["price"], abs(t1["price"] - t3["price"]) / t1["price"]]
         if max(diffs) <= 0.035:
             mid_peaks = [p for p in peaks if t1["idx"] < p["idx"] < t3["idx"]]
-            if mid_peaks:
-                neck_p = max(p["price"] for p in mid_peaks)
-                avg_bottom = (t1["price"] + t2["price"] + t3["price"]) / 3.0
-                target = round(neck_p + (neck_p - avg_bottom), 2)
-                p_mid1 = [p for p in mid_peaks if t1["idx"] < p["idx"] < t2["idx"]]
-                p_mid2 = [p for p in mid_peaks if t2["idx"] < p["idx"] < t3["idx"]]
-                pm1 = max(p_mid1, key=lambda x: x["price"]) if p_mid1 else mid_peaks[0]
-                pm2 = max(p_mid2, key=lambda x: x["price"]) if p_mid2 else mid_peaks[-1]
+            p_mid1 = [p for p in mid_peaks if t1["idx"] < p["idx"] < t2["idx"]]
+            p_mid2 = [p for p in mid_peaks if t2["idx"] < p["idx"] < t3["idx"]]
+
+            if p_mid1:
+                pm1 = max(p_mid1, key=lambda x: x["price"])
+            else:
+                b1 = recent[t1["idx"] + 1: t2["idx"]]
+                if b1:
+                    c_max = max(b1, key=lambda c: c["high"])
+                    pm1 = {"idx": t1["idx"] + 1 + b1.index(c_max), "time": c_max["time"], "price": c_max["high"]}
+                else:
+                    pm1 = None
+
+            if p_mid2:
+                pm2 = max(p_mid2, key=lambda x: x["price"])
+            else:
+                b2 = recent[t2["idx"] + 1: t3["idx"]]
+                if b2:
+                    c_max = max(b2, key=lambda c: c["high"])
+                    pm2 = {"idx": t2["idx"] + 1 + b2.index(c_max), "time": c_max["time"], "price": c_max["high"]}
+                else:
+                    pm2 = None
+
+            if pm1 and pm2 and t1["idx"] < pm1["idx"] < t2["idx"] < pm2["idx"] < t3["idx"]:
+                neck_p = max(pm1["price"], pm2["price"])
+                min_floor = min(t1["price"], t2["price"], t3["price"])
+                target = round(neck_p + (neck_p - min_floor), 2)
+
+                # Check for post-bounce high after t3
+                post_peaks = [p for p in peaks if p["idx"] > t3["idx"]]
+                if post_peaks:
+                    end_p = post_peaks[0]
+                else:
+                    post_win = recent[t3["idx"] + 1:]
+                    if post_win:
+                        max_h = max(c["high"] for c in post_win)
+                        end_c = [c for c in post_win if c["high"] == max_h][0]
+                        end_p = {"name": "Rebound High", "time": end_c["time"], "price": end_c["high"], "idx": t3["idx"] + 1 + post_win.index(end_c)}
+                    else:
+                        end_p = None
+
+                key_pts = [
+                    {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
+                    {"name": "Neckline Peak 1", "time": pm1["time"], "price": pm1["price"]},
+                    {"name": "Bottom 2", "time": t2["time"], "price": t2["price"]},
+                    {"name": "Neckline Peak 2", "time": pm2["time"], "price": pm2["price"]},
+                    {"name": "Bottom 3", "time": t3["time"], "price": t3["price"]},
+                ]
+                if end_p and end_p["time"] != t3["time"]:
+                    key_pts.append({"name": "Rebound (ขาขวาดีดตัว)", "time": end_p["time"], "price": end_p["price"]})
+
                 detected = {
                     "name": "Bullish Triple Bottom (สามฐานแข็งแกร่ง)",
                     "type": "Bullish Reversal",
                     "badge": "🟢 สามฐานกระทิง (Triple Bottom)",
-                    "summary": f"ทดสอบแนวรับ 3 ครั้งไม่หลุดใกล้ ${avg_bottom:.2f} โซนดูดซับแรงขายสมบูรณ์แบบ",
+                    "summary": f"ทดสอบแนวรับ 3 ครั้งไม่หลุดใกล้ ${min_floor:.2f} โซนดูดซับแรงขายสมบูรณ์แบบ",
                     "neckline": round(neck_p, 2),
                     "breakout": round(neck_p, 2),
                     "target": target,
                     "upside_pct": round((target - current_price) / current_price * 100, 1),
                     "psychology": "ราคาทดสอบแนวรับเดิมถึง 3 ครั้ง แต่ไม่มีแรงขายใดสามารถกดให้หลุดลงไปได้ แสดงถึงแนวรับหินผา (Institutional Strong Floor) ที่สถาบันตั้งรับซื้อไม่อั้นจนอุปทานหมดตลาด",
-                    "structure": f"ฐานแนวรับ 3 ครั้งเฉลี่ย ${avg_bottom:.2f} • Neckline แนวต้านเบรกเอาท์ ${neck_p:.2f}",
-                    "action_plan": f"ซื้อสะสมใกล้โซนฐาน ${avg_bottom:.2f} หรือ Follow Buy เมื่อปิดเบรก Neckline ${neck_p:.2f} เป้าหมาย ${target:.2f}",
-                    "invalidation": f"Stop Loss ทันทีหากราคาปิดหลุดฐานต่ำสุด ${min(t1['price'], t2['price'], t3['price']):.2f}",
+                    "structure": f"ฐานแนวรับ 3 ครั้งต่ำสุด ${min_floor:.2f} • Neckline แนวต้านเบรกเอาท์ ${neck_p:.2f}",
+                    "action_plan": f"ซื้อสะสมใกล้โซนฐาน ${min_floor:.2f} หรือ Follow Buy เมื่อปิดเบรก Neckline ${neck_p:.2f} เป้าหมาย ${target:.2f}",
+                    "invalidation": f"Stop Loss ทันทีหากราคาปิดหลุดฐานต่ำสุด ${min_floor:.2f}",
                     "win_rate": PATTERN_WIN_RATE_NOTE,
-                    "target_calc": f"วัดความสูงจากฐาน ${avg_bottom:.2f} ถึงยอด Neckline ${neck_p:.2f} แล้วนำไปบวกเพิ่มจากยอด Neckline",
-                    "key_points": [
-                        {"name": "Bottom 1", "time": t1["time"], "price": t1["price"], "role": "start"},
-                        {"name": "Neckline Peak 1", "time": pm1["time"], "price": pm1["price"]},
-                        {"name": "Bottom 2", "time": t2["time"], "price": t2["price"]},
-                        {"name": "Neckline Peak 2", "time": pm2["time"], "price": pm2["price"]},
-                        {"name": "Bottom 3", "time": t3["time"], "price": t3["price"]},
-                    ],
+                    "target_calc": f"วัดความสูงจากฐาน ${min_floor:.2f} ถึงยอด Neckline ${neck_p:.2f} แล้วนำไปบวกเพิ่มจากยอด Neckline",
+                    "key_points": key_pts,
                     "lines": [
-                        {"name": "Triple Support Floor", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": avg_bottom}, {"time": times[-1], "value": avg_bottom}]},
+                        {"name": "Triple Support Floor", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": min_floor}, {"time": times[-1], "value": min_floor}]},
                         {"name": "Neckline Breakout", "color": "#38bdf8", "style": 2, "points": [{"time": t1["time"], "value": neck_p}, {"time": times[-1], "value": neck_p}]}
                     ]
                 }
@@ -742,6 +817,20 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                         "style": 2,
                         "points": [{"time": times[first_break_idx], "value": support_level}, {"time": times[-1], "value": support_level}]
                     })
+                    # Append Breakdown leg to key_points so the skeleton connects through the broken floor
+                    valid_break_indices = [i for i in breakdown_indices if i > 0]
+                    target_break_idx = valid_break_indices[0] if valid_break_indices else breakdown_indices[0]
+                    break_slice = post_candles[target_break_idx:]
+                    if break_slice:
+                        break_c = min(break_slice, key=lambda c: c["low"])
+                        if not detected.get("key_points") or break_c["time"] != detected["key_points"][-1]["time"]:
+                            detected.setdefault("key_points", []).append({
+                                "name": "Breakdown (หลุดแนวรับ)",
+                                "time": break_c["time"],
+                                "price": round(break_c["low"], 2)
+                            })
+                            if "structure" in detected and "หลุดแนวรับ" not in detected["structure"]:
+                                detected["structure"] += f" ➔ ⚠️ หลุดแนวรับ Breakdown (${break_c['low']:.2f})"
             else:
                 if resistance_level and any(c >= resistance_level * 1.002 for c in post_closes):
                     detected["status"] = "confirmed"
@@ -765,6 +854,20 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     detected["type"] = "Failed Pattern (เบรกทะลุต้าน)"
                     detected["target"] = None
                     detected["upside_pct"] = None
+                    # Append Breakout leg to key_points so the skeleton connects through the broken ceiling
+                    valid_break_indices = [i for i in breakout_indices if i > 0]
+                    target_break_idx = valid_break_indices[0] if valid_break_indices else breakout_indices[0]
+                    break_slice = post_candles[target_break_idx:]
+                    if break_slice:
+                        break_c = max(break_slice, key=lambda c: c["high"])
+                        if not detected.get("key_points") or break_c["time"] != detected["key_points"][-1]["time"]:
+                            detected.setdefault("key_points", []).append({
+                                "name": "Breakout (ทะลุต้าน)",
+                                "time": break_c["time"],
+                                "price": round(break_c["high"], 2)
+                            })
+                            if "structure" in detected and "ทะลุต้าน" not in detected["structure"]:
+                                detected["structure"] += f" ➔ 🚀 ทะลุต้าน Breakout (${break_c['high']:.2f})"
             else:
                 if support_level and any(c <= support_level * 0.998 for c in post_closes):
                     detected["status"] = "confirmed"
@@ -2459,7 +2562,7 @@ def save_candles_cache(cache: Dict[str, Any]):
 
 
 # Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 3
+INDICATOR_SCHEMA_VERSION = 5
 
 
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
