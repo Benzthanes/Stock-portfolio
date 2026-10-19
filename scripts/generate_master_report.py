@@ -30,6 +30,7 @@ from src.fmt import FMT_MONEY_JS, money, pct
 from src.fx import resolve_usdthb
 from src.html_report import get_chart_modal_component, _make_chart_onclick
 from src.nav import nav_bar_html
+from src.wealth_timeline import calculate_daily_wealth_timeline
 
 MONTH_MAP = {
     "มค": 1, "กพ": 2, "มีค": 3, "เมย": 4, "พค": 5, "มิย": 6,
@@ -301,7 +302,7 @@ def generate_master_dashboard_data(ledger_path=None):
     sort_buy_orders(buy_orders)
     cash_movements = load_statement_cash_flow(ledger["cash_movements"])
 
-    return {
+    result_data = {
         "portfolio_name": live_summary.get("portfolio_name", "ไม่รวยก็ซวยอ่ะค้าบ"),
         "broker": "Dime! (KKP Securities)",
         "account_no": "2081682995",
@@ -335,6 +336,484 @@ def generate_master_dashboard_data(ledger_path=None):
         "buy_orders": buy_orders,
         "cash_movements": cash_movements,
     }
+
+    try:
+        wealth_res = calculate_daily_wealth_timeline(result_data)
+        result_data["wealth_timeline"] = wealth_res.get("timeline", [])
+        result_data["wealth_summary"] = wealth_res.get("summary", {})
+    except Exception as exc:
+        print(f"⚠️ Error computing wealth timeline: {exc}", file=sys.stderr)
+        result_data["wealth_timeline"] = []
+        result_data["wealth_summary"] = {}
+
+    return result_data
+
+
+def render_wealth_chart_section(data):
+    timeline = data.get("wealth_timeline", [])
+    summary = data.get("wealth_summary", {})
+    timeline_json = json.dumps(timeline, ensure_ascii=False)
+
+    start_date = summary.get("start_date", "2026-02-02")
+    end_date = summary.get("end_date", "")
+    ath_nav_thb = summary.get("ath_nav_thb", 0.0)
+    current_nav_thb = summary.get("current_nav_thb", data.get("total_net_worth_thb", 0.0))
+    current_capital_thb = summary.get("current_capital_thb", data.get("net_injected_capital_thb", 0.0))
+    current_profit_thb = summary.get("current_profit_thb", data.get("all_time_profit_thb", 0.0))
+    current_roi_pct = summary.get("current_roi_pct", data.get("all_time_roi_pct", 0.0))
+    total_days = summary.get("total_days", len(timeline))
+
+    p_color = "#10b981" if current_profit_thb >= 0 else "#f43f5e"
+
+    return f"""
+    <!-- SECTION: TOTAL WEALTH & NAV TIMELINE CHART -->
+    <div class="wealth-chart-card">
+        <div class="wealth-chart-header">
+            <div>
+                <div class="wealth-chart-title">
+                    <span>📈</span> กราฟการเติบโตของสินทรัพย์รวมสุทธิ (Total Wealth & NAV Growth)
+                    <span class="badge badge-info" style="font-size: 0.78rem; font-weight: 600;">เริ่มตั้งแต่เติมเงินวันแรก 2 ก.พ. 2569</span>
+                </div>
+                <div class="wealth-chart-sub">
+                    ติดตามมูลค่าพอร์ตรวมสุทธิ (หุ้น + เงินสด) เทียบกับเงินต้นเติมสุทธิตามจริง ({total_days} วัน)
+                </div>
+            </div>
+            <div class="wealth-controls-bar">
+                <!-- Currency Toggle -->
+                <div class="chart-ctrl-group" title="สลับหน่วยสกุลเงิน">
+                    <button id="btn-ccy-thb" class="ctrl-btn active" onclick="switchWealthCcy('THB')">฿ THB</button>
+                    <button id="btn-ccy-usd" class="ctrl-btn" onclick="switchWealthCcy('USD')">$ USD</button>
+                </div>
+                <!-- Timeframe Filters -->
+                <div class="chart-ctrl-group" title="เลือกช่วงเวลา">
+                    <button id="btn-tf-1m" class="ctrl-btn" onclick="setWealthTf('1M')">1M</button>
+                    <button id="btn-tf-3m" class="ctrl-btn" onclick="setWealthTf('3M')">3M</button>
+                    <button id="btn-tf-6m" class="ctrl-btn" onclick="setWealthTf('6M')">6M</button>
+                    <button id="btn-tf-all" class="ctrl-btn active" onclick="setWealthTf('ALL')">ALL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic HUD / Crosshair Stats Strip -->
+        <div class="wealth-hud">
+            <div class="wealth-hud-item">
+                <span class="wealth-hud-label">วันที่อ้างอิง</span>
+                <span id="whud-date" class="wealth-hud-val" style="font-size: 1.02rem;">{end_date} <span style="color:#00e5ff; font-weight:600;">(ล่าสุด)</span></span>
+                <span class="wealth-hud-sub" style="color: var(--text-muted);">เริ่ม: {start_date}</span>
+            </div>
+            <div class="wealth-hud-item">
+                <span class="wealth-hud-label">สินทรัพย์รวมสุทธิ (NAV)</span>
+                <span id="whud-nav" class="wealth-hud-val" style="color: #00e5ff;">{money(current_nav_thb, 'THB')}</span>
+                <span class="wealth-hud-sub" style="color: #38bdf8;">ATH: {money(ath_nav_thb, 'THB')}</span>
+            </div>
+            <div class="wealth-hud-item">
+                <span class="wealth-hud-label">เงินต้นเติมสะสมสุทธิ</span>
+                <span id="whud-capital" class="wealth-hud-val" style="color: #fbbf24;">{money(current_capital_thb, 'THB')}</span>
+                <span class="wealth-hud-sub" style="color: var(--text-muted);">KKP Statement & Slips</span>
+            </div>
+            <div class="wealth-hud-item">
+                <span class="wealth-hud-label">กำไรสุทธิรวม (All-Time Profit)</span>
+                <span id="whud-profit" class="wealth-hud-val" style="color: {p_color};">{money(current_profit_thb, 'THB', signed=True)} ({pct(current_roi_pct, 2)})</span>
+                <span class="wealth-hud-sub" style="color: {p_color};">ผลตอบแทนสุทธิตลอดกาล</span>
+            </div>
+            <div class="wealth-hud-item">
+                <span class="wealth-hud-label">มูลค่าหุ้นในพอร์ต</span>
+                <span id="whud-stock" class="wealth-hud-val">{money(data.get('stock_market_val_thb', 0.0), 'THB')}</span>
+                <span class="wealth-hud-sub">เงินสด: <strong id="whud-cash" style="color: #10b981;">{money(data.get('total_cash_thb', 0.0), 'THB')}</strong></span>
+            </div>
+        </div>
+
+        <!-- Chart Canvas Container -->
+        <div id="wealth-chart-container" style="width: 100%; height: 380px; position: relative;"></div>
+
+        <!-- Legend and Footnote -->
+        <div class="wealth-legend-bar">
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: #00e5ff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.8);"></span>
+                    <strong style="color: #00e5ff;">มูลค่าสินทรัพย์รวม (Total NAV: หุ้น + เงินสด)</strong>
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);"></span>
+                    <strong style="color: #fbbf24;">เงินต้นเติมสะสมสุทธิ (Net Capital)</strong>
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);"></span>
+                    <strong style="color: #10b981;">Diff กำไรเหนือทุน (NAV &gt; ทุน)</strong>
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);"></span>
+                    <strong style="color: #f43f5e;">Diff ต่ำกว่าทุน (NAV &lt; ทุน)</strong>
+                </span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">
+                💡 ชี้เมาส์บนกราฟเพื่อดูมูลค่า กำไร และสัดส่วนสินทรัพย์ในแต่ละวัน | ดับเบิ้ลคลิกเพื่อรีเซ็ต
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Script -->
+    <script>
+    (function() {{
+        const rawData = {timeline_json};
+        let currentCcy = 'THB';
+        let currentTf = 'ALL';
+        let chartInstance = null;
+        let navSeries = null;
+        let capSeries = null;
+        let diffCanvas = null;
+        let animFrameId = null;
+
+        if (!rawData || !rawData.length) {{
+            const c = document.getElementById('wealth-chart-container');
+            if (c) c.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">ยังไม่มีข้อมูลเส้นเวลาสินทรัพย์</div>';
+            return;
+        }}
+
+        const latestPoint = rawData[rawData.length - 1];
+
+        function updateHud(pt) {{
+            if (!pt) pt = latestPoint;
+            const isThb = (currentCcy === 'THB');
+            const ccySym = isThb ? '฿' : '$';
+            const navVal = isThb ? pt.nav_thb : pt.nav_usd;
+            const capVal = isThb ? pt.capital_thb : pt.capital_usd;
+            const profitVal = isThb ? pt.profit_thb : pt.profit_usd;
+            const stockVal = isThb ? pt.stock_thb : pt.stock_usd;
+            const cashVal = isThb ? pt.cash_thb : pt.cash_usd;
+            const roiVal = pt.roi_pct;
+
+            const dateEl = document.getElementById('whud-date');
+            const navEl = document.getElementById('whud-nav');
+            const capEl = document.getElementById('whud-capital');
+            const profitEl = document.getElementById('whud-profit');
+            const stockEl = document.getElementById('whud-stock');
+            const cashEl = document.getElementById('whud-cash');
+
+            if (dateEl) {{
+                const isLatest = (pt.time === latestPoint.time);
+                dateEl.innerHTML = pt.time + (isLatest ? ' <span style="color:#60a5fa; font-weight:600;">(ล่าสุด)</span>' : '');
+            }}
+            if (navEl) navEl.textContent = fmtMoney(navVal, ccySym);
+            if (capEl) capEl.textContent = fmtMoney(capVal, ccySym);
+            if (profitEl) {{
+                const pColor = profitVal >= 0 ? '#10b981' : '#f43f5e';
+                profitEl.style.color = pColor;
+                profitEl.textContent = fmtMoney(profitVal, ccySym, true) + ' (' + fmtPct(roiVal, 2) + ')';
+            }}
+            if (stockEl) stockEl.textContent = fmtMoney(stockVal, ccySym);
+            if (cashEl) cashEl.textContent = fmtMoney(cashVal, ccySym);
+        }}
+
+        function syncDiffCanvasSize() {{
+            const container = document.getElementById('wealth-chart-container');
+            if (!container) return;
+            if (!diffCanvas) diffCanvas = document.getElementById('wealth-diff-canvas');
+            if (!diffCanvas) return;
+            const mainCanvas = container.querySelector('.tv-lightweight-charts canvas') || container.querySelector('canvas:not(#wealth-diff-canvas)');
+            const w = mainCanvas ? mainCanvas.clientWidth : (container.clientWidth || 900);
+            const h = mainCanvas ? mainCanvas.clientHeight : 380;
+            const dpr = window.devicePixelRatio || 1;
+            const targetW = Math.round(w * dpr);
+            const targetH = Math.round(h * dpr);
+            if (diffCanvas.width !== targetW || diffCanvas.height !== targetH) {{
+                diffCanvas.width = targetW;
+                diffCanvas.height = targetH;
+                diffCanvas.style.width = w + 'px';
+                diffCanvas.style.height = h + 'px';
+            }}
+        }}
+
+        function drawDiffRibbon() {{
+            const container = document.getElementById('wealth-chart-container');
+            if (!container || !chartInstance || !navSeries || !capSeries) return;
+            if (!diffCanvas) diffCanvas = document.getElementById('wealth-diff-canvas');
+            if (!diffCanvas) return;
+            syncDiffCanvasSize();
+            const ctx = diffCanvas.getContext('2d');
+            if (!ctx) return;
+            const dpr = window.devicePixelRatio || 1;
+            ctx.clearRect(0, 0, diffCanvas.width, diffCanvas.height);
+
+            ctx.save();
+            ctx.scale(dpr, dpr);
+
+            const mainCanvas = container.querySelector('.tv-lightweight-charts canvas') || container.querySelector('canvas:not(#wealth-diff-canvas)');
+            const clipW = mainCanvas ? mainCanvas.clientWidth : (container.clientWidth || 900);
+            const clipH = mainCanvas ? mainCanvas.clientHeight : 380;
+            ctx.beginPath();
+            ctx.rect(0, 0, clipW, clipH);
+            ctx.clip();
+
+            const ts = chartInstance.timeScale();
+            const isThb = (currentCcy === 'THB');
+            const greenFill = 'rgba(16, 185, 129, 0.42)';
+            const redFill = 'rgba(244, 63, 94, 0.42)';
+
+            for (let i = 0; i < rawData.length - 1; i++) {{
+                const p1 = rawData[i];
+                const p2 = rawData[i + 1];
+
+                const x1 = ts.timeToCoordinate(p1.time);
+                const x2 = ts.timeToCoordinate(p2.time);
+                if (x1 === null || x2 === null) continue;
+
+                const vNav1 = isThb ? p1.nav_thb : p1.nav_usd;
+                const vCap1 = isThb ? p1.capital_thb : p1.capital_usd;
+                const vNav2 = isThb ? p2.nav_thb : p2.nav_usd;
+                const vCap2 = isThb ? p2.capital_thb : p2.capital_usd;
+
+                const yNav1 = navSeries.priceToCoordinate(vNav1);
+                const yCap1 = capSeries.priceToCoordinate(vCap1);
+                const yNav2 = navSeries.priceToCoordinate(vNav2);
+                const yCap2 = capSeries.priceToCoordinate(vCap2);
+                if (yNav1 === null || yCap1 === null || yNav2 === null || yCap2 === null) continue;
+
+                const diff1 = vNav1 - vCap1;
+                const diff2 = vNav2 - vCap2;
+
+                if ((diff1 >= 0 && diff2 >= 0) || (diff1 <= 0 && diff2 <= 0)) {{
+                    ctx.fillStyle = (diff1 >= 0 && diff2 >= 0) ? greenFill : redFill;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, yNav1);
+                    ctx.lineTo(x2, yNav2);
+                    ctx.lineTo(x2, yCap2);
+                    ctx.lineTo(x1, yCap1);
+                    ctx.closePath();
+                    ctx.fill();
+                }} else {{
+                    const t = Math.abs(diff1) / (Math.abs(diff1) + Math.abs(diff2));
+                    const xm = x1 + t * (x2 - x1);
+                    const ymNav = yNav1 + t * (yNav2 - yNav1);
+                    const ymCap = yCap1 + t * (yCap2 - yCap1);
+                    const ym = (ymNav + ymCap) / 2;
+
+                    ctx.fillStyle = diff1 >= 0 ? greenFill : redFill;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, yNav1);
+                    ctx.lineTo(xm, ym);
+                    ctx.lineTo(x1, yCap1);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.fillStyle = diff2 >= 0 ? greenFill : redFill;
+                    ctx.beginPath();
+                    ctx.moveTo(xm, ym);
+                    ctx.lineTo(x2, yNav2);
+                    ctx.lineTo(x2, yCap2);
+                    ctx.closePath();
+                    ctx.fill();
+                }}
+            }}
+            ctx.restore();
+        }}
+
+        function scheduleDiffRibbonDraw() {{
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(drawDiffRibbon);
+        }}
+
+        function initChart() {{
+            const container = document.getElementById('wealth-chart-container');
+            if (!container) return;
+
+            if (typeof LightweightCharts === 'undefined') {{
+                container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:rgba(255,255,255,0.02);border-radius:10px;">⚠️ กำลังโหลดไลบรารีกราฟ หรือเครือข่ายออฟไลน์</div>';
+                return;
+            }}
+
+            container.innerHTML = '';
+            chartInstance = LightweightCharts.createChart(container, {{
+                width: container.clientWidth || 900,
+                height: 380,
+                layout: {{
+                    background: {{ type: 'solid', color: 'transparent' }},
+                    textColor: '#94a3b8',
+                    fontFamily: "'Inter', 'Prompt', -apple-system, sans-serif",
+                    fontSize: 12
+                }},
+                grid: {{
+                    vertLines: {{ color: 'rgba(255, 255, 255, 0.04)' }},
+                    horzLines: {{ color: 'rgba(255, 255, 255, 0.04)' }}
+                }},
+                timeScale: {{
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
+                    timeVisible: true,
+                    secondsVisible: false,
+                    fixLeftEdge: true,
+                    fixRightEdge: true
+                }},
+                rightPriceScale: {{
+                    borderColor: 'rgba(255, 255, 255, 0.08)',
+                    autoScale: true
+                }},
+                crosshair: {{
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                    vertLine: {{
+                        color: 'rgba(96, 165, 250, 0.4)',
+                        width: 1,
+                        style: LightweightCharts.LineStyle.Dashed
+                    }},
+                    horzLine: {{
+                        color: 'rgba(96, 165, 250, 0.4)',
+                        width: 1,
+                        style: LightweightCharts.LineStyle.Dashed
+                    }}
+                }}
+            }});
+
+            navSeries = chartInstance.addLineSeries({{
+                color: '#00e5ff',
+                lineWidth: 3
+            }});
+
+            capSeries = chartInstance.addLineSeries({{
+                color: '#fbbf24',
+                lineColor: '#fbbf24',
+                lineWidth: 2.5,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                lineType: LightweightCharts.LineType.WithSteps
+            }});
+
+            diffCanvas = document.getElementById('wealth-diff-canvas');
+            if (!diffCanvas) {{
+                diffCanvas = document.createElement('canvas');
+                diffCanvas.id = 'wealth-diff-canvas';
+                diffCanvas.style.position = 'absolute';
+                diffCanvas.style.left = '0';
+                diffCanvas.style.top = '0';
+                diffCanvas.style.pointerEvents = 'none';
+                diffCanvas.style.zIndex = '2';
+                container.appendChild(diffCanvas);
+            }}
+
+            chartInstance.timeScale().subscribeVisibleTimeRangeChange(scheduleDiffRibbonDraw);
+            chartInstance.timeScale().subscribeVisibleLogicalRangeChange(scheduleDiffRibbonDraw);
+
+            feedData();
+            setTimeout(scheduleDiffRibbonDraw, 80);
+            setTimeout(scheduleDiffRibbonDraw, 250);
+
+            chartInstance.subscribeCrosshairMove(function(param) {{
+                if (!param || !param.time || !param.seriesData || !param.seriesData.get(navSeries)) {{
+                    updateHud(latestPoint);
+                    return;
+                }}
+                const timeStr = typeof param.time === 'string' ? param.time : 
+                    (param.time.year + '-' + String(param.time.month).padStart(2, '0') + '-' + String(param.time.day).padStart(2, '0'));
+                const matchPt = rawData.find(d => d.time === timeStr);
+                if (matchPt) {{
+                    updateHud(matchPt);
+                }}
+            }});
+
+            if (window.ResizeObserver) {{
+                const resizeObserver = new ResizeObserver(entries => {{
+                    if (entries.length > 0 && chartInstance) {{
+                        const newWidth = entries[0].contentRect.width;
+                        if (newWidth > 0) {{
+                            chartInstance.applyOptions({{ width: newWidth }});
+                            scheduleDiffRibbonDraw();
+                        }}
+                    }}
+                }});
+                resizeObserver.observe(container);
+            }}
+
+            updateHud(latestPoint);
+        }}
+
+        function feedData() {{
+            if (!navSeries || !capSeries) return;
+            const isThb = (currentCcy === 'THB');
+            const navData = rawData.map(d => ({{ time: d.time, value: isThb ? d.nav_thb : d.nav_usd }}));
+            const capData = rawData.map(d => ({{ time: d.time, value: isThb ? d.capital_thb : d.capital_usd }}));
+
+            navSeries.setData(navData);
+            capSeries.setData(capData);
+
+            const priceFormatter = (p) => fmtMoney(p, isThb ? '฿' : '$');
+            navSeries.applyOptions({{
+                color: '#00e5ff',
+                priceFormat: {{ type: 'custom', formatter: priceFormatter }}
+            }});
+            capSeries.applyOptions({{
+                color: '#fbbf24',
+                lineColor: '#fbbf24',
+                priceFormat: {{ type: 'custom', formatter: priceFormatter }}
+            }});
+
+            applyTimeframe(currentTf);
+            scheduleDiffRibbonDraw();
+        }}
+
+        function applyTimeframe(tf) {{
+            if (!chartInstance || !rawData.length) return;
+            currentTf = tf;
+
+            ['1m', '3m', '6m', 'all'].forEach(k => {{
+                const btn = document.getElementById('btn-tf-' + k);
+                if (btn) btn.classList.toggle('active', k === tf.toLowerCase());
+            }});
+
+            if (tf === 'ALL') {{
+                chartInstance.timeScale().fitContent();
+                setTimeout(scheduleDiffRibbonDraw, 40);
+                return;
+            }}
+
+            const lastDate = new Date(latestPoint.time);
+            let days = 30;
+            if (tf === '3M') days = 90;
+            if (tf === '6M') days = 180;
+
+            const fromDate = new Date(lastDate);
+            fromDate.setDate(fromDate.getDate() - days);
+            const fromStr = fromDate.toISOString().split('T')[0];
+
+            chartInstance.timeScale().setVisibleRange({{
+                from: fromStr,
+                to: latestPoint.time
+            }});
+            setTimeout(scheduleDiffRibbonDraw, 40);
+        }}
+
+        window.switchWealthCcy = function(ccy) {{
+            currentCcy = ccy;
+            const btnThb = document.getElementById('btn-ccy-thb');
+            const btnUsd = document.getElementById('btn-ccy-usd');
+            if (btnThb) btnThb.classList.toggle('active', ccy === 'THB');
+            if (btnUsd) btnUsd.classList.toggle('active', ccy === 'USD');
+            feedData();
+            updateHud(latestPoint);
+        }};
+
+        window.setWealthTf = function(tf) {{
+            applyTimeframe(tf);
+        }};
+
+        window.__WEALTH_CHART_UPDATE__ = function(liveData) {{
+            if (!liveData || !rawData.length) return;
+            const last = rawData[rawData.length - 1];
+            if (liveData.total_net_worth_thb !== undefined) last.nav_thb = liveData.total_net_worth_thb;
+            if (liveData.total_net_worth_usd !== undefined) last.nav_usd = liveData.total_net_worth_usd;
+            if (liveData.stock_market_val_thb !== undefined) last.stock_thb = liveData.stock_market_val_thb;
+            if (liveData.stock_market_val_usd !== undefined) last.stock_usd = liveData.stock_market_val_usd;
+            if (liveData.total_cash_thb !== undefined) last.cash_thb = liveData.total_cash_thb;
+            if (liveData.all_time_profit_thb !== undefined) last.profit_thb = liveData.all_time_profit_thb;
+            if (liveData.all_time_roi_pct !== undefined) last.roi_pct = liveData.all_time_roi_pct;
+            feedData();
+            updateHud(last);
+        }};
+
+        if (document.readyState === 'loading') {{
+            document.addEventListener('DOMContentLoaded', initChart);
+        }} else {{
+            initChart();
+        }}
+    }})();
+    </script>
+    """
 
 
 def get_live_refresh_script(data):
@@ -557,6 +1036,18 @@ def get_live_refresh_script(data):
             if (kpiTotalCashThb) kpiTotalCashThb.textContent = fmtMoney(totalCashThb, '฿');
             if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + currentFx.toFixed(2) + ' THB';
 
+            if (typeof window.__WEALTH_CHART_UPDATE__ === 'function') {{
+                window.__WEALTH_CHART_UPDATE__({{
+                    total_net_worth_thb: totalNetWorthThb,
+                    total_net_worth_usd: totalNetWorthUsd,
+                    stock_market_val_thb: totalMarketValThb,
+                    stock_market_val_usd: totalMarketValUsd,
+                    total_cash_thb: totalCashThb,
+                    all_time_profit_thb: allTimeProfitThb,
+                    all_time_roi_pct: allTimeRoiPct
+                }});
+            }}
+
             const now = new Date();
             const timeStr = now.toLocaleTimeString('th-TH', {{ hour: '2-digit', minute: '2-digit', second: '2-digit' }});
             if (ts) ts.innerHTML = '🟢 ราคาเรียลไทม์ล่าสุด: <strong style="color: #60a5fa;">' + timeStr + ' น.</strong>';
@@ -656,6 +1147,10 @@ def get_live_refresh_script(data):
                     if (kpiTotalCashThb) kpiTotalCashThb.textContent = fmtMoney((cData.total_cash_thb || 0), '฿');
                     if (kpiFxPill) kpiFxPill.textContent = '⚡ 1 USD = ' + (cData.fx_rate || PORTFOLIO_STATIC.fxRate).toFixed(2) + ' THB';
 
+                    if (typeof window.__WEALTH_CHART_UPDATE__ === 'function') {{
+                        window.__WEALTH_CHART_UPDATE__(cData);
+                    }}
+
                     if (ts) ts.innerHTML = '☁️ ซิงค์ข้อมูลล่าสุดจาก Cloud: <strong style="color: #60a5fa;">' + (cData.updated_at || '') + ' น.</strong>';
                 }}
             }} catch (fallbackErr) {{
@@ -722,6 +1217,8 @@ def generate_master_dashboard_html(data):
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- TradingView Lightweight Charts -->
+    <script type="text/javascript" src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         :root {{
             --bg-body: #070b14;
@@ -876,6 +1373,128 @@ def generate_master_dashboard_html(data):
             color: #c084fc;
             font-weight: 600;
         }}
+        /* WEALTH & NAV GROWTH TIMELINE CARD */
+        .wealth-chart-card {{
+            background: linear-gradient(180deg, rgba(13, 21, 39, 0.95) 0%, rgba(9, 14, 26, 0.98) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 36px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }}
+        .wealth-chart-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 18px;
+        }}
+        .wealth-chart-title {{
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }}
+        .wealth-chart-sub {{
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }}
+        .wealth-controls-bar {{
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }}
+        .chart-ctrl-group {{
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 3px;
+            gap: 3px;
+        }}
+        .ctrl-btn {{
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }}
+        .ctrl-btn:hover {{
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.06);
+        }}
+        .ctrl-btn.active {{
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+            color: #60a5fa;
+            font-weight: 700;
+        }}
+        .wealth-hud {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+        }}
+        .wealth-hud-item {{
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }}
+        .wealth-hud-label {{
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        .wealth-hud-val {{
+            font-size: 1.15rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            color: #f8fafc;
+        }}
+        .wealth-hud-sub {{
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+        }}
+        .wealth-legend-bar {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }}
+        .legend-item {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        .legend-dot {{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }}
     </style>
 </head>
 <body>
@@ -960,6 +1579,8 @@ def generate_master_dashboard_html(data):
                 </div>
             </div>
         </div>
+
+        {render_wealth_chart_section(data)}
 
         <!-- SECTION 1: ACTIVE HOLDINGS TABLE -->
         <div style="margin-bottom: 36px;">
