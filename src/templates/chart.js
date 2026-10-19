@@ -3850,6 +3850,10 @@
         } else {
             renderTradingViewWidget(ticker);
         }
+
+        if (typeof latestLiveQuotesMap !== 'undefined' && latestLiveQuotesMap[ticker]) {
+            handleLiveQuotesBroadcast({ quotes: { [ticker]: latestLiveQuotesMap[ticker] } });
+        }
     }
 
     // AI Decision Cards
@@ -4457,6 +4461,201 @@
         }
     });
 
+    // Live Auto-Refresh State
+    let chartLiveIntervalSec = 0;
+    let chartCountdownSec = 0;
+    let chartCountdownTimer = null;
+    let chartLastSyncTimeStr = '';
+    let latestLiveQuotesMap = {};
+
+    window.setChartLiveInterval = function(sec) {
+        chartLiveIntervalSec = parseInt(sec, 10) || 0;
+        try {
+            localStorage.setItem('portfolio_live_interval', chartLiveIntervalSec);
+        } catch (e) {}
+
+        [0, 15, 30, 60].forEach(s => {
+            const b = document.getElementById('btn-chart-live-' + s);
+            if (b) b.classList.toggle('active', s === chartLiveIntervalSec);
+        });
+
+        if (chartCountdownTimer) {
+            clearInterval(chartCountdownTimer);
+            chartCountdownTimer = null;
+        }
+
+        const statusEl = document.getElementById('chart-live-status');
+
+        if (chartLiveIntervalSec <= 0) {
+            if (statusEl) {
+                statusEl.innerHTML = chartLastSyncTimeStr 
+                    ? '⚪ ปิด Live | ซิงค์ล่าสุด <strong style="color:#60a5fa;">' + chartLastSyncTimeStr + ' น.</strong>'
+                    : '⚪ อัปเดตด้วยตนเอง';
+            }
+            return;
+        }
+
+        chartCountdownSec = chartLiveIntervalSec;
+        updateChartLiveStatusUI();
+        fetchChartLiveQuotes();
+
+        chartCountdownTimer = setInterval(() => {
+            if (document.hidden) return; // Save mobile battery on lock
+            chartCountdownSec--;
+            if (chartCountdownSec <= 0) {
+                chartCountdownSec = chartLiveIntervalSec;
+                fetchChartLiveQuotes();
+            }
+            updateChartLiveStatusUI();
+        }, 1000);
+    };
+
+    function updateChartLiveStatusUI() {
+        const statusEl = document.getElementById('chart-live-status');
+        if (!statusEl || chartLiveIntervalSec <= 0) return;
+        const pulseDot = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981; margin-right:4px;"></span>';
+        statusEl.innerHTML = pulseDot + 'Live (' + chartLiveIntervalSec + 's): <strong style="color:#10b981;">' + chartCountdownSec + 's</strong>' + 
+            (chartLastSyncTimeStr ? ' | <strong style="color:#60a5fa;">' + chartLastSyncTimeStr + ' น.</strong>' : '');
+    }
+
+    async function fetchChartLiveQuotes() {
+        try {
+            const tickers = Object.keys(STOCKS_META).map(tk => {
+                const m = STOCKS_META[tk] || {};
+                const ex = m.exchange || 'NASDAQ';
+                return ex + ':' + tk;
+            });
+
+            if (tickers.length === 0) return;
+
+            const res = await fetch('https://scanner.tradingview.com/america/scan', {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    symbols: { tickers: tickers },
+                    columns: ['close', 'change', 'high', 'low', 'open', 'volume']
+                })
+            });
+
+            if (!res.ok) return;
+
+            const data = await res.json();
+            const quotes = {};
+            (data.data || []).forEach(item => {
+                const parts = (item.s || '').split(':');
+                const tk = parts.length > 1 ? parts[1] : parts[0];
+                quotes[tk] = {
+                    close: item.d[0],
+                    change: item.d[1],
+                    high: item.d[2],
+                    low: item.d[3],
+                    open: item.d[4],
+                    volume: item.d[5]
+                };
+            });
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            chartLastSyncTimeStr = timeStr;
+            updateChartLiveStatusUI();
+
+            const payload = {
+                quotes: quotes,
+                timeStr: timeStr,
+                timestamp: Date.now()
+            };
+
+            handleLiveQuotesBroadcast(payload);
+
+            try {
+                localStorage.setItem('portfolio_live_bus', JSON.stringify(payload));
+            } catch (e) {}
+
+            try {
+                if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+                window.__LIVE_BC__.postMessage(payload);
+            } catch (e) {}
+
+        } catch (err) {
+            console.warn('Chart live quote fetch error:', err);
+        }
+    }
+
+    // Cross-Tab & Self Live Quote Handler
+    function handleLiveQuotesBroadcast(data) {
+        if (!data || !data.quotes) return;
+        const quotes = data.quotes;
+        latestLiveQuotesMap = Object.assign(latestLiveQuotesMap, quotes);
+
+        // 1. Update pills at the top
+        Object.keys(quotes).forEach(tk => {
+            const q = quotes[tk];
+            if (q && typeof q.close === 'number') {
+                const pillElem = document.querySelector('#pill_' + tk + ' .sp-pill-p');
+                if (pillElem) {
+                    pillElem.textContent = '$' + q.close.toFixed(2);
+                }
+            }
+        });
+
+        // 2. Update active stock header
+        if (currentStockTicker && quotes[currentStockTicker]) {
+            const q = quotes[currentStockTicker];
+            const headPriceElem = document.getElementById('st_head_price');
+            const headChangeElem = document.getElementById('st_head_change');
+            if (headPriceElem && typeof q.close === 'number') {
+                headPriceElem.textContent = '$' + q.close.toFixed(2);
+            }
+            if (headChangeElem && typeof q.change === 'number') {
+                const isUp = q.change >= 0;
+                headChangeElem.className = 'header-change-chip ' + (isUp ? 'up' : 'down');
+                headChangeElem.textContent = (isUp ? '▲ +' : '▼ ') + q.change.toFixed(2) + '%';
+            }
+
+            const hudPrice = document.getElementById('hud_price');
+            if (hudPrice && typeof q.close === 'number') {
+                hudPrice.textContent = '$' + q.close.toFixed(2);
+            }
+
+            // 3. Tick active candle bar
+            if (activeCandleSeries && CHARTS_DATA[currentStockTicker] && CHARTS_DATA[currentStockTicker].candles) {
+                const candles = CHARTS_DATA[currentStockTicker].candles;
+                if (candles.length > 0) {
+                    const lastBar = Object.assign({}, candles[candles.length - 1]);
+                    lastBar.close = q.close;
+                    if (q.close > lastBar.high) lastBar.high = q.close;
+                    if (q.close < lastBar.low) lastBar.low = q.close;
+                    try {
+                        activeCandleSeries.update(lastBar);
+                    } catch (e) {}
+                }
+            }
+        }
+    }
+
+    try {
+        if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+        window.__LIVE_BC__.onmessage = (ev) => {
+            if (ev.data) handleLiveQuotesBroadcast(ev.data);
+        };
+    } catch (e) {}
+
+    window.addEventListener('storage', (ev) => {
+        if (ev.key === 'portfolio_live_bus' && ev.newValue) {
+            try {
+                handleLiveQuotesBroadcast(JSON.parse(ev.newValue));
+            } catch (e) {}
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && chartLiveIntervalSec > 0) {
+            chartCountdownSec = chartLiveIntervalSec;
+            fetchChartLiveQuotes();
+            updateChartLiveStatusUI();
+        }
+    });
+
     // Initializer
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -4468,4 +4667,18 @@
             targetTicker = '__INIT_TICKER__';
         }
         selectStock(targetTicker);
+
+        // Check for cached live quotes on load
+        try {
+            const cached = localStorage.getItem('portfolio_live_bus');
+            if (cached) handleLiveQuotesBroadcast(JSON.parse(cached));
+        } catch (e) {}
+
+        // Inherit live interval if selected on Master
+        try {
+            const savedInterval = parseInt(localStorage.getItem('portfolio_live_interval') || '0', 10);
+            if (savedInterval > 0) {
+                setChartLiveInterval(savedInterval);
+            }
+        } catch (e) {}
     });

@@ -1003,6 +1003,66 @@ def get_live_refresh_script(data):
         fxRate: {fx_rate}
     }};
 
+    let liveIntervalSec = 0; // default 0 = ปิด
+    let liveCountdownSec = 0;
+    let liveCountdownTimer = null;
+    let lastSyncTimeStr = '';
+
+    window.setLiveInterval = function(sec) {{
+        liveIntervalSec = parseInt(sec, 10) || 0;
+
+        [0, 15, 30, 60].forEach(s => {{
+            const b = document.getElementById('btn-live-' + s);
+            if (b) b.classList.toggle('active', s === liveIntervalSec);
+        }});
+
+        if (liveCountdownTimer) {{
+            clearInterval(liveCountdownTimer);
+            liveCountdownTimer = null;
+        }}
+
+        const ts = document.getElementById('refresh-timestamp');
+
+        if (liveIntervalSec <= 0) {{
+            if (ts) {{
+                ts.innerHTML = lastSyncTimeStr 
+                    ? '⚪ ปิด Live Auto | ซิงค์ล่าสุดเมื่อ <strong style="color: #60a5fa;">' + lastSyncTimeStr + ' น.</strong>'
+                    : '⚪ อัปเดตด้วยตนเอง (กดปุ่มเพื่อดึงราคา)';
+            }}
+            return;
+        }}
+
+        liveCountdownSec = liveIntervalSec;
+        updateLiveCountdownStatus();
+        refreshLiveQuotes();
+
+        liveCountdownTimer = setInterval(() => {{
+            if (document.hidden) return; // Pause on locked screen to save mobile battery
+            liveCountdownSec--;
+            if (liveCountdownSec <= 0) {{
+                liveCountdownSec = liveIntervalSec;
+                refreshLiveQuotes();
+            }}
+            updateLiveCountdownStatus();
+        }}, 1000);
+    }};
+
+    function updateLiveCountdownStatus() {{
+        const ts = document.getElementById('refresh-timestamp');
+        if (!ts || liveIntervalSec <= 0) return;
+        const pulseDot = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981; margin-right:4px;"></span>';
+        ts.innerHTML = pulseDot + 'Live Auto (' + liveIntervalSec + 's): ถัดไปใน <strong style="color:#10b981;">' + liveCountdownSec + 's</strong>' + 
+            (lastSyncTimeStr ? ' | ซิงค์ล่าสุด <strong style="color:#60a5fa;">' + lastSyncTimeStr + ' น.</strong>' : '');
+    }}
+
+    document.addEventListener('visibilitychange', () => {{
+        if (!document.hidden && liveIntervalSec > 0) {{
+            liveCountdownSec = liveIntervalSec;
+            refreshLiveQuotes();
+            updateLiveCountdownStatus();
+        }}
+    }});
+
     async function refreshLiveQuotes() {{
         const btn = document.getElementById('btn-refresh-live');
         const icon = document.getElementById('refresh-icon');
@@ -1221,7 +1281,27 @@ def get_live_refresh_script(data):
 
             const now = new Date();
             const timeStr = now.toLocaleTimeString('th-TH', {{ hour: '2-digit', minute: '2-digit', second: '2-digit' }});
-            if (ts) ts.innerHTML = '🟢 ราคาเรียลไทม์ล่าสุด: <strong style="color: #60a5fa;">' + timeStr + ' น.</strong>';
+            lastSyncTimeStr = timeStr;
+            if (liveIntervalSec > 0) {{
+                updateLiveCountdownStatus();
+            }} else {{
+                if (ts) ts.innerHTML = '🟢 ราคาเรียลไทม์ล่าสุด: <strong style="color: #60a5fa;">' + timeStr + ' น.</strong>';
+            }}
+
+            // Broadcast to other open tabs
+            const livePayload = {{
+                quotes: quotes,
+                currentFx: currentFx,
+                timeStr: timeStr,
+                timestamp: Date.now()
+            }};
+            try {{
+                localStorage.setItem('portfolio_live_bus', JSON.stringify(livePayload));
+            }} catch (e) {{}}
+            try {{
+                if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+                window.__LIVE_BC__.postMessage(livePayload);
+            }} catch (e) {{}}
 
         }} catch (err) {{
             console.warn('Direct TradingView fetch blocked (common on mobile iOS/WebKit ITP), syncing from Cloud data:', err);
@@ -1322,7 +1402,12 @@ def get_live_refresh_script(data):
                         window.__WEALTH_CHART_UPDATE__(cData);
                     }}
 
-                    if (ts) ts.innerHTML = '☁️ ซิงค์ข้อมูลล่าสุดจาก Cloud: <strong style="color: #60a5fa;">' + (cData.updated_at || '') + ' น.</strong>';
+                    lastSyncTimeStr = cData.updated_at || '';
+                    if (liveIntervalSec > 0) {{
+                        updateLiveCountdownStatus();
+                    }} else {{
+                        if (ts) ts.innerHTML = '☁️ ซิงค์ข้อมูลล่าสุดจาก Cloud: <strong style="color: #60a5fa;">' + (cData.updated_at || '') + ' น.</strong>';
+                    }}
                 }}
             }} catch (fallbackErr) {{
                 console.error('Cloud sync fallback error:', fallbackErr);
@@ -1686,16 +1771,28 @@ def generate_master_dashboard_html(data):
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
                     <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
+
+                    <!-- Live Auto-Refresh Interval Controls (15s to 60s, default: ปิด) -->
+                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 2px 4px;" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)">
+                        <span style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; padding-left: 4px;">⏱️ อัปเดตสด:</span>
+                        <div class="chart-ctrl-group" style="margin: 0;">
+                            <button id="btn-live-0" class="ctrl-btn active" onclick="setLiveInterval(0)">ปิด</button>
+                            <button id="btn-live-15" class="ctrl-btn" onclick="setLiveInterval(15)">15s</button>
+                            <button id="btn-live-30" class="ctrl-btn" onclick="setLiveInterval(30)">30s</button>
+                            <button id="btn-live-60" class="ctrl-btn" onclick="setLiveInterval(60)">60s</button>
+                        </div>
+                    </div>
+
                     <button id="btn-refresh-live" onclick="refreshLiveQuotes()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
                         <span id="refresh-icon" style="display: inline-block; transition: transform 0.6s ease;">🔄</span>
                         <span id="refresh-text">รีเฟรชราคา</span>
-                        <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; margin-left: 2px;">v2.2</span>
+                        <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; margin-left: 2px;">Live</span>
                     </button>
                     <a href="https://github.com/Benzthanes/Stock-portfolio/actions/workflows/update_portfolio.yml" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399; padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; font-family: inherit;">
                         <span>⚡ สั่งคำนวณสดบน Cloud ↗</span>
                     </a>
                 </div>
-                <span id="refresh-timestamp" style="font-size: 0.78rem; color: var(--text-muted);"></span>
+                <span id="refresh-timestamp" style="font-size: 0.78rem; color: var(--text-muted);">⚪ อัปเดตด้วยตนเอง (กดปุ่มเพื่อดึงราคา)</span>
             </div>
         </div>
 
