@@ -423,8 +423,26 @@ def render_wealth_chart_section(data):
             </div>
         </div>
 
-        <!-- Chart Canvas Container -->
-        <div id="wealth-chart-container" style="width: 100%; height: 380px; position: relative;"></div>
+        <!-- Main Chart Canvas Container -->
+        <div id="wealth-chart-container" style="width: 100%; height: 320px; position: relative;"></div>
+
+        <!-- Sub-Pane: Cumulative Net Profit & ROI Curve -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 6px; padding: 6px 4px 0 4px; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+            <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 10px;">
+                <span>💰</span> <span id="subchart-title-text">กราฟกำไรสุทธิสะสมตลอดกาล (Cumulative All-Time Net Profit)</span>
+                <span id="sub-profit-badge" style="font-size: 0.80rem; font-weight: 700; padding: 2px 10px; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    {money(current_profit_thb, 'THB', signed=True)} ({pct(current_roi_pct, 2)})
+                </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="sub-mode-hint" style="font-size: 0.78rem; color: var(--text-muted);">เส้นฐาน 0 บาท (เขียว = กำไรสะสม / แดง = ขาดทุนสะสม)</span>
+                <div class="chart-ctrl-group" style="margin: 0;" title="สลับมุมมองกำไรเป็นจำนวนเงินหรืออัตราส่วนต่อเงินทุน">
+                    <button id="btn-sub-val" class="ctrl-btn active" onclick="switchSubChartMode('VAL')">จำนวนเงิน (฿)</button>
+                    <button id="btn-sub-pct" class="ctrl-btn" onclick="switchSubChartMode('PCT')">อัตราส่วน (%)</button>
+                </div>
+            </div>
+        </div>
+        <div id="wealth-subchart-container" style="width: 100%; height: 135px; position: relative;"></div>
 
         <!-- Legend and Footnote -->
         <div class="wealth-legend-bar">
@@ -445,9 +463,13 @@ def render_wealth_chart_section(data):
                     <span class="legend-dot" style="background: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.8);"></span>
                     <strong style="color: #f43f5e;">Diff ต่ำกว่าทุน (NAV &lt; ทุน)</strong>
                 </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: #34d399; box-shadow: 0 0 10px rgba(52, 211, 153, 0.8);"></span>
+                    <strong id="legend-profit-text" style="color: #34d399;">เส้นกำไรสุทธิสะสม (Net Profit Baseline)</strong>
+                </span>
             </div>
             <div style="font-size: 0.78rem; color: var(--text-muted);">
-                💡 ชี้เมาส์บนกราฟเพื่อดูมูลค่า กำไร และสัดส่วนสินทรัพย์ในแต่ละวัน | ดับเบิ้ลคลิกเพื่อรีเซ็ต
+                💡 ชี้เมาส์บนกราฟเพื่อดูมูลค่า กำไร และสัดส่วนสินทรัพย์ในแต่ละวัน | หน้าต่างบนและล่างจะเลื่อนและซูมพร้อมกันอัตโนมัติ
             </div>
         </div>
     </div>
@@ -458,11 +480,16 @@ def render_wealth_chart_section(data):
         const rawData = {timeline_json};
         let currentCcy = 'THB';
         let currentTf = 'ALL';
+        let currentSubMode = 'VAL';
         let chartInstance = null;
+        let subChartInstance = null;
         let navSeries = null;
         let capSeries = null;
+        let profitSeries = null;
+        let zeroPriceLine = null;
         let diffCanvas = null;
         let animFrameId = null;
+        let isSyncingRange = false;
 
         if (!rawData || !rawData.length) {{
             const c = document.getElementById('wealth-chart-container');
@@ -489,6 +516,7 @@ def render_wealth_chart_section(data):
             const profitEl = document.getElementById('whud-profit');
             const stockEl = document.getElementById('whud-stock');
             const cashEl = document.getElementById('whud-cash');
+            const subBadgeEl = document.getElementById('sub-profit-badge');
 
             if (dateEl) {{
                 const isLatest = (pt.time === latestPoint.time);
@@ -501,6 +529,19 @@ def render_wealth_chart_section(data):
                 profitEl.style.color = pColor;
                 profitEl.textContent = fmtMoney(profitVal, ccySym, true) + ' (' + fmtPct(roiVal, 2) + ')';
             }}
+            if (subBadgeEl) {{
+                const pColor = profitVal >= 0 ? '#10b981' : '#f43f5e';
+                const pBg = profitVal >= 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)';
+                const pBorder = profitVal >= 0 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)';
+                subBadgeEl.style.color = pColor;
+                subBadgeEl.style.background = pBg;
+                subBadgeEl.style.borderColor = pBorder;
+                if (currentSubMode === 'PCT') {{
+                    subBadgeEl.textContent = fmtPct(roiVal, 2) + ' (' + fmtMoney(profitVal, ccySym, true) + ')';
+                }} else {{
+                    subBadgeEl.textContent = fmtMoney(profitVal, ccySym, true) + ' (' + fmtPct(roiVal, 2) + ')';
+                }}
+            }}
             if (stockEl) stockEl.textContent = fmtMoney(stockVal, ccySym);
             if (cashEl) cashEl.textContent = fmtMoney(cashVal, ccySym);
         }}
@@ -512,7 +553,7 @@ def render_wealth_chart_section(data):
             if (!diffCanvas) return;
             const mainCanvas = container.querySelector('.tv-lightweight-charts canvas') || container.querySelector('canvas:not(#wealth-diff-canvas)');
             const w = mainCanvas ? mainCanvas.clientWidth : (container.clientWidth || 900);
-            const h = mainCanvas ? mainCanvas.clientHeight : 380;
+            const h = mainCanvas ? mainCanvas.clientHeight : 320;
             const dpr = window.devicePixelRatio || 1;
             const targetW = Math.round(w * dpr);
             const targetH = Math.round(h * dpr);
@@ -615,6 +656,7 @@ def render_wealth_chart_section(data):
 
         function initChart() {{
             const container = document.getElementById('wealth-chart-container');
+            const subContainer = document.getElementById('wealth-subchart-container');
             if (!container) return;
 
             if (typeof LightweightCharts === 'undefined') {{
@@ -623,9 +665,9 @@ def render_wealth_chart_section(data):
             }}
 
             container.innerHTML = '';
-            chartInstance = LightweightCharts.createChart(container, {{
-                width: container.clientWidth || 900,
-                height: 380,
+            if (subContainer) subContainer.innerHTML = '';
+
+            const commonOpts = {{
                 layout: {{
                     background: {{ type: 'solid', color: 'transparent' }},
                     textColor: '#94a3b8',
@@ -635,13 +677,6 @@ def render_wealth_chart_section(data):
                 grid: {{
                     vertLines: {{ color: 'rgba(255, 255, 255, 0.04)' }},
                     horzLines: {{ color: 'rgba(255, 255, 255, 0.04)' }}
-                }},
-                timeScale: {{
-                    borderColor: 'rgba(255, 255, 255, 0.08)',
-                    timeVisible: true,
-                    secondsVisible: false,
-                    fixLeftEdge: true,
-                    fixRightEdge: true
                 }},
                 rightPriceScale: {{
                     borderColor: 'rgba(255, 255, 255, 0.08)',
@@ -660,7 +695,79 @@ def render_wealth_chart_section(data):
                         style: LightweightCharts.LineStyle.Dashed
                     }}
                 }}
-            }});
+            }};
+
+            chartInstance = LightweightCharts.createChart(container, Object.assign({{}}, commonOpts, {{
+                width: container.clientWidth || 900,
+                height: 320,
+                timeScale: {{
+                    visible: false,
+                    fixLeftEdge: true,
+                    fixRightEdge: true
+                }}
+            }}));
+
+            if (subContainer) {{
+                subChartInstance = LightweightCharts.createChart(subContainer, Object.assign({{}}, commonOpts, {{
+                    width: subContainer.clientWidth || 900,
+                    height: 135,
+                    timeScale: {{
+                        borderColor: 'rgba(255, 255, 255, 0.08)',
+                        visible: true,
+                        timeVisible: true,
+                        secondsVisible: false,
+                        fixLeftEdge: true,
+                        fixRightEdge: true
+                    }}
+                }}));
+
+                profitSeries = subChartInstance.addBaselineSeries({{
+                    baseValue: {{ type: 'price', price: 0 }},
+                    topLineColor: '#10b981',
+                    topFillColor1: 'rgba(16, 185, 129, 0.35)',
+                    topFillColor2: 'rgba(16, 185, 129, 0.04)',
+                    bottomLineColor: '#f43f5e',
+                    bottomFillColor1: 'rgba(244, 63, 94, 0.04)',
+                    bottomFillColor2: 'rgba(244, 63, 94, 0.35)',
+                    lineWidth: 2.5
+                }});
+
+                zeroPriceLine = profitSeries.createPriceLine({{
+                    price: 0,
+                    color: 'rgba(255, 255, 255, 0.45)',
+                    lineWidth: 1.5,
+                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: '฿0.00'
+                }});
+
+                chartInstance.timeScale().subscribeVisibleLogicalRangeChange(range => {{
+                    if (isSyncingRange || !range || !subChartInstance) return;
+                    isSyncingRange = true;
+                    subChartInstance.timeScale().setVisibleLogicalRange(range);
+                    isSyncingRange = false;
+                }});
+
+                subChartInstance.timeScale().subscribeVisibleLogicalRangeChange(range => {{
+                    if (isSyncingRange || !range || !chartInstance) return;
+                    isSyncingRange = true;
+                    chartInstance.timeScale().setVisibleLogicalRange(range);
+                    isSyncingRange = false;
+                }});
+
+                subChartInstance.subscribeCrosshairMove(function(param) {{
+                    if (!param || !param.time || !param.seriesData || !param.seriesData.get(profitSeries)) {{
+                        updateHud(latestPoint);
+                        return;
+                    }}
+                    const timeStr = typeof param.time === 'string' ? param.time : 
+                        (param.time.year + '-' + String(param.time.month).padStart(2, '0') + '-' + String(param.time.day).padStart(2, '0'));
+                    const matchPt = rawData.find(d => d.time === timeStr);
+                    if (matchPt) {{
+                        updateHud(matchPt);
+                    }}
+                }});
+            }}
 
             navSeries = chartInstance.addLineSeries({{
                 color: '#00e5ff',
@@ -713,6 +820,7 @@ def render_wealth_chart_section(data):
                         const newWidth = entries[0].contentRect.width;
                         if (newWidth > 0) {{
                             chartInstance.applyOptions({{ width: newWidth }});
+                            if (subChartInstance) subChartInstance.applyOptions({{ width: newWidth }});
                             scheduleDiffRibbonDraw();
                         }}
                     }}
@@ -729,8 +837,32 @@ def render_wealth_chart_section(data):
             const navData = rawData.map(d => ({{ time: d.time, value: isThb ? d.nav_thb : d.nav_usd }}));
             const capData = rawData.map(d => ({{ time: d.time, value: isThb ? d.capital_thb : d.capital_usd }}));
 
+            let subData;
+            let subPriceFormatter;
+            let zeroTitle;
+            if (currentSubMode === 'PCT') {{
+                subData = rawData.map(d => ({{ time: d.time, value: d.roi_pct }}));
+                subPriceFormatter = (p) => (p >= 0 ? '+' : '') + p.toFixed(2) + '%';
+                zeroTitle = '0.0%';
+            }} else {{
+                subData = rawData.map(d => ({{ time: d.time, value: isThb ? d.profit_thb : d.profit_usd }}));
+                subPriceFormatter = (p) => fmtMoney(p, isThb ? '฿' : '$');
+                zeroTitle = isThb ? '฿0.00' : '$0.00';
+            }}
+
             navSeries.setData(navData);
             capSeries.setData(capData);
+            if (profitSeries) {{
+                profitSeries.setData(subData);
+                profitSeries.applyOptions({{
+                    priceFormat: {{ type: 'custom', formatter: subPriceFormatter }}
+                }});
+                if (zeroPriceLine) {{
+                    zeroPriceLine.applyOptions({{
+                        title: zeroTitle
+                    }});
+                }}
+            }}
 
             const priceFormatter = (p) => fmtMoney(p, isThb ? '฿' : '$');
             navSeries.applyOptions({{
@@ -758,6 +890,7 @@ def render_wealth_chart_section(data):
 
             if (tf === 'ALL') {{
                 chartInstance.timeScale().fitContent();
+                if (subChartInstance) subChartInstance.timeScale().fitContent();
                 setTimeout(scheduleDiffRibbonDraw, 40);
                 return;
             }}
@@ -775,15 +908,53 @@ def render_wealth_chart_section(data):
                 from: fromStr,
                 to: latestPoint.time
             }});
+            if (subChartInstance) {{
+                subChartInstance.timeScale().setVisibleRange({{
+                    from: fromStr,
+                    to: latestPoint.time
+                }});
+            }}
             setTimeout(scheduleDiffRibbonDraw, 40);
         }}
+
+        window.switchSubChartMode = function(mode) {{
+            currentSubMode = mode;
+            const btnVal = document.getElementById('btn-sub-val');
+            const btnPct = document.getElementById('btn-sub-pct');
+            const titleEl = document.getElementById('subchart-title-text');
+            const hintEl = document.getElementById('sub-mode-hint');
+            const legendProfitEl = document.getElementById('legend-profit-text');
+
+            if (btnVal) btnVal.classList.toggle('active', mode === 'VAL');
+            if (btnPct) btnPct.classList.toggle('active', mode === 'PCT');
+
+            if (mode === 'PCT') {{
+                if (titleEl) titleEl.textContent = 'กราฟอัตราส่วนกำไรสะสมต่อเงินทุน (Cumulative ROI %)';
+                if (hintEl) hintEl.textContent = 'เส้นฐาน 0.0% (เขียว = กำไรเหนือทุน / แดง = ขาดทุน)';
+                if (legendProfitEl) legendProfitEl.textContent = 'เส้นอัตราส่วนกำไรสะสมต่อทุน (ROI % Baseline)';
+            }} else {{
+                const ccySym = (currentCcy === 'THB') ? 'บาท' : 'ดอลลาร์';
+                if (titleEl) titleEl.textContent = 'กราฟกำไรสุทธิสะสมตลอดกาล (Cumulative All-Time Net Profit)';
+                if (hintEl) hintEl.textContent = 'เส้นฐาน 0 ' + ccySym + ' (เขียว = กำไรสะสม / แดง = ขาดทุนสะสม)';
+                if (legendProfitEl) legendProfitEl.textContent = 'เส้นกำไรสุทธิสะสม (Net Profit Baseline)';
+            }}
+
+            feedData();
+            updateHud(latestPoint);
+        }};
 
         window.switchWealthCcy = function(ccy) {{
             currentCcy = ccy;
             const btnThb = document.getElementById('btn-ccy-thb');
             const btnUsd = document.getElementById('btn-ccy-usd');
+            const btnSubVal = document.getElementById('btn-sub-val');
+            const hintEl = document.getElementById('sub-mode-hint');
             if (btnThb) btnThb.classList.toggle('active', ccy === 'THB');
             if (btnUsd) btnUsd.classList.toggle('active', ccy === 'USD');
+            if (btnSubVal) btnSubVal.textContent = (ccy === 'THB') ? 'จำนวนเงิน (฿)' : 'จำนวนเงิน ($)';
+            if (currentSubMode === 'VAL' && hintEl) {{
+                hintEl.textContent = 'เส้นฐาน 0 ' + (ccy === 'THB' ? 'บาท' : 'ดอลลาร์') + ' (เขียว = กำไรสะสม / แดง = ขาดทุนสะสม)';
+            }}
             feedData();
             updateHud(latestPoint);
         }};
