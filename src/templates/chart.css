@@ -295,6 +295,38 @@
             color: #fb7185;
             border: 1px solid rgba(244, 63, 94, 0.35);
         }
+        .header-ext-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: -0.01em;
+            transition: all 0.2s ease;
+        }
+        .header-ext-chip.up {
+            background: rgba(56, 189, 248, 0.14);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.40);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+        }
+        .header-ext-chip.down {
+            background: rgba(251, 113, 133, 0.14);
+            color: #fb7185;
+            border: 1px solid rgba(251, 113, 133, 0.40);
+            box-shadow: 0 0 10px rgba(251, 113, 133, 0.15);
+        }
+        .header-ext-chip .ext-tag {
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.12);
+        }
 
         /* Modernized Flat Toolbar - All Indicators Always Accessible */
         .chart-toolbar-modern {

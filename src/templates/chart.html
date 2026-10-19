@@ -72,6 +72,7 @@ __CHART_CSS__    </style>
                                     <span id="st_name">NVIDIA Corporation</span>
                                     <span class="header-price-chip" id="st_head_price">$0.00</span>
                                     <span class="header-change-chip" id="st_head_change">0.00%</span>
+                                    <span class="header-ext-chip" id="st_head_ext" style="display:none;"></span>
                                     <span id="st_stale_badge" title="ดึงข้อมูลล่าสุดไม่สำเร็จ กำลังแสดงข้อมูลจากรอบก่อน" style="display:none; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:6px; color:#fbbf24; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4);">⚠️ ข้อมูลเก่า</span>
                                 </h1>
                                 <p id="st_sector_exchange">Semiconductors • NASDAQ</p>
@@ -99,6 +100,10 @@ __CHART_CSS__    </style>
                         <div class="hud-card">
                             <span class="hud-label">⚡ ราคาล่าสุด</span>
                             <span id="hud_price" class="hud-val" style="color: #60a5fa;">-</span>
+                        </div>
+                        <div class="hud-card" id="hud_ext_card" style="display:none;">
+                            <span class="hud-label" id="hud_ext_label">☀️ Pre-Market</span>
+                            <span id="hud_ext_val" class="hud-val" style="color: #38bdf8;">-</span>
                         </div>
                         <div class="hud-card">
                             <span class="hud-label">🟢 แนวรับสำคัญ (S1)</span>
@@ -171,6 +176,7 @@ __CHART_CSS__    </style>
                             <button class="ema-pill active" id="tog_earn" style="color: #facc15;" onclick="toggleIndicator('earn')">🗓️ ผลงบ (Earnings) <span class="help-q" onclick="openIndicatorHelp('earn', event)" title="วิธีดู ผลงบและวันประกาศงบ">?</span></button>
                             <button class="ema-pill" id="tog_fibo" style="color: #38bdf8;" onclick="toggleIndicator('fibo')">📐 Fibo Cycle <span class="help-q" onclick="openIndicatorHelp('fibo', event)" title="วิธีดู Fibo Cycle">?</span></button>
                             <button class="ema-pill" id="tog_pat" style="color: #34d399;" onclick="toggleIndicator('pat')">🏛️ Patterns <span class="help-q" onclick="openIndicatorHelp('pat', event)" title="วิธีดู Chart Patterns">?</span></button>
+                            <button class="ema-pill active" id="tog_ext" style="color: #38bdf8;" onclick="toggleIndicator('ext')">☀️ Pre/Post Mkt <span class="help-q" onclick="openIndicatorHelp('ext', event)" title="วิธีดูราคานอกเวลาตลาด (Pre-Market / After-Hours)">?</span></button>
                         </div>
 
                         <div class="tb-group">

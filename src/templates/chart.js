@@ -255,6 +255,14 @@
                    '🔵 <strong>DCA (1-5/5):</strong> สัญญาณจุดสะสมหุ้นเพิ่มเมื่อราคาย่อตัวลงมาแตะแนวรับสำคัญ.<br>' +
                    '🔴 <strong>TP (1-5/5):</strong> สัญญาณทยอยแบ่งขายทำกำไรเมื่อราคาเข้าใกล้เป้าหมาย Fibonacci หรือแนวต้าน.',
             tip: 'ใช้สัญญาณคะแนน 4/5 หรือ 5/5 เพื่อหาจุดเข้าที่ปลอดภัยและมีแต้มต่อ Risk-to-Reward สูงที่สุด.'
+        },
+        ext: {
+            icon: '☀️',
+            title: 'Pre-Market & After-Hours Extended Trading',
+            cat: 'Extended Session Trading',
+            desc: 'แสดงระดับราคาซื้อขายนอกเวลาตลาดสหรัฐ (Pre-Market 15:00-20:30 น. และ After-Hours 03:00-07:00 น. ตามเวลาไทย) เพื่อให้เห็นแนวโน้มราคาก่อนตลาดเปิดจริง.',
+            usage: 'เส้นประแนวนอนสีฟ้า (บวก) หรือสีชมพู (ลบ) แสดงระดับราคาและเปอร์เซ็นต์เปลี่ยนแปลงล่าสุดเทียบกับราคาปิดรอบปกติ.',
+            tip: 'ราคานอกเวลาตลาดมักมี Volume น้อยและผันผวนสูง ให้ใช้สังเกตการตอบสนองต่อข่าวและงบการเงิน.'
         }
     };
 
@@ -483,6 +491,7 @@
         hull: false,
         lorentzian: false,
         aisig: false,
+        ext: true,
     };
 
     const chartSeriesRegistry = {
@@ -505,7 +514,8 @@
         fiboLines: [],
         utbot: [],
         chand: [],
-        hull: []
+        hull: [],
+        extPriceLine: null
     };
 
     const ALL_TICKERS = __SORTED_TICKERS_JSON__;
@@ -1620,6 +1630,11 @@
             return;
         }
 
+        if (key === 'ext') {
+            updateExtPriceLine(activeCandleSeries, currentStockTicker);
+            return;
+        }
+
         if (key === 'pivots') {
             const tData = CHARTS_DATA[currentStockTicker] || {};
             const m = STOCKS_META[currentStockTicker] || {};
@@ -1849,6 +1864,10 @@
                     try { activeCandleSeries.removePriceLine(pl); } catch(e) {}
                 });
                 chartSeriesRegistry.patPriceLines = [];
+            }
+            if (chartSeriesRegistry.extPriceLine) {
+                try { activeCandleSeries.removePriceLine(chartSeriesRegistry.extPriceLine); } catch(e) {}
+                chartSeriesRegistry.extPriceLine = null;
             }
         }
         if (activeLwChart && chartSeriesRegistry.ew) {
@@ -3350,6 +3369,10 @@
             chartSeriesRegistry.ewPriceLines = ewRes.priceLines;
         }
 
+        // Extended Hours (Pre-market / After-hours) Price Line
+        chartSeriesRegistry.extPriceLine = null;
+        updateExtPriceLine(candleSeries, ticker);
+
         // Click on chart sets DCA target price
         chart.subscribeClick(param => {
             if (param && param.point) {
@@ -3753,6 +3776,11 @@
                 staleBadge.title = 'ดึงข้อมูลล่าสุดไม่สำเร็จ ข้อมูลนี้อัปเดตเมื่อ ' + new Date(tData.timestamp * 1000).toLocaleString('th-TH');
             }
         }
+
+        const extChipReset = document.getElementById('st_head_ext');
+        if (extChipReset) extChipReset.style.display = 'none';
+        const extCardReset = document.getElementById('hud_ext_card');
+        if (extCardReset) extCardReset.style.display = 'none';
 
         const lastPrice = m.price || (tData.candles && tData.candles.length ? tData.candles[tData.candles.length - 1].close : 0);
         const headPriceElem = document.getElementById('st_head_price');
@@ -4518,6 +4546,58 @@
             (chartLastSyncTimeStr ? ' | <strong style="color:#60a5fa;">' + chartLastSyncTimeStr + ' น.</strong>' : '');
     }
 
+    function getExtQuote(q) {
+        if (!q) return null;
+        if (typeof q.postmarket_close === 'number' && q.postmarket_close > 0) {
+            return {
+                type: 'post',
+                label: '🌙 Post-Market',
+                shortLabel: 'Post',
+                price: q.postmarket_close,
+                change: typeof q.postmarket_change === 'number' ? q.postmarket_change : 0
+            };
+        }
+        if (typeof q.premarket_close === 'number' && q.premarket_close > 0) {
+            return {
+                type: 'pre',
+                label: '☀️ Pre-Market',
+                shortLabel: 'Pre',
+                price: q.premarket_close,
+                change: typeof q.premarket_change === 'number' ? q.premarket_change : 0
+            };
+        }
+        return null;
+    }
+
+    function updateExtPriceLine(series, ticker) {
+        if (!series) return;
+        if (chartSeriesRegistry.extPriceLine) {
+            try {
+                series.removePriceLine(chartSeriesRegistry.extPriceLine);
+            } catch (e) {}
+            chartSeriesRegistry.extPriceLine = null;
+        }
+        if (!indicatorVisibility.ext) return;
+        const q = latestLiveQuotesMap[ticker];
+        const ext = getExtQuote(q);
+        if (!ext) return;
+
+        const isUp = ext.change >= 0;
+        const sign = isUp ? '+' : '';
+        try {
+            chartSeriesRegistry.extPriceLine = series.createPriceLine({
+                price: ext.price,
+                color: isUp ? '#38bdf8' : '#fb7185',
+                lineWidth: 1.5,
+                lineStyle: LightweightCharts.LineStyle.Dashed,
+                axisLabelVisible: true,
+                title: `${ext.shortLabel} $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`
+            });
+        } catch (e) {
+            console.warn('Error creating extPriceLine:', e);
+        }
+    }
+
     async function fetchChartLiveQuotes() {
         try {
             const tickers = Object.keys(STOCKS_META).map(tk => {
@@ -4533,7 +4613,11 @@
                 mode: 'cors',
                 body: JSON.stringify({
                     symbols: { tickers: tickers },
-                    columns: ['close', 'change', 'high', 'low', 'open', 'volume']
+                    columns: [
+                        'close', 'change', 'high', 'low', 'open', 'volume',
+                        'premarket_close', 'premarket_change',
+                        'postmarket_close', 'postmarket_change'
+                    ]
                 })
             });
 
@@ -4550,7 +4634,11 @@
                     high: item.d[2],
                     low: item.d[3],
                     open: item.d[4],
-                    volume: item.d[5]
+                    volume: item.d[5],
+                    premarket_close: item.d[6],
+                    premarket_change: item.d[7],
+                    postmarket_close: item.d[8],
+                    postmarket_change: item.d[9]
                 };
             });
 
@@ -4612,9 +4700,41 @@
                 headChangeElem.textContent = (isUp ? '▲ +' : '▼ ') + q.change.toFixed(2) + '%';
             }
 
+            // Extended session quote (Pre-market / After-hours)
+            const extChip = document.getElementById('st_head_ext');
+            const extCard = document.getElementById('hud_ext_card');
+            const extLabel = document.getElementById('hud_ext_label');
+            const extVal = document.getElementById('hud_ext_val');
+            const ext = getExtQuote(q);
+
+            if (ext) {
+                const isUp = ext.change >= 0;
+                const sign = isUp ? '+' : '';
+                if (extChip) {
+                    extChip.style.display = 'inline-flex';
+                    extChip.className = 'header-ext-chip ' + (isUp ? 'up' : 'down');
+                    extChip.innerHTML = `<span class="ext-tag">${ext.shortLabel}</span> $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`;
+                    extChip.title = `${ext.label}: $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`;
+                }
+                if (extCard && extVal) {
+                    extCard.style.display = 'flex';
+                    if (extLabel) extLabel.textContent = ext.label;
+                    extVal.style.color = isUp ? '#38bdf8' : '#fb7185';
+                    extVal.innerHTML = `$${ext.price.toFixed(2)} <span style="font-size:0.72rem; font-weight:600;">(${sign}${ext.change.toFixed(2)}%)</span>`;
+                }
+            } else {
+                if (extChip) extChip.style.display = 'none';
+                if (extCard) extCard.style.display = 'none';
+            }
+
             const hudPrice = document.getElementById('hud_price');
             if (hudPrice && typeof q.close === 'number') {
                 hudPrice.textContent = '$' + q.close.toFixed(2);
+            }
+
+            // Update Extended Price Line on active chart
+            if (activeCandleSeries) {
+                updateExtPriceLine(activeCandleSeries, currentStockTicker);
             }
 
             // 3. Tick active candle bar
@@ -4681,4 +4801,7 @@
                 setChartLiveInterval(savedInterval);
             }
         } catch (e) {}
+
+        // Fetch live quotes immediately on load to get latest pre/post market prices
+        fetchChartLiveQuotes();
     });
