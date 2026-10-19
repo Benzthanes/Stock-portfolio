@@ -43,8 +43,11 @@ class TempDirCase(unittest.TestCase):
         (self.tmp / "data").mkdir()
         (self.tmp / "reports").mkdir()
         os.chdir(self.tmp)
+        self._env = mock.patch.dict(os.environ, {"FILTER_STOCK_DATA_DIR": str(self.tmp / "data")})
+        self._env.start()
 
     def tearDown(self):
+        self._env.stop()
         os.chdir(self._cwd)
         self._tmp.cleanup()
 

@@ -73,24 +73,27 @@ def merge_ai_articles(ticker: str, articles: List[Dict[str, Any]]) -> None:
     existing_entry = ai_cache.get(t_up, {"updated_at": "", "articles": []})
     existing_articles = existing_entry.get("articles", [])
 
-    # Index by link and title
+    # Google News hands out a new redirect link for the same story, so a title match is a duplicate too.
     merged = []
     seen = set()
 
+    def keys(a: Dict[str, Any]) -> set:
+        return {k for k in ((a.get("link") or "").strip().lower(), (a.get("title") or "").strip().lower()) if k}
+
     for new_a in articles:
-        key = (new_a.get("link") or new_a.get("title") or "").strip()
-        if not key or key in seen:
+        k = keys(new_a)
+        if not k or k & seen:
             continue
         new_a["ai_analyzed"] = True
         new_a["ai_analyzed_at"] = new_a.get("ai_analyzed_at") or datetime.now().isoformat()
         merged.append(new_a)
-        seen.add(key)
+        seen |= k
 
     for old_a in existing_articles:
-        key = (old_a.get("link") or old_a.get("title") or "").strip()
-        if key and key not in seen:
+        k = keys(old_a)
+        if k and not k & seen:
             merged.append(old_a)
-            seen.add(key)
+            seen |= k
 
     ai_cache[t_up] = {
         "updated_at": datetime.now().isoformat(),

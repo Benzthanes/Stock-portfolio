@@ -180,7 +180,7 @@
 .rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
 .rnav-time { margin-left: auto; white-space: nowrap; color: #64748b; font-size: 0.8rem; }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link active" aria-current="page">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-18 23:12</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link active" aria-current="page">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div><span class="rnav-time">อัปเดต: 2026-10-19 10:09</span></nav><script>(function(){var a=document.querySelector(".rnav-link.active");if(a){var b=a.parentNode;b.scrollLeft=a.offsetLeft-b.offsetLeft-16;}})();</script>
         <!-- HEADER -->
         <div class="header">
             <div>
@@ -195,7 +195,7 @@
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                    <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = 33.42 THB</span>
+                    <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = 33.48 THB</span>
                     <button id="btn-refresh-live" onclick="refreshLiveQuotes()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
                         <span id="refresh-icon" style="display: inline-block; transition: transform 0.6s ease;">🔄</span>
                         <span id="refresh-text">รีเฟรชราคา</span>
@@ -213,7 +213,7 @@
         <div class="grid-4-cols">
             <div class="card" style="border-left: 4px solid var(--blue);">
                 <div class="kpi-label">มูลค่าพอร์ตรวมสุทธิ (Total Net Worth / NAV)</div>
-                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa;">฿1,518,091.91</div>
+                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa;">฿1,520,817.39</div>
                 <div id="kpi-net-worth-usd-sub" class="kpi-subtext">~$45,424.65 USD (หุ้น + เงินสด)</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--purple);">
@@ -223,8 +223,8 @@
             </div>
             <div class="card" style="border-left: 4px solid #10b981;">
                 <div class="kpi-label">กำไรรวมสุทธิของพอร์ต (All-Time Net Profit)</div>
-                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: #10b981;">+฿273,091.91</div>
-                <div id="kpi-all-time-roi-sub" class="kpi-subtext" style="color: #10b981; font-weight: 700;">+21.94% All-Time ROI</div>
+                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: #10b981;">+฿275,817.39</div>
+                <div id="kpi-all-time-roi-sub" class="kpi-subtext" style="color: #10b981; font-weight: 700;">+22.15% All-Time ROI</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--emerald);">
                 <div class="kpi-label">เงินสดคงเหลือรวม (Total Idle Cash)</div>
@@ -239,7 +239,7 @@
                 <div class="kpi-label">หุ้นที่กำลังถือครอง (Active Holdings)</div>
                 <div style="font-size: 1.45rem; font-weight: 700;">9 บริษัท</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    มูลค่าตลาด: <strong id="kpi-stock-market-val-usd">$45,424.65</strong> (<span id="kpi-stock-market-val-thb">฿1,518,091.91</span>)<br>
+                    มูลค่าตลาด: <strong id="kpi-stock-market-val-usd">$45,424.65</strong> (<span id="kpi-stock-market-val-thb">฿1,520,817.39</span>)<br>
                     กำไรที่ยังไม่ขาย: <strong id="kpi-stock-unrealized-pl" style="color: #10b981;">+$6,209.59 (+15.83%)</strong>
                 </div>
             </div>
@@ -255,8 +255,8 @@
                 <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
                 <div style="font-size: 1.45rem; font-weight: 700; color: #10b981;">+$141.74</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    คิดเป็นเงินไทย: <strong style="color: #10b981;">+฿4,736.95</strong> (รับรวม 13 ครั้ง)<br>
-                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: #10b981;">+฿32,072.33</strong>
+                    คิดเป็นเงินไทย: <strong style="color: #10b981;">+฿4,745.46</strong> (รับรวม 13 ครั้ง)<br>
+                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: #10b981;">+฿32,080.84</strong>
                 </div>
             </div>
         </div>
@@ -286,7 +286,7 @@
                     </thead>
                     <tbody>
                         
-        <tr class="holding-row" data-ticker="LLY" data-exchange="NYSE" data-shares="27.6477631" data-cost="1021.1077" data-server-val-usd="34754.067649592995">
+        <tr class="holding-row" data-ticker="LLY" data-exchange="NYSE" data-shares="27.6477631" data-cost="1021.1077" data-cost-usd="28231.34" data-cost-thb="949137.8" data-server-val-usd="34754.067649592995">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1257.03, 1118.53, 1364.39, 1203.33, 1357.59, 1364.39)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LLY 📈</span>
             </td>
@@ -295,14 +295,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$1,021.11</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$1,257.03</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$34,754.07</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿1,161,480.94</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿1,163,566.18</td>
             <td class="cell-pl-usd" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+$6,522.73</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿212,343.14</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿214,428.38</td>
             <td class="cell-pl-pct" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+23.10%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">76.5%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="GOOGL" data-exchange="NASDAQ" data-shares="11.1897032" data-cost="341.7162" data-server-val-usd="3811.101012888">
+        <tr class="holding-row" data-ticker="GOOGL" data-exchange="NASDAQ" data-shares="11.1897032" data-cost="341.7162" data-cost-usd="3823.7" data-cost-thb="128552.88" data-server-val-usd="3811.101012888">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 340.59, 336.38, 344.58, 327.23, 344.58, 427.64)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
             </td>
@@ -311,14 +311,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$341.72</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$340.59</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$3,811.10</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿127,367.00</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿127,595.66</td>
             <td class="cell-pl-usd" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-$12.60</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿1,185.88</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿957.22</td>
             <td class="cell-pl-pct" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-0.33%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">8.4%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="ABNB" data-exchange="NASDAQ" data-shares="9.8248563" data-cost="151.7895" data-server-val-usd="1706.57753931">
+        <tr class="holding-row" data-ticker="ABNB" data-exchange="NASDAQ" data-shares="9.8248563" data-cost="151.7895" data-cost-usd="1491.31" data-cost-thb="50137.84" data-server-val-usd="1706.57753931">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;ABNB&quot;, &quot;NASDAQ&quot;, &quot;Airbnb, Inc.&quot;, &quot;Consumer Services&quot;, 151.7895, 173.7, 150.02, 174.17, 166.21, 187.6, 184.45)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">ABNB 📈</span>
             </td>
@@ -327,14 +327,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$151.79</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$173.70</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$1,706.58</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿57,033.82</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿57,136.22</td>
             <td class="cell-pl-usd" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+$215.27</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿6,895.98</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿6,998.38</td>
             <td class="cell-pl-pct" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+14.43%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">3.8%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="BAC" data-exchange="NYSE" data-shares="27.3711243" data-cost="54.3123" data-server-val-usd="1402.222697889">
+        <tr class="holding-row" data-ticker="BAC" data-exchange="NYSE" data-shares="27.3711243" data-cost="54.3123" data-cost-usd="1486.59" data-cost-thb="49979.16" data-server-val-usd="1402.222697889">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 54.3123, 51.23, 51.0, 59.05, 49.25, 59.05, 63.22)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
             </td>
@@ -343,14 +343,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$54.31</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$51.23</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$1,402.22</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿46,862.28</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿46,946.42</td>
             <td class="cell-pl-usd" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-$84.37</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿3,116.88</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿3,032.74</td>
             <td class="cell-pl-pct" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-5.68%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">3.1%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="NOK" data-exchange="NYSE" data-shares="137.7332496" data-cost="11.8125" data-server-val-usd="1258.881901344">
+        <tr class="holding-row" data-ticker="NOK" data-exchange="NYSE" data-shares="137.7332496" data-cost="11.8125" data-cost-usd="1626.97" data-cost-thb="54698.73" data-server-val-usd="1258.881901344">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 11.8125, 9.14, 8.41, 10.23, 8.41, 10.23, 13.18)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOK 📈</span>
             </td>
@@ -359,14 +359,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$11.81</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$9.14</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$1,258.88</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿42,071.83</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿42,147.37</td>
             <td class="cell-pl-usd" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-$368.09</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿12,626.90</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿12,551.36</td>
             <td class="cell-pl-pct" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-22.62%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">2.8%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="MNST" data-exchange="NASDAQ" data-shares="17.3443578" data-cost="42.935" data-server-val-usd="793.157482194">
+        <tr class="holding-row" data-ticker="MNST" data-exchange="NASDAQ" data-shares="17.3443578" data-cost="42.935" data-cost-usd="744.68" data-cost-thb="25036.14" data-server-val-usd="793.157482194">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;MNST&quot;, &quot;NASDAQ&quot;, &quot;Monster Beverage Corp&quot;, &quot;Consumer Non-Durables&quot;, 42.935, 45.73, 42.68, 50.69, 44.22, 49.39, 50.69)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">MNST 📈</span>
             </td>
@@ -375,14 +375,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$42.94</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$45.73</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$793.16</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿26,507.32</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿26,554.91</td>
             <td class="cell-pl-usd" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+$48.48</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿1,471.18</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿1,518.77</td>
             <td class="cell-pl-pct" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+6.51%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">1.7%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="APP" data-exchange="NASDAQ" data-shares="2.9770995" data-cost="285.3213" data-server-val-usd="792.295489935">
+        <tr class="holding-row" data-ticker="APP" data-exchange="NASDAQ" data-shares="2.9770995" data-cost="285.3213" data-cost-usd="849.43" data-cost-thb="28557.84" data-server-val-usd="792.295489935">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 285.3213, 266.13, 248.87, 305.68, 244.72, 305.68, 481.28)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">APP 📈</span>
             </td>
@@ -391,14 +391,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$285.32</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$266.13</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$792.30</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿26,478.52</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿26,526.05</td>
             <td class="cell-pl-usd" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-$57.13</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿2,079.32</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿2,031.79</td>
             <td class="cell-pl-pct" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-6.73%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">1.7%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="VRT" data-exchange="NYSE" data-shares="2.7077294" data-cost="237.8007" data-server-val-usd="558.9295027479999">
+        <tr class="holding-row" data-ticker="VRT" data-exchange="NYSE" data-shares="2.7077294" data-cost="237.8007" data-cost-usd="643.9" data-cost-thb="21647.92" data-server-val-usd="558.9295027479999">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;VRT&quot;, &quot;NYSE&quot;, &quot;Vertiv Holdings Co.&quot;, &quot;Electronic Technology&quot;, 237.8007, 206.42, 189.14, 255.46, 189.14, 255.46, 329.93)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">VRT 📈</span>
             </td>
@@ -407,14 +407,14 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$237.80</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$206.42</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$558.93</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿18,679.42</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿18,712.96</td>
             <td class="cell-pl-usd" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-$84.97</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿2,968.50</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 600;">-฿2,934.96</td>
             <td class="cell-pl-pct" style="text-align: right; color: #f43f5e; font-family: 'Inter', sans-serif; font-weight: 700;">-13.20%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">1.2%</td>
         </tr>
         
-        <tr class="holding-row" data-ticker="VOO" data-exchange="AMEX" data-shares="0.4951753" data-cost="640.46" data-server-val-usd="347.419942233">
+        <tr class="holding-row" data-ticker="VOO" data-exchange="AMEX" data-shares="0.4951753" data-cost="640.46" data-cost-usd="317.14" data-cost-thb="10662.25" data-server-val-usd="347.419942233">
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="openChartModal(&quot;VOO&quot;, &quot;AMEX&quot;, &quot;Vanguard S&amp;P 500 ETF&quot;, &quot;Miscellaneous&quot;, 640.46, 701.61, 666.69, 706.62, 691.9, 706.62, null)" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">VOO 📈</span>
             </td>
@@ -423,9 +423,9 @@
             <td style="text-align: right; font-family: 'Inter', sans-serif;">$640.46</td>
             <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">$701.61</td>
             <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">$347.42</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿11,610.77</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">฿11,631.62</td>
             <td class="cell-pl-usd" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+$30.28</td>
-            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿948.52</td>
+            <td class="cell-pl-thb" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 600;">+฿969.37</td>
             <td class="cell-pl-pct" style="text-align: right; color: #10b981; font-family: 'Inter', sans-serif; font-weight: 700;">+9.55%</td>
             <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">0.8%</td>
         </tr>
@@ -491,7 +491,7 @@ function fmtPct(v, digits) {
         netInjectedCapitalThb: 1245000.0,
         dimeSaveCashThb: 0.0,
         dimeUsdCash: 0.0,
-        fxRate: 33.42
+        fxRate: 33.48
     };
 
     async function refreshLiveQuotes() {
@@ -571,6 +571,7 @@ function fmtPct(v, digits) {
             // 4. Update rows and compute totals
             let totalMarketValUsd = 0;
             let totalCostUsd = 0;
+            let totalCostThb = 0;
 
             rows.forEach(r => {
                 const ticker = r.dataset.ticker;
@@ -578,12 +579,15 @@ function fmtPct(v, digits) {
                 const avgCost = parseFloat(r.dataset.cost) || 0;
                 const serverValUsd = parseFloat(r.dataset.serverValUsd);
                 const quote = quotes[ticker];
-                const costUsd = shares * avgCost;
+                const costUsd = parseFloat(r.dataset.costUsd) || shares * avgCost;
+                // THB P/L uses the THB actually paid, matching the server-rendered value.
+                const costThb = parseFloat(r.dataset.costThb) || costUsd * currentFx;
 
                 if (!(quote && typeof quote.close === 'number')) {
                     if (!isNaN(serverValUsd)) {
                         totalMarketValUsd += serverValUsd;
                         totalCostUsd += costUsd;
+                        totalCostThb += costThb;
                         r.dataset.currentValUsd = serverValUsd;
                         r.title = 'ไม่ได้ราคาสด ใช้มูลค่าล่าสุดจากเซิร์ฟเวอร์';
                     } else {
@@ -596,11 +600,12 @@ function fmtPct(v, digits) {
                 const valUsd = shares * close;
                 const valThb = valUsd * currentFx;
                 const plUsd = valUsd - costUsd;
-                const plThb = plUsd * currentFx;
+                const plThb = valThb - costThb;
                 const plPct = costUsd > 0 ? (plUsd / costUsd * 100) : 0;
 
                 totalMarketValUsd += valUsd;
                 totalCostUsd += costUsd;
+                totalCostThb += costThb;
 
                 r.dataset.currentValUsd = valUsd;
                 r.title = '';
@@ -647,7 +652,7 @@ function fmtPct(v, digits) {
             // 6. Update KPIs
             const totalMarketValThb = totalMarketValUsd * currentFx;
             const totalPlUsd = totalMarketValUsd - totalCostUsd;
-            const totalPlThb = totalPlUsd * currentFx;
+            const totalPlThb = totalMarketValUsd * currentFx - totalCostThb;
             const totalPlPct = totalCostUsd > 0 ? (totalPlUsd / totalCostUsd * 100) : 0;
 
             const totalCashThb = PORTFOLIO_STATIC.dimeSaveCashThb + (PORTFOLIO_STATIC.dimeUsdCash * currentFx);

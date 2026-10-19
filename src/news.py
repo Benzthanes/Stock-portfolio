@@ -14,6 +14,7 @@ import time
 import urllib.parse
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -62,6 +63,10 @@ BULLISH_KEYWORDS = {
 _BEAR_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BEARISH_KEYWORDS) + r')\b', re.IGNORECASE)
 _BULL_REGEX = re.compile(r'\b(' + '|'.join(re.escape(k) for k in BULLISH_KEYWORDS) + r')\b(?!\s+lows?\b)', re.IGNORECASE)
 _NEUTRAL_PHRASE_REGEX = re.compile(r'\bweight[- ]loss\b', re.IGNORECASE)
+# Checked before the word lists: these phrases contain a word from the opposite list.
+_BEAR_PHRASE_REGEX = re.compile(r'\b(cuts? (its |the )?dividend|dividend cut|suspends dividend|cuts? (its |the )?price target|lowers? (its |the )?price target|(profit|earnings|revenue|sales) (misses|missed|falls short)|slips?|slipped)\b', re.IGNORECASE)
+_BULL_PHRASE_REGEX = re.compile(r'\bnarrows? (its |the )?(quarterly )?loss(es)?\b', re.IGNORECASE)
+_QUESTION_REGEX = re.compile(r'^\s*(should you|is it time|is now|can|will|is)\b.*\?\s*$', re.IGNORECASE)
 
 
 def _load_cache() -> Dict[str, Any]:
@@ -114,22 +119,21 @@ def _update_cache(ticker: str, articles: List[Dict[str, str]], max_items: int, k
         _save_cache(cache)
 
 
-def _format_relative_time(pub_date_str: str) -> str:
-    """Format RFC 822 date to a clean relative string (e.g., '3h ago', '1d ago')."""
+def _parse_pub_date(pub_date_str: str) -> Optional[datetime]:
     try:
         dt = parsedate_to_datetime(pub_date_str)
-        diff = time.time() - dt.timestamp()
-        if diff < 3600:
-            mins = max(1, int(diff / 60))
-            return f"{mins}m ago"
-        elif diff < 86400:
-            hrs = int(diff / 3600)
-            return f"{hrs}h ago"
-        else:
-            days = int(diff / 86400)
-            return f"{days}d ago"
-    except Exception:
+    except (TypeError, ValueError, IndexError):
+        return None
+    # RFC 2822 "-0000" parses as naive; it still means UTC.
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+
+
+def _format_relative_time(pub_date_str: str) -> str:
+    """Absolute date (e.g. '16 Oct 2026'). A relative '3h ago' baked into static HTML goes stale the moment the page is opened later."""
+    dt = _parse_pub_date(pub_date_str)
+    if dt is None:
         return pub_date_str[:16] if pub_date_str else ""
+    return dt.astimezone(timezone.utc).strftime("%d %b %Y")
 
 
 def classify_sentiment(title: str) -> str:
@@ -137,6 +141,12 @@ def classify_sentiment(title: str) -> str:
     Classify a headline as 'bullish', 'bearish', or 'neutral' using whole-word regex matching.
     """
     title_clean = _NEUTRAL_PHRASE_REGEX.sub(" ", title)
+    if _BULL_PHRASE_REGEX.search(title_clean):
+        return "bullish"
+    if _BEAR_PHRASE_REGEX.search(title_clean):
+        return "bearish"
+    if _QUESTION_REGEX.search(title_clean):
+        return "neutral"
     is_bear = bool(_BEAR_REGEX.search(title_clean))
     is_bull = bool(_BULL_REGEX.search(title_clean))
 
@@ -347,7 +357,10 @@ def fetch_stock_news_with_status(ticker: str, max_items: int = 4, timeout: int =
         return [], False
 
     articles: List[Dict[str, str]] = []
-    for item in tree.findall(".//item")[:max_items]:
+    # Google News search RSS is ordered by relevance; sort so "latest" really means newest.
+    epoch = datetime.min.replace(tzinfo=timezone.utc)
+    items = sorted(tree.findall(".//item"), key=lambda it: _parse_pub_date(it.findtext("pubDate") or "") or epoch, reverse=True)
+    for item in items[:max_items]:
         raw_title = item.find("title").text if item.find("title") is not None else ""
         link = item.find("link").text if item.find("link") is not None else ""
         pub_date = item.find("pubDate").text if item.find("pubDate") is not None else ""

@@ -13,8 +13,7 @@ SP100_TICKERS = {
     "COP": "NYSE", "COST": "NASDAQ", "CRM": "NYSE", "CSCO": "NASDAQ", "CVS": "NYSE",
     "CVX": "NYSE", "DE": "NYSE", "DHR": "NYSE", "DIS": "NYSE", "DOW": "NYSE",
     "DUK": "NYSE", "EMR": "NYSE", "EXC": "NASDAQ", "F": "NYSE", "FDX": "NYSE",
-    "GD": "NYSE", "GE": "NYSE", "GILD": "NASDAQ", "GM": "NYSE", "GOOG": "NASDAQ",
-    "GOOGL": "NASDAQ", "GS": "NYSE", "HD": "NYSE", "HON": "NASDAQ", "IBM": "NYSE",
+    "GD": "NYSE", "GE": "NYSE", "GILD": "NASDAQ", "GM": "NYSE", "GOOGL": "NASDAQ", "GS": "NYSE", "HD": "NYSE", "HON": "NASDAQ", "IBM": "NYSE",
     "INTC": "NASDAQ", "INTU": "NASDAQ", "ISRG": "NASDAQ", "JNJ": "NYSE", "JPM": "NYSE",
     "KHC": "NYSE", "KO": "NYSE", "LIN": "NASDAQ", "LLY": "NYSE", "LMT": "NYSE",
     "LOW": "NYSE", "MA": "NYSE", "MCD": "NYSE", "MDT": "NYSE", "MET": "NYSE",
@@ -39,7 +38,7 @@ NASDAQ100_TICKERS = {
     "CSX": "NASDAQ", "CTAS": "NASDAQ", "CTSH": "NASDAQ", "DASH": "NASDAQ", "DDOG": "NASDAQ",
     "DLTR": "NASDAQ", "DXCM": "NASDAQ", "EXC": "NASDAQ", "FANG": "NASDAQ",
     "FAST": "NASDAQ", "FTNT": "NASDAQ", "GEHC": "NASDAQ", "GFS": "NASDAQ", "GILD": "NASDAQ",
-    "GOOG": "NASDAQ", "GOOGL": "NASDAQ", "HON": "NASDAQ", "IDXX": "NASDAQ", "ILMN": "NASDAQ",
+    "GOOGL": "NASDAQ", "HON": "NASDAQ", "IDXX": "NASDAQ", "ILMN": "NASDAQ",
     "INTC": "NASDAQ", "INTU": "NASDAQ", "ISRG": "NASDAQ", "KDP": "NASDAQ", "KHC": "NYSE",
     "KLAC": "NASDAQ", "LIN": "NASDAQ", "LRCX": "NASDAQ", "LULU": "NASDAQ", "MAR": "NASDAQ",
     "MCHP": "NASDAQ", "MDB": "NASDAQ", "MDLZ": "NASDAQ", "MELI": "NASDAQ", "META": "NASDAQ",
@@ -105,8 +104,8 @@ def resolve_custom_tickers(ticker_list: list[str]) -> list[str]:
                 seen.add(sym)
                 symbols.append(sym)
         else:
-            # Add NASDAQ and NYSE candidate prefixes for unknown ticker
-            for ex in ["NASDAQ", "NYSE"]:
+            # TradingView files NYSE Arca ETFs such as VOO and SPY under AMEX.
+            for ex in ["NASDAQ", "NYSE", "AMEX"]:
                 sym = f"{ex}:{clean}"
                 if sym not in seen:
                     seen.add(sym)

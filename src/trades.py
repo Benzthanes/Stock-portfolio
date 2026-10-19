@@ -13,11 +13,24 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 from src.fx import FALLBACK_USDTHB, resolve_usdthb
 
-DEFAULT_PORTFOLIO_PATH = Path("data/portfolio.json")
-DEFAULT_TRADES_PATH = Path("data/trades.json")
-DEFAULT_LEDGER_PATH = Path("data/ledger.json")
+REPO_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
+def data_path(name: str) -> Path:
+    """Repo-anchored so a run from another directory never reads an empty ledger. Read per call so tests can redirect it."""
+    return Path(os.environ.get("FILTER_STOCK_DATA_DIR") or REPO_DATA_DIR) / name
+
+
+DEFAULT_PORTFOLIO_PATH = data_path("portfolio.json")
+DEFAULT_TRADES_PATH = data_path("trades.json")
+DEFAULT_LEDGER_PATH = data_path("ledger.json")
 THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
-_THAI_MONTH_RE = re.compile("|".join(re.escape(m) for m in sorted(THAI_MONTHS, key=len, reverse=True)))
+# Slips sometimes drop the final dot ("14 ต.ค 69"), so it is optional in the match.
+_THAI_MONTH_RE = re.compile("|".join(re.escape(m[:-1]) + r"\.?" for m in sorted(THAI_MONTHS, key=len, reverse=True)))
+
+
+def _thai_month_index(token: str) -> int:
+    return [m.rstrip(".") for m in THAI_MONTHS].index(token.rstrip(".")) + 1
 
 
 def _to_ce_year(year: int) -> int:
@@ -33,18 +46,25 @@ def parse_trade_date(value: Optional[str]) -> Optional[date]:
     text = re.sub(r"\(\s*\d+\s*ไม้\s*\)", "", str(value))
     text = re.sub(r"\d{1,2}:\d{2}(\s*น\.?)?", "", text).strip(" -")
     iso = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})", text)
-    if iso:
-        return date(int(iso.group(1)), int(iso.group(2)), int(iso.group(3)))
     dmy = re.match(r"^(\d{1,2})/(\d{1,2})/(\d{2,4})", text)
-    if dmy:
-        return date(_to_ce_year(int(dmy.group(3))), int(dmy.group(2)), int(dmy.group(1)))
+    try:
+        if iso:
+            return date(int(iso.group(1)), int(iso.group(2)), int(iso.group(3)))
+        if dmy:
+            year = int(dmy.group(3))
+            # A two-digit slash year is ambiguous: 26 means 2026 (CE) while 69 means 2569 (BE).
+            if year < 50:
+                year += 2000
+            return date(_to_ce_year(year), int(dmy.group(2)), int(dmy.group(1)))
+    except ValueError:
+        return None
     day = re.match(r"^(\d{1,2})\b", text)
     months = list(_THAI_MONTH_RE.finditer(text))
     if not day or not months:
         return None
     first = months[0]
     year_after_first = re.match(r"\s*(\d{2}|\d{4})\b", text[first.end():])
-    month_idx = THAI_MONTHS.index(first.group(0)) + 1
+    month_idx = _thai_month_index(first.group(0))
     if year_after_first:
         year = _to_ce_year(int(year_after_first.group(1)))
     else:
@@ -52,7 +72,7 @@ def parse_trade_date(value: Optional[str]) -> Optional[date]:
         if not years:
             return None
         year = _to_ce_year(int(years[-1]))
-        if THAI_MONTHS.index(months[-1].group(0)) + 1 < month_idx:
+        if _thai_month_index(months[-1].group(0)) < month_idx:
             year -= 1
     try:
         return date(year, month_idx, int(day.group(1)))
@@ -61,8 +81,9 @@ def parse_trade_date(value: Optional[str]) -> Optional[date]:
 
 
 def _atomic_write_many(files: Sequence[Tuple[Path, str]]) -> None:
-    """Write every file to a temp sibling first, then os.replace them all, so a crash never leaves a half-written set."""
+    """Stage every file as a temp sibling, then swap them in. If a swap fails, the files already swapped are restored."""
     staged: List[Tuple[str, Path]] = []
+    replaced: List[Tuple[Path, Optional[str]]] = []
     try:
         for path, text in files:
             path = Path(path)
@@ -73,12 +94,32 @@ def _atomic_write_many(files: Sequence[Tuple[Path, str]]) -> None:
                 f.write(text)
                 f.flush()
                 os.fsync(f.fileno())
-        for tmp, path in staged:
-            os.replace(tmp, path)
+        try:
+            for tmp, path in staged:
+                previous = path.read_text(encoding="utf-8") if path.exists() else None
+                os.replace(tmp, path)
+                replaced.append((path, previous))
+        except BaseException:
+            for path, previous in reversed(replaced):
+                if previous is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    path.write_text(previous, encoding="utf-8")
+            raise
     finally:
         for tmp, _ in staged:
             if os.path.exists(tmp):
                 os.unlink(tmp)
+
+
+def _unique_trade_id(trades_data: Dict[str, Any], ticker: str) -> str:
+    base = f"TRD-{datetime.now().strftime('%Y%m%d%H%M%S')}-{ticker}"
+    taken = {t.get("id") for t in trades_data.get("trades", [])}
+    trade_id, n = base, 1
+    while trade_id in taken:
+        n += 1
+        trade_id = f"{base}-{n}"
+    return trade_id
 
 
 def _json_text(data: Dict[str, Any], trailing_newline: bool = False) -> str:
@@ -396,7 +437,7 @@ document.addEventListener('keydown', function(event) {
 
 
 def load_trades(filepath: Optional[str] = None) -> Dict[str, Any]:
-    path = Path(filepath) if filepath else DEFAULT_TRADES_PATH
+    path = Path(filepath) if filepath else data_path("trades.json")
     if not path.exists():
         return {
             "portfolio_name": "ไม่รวยก็ซวยอ่ะค้าบ",
@@ -410,11 +451,11 @@ def load_trades(filepath: Optional[str] = None) -> Dict[str, Any]:
 
 
 def save_trades(trades_data: Dict[str, Any], filepath: Optional[str] = None) -> None:
-    _atomic_write_many([(Path(filepath) if filepath else DEFAULT_TRADES_PATH, _json_text(trades_data))])
+    _atomic_write_many([(Path(filepath) if filepath else data_path("trades.json"), _json_text(trades_data))])
 
 
 def load_ledger(filepath: Optional[str] = None) -> Dict[str, Any]:
-    path = Path(filepath) if filepath else DEFAULT_LEDGER_PATH
+    path = Path(filepath) if filepath else data_path("ledger.json")
     if not path.exists():
         return {
             "cash": {"dime_save_thb": 0.0, "dime_usd": 0.0},
@@ -431,7 +472,7 @@ def load_ledger(filepath: Optional[str] = None) -> Dict[str, Any]:
 
 
 def save_ledger(ledger: Dict[str, Any], filepath: Optional[str] = None) -> None:
-    _atomic_write_many([(Path(filepath) if filepath else DEFAULT_LEDGER_PATH, _json_text(ledger, trailing_newline=True))])
+    _atomic_write_many([(Path(filepath) if filepath else data_path("ledger.json"), _json_text(ledger, trailing_newline=True))])
 
 
 def _when(trade_date: Optional[str]) -> datetime:
@@ -449,7 +490,7 @@ def _thai_date_str(when: datetime) -> str:
 
 
 def _portfolio_fx(portfolio_path: Optional[str]) -> float:
-    p_path = Path(portfolio_path) if portfolio_path else DEFAULT_PORTFOLIO_PATH
+    p_path = Path(portfolio_path) if portfolio_path else data_path("portfolio.json")
     stored = json.loads(p_path.read_text(encoding="utf-8")).get("fx_rate_usd_thb") if p_path.exists() else None
     return resolve_usdthb(stored)
 
@@ -513,7 +554,7 @@ def record_buy(
     if pay not in ("thb", "usd"):
         raise ValueError(f"--pay must be thb or usd (got {pay}).")
 
-    p_path = Path(portfolio_path) if portfolio_path else DEFAULT_PORTFOLIO_PATH
+    p_path = Path(portfolio_path) if portfolio_path else data_path("portfolio.json")
     if not p_path.exists():
         raise FileNotFoundError(f"Portfolio file not found at {p_path}")
     portfolio_data = json.loads(p_path.read_text(encoding="utf-8"))
@@ -582,7 +623,7 @@ def record_buy(
     if not dry_run:
         _atomic_write_many([
             (p_path, _json_text(portfolio_data)),
-            (Path(ledger_path) if ledger_path else DEFAULT_LEDGER_PATH, _json_text(ledger, trailing_newline=True)),
+            (Path(ledger_path) if ledger_path else data_path("ledger.json"), _json_text(ledger, trailing_newline=True)),
         ])
 
     return {
@@ -737,7 +778,7 @@ def record_sell(
     dry_run: bool = False,
     ledger_path: Optional[str] = None,
 ) -> Dict[str, Any]:
-    p_path = Path(portfolio_path) if portfolio_path else DEFAULT_PORTFOLIO_PATH
+    p_path = Path(portfolio_path) if portfolio_path else data_path("portfolio.json")
     if not p_path.exists():
         raise FileNotFoundError(f"Portfolio file not found at {p_path}")
 
@@ -764,6 +805,8 @@ def record_sell(
     _validate_trade(shares, sell_price, fees)
     if shares is None:
         sell_shares = current_shares
+        if not sell_shares > 0:
+            raise ValueError(f"ไม่มีหุ้นให้ขาย / {target_ticker} has no shares to sell (held {current_shares}).")
     elif shares > current_shares:
         raise ValueError(f"ขายเกินจำนวนที่ถือ / Cannot sell {shares} shares of {target_ticker}: only {current_shares} held.")
     else:
@@ -778,7 +821,8 @@ def record_sell(
     else:
         exec_date = datetime.now().strftime("%Y-%m-%d")
 
-    cost_usd = round(sell_shares * avg_cost, 2)
+    held_cost_usd = float(holding_match.get("total_cost_usd") or current_shares * avg_cost)
+    cost_usd = round(held_cost_usd * sell_shares / current_shares, 2)
     old_cost_thb = holding_match.get("cost_thb")
     if old_cost_thb is None:
         old_cost_thb = round(current_shares * avg_cost * current_fx, 2)
@@ -794,7 +838,7 @@ def record_sell(
     realized_pl_pct = round((realized_pl_usd / cost_usd * 100.0) if cost_usd > 0 else 0.0, 2)
 
     trades_data = load_trades(trades_path)
-    trade_id = f"TRD-{datetime.now().strftime('%Y%m%d%H%M%S')}-{target_ticker}"
+    trade_id = _unique_trade_id(trades_data, target_ticker)
 
     trade_entry = {
         "id": trade_id,
@@ -833,7 +877,7 @@ def record_sell(
         if not dry_run:
             holdings.pop(holding_idx)
     else:
-        new_total_cost = round(remaining_shares * avg_cost, 2)
+        new_total_cost = round(held_cost_usd - cost_usd, 2)
         new_cost_thb = round(old_cost_thb - cost_thb, 2)
         status_action = f"Partial sell: {sell_shares} sold, {remaining_shares:.4f} remaining."
         if not dry_run:
@@ -847,8 +891,8 @@ def record_sell(
         trades_data["trades"].append(trade_entry)
         _atomic_write_many([
             (p_path, _json_text(portfolio_data)),
-            (Path(trades_path) if trades_path else DEFAULT_TRADES_PATH, _json_text(trades_data)),
-            (Path(ledger_path) if ledger_path else DEFAULT_LEDGER_PATH, _json_text(ledger, trailing_newline=True)),
+            (Path(trades_path) if trades_path else data_path("trades.json"), _json_text(trades_data)),
+            (Path(ledger_path) if ledger_path else data_path("ledger.json"), _json_text(ledger, trailing_newline=True)),
         ])
 
     return {

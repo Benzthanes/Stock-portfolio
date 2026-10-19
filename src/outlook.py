@@ -9,6 +9,7 @@ from html import escape
 from typing import Dict, Any, Optional, List
 
 from src.fmt import money, pct, num
+from src.scoring import EARNINGS_GUARD_DAYS
 
 CURATED_AS_OF = "2026-10-17"
 
@@ -74,7 +75,7 @@ def get_forward_outlook(
     rev_g_str = pct(rev_g_live)
     has_earnings_date = days_to_earnings is not None and days_to_earnings >= 0
     earnings_period = f"ระยะประชิด ({days_to_earnings:.1f} วัน)" if has_earnings_date else "รอบประกาศงบถัดไป"
-    if has_earnings_date and days_to_earnings <= 14:
+    if has_earnings_date and days_to_earnings <= EARNINGS_GUARD_DAYS:
         earnings_note = f"มีวันงบออกในอีก {days_to_earnings:.1f} วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. "
     elif has_earnings_date:
         earnings_note = f"วันงบถัดไปอยู่ห่างอีก {days_to_earnings:.0f} วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. "

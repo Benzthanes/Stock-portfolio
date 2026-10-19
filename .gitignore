@@ -22,3 +22,5 @@ data/.port_analysis.json
 # Regenerable caches
 data/.news_cache.json
 data/candles_cache.json
+data/.backtest_candles.json
+data/.backups/

@@ -10,8 +10,21 @@ from typing import Any, Dict, List, Optional
 from src.fmt import money, pct
 from src.fx import resolve_usdthb
 from src.nav import nav_bar_html
+from src.scoring import format_score
 
 NA = "n/a"
+HEALTH_BADGE_CLASS = {"A+": "badge-emerald", "A": "badge-emerald", "B": "badge-amber", "C": "badge-amber", "F": "badge-rose"}
+
+
+def score_badge_html(score: Optional[Dict[str, Any]]) -> str:
+    """One badge for the unified src/scoring.py grade, with every reason in the tooltip."""
+    if not score:
+        return "<span class='badge badge-neutral'>-</span>"
+    grade = score.get("grade", "N/A")
+    label = format_score(score)
+    tip = escape(" • ".join(score.get("reasons") or []), quote=True)
+    cls = HEALTH_BADGE_CLASS.get(grade, "badge-neutral")
+    return f"<span class='badge {cls}' title=\"{tip}\" style='cursor:help;'>{label}</span>"
 
 
 def _make_chart_onclick(p: Dict[str, Any], is_thb: bool = False) -> str:
@@ -239,7 +252,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                 <div class="fw-bold">{name}</div>
                 <div class="text-muted small">{biz}</div>
             </td>
-            <td style="white-space: nowrap;">{stars}</td>
+            <td style="white-space: nowrap;">{stars}<br>{score_badge_html(p.get("stock_score"))}</td>
             <td style="text-align: right; font-weight: 700;">{weight:.1f}%</td>
             <td style="text-align: right;">{avg_cost_disp}</td>
             <td style="text-align: right; font-weight: 600;">{price_disp}</td>
@@ -272,14 +285,10 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         peg_verdict = fh.get("peg_verdict", "-")
         fcf_str = fh.get("fcf_str", "-")
 
-        if "ยอดเยี่ยม" in h_badge or "สุขภาพดี" in h_badge:
-            badge_html = f"<span class='badge badge-emerald'>{h_badge}</span>"
-        elif "ปานกลาง" in h_badge or "เฝ้าระวัง" in h_badge:
-            badge_html = f"<span class='badge badge-amber'>{h_badge}</span>"
-        elif "กำไรหดตัว" in h_badge:
-            badge_html = f"<span class='badge badge-rose'>{h_badge}</span>"
-        else:
-            badge_html = f"<span class='badge badge-neutral'>{h_badge}</span>"
+        badge_cls = HEALTH_BADGE_CLASS.get(fh.get("grade_code"), "badge-neutral")
+        badge_html = f"<span class='badge {badge_cls}'>{h_badge}</span>"
+        if fh.get("pct") is not None:
+            badge_html += f" <span class='text-muted' style='font-size:0.72rem;'>{fh['pct']:.0f}/100 · ข้อมูล {fh.get('coverage', 0) * 100:.0f}%</span>"
 
         rev_g = pct(p.get('rev_growth_yoy'))
         net_g = pct(p.get('net_inc_growth_yoy'))
@@ -372,16 +381,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             buy_high = round(c * 0.99, 2)
         biz = escape(pick.get("business_summary") or "")
 
-        target_upside = pick.get("target_upside_pct")
-        if t in ("VOO", "SPY", "QQQ"):
-            reason = "เป็นกองทุนดัชนีรวมที่ช่วยกระจายความเสี่ยงของพอร์ตทันที ช่วยลดการพึ่งพาหุ้นตัวใดตัวหนึ่งมากเกินไป."
-        elif pick.get("in_value_zone"):
-            t_avg = money(pick['price_target_average'], ccy) if pick.get("price_target_average") else "ไม่ระบุ"
-            reason = f"ราคาพักตัวลงมาในจุดรับที่มีแต้มต่อสูง (Value Zone 💎) ใกล้เส้น 200 วัน กำไรเติบโตเด่น และสถาบันให้เป้าหมายเฉลี่ย {t_avg}."
-        elif target_upside is not None:
-            reason = f"หุ้นคุณภาพดี พื้นฐานแกร่ง เทรนด์ขาขึ้นเหนือเส้น 200 วัน สถาบันให้เป้าหมายมี Upside {pct(target_upside)}."
-        else:
-            reason = "หุ้นคุณภาพดี พื้นฐานมั่นคง เทรนด์ทางเทคนิคประคองตัวได้ดี."
+        from src.portfolio import top_pick_reason
+        reason = escape(top_pick_reason(pick, lambda v: money(v, ccy)))
 
         top_cards_html += f"""
         <div class="card buy-card" style="border-top: 4px solid {m_color};">
@@ -1371,7 +1372,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             </td>
             <td style="text-align: right;" class="text-emerald fw-bold">{pct(be_gap)}</td>
             <td style="text-align: right;">{target_str}</td>
-            <td style="text-align: center;"><span class="badge badge-neutral">{fund_str}</span></td>
+            <td style="text-align: center;">{score_badge_html(p.get("stock_score"))}<br><span class="badge badge-neutral">{fund_str}</span></td>
             <td style="text-align: center;">{earn_badge}</td>
             <td><span class="badge badge-amber">{verdict}</span></td>
         </tr>

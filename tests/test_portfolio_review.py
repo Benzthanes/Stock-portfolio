@@ -16,7 +16,8 @@ class PortfolioReviewProductionTest(unittest.TestCase):
             "peg": 1.1
         }
         res_elite = compute_financial_health(pos_elite)
-        self.assertIn("A", res_elite["health_grade"])
+        self.assertEqual(res_elite["health_grade"], "เกรด A+ (ยอดเยี่ยม 🟢)")
+        self.assertEqual((res_elite["score"], res_elite["pct"], res_elite["grade_code"]), (22.0, 88.0, "A+"))
         self.assertEqual(res_elite["roe_str"], "+35.0%")
         self.assertEqual(res_elite["de_str"], "0.50")
         self.assertIn("ROE", res_elite["summary"])
@@ -32,8 +33,8 @@ class PortfolioReviewProductionTest(unittest.TestCase):
             "peg": -0.5
         }
         res_distressed = compute_financial_health(pos_distressed)
-        self.assertIn("D", res_distressed["health_grade"])
-        self.assertLess(res_distressed["score"], 0)
+        self.assertEqual(res_distressed["health_grade"], "เกรด F (น่าเป็นห่วง 🔴)")
+        self.assertEqual((res_distressed["score"], res_distressed["pct"], res_distressed["grade_code"]), (0.0, 0.0, "F"))
 
     def test_compute_stock_rating_rewards_high_roe_and_penalizes_debt(self):
         pos_high_roe = {

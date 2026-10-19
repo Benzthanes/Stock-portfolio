@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from src.news import fetch_batch_news, fetch_batch_catalysts
 from src.profiles import get_business_summary
+from src.scoring import EARNINGS_GUARD_DAYS, format_score, score_fundamentals, score_stock, score_timing
 
 FALLBACK_SL_RATIO = 0.95
 MIN_SL_RATIO = 0.5
@@ -60,7 +61,7 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     adx = data.get("ADX")
     atr = data.get("ATR")
     vol = data.get("volume") or 0.0
-    avg_vol_30 = data.get("average_volume_30d_calc") or 1.0
+    avg_vol_30 = data.get("average_volume_30d_calc") or 0.0
 
     # Fundamentals
     rev_growth_yoy = data.get("total_revenue_yoy_growth_ttm")
@@ -80,12 +81,9 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     dist_sma200_pct = ((close - sma200) / sma200 * 100.0) if sma200 else None
     dist_ema200_pct = ((close - ema200) / ema200 * 100.0) if ema200 else None
 
-    # Value Zone: 0% to +5% above 200-day trend lines
-    in_value_zone = False
-    for dist in [dist_sma200_pct, dist_ema200_pct]:
-        if dist is not None and 0.0 <= dist <= 5.0:
-            in_value_zone = True
-            break
+    # Value Zone matches the full-points ema200_dist band in src/scoring.py (0..10% above EMA200).
+    zone_dist = dist_ema200_pct if dist_ema200_pct is not None else dist_sma200_pct
+    in_value_zone = zone_dist is not None and 0.0 <= zone_dist < 10.0
 
     # Distance to SMA50 & Lower BB
     dist_sma50_pct = ((close - sma50) / sma50 * 100.0) if sma50 else None
@@ -177,7 +175,7 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     if selected_earnings_ts:
         diff_days = (selected_earnings_ts - now_ts) / 86400.0
         days_to_earnings = round(diff_days, 1)
-        is_earnings_near = (days_to_earnings <= 14.0)
+        is_earnings_near = (days_to_earnings <= EARNINGS_GUARD_DAYS)
         try:
             earnings_date_str = datetime.fromtimestamp(selected_earnings_ts, tz=timezone.utc).strftime("%d %b %Y")
         except Exception:
@@ -193,7 +191,7 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         signal_tags.append(trend_label)
         if in_value_zone:
             score_points += 0.5
-            signal_tags.append("Value Zone (0-5% to 200D) 💎")
+            signal_tags.append("Value Zone (0-10% เหนือ EMA200) 💎")
             
     if weekly_bullish:
         score_points += 1.0
@@ -246,52 +244,12 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         score_points -= 1.0
         signal_tags.append("⚠️ Plunge Day (มีดยังหล่น)")
 
-    # Universal Long-Term Value & Fundamental Quality (Across All Sectors)
-    if roe is not None:
-        if roe >= 25.0:
-            score_points += 1.5
-            signal_tags.append(f"Elite ROE ({roe:.0f}%) 🏆")
-        elif roe >= 15.0:
-            score_points += 1.0
-            signal_tags.append(f"High ROE ({roe:.0f}%) 💎")
-        elif roe < 0.0:
-            score_points -= 1.5
-            signal_tags.append("⚠️ Neg ROE Trap")
-
-    if fcf is not None and fcf > 0:
-        score_points += 0.5
-        signal_tags.append("FCF Cash Cow 💵")
-
-    if rev_growth_yoy is not None:
-        if rev_growth_yoy >= 15.0:
-            score_points += 1.0
-            signal_tags.append(f"Rev Growth +{rev_growth_yoy:.0f}% 🚀")
-        elif rev_growth_yoy >= 5.0:
-            score_points += 0.5
-            signal_tags.append(f"Rev Growth +{rev_growth_yoy:.0f}%")
-        elif rev_growth_yoy < 0.0:
-            score_points -= 1.5
-            signal_tags.append("⚠️ Neg Rev Trap")
-
-    if peg is not None:
-        if 0.0 < peg <= 1.2:
-            score_points += 1.0
-            signal_tags.append(f"Attractive PEG {peg:.1f} 💎")
-        elif 1.2 < peg <= 1.8:
-            score_points += 0.5
-            signal_tags.append(f"Fair PEG {peg:.1f}")
-        elif peg > 3.0:
-            score_points -= 1.0
-            signal_tags.append("⚠️ High PEG Overvalued")
-
-    sec = data.get("sector") or ""
-    if debt_to_equity is not None and sec != "Finance":
-        if 0.0 <= debt_to_equity <= 1.0:
-            score_points += 0.5
-            signal_tags.append(f"Safe Debt (D/E {debt_to_equity:.1f}) 🛡️")
-        elif debt_to_equity > 3.0:
-            score_points -= 1.0
-            signal_tags.append("⚠️ High Debt Risk")
+    ticker = data.get("ticker", data.get("name", ""))
+    fundamental = score_fundamentals(ticker, data.get("sector"), rev_growth_yoy, net_inc_growth_yoy, roe, peg, debt_to_equity, fcf)
+    if fundamental["pct"] is not None:
+        score_points += (fundamental["pct"] - 40.0) / 60.0 * 4.5
+    signal_tags.extend(fundamental["reasons"])
+    stock_score = score_stock(fundamental, score_timing(dist_ema200_pct, rsi, rsi_prev), days_to_earnings)
 
     if rec_mark is not None and rec_mark <= 1.5:
         score_points += 0.5
@@ -319,7 +277,6 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
             tier = "⭐ Watchlist"
         
     exchange = data.get("exchange", "NASDAQ")
-    ticker = data.get("ticker", data.get("name", ""))
     tv_url = f"https://www.tradingview.com/chart/?symbol={exchange}:{ticker}"
     sector = data.get("sector", "-")
     industry = data.get("industry", "-")
@@ -392,6 +349,8 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         "debt_to_equity": round(debt_to_equity, 2) if debt_to_equity is not None else None,
         "fcf": fcf,
         "rec_mark": round(rec_mark, 2) if rec_mark is not None else None,
+        "fundamental": fundamental,
+        "stock_score": stock_score,
         "price_target_average": round(data.get("price_target_average"), 2) if data.get("price_target_average") else None,
         "price_target_high": round(data.get("price_target_high"), 2) if data.get("price_target_high") else None,
         "price_target_low": round(data.get("price_target_low"), 2) if data.get("price_target_low") else None,
@@ -710,7 +669,7 @@ def generate_markdown_report(
         rr_val = s.get("rr_ratio", 0.0)
         rr_badge = f"**{rr_val}x**" if rr_val >= 2.0 else f"{rr_val}x"
         
-        badge = s["tier"]
+        badge = f'{s["tier"]}<br><small>{format_score(s.get("stock_score"))}</small>'
         tags_str = ", ".join(s["signal_tags"][:3])
         
         chart_link = f"[📈 Chart]({s['tv_url']})"

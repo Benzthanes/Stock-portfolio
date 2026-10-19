@@ -22,7 +22,7 @@ from src.screener import FALLBACK_SL_RATIO, atr_stop_loss, evaluate_stock
 from src.outlook import get_forward_outlook
 from src.fmt import money, pct
 from src.fx import resolve_usdthb
-from src.html_report import get_chart_modal_component, _make_chart_onclick
+from src.html_report import get_chart_modal_component, _make_chart_onclick, score_badge_html
 from src.nav import nav_bar_html
 
 NA = "n/a"
@@ -183,6 +183,7 @@ def analyze_simulation(sim_data: Dict[str, Any]) -> Dict[str, Any]:
             "setup_reason": h.get("setup_reason", "-"),
             "notes": h.get("notes", "-"),
             "forward_outlook": fo,
+            "stock_score": evaluate_stock(live_row)["stock_score"] if live_row else None,
             "tv_url": f"https://www.tradingview.com/chart/?symbol={h.get('exchange', 'NASDAQ')}:{ticker}"
         })
 
@@ -339,7 +340,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
             </div>
             <div style="margin-top: 14px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 0.82rem; color: var(--amber); font-weight: 600; margin-bottom: 4px;">
-                    🎯 กลยุทธ์ช้อนซื้อ: {p['strategy_tier']}
+                    🎯 กลยุทธ์ช้อนซื้อ: {p['strategy_tier']} {score_badge_html(p.get('stock_score'))}
                 </div>
                 <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
                     💡 <strong>เหตุผลที่เข้าซื้อ:</strong> {escape(str(p['setup_reason']))}
@@ -668,7 +669,7 @@ def add_sim_holding(ticker: str, capital_thb: float = 10000.0, notes: str = "") 
 
     name = live_row.get("description") or live_row.get("name") or ticker
     exchange = live_row.get("exchange") or "NASDAQ"
-    business = get_business_summary(ticker, live_row.get("description"))
+    business = get_business_summary(ticker, live_row.get("sector") or "", live_row.get("industry") or "")
 
     cap_usd = capital_thb / fx_rate
     shares = round(cap_usd / close_price, 4)
@@ -769,7 +770,7 @@ def close_triggered_holdings(now: Optional[datetime] = None) -> List[Dict[str, A
 
         cap_thb = float(h.get("capital_thb", 10000.0))
         cap_usd = float(h.get("capital_usd", cap_thb / fx_rate))
-        shares = float(h.get("shares", 0.0))
+        shares = float(h.get("shares", cap_usd / float(h.get("buy_price_usd", 1.0))))
         exit_price_usd = round(close_price, 2)
         net_revenue_usd = round(shares * exit_price_usd, 2)
         net_revenue_thb = round(net_revenue_usd * fx_rate, 2)

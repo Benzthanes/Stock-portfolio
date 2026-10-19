@@ -22,6 +22,21 @@ from src.tradingview import fetch_screener_data
 from src.news import get_catalyst_breakdown, fetch_batch_catalysts
 from src.profiles import get_business_summary
 from src.html_report import generate_recovery_html
+from src.scoring import EARNINGS_GUARD_DAYS, format_score, score_fundamentals, score_stock, score_timing
+
+QUALITY_HIGH = (3, "🟢 High Quality Growth (ธุรกิจเติบโตสูง)")
+QUALITY_STABLE = (2, "🟡 Resilient / Stable (ธุรกิจประคองตัวได้)")
+QUALITY_WEAK = (1, "🔴 Profit Contraction (พื้นฐานอ่อนแอ)")
+QUALITY_BY_GRADE = {
+    "A+": QUALITY_HIGH,
+    "A": QUALITY_HIGH,
+    "B": QUALITY_STABLE,
+    "C": QUALITY_WEAK,
+    "F": QUALITY_WEAK,
+    "N/A": (0, "⚪ Neutral (ข้อมูลไม่เพียงพอ)"),
+    # An index fund never "contracts" into a Capital Rotation verdict.
+    "ETF": QUALITY_STABLE,
+}
 
 
 def evaluate_fundamental_health(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -35,6 +50,11 @@ def evaluate_fundamental_health(data: Dict[str, Any]) -> Dict[str, Any]:
     roe = data.get("return_on_equity_fq")
     rec_mark = data.get("recommendation_mark")
     fcf = data.get("free_cash_flow_ttm")
+    fund = score_fundamentals(
+        data.get("ticker", ""), data.get("sector"), rev_growth, net_inc_growth, roe, peg,
+        data.get("debt_to_equity_fq"), fcf,
+    )
+    quality_score, quality_tier = QUALITY_BY_GRADE[fund["grade"]]
 
     if rec_mark is not None:
         if rec_mark <= 1.5:
@@ -48,19 +68,6 @@ def evaluate_fundamental_health(data: Dict[str, Any]) -> Dict[str, Any]:
     else:
         rec_label = "N/A"
 
-    if net_inc_growth is not None and net_inc_growth > 20.0 and (rev_growth or 0) > 10.0:
-        quality_tier = "🟢 High Quality Growth (ธุรกิจเติบโตสูง)"
-        quality_score = 3
-    elif net_inc_growth is not None and net_inc_growth >= 0.0:
-        quality_tier = "🟡 Resilient / Stable (ธุรกิจประคองตัวได้)"
-        quality_score = 2
-    elif net_inc_growth is not None and net_inc_growth < 0.0:
-        quality_tier = "🔴 Profit Contraction (กำไรหดตัว ชะลอตัว)"
-        quality_score = 1
-    else:
-        quality_tier = "⚪ Neutral (ข้อมูลไม่เพียงพอ)"
-        quality_score = 1
-
     return {
         "rev_growth_yoy": round(rev_growth, 2) if rev_growth is not None else None,
         "net_inc_growth_yoy": round(net_inc_growth, 2) if net_inc_growth is not None else None,
@@ -71,7 +78,9 @@ def evaluate_fundamental_health(data: Dict[str, Any]) -> Dict[str, Any]:
         "rec_mark": round(rec_mark, 2) if rec_mark is not None else None,
         "rec_label": rec_label,
         "quality_tier": quality_tier,
-        "quality_score": quality_score
+        "quality_score": quality_score,
+        "grade": fund["grade"],
+        "fundamental": fund,
     }
 
 
@@ -126,7 +135,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
     sma50 = data.get("SMA50") or 0.0
     sma200 = data.get("SMA200") or 0.0
     ema50 = data.get("EMA50") or 0.0
-    rsi = data.get("RSI") or 0.0
+    rsi = data.get("RSI")
     bb_lower = data.get("BB.lower") or 0.0
 
     current_val = shares * close
@@ -144,7 +153,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
     if next_earnings_ts and next_earnings_ts > now_ts:
         diff_days = (next_earnings_ts - now_ts) / 86400.0
         days_to_earnings = round(diff_days, 1)
-        is_earnings_imminent = (days_to_earnings <= 14.0)
+        is_earnings_imminent = (days_to_earnings <= EARNINGS_GUARD_DAYS)
         try:
             earnings_date_str = datetime.fromtimestamp(next_earnings_ts, tz=timezone.utc).strftime("%d %b %Y")
         except Exception:
@@ -152,6 +161,12 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
 
     # Fundamental Health
     fundamentals = evaluate_fundamental_health(data)
+    ema200 = data.get("EMA200")
+    dist_ema200_pct = (close - ema200) / ema200 * 100.0 if ema200 else None
+    timing = score_timing(dist_ema200_pct, data.get("RSI"), data.get("RSI[1]"))
+    stock_score = score_stock(fundamentals["fundamental"], timing, days_to_earnings)
+    # Backtest: more than 10% under EMA200 carried the deepest 60-day drawdowns.
+    deep_below_trend = dist_ema200_pct is None or dist_ema200_pct < -10.0
 
     # Business Profile
     sector = data.get("sector", "-")
@@ -218,7 +233,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         dca_permitted = False
         primary_playbook = "Freeze & Hedge"
         layman_action = f"งบจะออกในอีก {days_to_earnings} วัน ให้หยุดเติมเงินทันที รอให้งบออกก่อน ค่อยตัดสินใจเพื่อป้องกันราคาเปิดกระโดดลงแรง."
-    elif fundamentals["quality_score"] == 3 and not is_earnings_imminent and rsi <= 35:
+    elif fundamentals["quality_score"] == 3 and not deep_below_trend and ((rsi is not None and rsi <= 35) or timing["entry_signal"]):
         action_verdict = "🟢 Smart DCA เมื่อคอนเฟิร์มฐาน (พื้นฐานโตแกร่ง ทยอยดึงทุนต่ำได้)"
         dca_permitted = True
         primary_playbook = "Smart DCA"
@@ -268,7 +283,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         "unrealized_pl": unrealized_pl,
         "unrealized_pl_pct": unrealized_pl_pct,
         "pct_to_breakeven": pct_to_breakeven,
-        "rsi": round(rsi, 2),
+        "rsi": round(rsi, 2) if rsi is not None else None,
         "atr": round(atr, 2),
         "key_support": key_support,
         "support_desc": support_desc,
@@ -286,6 +301,8 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         "earnings_date_str": earnings_date_str,
         "is_earnings_imminent": is_earnings_imminent,
         "fundamentals": fundamentals,
+        "stock_score": stock_score,
+        "dist_ema200_pct": round(dist_ema200_pct, 2) if dist_ema200_pct is not None else None,
         "catalysts": catalysts,
         "forward_outlook": forward_outlook,
         "price_target_average": round(target_avg, 2) if target_avg else None,
@@ -415,6 +432,7 @@ def generate_single_report(res: Dict[str, Any]) -> str:
         "",
         f"- **สรุปอาการติดลบตอนนี้:** ขาดทุนอยู่ที่ {pl_pct:.2f}% (เงินหายไป {curr_sym}{abs(pl_usd):,.2f} {curr_code}). ต้องการแรงดีดกลับ {be_str} เพื่อคืนทุนเดิมที่ {curr_sym}{avg:.2f} {curr_code}.",
         f"- **สุขภาพของธุรกิจ:** {f['quality_tier']}. รายได้ YoY {rev_g_str}, กำไรสุทธิ YoY {net_g_str}.",
+        f"- **คะแนนรวม (พื้นฐาน 60% + โซนราคา EMA200 40%):** {format_score(res.get('stock_score'))}. {', '.join((res.get('stock_score') or {}).get('reasons', [])) or '-'}.",
         f"- **คำแนะนำแบบเข้าใจง่ายทันที:** {res['layman_action']}",
         "",
         "---",

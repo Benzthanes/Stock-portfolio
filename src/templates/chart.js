@@ -1989,6 +1989,43 @@
         `;
     }
 
+    function updateScoreSidebar(ticker) {
+        const body = document.getElementById('score_sidebar_body');
+        const badge = document.getElementById('score_grade_badge');
+        if (!body) return;
+        const sc = (STOCKS_META[ticker] || {}).score;
+        if (!sc) {
+            body.innerHTML = '<div style="color:#94a3b8;">ไม่มีข้อมูลคะแนนสำหรับหุ้นนี้</div>';
+            if (badge) badge.textContent = '-';
+            return;
+        }
+        const gradeColor = {'A+': '#34d399', 'A': '#34d399', 'B': '#fbbf24', 'C': '#fb923c', 'F': '#fb7185'}[sc.grade] || '#94a3b8';
+        if (badge) {
+            badge.textContent = sc.grade === 'ETF' ? 'ETF' : `เกรด ${sc.grade}` + (sc.total != null ? ` · ${Math.round(sc.total)}/100` : '');
+            badge.style.color = gradeColor;
+        }
+        const bar = (label, val, hint) => {
+            const v = val == null ? null : Math.max(0, Math.min(100, val));
+            const fill = v == null ? '' : `<div style="height:100%; width:${v}%; background:${v >= 70 ? '#34d399' : v >= 40 ? '#fbbf24' : '#fb7185'}; border-radius:4px;"></div>`;
+            return `<div style="margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between;"><span>${label}</span><b>${v == null ? 'ไม่ประเมิน' : Math.round(v) + '/100'}</b></div>
+                <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:4px; margin-top:3px;">${fill}</div>
+                <div style="font-size:0.68rem; color:#94a3b8; margin-top:2px;">${hint}</div>
+            </div>`;
+        };
+        const reasons = (sc.reasons || []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
+        const flags = [];
+        if (sc.timing && sc.timing.entry_signal) flags.push('<span style="color:#34d399; font-weight:700;">⤴ Entry Signal (RSI Hook)</span>');
+        if (sc.earnings_guard) flags.push('<span style="color:#fb923c; font-weight:700;">🟠 งบออกใน 14 วัน ระงับการถัว</span>');
+        body.innerHTML = `
+            ${bar('🏦 พื้นฐาน (60%)', sc.pillars.fundamental, 'รายได้ กำไร ROE PEG D/E FCF')}
+            ${bar('📍 โซนราคา vs EMA200 (40%)', sc.pillars.timing, 'วัดจาก backtest: โซน 0-10% เหนือ EMA200 มี drawdown ต่ำสุด')}
+            ${flags.length ? `<div style="margin:6px 0;">${flags.join('<br>')}</div>` : ''}
+            <ul style="margin:6px 0 0 16px; padding:0;">${reasons}</ul>
+            <div style="margin-top:8px; font-size:0.68rem; color:#94a3b8;">ข้อมูลครบ ${Math.round((sc.coverage || 0) * 100)}% • อินดิเคเตอร์อื่นบนกราฟ (VFI, WAE, Squeeze, UT Bot, Lorentzian) ไม่ผ่าน backtest จึงไม่นับคะแนน</div>
+        `;
+    }
+
     function updateSmcSidebar(ticker) {
         const tData = CHARTS_DATA[ticker] || {};
         const smcBody = document.getElementById('smc_sidebar_body');
@@ -2003,9 +2040,9 @@
             return;
         }
 
-        const ms = (smc && smc.market_structure) || 'Neutral';
+        const ms = (smc && smc.structure) || 'NEUTRAL';
         if (msBadge) {
-            msBadge.textContent = ms === 'Bullish' ? '🟢 Bullish Structure' : (ms === 'Bearish' ? '🔴 Bearish Structure' : '⚪ Neutral Flow');
+            msBadge.textContent = ms === 'BULLISH' ? '🟢 Bullish Structure' : (ms === 'BEARISH' ? '🔴 Bearish Structure' : '⚪ Neutral Flow');
         }
 
         const fvgs = (smc && smc.unmitigated_fvgs) || [];
@@ -3641,7 +3678,7 @@
         const radarBody = document.getElementById('earn_radar_body');
         const radarCard = document.getElementById('earn_radar_card');
         const dEarn = meta.days_to_earnings;
-        const dDate = meta.earnings_date || '-';
+        const dDate = escapeHtml(meta.earnings_date || '-');
 
         if (!radarBody) return;
 
@@ -3779,7 +3816,7 @@
         if (earnVal) {
             if (dEarn !== null && dEarn !== undefined && dEarn >= 0) {
                 const roundedDays = Math.round(dEarn);
-                const shortDate = String(dDate).replace(/\s+202\d$/, '');
+                const shortDate = escapeHtml(String(dDate).replace(/\s+202\d$/, ''));
                 earnVal.innerHTML = `<span style="color:${dEarn <= 14 ? '#fb7185' : '#facc15'};">ใน ${roundedDays} วัน</span> <span style="font-size:0.70rem; color:#94a3b8; font-weight:600;">(${shortDate})</span>`;
             } else {
                 earnVal.textContent = dDate;
@@ -3796,6 +3833,7 @@
         updateKeyLevelsRadar(ticker);
         updateEarningsRadar(ticker);
         updateElliottWaveSidebar(ticker);
+        updateScoreSidebar(ticker);
         updateSmcSidebar(ticker);
         updateOscillatorsSidebar(ticker);
         updateMlSidebar(ticker);
@@ -3852,8 +3890,16 @@
 
         const actionClass = sig.action ? sig.action.toLowerCase() : 'hold';
         const reasonsHtml = (sig.reasons || []).map(r => `<li style="margin-bottom: 5px; color: #cbd5e1;">${r}</li>`).join('');
+        const unified = (STOCKS_META[currentStockTicker] || {}).score;
+        const sigs = (CHARTS_DATA[currentStockTicker] || {}).ai_signals || [];
+        const isLatest = sigs.length && sigs[sigs.length - 1].time === sig.time;
+        const isBuy = /BUY|DCA/i.test(sig.type || sig.badge || '');
+        const guardHtml = (isLatest && isBuy && unified && unified.earnings_guard)
+            ? `<div style="margin-bottom:10px; padding:8px 12px; border-radius:6px; background:rgba(251,146,60,0.12); border:1px solid rgba(251,146,60,0.45); color:#fdba74; font-size:0.80rem; font-weight:700;">🟠 งบจะออกภายใน 14 วัน คะแนนรวมให้ระงับการซื้อเพิ่มจนกว่างบออก สัญญาณนี้จึงยังไม่ควรใช้</div>`
+            : '';
 
         card.innerHTML = `
+            ${guardHtml}
             <div class="dc-top">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span class="dc-badge ${actionClass}">${sig.badge || sig.type}</span>

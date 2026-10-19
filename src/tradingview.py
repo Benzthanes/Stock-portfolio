@@ -3,8 +3,7 @@ TradingView Screener API Client
 Fetches batch technical and fundamental data directly from TradingView Scanner API.
 """
 
-import json
-import urllib.request
+from src.http import http_post_json
 from typing import Any, Dict, List, Optional
 
 SCANNER_URL = "https://scanner.tradingview.com/america/scan"
@@ -85,13 +84,7 @@ def _fetch_from_scanner(market: str, symbols: List[str], timeout: int = 15) -> L
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Content-Type": "application/json"
     }
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers=headers
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        raw_data = json.loads(response.read().decode("utf-8"))
+    raw_data = http_post_json(url, payload, headers=headers, timeout=timeout)
 
     results: List[Dict[str, Any]] = []
     for item in raw_data.get("data", []):

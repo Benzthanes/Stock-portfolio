@@ -15,6 +15,13 @@ This skill automatically synthesizes:
 6. Dime! Save Cash Movement & Deposit Ledger (including PromptPay deposits, stock deductions, and interest).
 7. Current Cash Reserves (Dime! Save THB and Dime! USD cash).
 
+## ก่อนเริ่ม
+
+อ่าน `AGENTS.md` ที่ root ของโปรเจกต์ให้จบก่อน. จุดที่ต้องระวังเฉพาะ skill นี้มีดังนี้:
+* ตัวเลขเงินบาทของต้นทุนหุ้นที่ซื้อด้วย Dime! USD ยังคิดที่ 33.62 THB/USD. ส่วนที่จ่ายจาก Dime! Save (THB) ปรับตาม slip ได้ด้วย `python3 scripts/reconcile_cost_thb.py` (dry-run ก่อนเสมอ).
+* LLY มีจำนวนหุ้นใน slip ไม่ตรงกับพอร์ต (27.7467 กับ 27.6477631). ถ้าผู้ใช้ถามเรื่องต้นทุน LLY ให้แจ้งเรื่องนี้ด้วย.
+* คำสั่ง `trades.py` ทุกคำสั่งต้องรันด้วย `--dry-run` ก่อน แล้วให้ผู้ใช้ยืนยันก่อนรันจริง.
+
 ---
 
 ## ⚡ Fast Chat Execution Protocol (Autonomous Execution)
@@ -38,6 +45,8 @@ This skill automatically synthesizes:
    - 📈 **สถานะหุ้นปัจจุบันในพอร์ต (Active Holdings):** ราคาตลาดสด กำไร Unrealized P/L รายตัว.
 4. **แนบลิงก์คลิกเปิดรายงานหน้าเว็บสวยงาม:**
    - `reports/portfolio_master.html`
+5. **ห้ามคำนวณตัวเลขเอง.** ให้อ่านค่าจาก `data/account_summary.json` เท่านั้น. ถ้าสคริปต์ล้มเหลว ให้แจ้ง error ตามจริงและห้ามใช้ตัวเลขจากรอบก่อนโดยไม่บอกผู้ใช้.
+6. **ถ้าผู้ใช้ถามว่าหุ้นตัวไหนดี** ให้ส่งต่อไปที่ `/port`. คะแนนและเกรดหุ้นรายตัวอยู่ใน `src/scoring.py` ไม่ได้อยู่ในรายงาน master.
 
 ---
 

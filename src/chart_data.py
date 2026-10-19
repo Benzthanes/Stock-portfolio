@@ -1342,7 +1342,7 @@ def detect_earnings_history(candles: List[Dict[str, Any]]) -> List[Dict[str, Any
         idx = recent.index(max_c)
         if idx > 0:
             avg_vol = sum(c.get("volume", 0) for c in chunk) / len(chunk)
-            if max_c.get("volume", 0) >= avg_vol * 1.3:
+            if avg_vol > 0 and max_c.get("volume", 0) >= avg_vol * 1.3:
                 prev_c = recent[idx - 1]
                 if prev_c.get("close", 0) > 0:
                     pct = round(((max_c["close"] - prev_c["close"]) / prev_c["close"]) * 100, 1)
@@ -1356,6 +1356,26 @@ def detect_earnings_history(candles: List[Dict[str, Any]]) -> List[Dict[str, Any
 
     events.sort(key=lambda x: x["time"])
     return events
+
+
+def _rsi_value(avg_gain: float, avg_loss: float) -> float:
+    """Wilder RSI from smoothed averages. No losses gives 100, as TradingView ta.rsi and calcRSI in chart.js do."""
+    if avg_loss <= 0:
+        return 100.0
+    return 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
+
+
+def _rma(values: List[float], period: int) -> List[float]:
+    """Wilder smoothing (TradingView ta.rma / ta.atr). Warm-up bars use the expanding mean."""
+    out = [0.0] * len(values)
+    total = 0.0
+    for i, v in enumerate(values):
+        if i < period:
+            total += v
+            out[i] = total / (i + 1)
+        else:
+            out[i] = (out[i - 1] * (period - 1) + v) / period
+    return out
 
 
 def _calc_ema_series(values: List[float], period: int) -> List[float]:
@@ -1690,15 +1710,29 @@ def compute_smart_money_concepts(candles: List[Dict[str, Any]]) -> Dict[str, Any
                     })
 
     # 3. Market Structure (CHoCH / BOS)
-    recent_high = max(highs[-20:])
-    recent_low = min(lows[-20:])
+    # A break needs a close beyond the latest confirmed swing (5 bars each side).
+    # Merely trading near a 20-day low used to count as Bearish BOS, which flagged every dip.
+    swing = 5
+    pivot_high = pivot_low = None
+    for i in range(n - 1 - swing, max(swing, n - 120) - 1, -1):
+        if pivot_high is None and highs[i] == max(highs[i - swing:i + swing + 1]):
+            pivot_high = highs[i]
+        if pivot_low is None and lows[i] == min(lows[i - swing:i + swing + 1]):
+            pivot_low = lows[i]
+        if pivot_high is not None and pivot_low is not None:
+            break
     current_p = closes[-1]
-    if current_p >= recent_high * 0.995:
-        ms = "Bullish BOS (Break of Structure)"
-    elif current_p <= recent_low * 1.005:
-        ms = "Bearish BOS (Break of Structure)"
+    if pivot_high is not None and current_p > pivot_high:
+        ms, structure = "Bullish BOS (Break of Structure)", "BULLISH"
+    elif pivot_low is not None and current_p < pivot_low:
+        ms, structure = "Bearish BOS (Break of Structure)", "BEARISH"
     else:
-        ms = "Internal Consolidation"
+        ms, structure = "Internal Consolidation", "NEUTRAL"
+
+    demand_test = any(
+        ob["type"] == "BULLISH_OB" and min(lows[-3:]) <= ob["top"] * 1.01 and current_p >= ob["bottom"]
+        for ob in order_blocks
+    )
 
     active_fvgs = (unmit_bull[-3:] + unmit_bear[-3:])
     active_obs = order_blocks[-4:]
@@ -1715,6 +1749,10 @@ def compute_smart_money_concepts(candles: List[Dict[str, Any]]) -> Dict[str, Any
         "unmitigated_fvgs": active_fvgs,
         "order_blocks": active_obs,
         "market_structure": ms,
+        "structure": structure,
+        "pivot_high": round(pivot_high, 2) if pivot_high is not None else None,
+        "pivot_low": round(pivot_low, 2) if pivot_low is not None else None,
+        "demand_test": demand_test,
         "summary": " • ".join(summary_parts) if summary_parts else "โครงสร้างสถาบันอยู่ในกรอบปกติ"
     }
 
@@ -1913,11 +1951,7 @@ def compute_waddah_attar_explosion(
         tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
 
     atr_period = min(100, n)
-    dead_zone = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - atr_period + 1)
-        w = tr[start_idx : i + 1]
-        dead_zone[i] = (sum(w) / len(w)) * 3.7
+    dead_zone = [v * 3.7 for v in _rma(tr, atr_period)]
 
     series_data = []
     for i in range(n):
@@ -2227,11 +2261,7 @@ def compute_ut_bot_alerts(
     for i in range(1, n):
         tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
 
-    atr = [tr[0]] * n
-    for i in range(1, n):
-        start_idx = max(0, i - atr_period + 1)
-        w = tr[start_idx : i + 1]
-        atr[i] = sum(w) / len(w)
+    atr = _rma(tr, atr_period)
 
     n_loss = [key_value * atr[i] for i in range(n)]
 
@@ -2351,11 +2381,7 @@ def compute_chandelier_exit(
     for i in range(1, n):
         tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
 
-    atr = [tr[0]] * n
-    for i in range(1, n):
-        start_idx = max(0, i - length + 1)
-        w = tr[start_idx : i + 1]
-        atr[i] = sum(w) / len(w)
+    atr = _rma(tr, length)
 
     long_stops = [0.0] * n
     short_stops = [0.0] * n
@@ -2559,13 +2585,11 @@ def compute_lorentzian_classification(
     if len(gains) >= 14:
         avg_g = sum(gains[:14]) / 14.0
         avg_l = sum(losses[:14]) / 14.0
-        rs = avg_g / max(1e-6, avg_l)
-        rsi[14] = 100.0 - (100.0 / (1.0 + rs))
+        rsi[14] = _rsi_value(avg_g, avg_l)
         for i in range(15, n):
             avg_g = (avg_g * 13.0 + gains[i - 1]) / 14.0
             avg_l = (avg_l * 13.0 + losses[i - 1]) / 14.0
-            rs = avg_g / max(1e-6, avg_l)
-            rsi[i] = 100.0 - (100.0 / (1.0 + rs))
+            rsi[i] = _rsi_value(avg_g, avg_l)
 
     roc = [0.0] * n
     for i in range(10, n):
@@ -3267,16 +3291,22 @@ def compute_ai_confluence_signals(
     if len(gains) >= 14:
         avg_g = sum(gains[:14]) / 14.0
         avg_l = sum(losses[:14]) / 14.0
-        rs = avg_g / max(1e-6, avg_l)
-        rsi_vals[14] = 100.0 - (100.0 / (1.0 + rs))
+        rsi_vals[14] = _rsi_value(avg_g, avg_l)
         for i in range(15, n):
             avg_g = (avg_g * 13.0 + gains[i - 1]) / 14.0
             avg_l = (avg_l * 13.0 + losses[i - 1]) / 14.0
-            rs = avg_g / max(1e-6, avg_l)
-            rsi_vals[i] = 100.0 - (100.0 / (1.0 + rs))
+            rsi_vals[i] = _rsi_value(avg_g, avg_l)
 
     signals = []
     scan_start = max(15, n - 220)  # scan past ~10-11 months
+
+    # Historical markers must only see bars up to the swing (plus the k_window that confirms it).
+    # Today's fibo grid, POC and pattern include later bars, so they are rebuilt or skipped per bar.
+    def causal_fibo(i: int) -> Dict[str, float]:
+        lo_i = max(0, i - 251)
+        hi_v, lo_v = max(highs[lo_i:i + 1]), min(lows[lo_i:i + 1])
+        rng = max(1e-6, hi_v - lo_v)
+        return {"0.0": hi_v, "50.0": hi_v - 0.5 * rng, "61.8": hi_v - 0.618 * rng, "78.6": hi_v - 0.786 * rng}
 
     # 1. Detect Swing Troughs (BUY / DCA Signals)
     k_window = 3
@@ -3292,20 +3322,18 @@ def compute_ai_confluence_signals(
 
             reasons = []
             score = 0
+            fib_i = causal_fibo(i)
 
-            # Factor 1: Value / Fibonacci Golden Pocket / POC
-            f618 = fibo_levels.get("61.8", 0.0)
-            f500 = fibo_levels.get("50.0", 0.0)
-            f786 = fibo_levels.get("78.6", 0.0)
+            # Factor 1: Value / Fibonacci Golden Pocket (POC is a full-history value, so it is not used here)
+            f618 = fib_i["61.8"]
+            f500 = fib_i["50.0"]
+            f786 = fib_i["78.6"]
             if f618 > 0 and abs(c_low - f618) / f618 <= 0.035:
                 score += 1
                 reasons.append(f"โซนราคาคุณค่า: ทดสอบแนวรับ Fibonacci 61.8% Golden Pocket (${f618:.2f}) รับอยู่หมัด")
             elif f500 > 0 and abs(c_low - f500) / f500 <= 0.035:
                 score += 1
                 reasons.append(f"โซนราคาคุณค่า: เด้งทดสอบแนวรับ Fibonacci 50.0% (${f500:.2f})")
-            elif poc_price > 0 and abs(c_low - poc_price) / poc_price <= 0.035:
-                score += 1
-                reasons.append(f"โซนราคาคุณค่า: ทดสอบ POC 2 ปี โซนสะสมวอลุ่มหนาแน่น (${poc_price:.2f})")
 
             # Factor 2: Momentum / RSI Hook
             if c_rsi <= 38:
@@ -3329,10 +3357,6 @@ def compute_ai_confluence_signals(
                 score += 1
                 reasons.append(f"แนวโน้มระยะกลาง: ราคายืนเหนือ EMA 50 (${c_ema50:.2f})")
 
-            # Factor 5: Pattern & Support Floor
-            if pattern and pattern.get("type") and "bull" in pattern["type"].lower():
-                score += 1
-                reasons.append(f"โครงสร้างกราฟ: เกิดการกลับตัวตามรูปแบบ {pattern['name']}")
 
             if score >= 3:
                 is_strong = score >= 4
@@ -3369,10 +3393,10 @@ def compute_ai_confluence_signals(
             score = 0
 
             # Resistance: ATH / Fibo 0.0% / 23.6%
-            ath_p = fibo_levels.get("0.0", 0.0)
+            ath_p = causal_fibo(i)["0.0"]
             if ath_p > 0 and abs(c_high - ath_p) / ath_p <= 0.03:
                 score += 1
-                reasons.append(f"แนวต้านสำคัญ: ทดสอบ All-Time High (${ath_p:.2f}) ชนกรอบต้านสูงสุด")
+                reasons.append(f"แนวต้านสำคัญ: ทดสอบจุดสูงสุดรอบ 52 สัปดาห์ (${ath_p:.2f})")
 
             # Momentum: Overbought
             if c_rsi >= 68:
@@ -3384,10 +3408,6 @@ def compute_ai_confluence_signals(
                 score += 1
                 reasons.append("สภาพคล่องเทขาย: วอลุ่มพุ่งสูงที่ยอดบน สะท้อนการขายทำกำไรของรายใหญ่ (Distribution)")
 
-            # Pattern Resistance
-            if pattern and pattern.get("neckline"):
-                score += 1
-                reasons.append("โครงสร้างราคา: ทดสอบแนวต้านโครงสร้างหลักและเริ่มมีแรงขายกดดัน")
 
             if score >= 3:
                 sl = round(c_high * 1.025, 2)
@@ -3583,7 +3603,7 @@ def compute_ai_confluence_signals(
     elif current_rsi > 70:
         act = "SELL"
         b_type = "TRIM"
-        badge = f"🎯 TRIM / TAKE PROFIT (4/5)"
+        badge = f"🎯 TRIM / TAKE PROFIT ({curr_score}/5)"
         m_shape = "arrowDown"
         m_col = "#f43f5e"
         summary_txt = f"สถานะปัจจุบันราคา ${curr_close:.2f} วิ่งขึ้นมาในโซนตึงตัว แนะนำแบ่งทำกำไรหรือเลื่อน Trailing Stop"
@@ -3802,13 +3822,11 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
     if len(gains) >= 14:
         avg_g = sum(gains[:14]) / 14.0
         avg_l = sum(losses[:14]) / 14.0
-        rs = avg_g / max(1e-9, avg_l)
-        rsi_val = 100.0 - (100.0 / (1.0 + rs))
+        rsi_val = _rsi_value(avg_g, avg_l)
         for i in range(14, len(gains)):
             avg_g = (avg_g * 13.0 + gains[i]) / 14.0
             avg_l = (avg_l * 13.0 + losses[i]) / 14.0
-            rs = avg_g / max(1e-9, avg_l)
-            rsi_val = 100.0 - (100.0 / (1.0 + rs))
+            rsi_val = _rsi_value(avg_g, avg_l)
 
     # 9. 52-Week High & Low
     w52_high = round(max(highs[-252:]), 2)
@@ -4055,7 +4073,7 @@ def save_candles_cache(cache: Dict[str, Any]):
 
 
 # Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 8
+INDICATOR_SCHEMA_VERSION = 10
 
 
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:

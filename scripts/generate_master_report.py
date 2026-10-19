@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.portfolio import load_portfolio, analyze_portfolio
 from src.trades import (
     load_trades, calculate_trades_summary, load_ledger,
-    resolve_slip_relative_path, get_slip_modal_component
+    resolve_slip_relative_path, get_slip_modal_component, _atomic_write_many
 )
 from html import escape
 
@@ -430,6 +430,7 @@ def get_live_refresh_script(data):
             // 4. Update rows and compute totals
             let totalMarketValUsd = 0;
             let totalCostUsd = 0;
+            let totalCostThb = 0;
 
             rows.forEach(r => {{
                 const ticker = r.dataset.ticker;
@@ -437,12 +438,15 @@ def get_live_refresh_script(data):
                 const avgCost = parseFloat(r.dataset.cost) || 0;
                 const serverValUsd = parseFloat(r.dataset.serverValUsd);
                 const quote = quotes[ticker];
-                const costUsd = shares * avgCost;
+                const costUsd = parseFloat(r.dataset.costUsd) || shares * avgCost;
+                // THB P/L uses the THB actually paid, matching the server-rendered value.
+                const costThb = parseFloat(r.dataset.costThb) || costUsd * currentFx;
 
                 if (!(quote && typeof quote.close === 'number')) {{
                     if (!isNaN(serverValUsd)) {{
                         totalMarketValUsd += serverValUsd;
                         totalCostUsd += costUsd;
+                        totalCostThb += costThb;
                         r.dataset.currentValUsd = serverValUsd;
                         r.title = 'ไม่ได้ราคาสด ใช้มูลค่าล่าสุดจากเซิร์ฟเวอร์';
                     }} else {{
@@ -455,11 +459,12 @@ def get_live_refresh_script(data):
                 const valUsd = shares * close;
                 const valThb = valUsd * currentFx;
                 const plUsd = valUsd - costUsd;
-                const plThb = plUsd * currentFx;
+                const plThb = valThb - costThb;
                 const plPct = costUsd > 0 ? (plUsd / costUsd * 100) : 0;
 
                 totalMarketValUsd += valUsd;
                 totalCostUsd += costUsd;
+                totalCostThb += costThb;
 
                 r.dataset.currentValUsd = valUsd;
                 r.title = '';
@@ -506,7 +511,7 @@ def get_live_refresh_script(data):
             // 6. Update KPIs
             const totalMarketValThb = totalMarketValUsd * currentFx;
             const totalPlUsd = totalMarketValUsd - totalCostUsd;
-            const totalPlThb = totalPlUsd * currentFx;
+            const totalPlThb = totalMarketValUsd * currentFx - totalCostThb;
             const totalPlPct = totalCostUsd > 0 ? (totalPlUsd / totalCostUsd * 100) : 0;
 
             const totalCashThb = PORTFOLIO_STATIC.dimeSaveCashThb + (PORTFOLIO_STATIC.dimeUsdCash * currentFx);
@@ -688,7 +693,7 @@ def generate_master_dashboard_html(data):
         server_val = p.get('current_val_usd')
         server_val_attr = f' data-server-val-usd="{server_val}"' if server_val is not None else ""
         holdings_rows += f"""
-        <tr class="holding-row" data-ticker="{tk}" data-exchange="{ex}" data-shares="{p['shares']}" data-cost="{p['avg_cost_usd']}"{server_val_attr}>
+        <tr class="holding-row" data-ticker="{tk}" data-exchange="{ex}" data-shares="{p['shares']}" data-cost="{p['avg_cost_usd']}" data-cost-usd="{p.get('total_cost_usd') or ''}" data-cost-thb="{p.get('cost_thb') or ''}"{server_val_attr}>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
                 <span class="clickable-ticker" onclick="{onclick_js}" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{tk} 📈</span>
             </td>
@@ -1639,7 +1644,7 @@ def main():
 
     # Save JSON summary
     json_path = Path("data/account_summary.json")
-    json_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    _atomic_write_many([(json_path, json.dumps(data, indent=2, ensure_ascii=False))])
 
     print_master_summary(data, out_path, json_path)
 

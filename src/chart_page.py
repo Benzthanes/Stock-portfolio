@@ -5,6 +5,7 @@ saved to reports/stock_chart.html.
 """
 
 import json
+import sys
 from html import escape
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -52,7 +53,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
         "JPM": ("JPMorgan Chase & Co.", "Diversified Banking", "NYSE"),
         "CRWD": ("CrowdStrike Holdings, Inc.", "Cybersecurity Software", "NASDAQ"),
         "BNY": ("Bank of New York Mellon Corp", "Asset Management", "NYSE"),
-        "SPCX": ("CrossingBridge Pre-Merger SPAC ETF", "Exchange Traded Fund", "NASDAQ"),
+        "SPCX": ("SpaceX (Space Exploration Technologies)", "Aerospace & Satellite Internet", "NASDAQ"),
         "QQQI": ("NEOS Nasdaq 100 High Income ETF", "High Yield ETF", "NASDAQ"),
         "ROST": ("Ross Stores, Inc.", "Apparel Retail", "NASDAQ"),
         "NOK": ("Nokia Corporation", "Telecom Equipment", "NYSE"),
@@ -225,6 +226,32 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
     return meta
 
 
+def attach_scores(meta: Dict[str, Any], tickers: List[str]) -> None:
+    """Adds the unified src/scoring.py score from one TradingView snapshot call."""
+    from src.screener import evaluate_stock
+    from src.tradingview import fetch_screener_data
+    from src.universe import get_universe
+
+    universe = get_universe("all")
+    symbols = []
+    for t in tickers:
+        exchange = meta.get(t, {}).get("exchange")
+        if exchange not in ("NASDAQ", "NYSE", "AMEX"):
+            exchange = universe.get(t, "NASDAQ")
+        symbols.append(f"{exchange}:{t}")
+    try:
+        rows = fetch_screener_data(symbols)
+    except Exception as exc:
+        print(f"[chart_page] score fetch failed: {exc}", file=sys.stderr)
+        return
+    for row in rows:
+        t = row.get("ticker")
+        if t in meta:
+            score = evaluate_stock(row)["stock_score"]
+            meta[t]["score"] = {k: score[k] for k in ("total", "grade", "stars", "pillars", "coverage", "earnings_guard", "reasons")}
+            meta[t]["score"]["timing"] = {"entry_signal": score["timing"]["entry_signal"]}
+
+
 def generate_stock_chart_page_html() -> str:
     """
     Builds the full HTML document for reports/stock_chart.html.
@@ -307,6 +334,8 @@ def generate_stock_chart_page_html() -> str:
             )
         if t in meta:
             meta[t]["news"] = t_news
+
+    attach_scores(meta, sorted_tickers)
 
     chart_data_json = json.dumps(cache, ensure_ascii=False, separators=(",", ":"))
     meta_json = json.dumps(meta, ensure_ascii=False)

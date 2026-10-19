@@ -239,7 +239,7 @@ __CHART_CSS__    </style>
                         <div class="ai-sec-header">
                             <div class="ai-sec-title">
                                 <span>🤖 Rule-based Confluence Decision Engine</span>
-                                <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(ระบบตัดสินใจซื้อ-ขาย-ทยอยสะสม DCA ด้วยคอนฟลูเอนซ์ 5 มิติ)</span>
+                                <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(ระบบตัดสินใจซื้อ-ขาย-ทยอยสะสม DCA ด้วยคอนฟลูเอนซ์ 5 มิติ • heuristic ยังไม่ผ่าน backtest ใช้คู่กับการ์ดคะแนนรวม)</span>
                             </div>
                             <div style="font-size: 0.74rem; color: #64748b;">
                                 💡 คลิกที่มาร์กเกอร์บนแท่งเทียน หรือเลือกจุดตัดสินใจด้านล่าง
@@ -421,6 +421,19 @@ __CHART_CSS__    </style>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Card 3.9: Unified Score (src/scoring.py) -->
+                <div class="sidebar-card" id="score_sidebar_card">
+                    <div class="sc-header">
+                        <div class="sc-title">
+                            <span>🧭 คะแนนรวม (Unified Score)</span>
+                        </div>
+                        <span class="sc-subtitle" id="score_grade_badge">-</span>
+                    </div>
+                    <div id="score_sidebar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
+                        กำลังโหลดคะแนน...
+                    </div>
                 </div>
 
                 <!-- Card 4: Elliott Wave (1-5) Analysis -->
