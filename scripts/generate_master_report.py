@@ -427,14 +427,14 @@ def render_wealth_chart_section(data):
         <div id="wealth-chart-container" style="width: 100%; height: 320px; position: relative;"></div>
 
         <!-- Sub-Pane: Cumulative Net Profit & ROI Curve -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 6px; padding: 6px 4px 0 4px; border-top: 1px solid rgba(255, 255, 255, 0.06);">
-            <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 10px;">
+        <div class="wealth-subchart-header">
+            <div class="subchart-title-box">
                 <span>💰</span> <span id="subchart-title-text">กราฟกำไรสุทธิสะสมตลอดกาล (Cumulative All-Time Net Profit)</span>
                 <span id="sub-profit-badge" style="font-size: 0.80rem; font-weight: 700; padding: 2px 10px; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
                     {money(current_profit_thb, 'THB', signed=True)} ({pct(current_roi_pct, 2)})
                 </span>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="subchart-ctrls-box">
                 <span id="sub-mode-hint" style="font-size: 0.78rem; color: var(--text-muted);">เส้นฐาน 0 บาท (เขียว = กำไรสะสม / แดง = ขาดทุนสะสม)</span>
                 <div class="chart-ctrl-group" style="margin: 0;" title="สลับมุมมองกำไรเป็นจำนวนเงินหรืออัตราส่วนต่อเงินทุน">
                     <button id="btn-sub-val" class="ctrl-btn active" onclick="switchSubChartMode('VAL')">จำนวนเงิน (฿)</button>
@@ -667,12 +667,18 @@ def render_wealth_chart_section(data):
             container.innerHTML = '';
             if (subContainer) subContainer.innerHTML = '';
 
+            const isMobile = (window.innerWidth || container.clientWidth || 900) <= 640;
+            const mainHeight = isMobile ? 240 : 320;
+            const subHeight = isMobile ? 110 : 135;
+            container.style.height = mainHeight + 'px';
+            if (subContainer) subContainer.style.height = subHeight + 'px';
+
             const commonOpts = {{
                 layout: {{
                     background: {{ type: 'solid', color: 'transparent' }},
                     textColor: '#94a3b8',
                     fontFamily: "'Inter', 'Prompt', -apple-system, sans-serif",
-                    fontSize: 12
+                    fontSize: isMobile ? 11 : 12
                 }},
                 grid: {{
                     vertLines: {{ color: 'rgba(255, 255, 255, 0.04)' }},
@@ -680,7 +686,22 @@ def render_wealth_chart_section(data):
                 }},
                 rightPriceScale: {{
                     borderColor: 'rgba(255, 255, 255, 0.08)',
-                    autoScale: true
+                    autoScale: true,
+                    scaleMargins: {{
+                        top: 0.1,
+                        bottom: 0.1
+                    }}
+                }},
+                handleScroll: {{
+                    mouseWheel: true,
+                    pressedMouseMove: true,
+                    horzTouchDrag: true,
+                    vertTouchDrag: false
+                }},
+                handleScale: {{
+                    axisPressedMouseMove: true,
+                    mouseWheel: true,
+                    pinch: true
                 }},
                 crosshair: {{
                     mode: LightweightCharts.CrosshairMode.Normal,
@@ -698,8 +719,8 @@ def render_wealth_chart_section(data):
             }};
 
             chartInstance = LightweightCharts.createChart(container, Object.assign({{}}, commonOpts, {{
-                width: container.clientWidth || 900,
-                height: 320,
+                width: container.clientWidth || (isMobile ? 360 : 900),
+                height: mainHeight,
                 timeScale: {{
                     visible: false,
                     fixLeftEdge: true,
@@ -709,8 +730,8 @@ def render_wealth_chart_section(data):
 
             if (subContainer) {{
                 subChartInstance = LightweightCharts.createChart(subContainer, Object.assign({{}}, commonOpts, {{
-                    width: subContainer.clientWidth || 900,
-                    height: 135,
+                    width: subContainer.clientWidth || (isMobile ? 360 : 900),
+                    height: subHeight,
                     timeScale: {{
                         borderColor: 'rgba(255, 255, 255, 0.08)',
                         visible: true,
@@ -818,9 +839,16 @@ def render_wealth_chart_section(data):
                 const resizeObserver = new ResizeObserver(entries => {{
                     if (entries.length > 0 && chartInstance) {{
                         const newWidth = entries[0].contentRect.width;
+                        const isMob = newWidth <= 640;
+                        const mH = isMob ? 240 : 320;
+                        const sH = isMob ? 110 : 135;
                         if (newWidth > 0) {{
-                            chartInstance.applyOptions({{ width: newWidth }});
-                            if (subChartInstance) subChartInstance.applyOptions({{ width: newWidth }});
+                            chartInstance.applyOptions({{ width: newWidth, height: mH }});
+                            container.style.height = mH + 'px';
+                            if (subChartInstance) {{
+                                subChartInstance.applyOptions({{ width: newWidth, height: sH }});
+                                if (subContainer) subContainer.style.height = sH + 'px';
+                            }}
                             scheduleDiffRibbonDraw();
                         }}
                     }}
@@ -1010,10 +1038,15 @@ def get_live_refresh_script(data):
 
     window.setLiveInterval = function(sec) {{
         liveIntervalSec = parseInt(sec, 10) || 0;
+        try {{
+            localStorage.setItem('portfolio_live_interval', liveIntervalSec);
+        }} catch (e) {{}}
 
         [0, 15, 30, 60].forEach(s => {{
             const b = document.getElementById('btn-live-' + s);
             if (b) b.classList.toggle('active', s === liveIntervalSec);
+            const rb = document.getElementById('rnav-live-' + s);
+            if (rb) rb.classList.toggle('active', s === liveIntervalSec);
         }});
 
         if (liveCountdownTimer) {{
@@ -1021,13 +1054,13 @@ def get_live_refresh_script(data):
             liveCountdownTimer = null;
         }}
 
-        const ts = document.getElementById('refresh-timestamp');
+        const ts = document.getElementById('rnav-live-status') || document.getElementById('refresh-timestamp');
 
         if (liveIntervalSec <= 0) {{
             if (ts) {{
                 ts.innerHTML = lastSyncTimeStr 
-                    ? '⚪ ปิด Live Auto | ซิงค์ล่าสุดเมื่อ <strong style="color: #60a5fa;">' + lastSyncTimeStr + ' น.</strong>'
-                    : '⚪ อัปเดตด้วยตนเอง (กดปุ่มเพื่อดึงราคา)';
+                    ? '🟢 ซิงค์ล่าสุด: <strong style="color: #60a5fa;">' + lastSyncTimeStr + ' น.</strong>'
+                    : '⚪ อัปเดตด้วยตนเอง';
             }}
             return;
         }}
@@ -1048,11 +1081,11 @@ def get_live_refresh_script(data):
     }};
 
     function updateLiveCountdownStatus() {{
-        const ts = document.getElementById('refresh-timestamp');
+        const ts = document.getElementById('rnav-live-status') || document.getElementById('refresh-timestamp');
         if (!ts || liveIntervalSec <= 0) return;
-        const pulseDot = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981; margin-right:4px;"></span>';
-        ts.innerHTML = pulseDot + 'Live Auto (' + liveIntervalSec + 's): ถัดไปใน <strong style="color:#10b981;">' + liveCountdownSec + 's</strong>' + 
-            (lastSyncTimeStr ? ' | ซิงค์ล่าสุด <strong style="color:#60a5fa;">' + lastSyncTimeStr + ' น.</strong>' : '');
+        const pulseDot = '<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981; margin-right:4px;"></span>';
+        ts.innerHTML = pulseDot + 'Live (' + liveIntervalSec + 's): <strong style="color:#10b981;">' + liveCountdownSec + 's</strong>' + 
+            (lastSyncTimeStr ? ' | <strong style="color:#60a5fa;">' + lastSyncTimeStr + ' น.</strong>' : '');
     }}
 
     document.addEventListener('visibilitychange', () => {{
@@ -1064,14 +1097,15 @@ def get_live_refresh_script(data):
     }});
 
     async function refreshLiveQuotes() {{
-        const btn = document.getElementById('btn-refresh-live');
-        const icon = document.getElementById('refresh-icon');
-        const text = document.getElementById('refresh-text');
-        const ts = document.getElementById('refresh-timestamp');
+        const btn = document.getElementById('rnav-btn-refresh') || document.getElementById('btn-refresh-live');
+        const icon = document.getElementById('rnav-refresh-icon') || document.getElementById('refresh-icon');
+        const text = document.getElementById('rnav-refresh-text') || document.getElementById('refresh-text');
+        const ts = document.getElementById('rnav-live-status') || document.getElementById('refresh-timestamp');
 
-        if (!btn) return;
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
+        if (btn) {{
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+        }}
         if (text) text.textContent = 'กำลังดึงราคา...';
         if (icon) icon.style.transform = 'rotate(360deg)';
 
@@ -1414,9 +1448,11 @@ def get_live_refresh_script(data):
                 if (ts) ts.innerHTML = '⚠️ ซิงค์ขัดข้อง กรุณาลองใหม่อีกครั้ง';
             }}
         }} finally {{
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            if (text) text.textContent = 'รีเฟรชราคาเรียลไทม์';
+            if (btn) {{
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }}
+            if (text) text.textContent = 'รีเฟรชราคา';
             if (icon) icon.style.transform = '';
         }}
     }}
@@ -1751,6 +1787,108 @@ def generate_master_dashboard_html(data):
             height: 10px;
             border-radius: 50%;
         }}
+
+        /* SUBCHART RESPONSIVE LAYOUT */
+        .wealth-subchart-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            padding: 6px 4px 0 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }}
+        .subchart-title-box {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #cbd5e1;
+        }}
+        .subchart-ctrls-box {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }}
+
+        @media (max-width: 640px) {{
+            .wealth-chart-card {{
+                padding: 12px 10px;
+                margin-bottom: 20px;
+                border-radius: 12px;
+            }}
+            .wealth-chart-header {{
+                gap: 10px;
+                margin-bottom: 12px;
+            }}
+            .wealth-chart-title {{
+                font-size: 1.05rem;
+                line-height: 1.35;
+                gap: 6px;
+            }}
+            .wealth-chart-sub {{
+                font-size: 0.78rem;
+            }}
+            .wealth-controls-bar {{
+                width: 100%;
+                justify-content: space-between;
+            }}
+            .wealth-hud {{
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 10px 12px;
+                border-radius: 10px;
+            }}
+            .wealth-hud-item:last-child {{
+                grid-column: span 2;
+            }}
+            .wealth-hud-label {{
+                font-size: 0.68rem;
+            }}
+            .wealth-hud-val {{
+                font-size: 1.0rem;
+            }}
+            .wealth-hud-sub {{
+                font-size: 0.72rem;
+            }}
+            .wealth-subchart-header {{
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }}
+            .subchart-title-box {{
+                font-size: 0.82rem;
+                justify-content: space-between;
+            }}
+            .subchart-ctrls-box {{
+                width: 100%;
+                justify-content: flex-end;
+            }}
+            #sub-mode-hint {{
+                display: none;
+            }}
+            .wealth-legend-bar {{
+                font-size: 0.72rem;
+                gap: 8px 10px;
+                padding-top: 10px;
+                margin-top: 10px;
+            }}
+            .legend-item {{
+                font-size: 0.72rem;
+                gap: 6px;
+            }}
+            .header h1 {{
+                font-size: 1.35rem !important;
+            }}
+            .header p {{
+                font-size: 0.82rem !important;
+            }}
+        }}
     </style>
 </head>
 <body>
@@ -1771,28 +1909,10 @@ def generate_master_dashboard_html(data):
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
                     <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
-
-                    <!-- Live Auto-Refresh Interval Controls (15s to 60s, default: ปิด) -->
-                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 2px 4px;" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)">
-                        <span style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; padding-left: 4px;">⏱️ อัปเดตสด:</span>
-                        <div class="chart-ctrl-group" style="margin: 0;">
-                            <button id="btn-live-0" class="ctrl-btn active" onclick="setLiveInterval(0)">ปิด</button>
-                            <button id="btn-live-15" class="ctrl-btn" onclick="setLiveInterval(15)">15s</button>
-                            <button id="btn-live-30" class="ctrl-btn" onclick="setLiveInterval(30)">30s</button>
-                            <button id="btn-live-60" class="ctrl-btn" onclick="setLiveInterval(60)">60s</button>
-                        </div>
-                    </div>
-
-                    <button id="btn-refresh-live" onclick="refreshLiveQuotes()" style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%); border: 1px solid rgba(59, 130, 246, 0.5); color: #93c5fd; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
-                        <span id="refresh-icon" style="display: inline-block; transition: transform 0.6s ease;">🔄</span>
-                        <span id="refresh-text">รีเฟรชราคา</span>
-                        <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; margin-left: 2px;">Live</span>
-                    </button>
                     <a href="https://github.com/Benzthanes/Stock-portfolio/actions/workflows/update_portfolio.yml" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399; padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; font-family: inherit;">
                         <span>⚡ สั่งคำนวณสดบน Cloud ↗</span>
                     </a>
                 </div>
-                <span id="refresh-timestamp" style="font-size: 0.78rem; color: var(--text-muted);">⚪ อัปเดตด้วยตนเอง (กดปุ่มเพื่อดึงราคา)</span>
             </div>
         </div>
 

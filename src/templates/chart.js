@@ -4505,6 +4505,8 @@
         [0, 15, 30, 60].forEach(s => {
             const b = document.getElementById('btn-chart-live-' + s);
             if (b) b.classList.toggle('active', s === chartLiveIntervalSec);
+            const rb = document.getElementById('rnav-live-' + s);
+            if (rb) rb.classList.toggle('active', s === chartLiveIntervalSec);
         });
 
         if (chartCountdownTimer) {
@@ -4512,12 +4514,12 @@
             chartCountdownTimer = null;
         }
 
-        const statusEl = document.getElementById('chart-live-status');
+        const statusEl = document.getElementById('rnav-live-status') || document.getElementById('chart-live-status');
 
         if (chartLiveIntervalSec <= 0) {
             if (statusEl) {
                 statusEl.innerHTML = chartLastSyncTimeStr 
-                    ? '⚪ ปิด Live | ซิงค์ล่าสุด <strong style="color:#60a5fa;">' + chartLastSyncTimeStr + ' น.</strong>'
+                    ? '🟢 ซิงค์ล่าสุด: <strong style="color:#60a5fa;">' + chartLastSyncTimeStr + ' น.</strong>'
                     : '⚪ อัปเดตด้วยตนเอง';
             }
             return;
@@ -4539,9 +4541,9 @@
     };
 
     function updateChartLiveStatusUI() {
-        const statusEl = document.getElementById('chart-live-status');
+        const statusEl = document.getElementById('rnav-live-status') || document.getElementById('chart-live-status');
         if (!statusEl || chartLiveIntervalSec <= 0) return;
-        const pulseDot = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981; margin-right:4px;"></span>';
+        const pulseDot = '<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981; margin-right:4px;"></span>';
         statusEl.innerHTML = pulseDot + 'Live (' + chartLiveIntervalSec + 's): <strong style="color:#10b981;">' + chartCountdownSec + 's</strong>' + 
             (chartLastSyncTimeStr ? ' | <strong style="color:#60a5fa;">' + chartLastSyncTimeStr + ' น.</strong>' : '');
     }
@@ -4599,6 +4601,13 @@
     }
 
     async function fetchChartLiveQuotes() {
+        const btn = document.getElementById('rnav-btn-refresh');
+        const icon = document.getElementById('rnav-refresh-icon');
+        const text = document.getElementById('rnav-refresh-text');
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+        if (icon) icon.style.transform = 'rotate(360deg)';
+        if (text) text.textContent = 'กำลังดึง...';
+
         try {
             const tickers = Object.keys(STOCKS_META).map(tk => {
                 const m = STOCKS_META[tk] || {};
@@ -4646,6 +4655,10 @@
             const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             chartLastSyncTimeStr = timeStr;
             updateChartLiveStatusUI();
+            const rnavStatus = document.getElementById('rnav-live-status');
+            if (rnavStatus && chartLiveIntervalSec <= 0) {
+                rnavStatus.innerHTML = '🟢 ซิงค์ล่าสุด: <strong style="color:#60a5fa;">' + timeStr + ' น.</strong>';
+            }
 
             const payload = {
                 quotes: quotes,
@@ -4666,8 +4679,13 @@
 
         } catch (err) {
             console.warn('Chart live quote fetch error:', err);
+        } finally {
+            if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+            if (icon) icon.style.transform = 'none';
+            if (text) text.textContent = 'รีเฟรชราคา';
         }
     }
+    window.fetchChartLiveQuotes = fetchChartLiveQuotes;
 
     // Cross-Tab & Self Live Quote Handler
     function handleLiveQuotesBroadcast(data) {
