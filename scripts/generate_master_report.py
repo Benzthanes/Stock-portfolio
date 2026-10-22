@@ -16,9 +16,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from src.portfolio import load_portfolio, analyze_portfolio
 from src.trades import (
     load_trades, calculate_trades_summary, load_ledger,

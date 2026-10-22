@@ -2,7 +2,14 @@ import unittest
 
 from recovery import evaluate_fundamental_health
 from src.portfolio import compute_stock_rating
-from src.scoring import FUNDAMENTAL_RULES, score_fundamentals, score_stock, score_timing
+from src.scoring import (
+    FUNDAMENTAL_RULES,
+    ROE_DISPLAY_RULES,
+    format_roe_html,
+    score_fundamentals,
+    score_stock,
+    score_timing,
+)
 from src.screener import evaluate_stock
 
 
@@ -103,6 +110,41 @@ class StockScoreTest(unittest.TestCase):
     def test_etf_keeps_fixed_stars(self):
         s = score_stock(score_fundamentals("VOO", None, None, None, None, None, None, None), score_timing(8.0, 50, 49))
         self.assertEqual((s["grade"], s["stars"], s["total"]), ("ETF", 4, 100.0))
+
+
+class ROEDisplayRulesTest(unittest.TestCase):
+    def test_roe_display_rules_table_structure(self):
+        self.assertEqual(len(ROE_DISPLAY_RULES), 3)
+        self.assertEqual(ROE_DISPLAY_RULES[0].min_val, 20.0)
+        self.assertFalse(ROE_DISPLAY_RULES[0].strict_gt)
+        self.assertEqual(ROE_DISPLAY_RULES[0].css_class, "text-emerald fw-bold")
+        self.assertEqual(ROE_DISPLAY_RULES[0].suffix, " 🏆")
+
+        self.assertEqual(ROE_DISPLAY_RULES[1].min_val, 0.0)
+        self.assertTrue(ROE_DISPLAY_RULES[1].strict_gt)
+        self.assertEqual(ROE_DISPLAY_RULES[1].css_class, "text-emerald")
+        self.assertEqual(ROE_DISPLAY_RULES[1].suffix, "")
+
+        self.assertIsNone(ROE_DISPLAY_RULES[2].min_val)
+        self.assertEqual(ROE_DISPLAY_RULES[2].css_class, "text-rose fw-bold")
+        self.assertEqual(ROE_DISPLAY_RULES[2].suffix, " 🔻")
+
+    def test_roe_html_formatting_exact_outputs(self):
+        # Elite ROE: >= 20.0
+        self.assertEqual(format_roe_html(20.0), "<span class='text-emerald fw-bold'>+20.0% 🏆</span>")
+        self.assertEqual(format_roe_html(28.5), "<span class='text-emerald fw-bold'>+28.5% 🏆</span>")
+
+        # Positive ROE: > 0 and < 20.0
+        self.assertEqual(format_roe_html(19.9), "<span class='text-emerald'>+19.9%</span>")
+        self.assertEqual(format_roe_html(15.0), "<span class='text-emerald'>+15.0%</span>")
+        self.assertEqual(format_roe_html(0.1), "<span class='text-emerald'>+0.1%</span>")
+
+        # Zero or Negative ROE: <= 0
+        self.assertEqual(format_roe_html(0.0), "<span class='text-rose fw-bold'>+0.0% 🔻</span>")
+        self.assertEqual(format_roe_html(-5.2), "<span class='text-rose fw-bold'>-5.2% 🔻</span>")
+
+        # Missing ROE: None
+        self.assertEqual(format_roe_html(None), "-")
 
 
 if __name__ == "__main__":

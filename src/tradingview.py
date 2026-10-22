@@ -4,7 +4,7 @@ Fetches batch technical and fundamental data directly from TradingView Scanner A
 """
 
 from src.http import http_post_json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 SCANNER_URL = "https://scanner.tradingview.com/america/scan"
 

@@ -4,8 +4,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from src import fmt
 from src.html_report import generate_portfolio_html, generate_recovery_html
 from src.nav import nav_bar_html

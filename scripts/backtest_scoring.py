@@ -8,8 +8,8 @@ and records the forward return. Each indicator state is then compared with the
 baseline (every sample) to decide whether it earns points.
 
 Usage:
-    python3 scripts/backtest_scoring.py            # uses data/.backtest_candles.json when fresh
-    python3 scripts/backtest_scoring.py --refresh  # re-downloads candles
+    python3 -m scripts.backtest_scoring            # uses data/.backtest_candles.json when fresh
+    python3 -m scripts.backtest_scoring --refresh  # re-downloads candles
 Writes data/backtest_scoring.json.
 """
 
@@ -21,10 +21,9 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
 
 from src import chart_data as cd
 from src.http import http_get

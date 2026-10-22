@@ -124,7 +124,7 @@ python3 recovery.py -f data/portfolio_set.json
 ## 🛠️ Setup & Development
 
 - ใช้ Python 3.11 และไม่มี dependency ภายนอก (ใช้แค่ standard library).
-- อัปเดตทุกรายงาน: `python3 portfolio.py --all`.
+- อัปเดตทุกรายงาน: `python3 portfolio.py --all` (หรือ `python3 -m portfolio --all`).
   ถ้ามีขั้นตอนไหนพัง รายงานอื่นยังสร้างต่อ แต่คำสั่งจะจบด้วย exit code 1.
 - รัน test: `python3 -m unittest discover -s tests -t .`.
   test ถูกบล็อกไม่ให้ต่อเน็ตจริง ตั้ง `ALLOW_NETWORK=1` ถ้าต้องการปิดการบล็อก.

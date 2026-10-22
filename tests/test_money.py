@@ -5,9 +5,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-
 import src.fx as fx
 import src.portfolio as portfolio
 from src.portfolio import analyze_portfolio, cost_basis

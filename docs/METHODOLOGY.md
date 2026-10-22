@@ -84,9 +84,9 @@
 ### 3.1 คำสั่ง
 
 ```bash
-/usr/bin/python3 scripts/backtest_scoring.py            # ใช้แท่งเทียนจาก cache ถ้ายังไม่เกิน 7 วัน
-/usr/bin/python3 scripts/backtest_scoring.py --refresh  # ดึงแท่งเทียนใหม่ทั้งหมด
-/usr/bin/python3 scripts/backtest_scoring.py --limit 3  # ทดสอบเร็วกับหุ้น 3 ตัว
+/usr/bin/python3 -m scripts.backtest_scoring            # ใช้แท่งเทียนจาก cache ถ้ายังไม่เกิน 7 วัน
+/usr/bin/python3 -m scripts.backtest_scoring --refresh  # ดึงแท่งเทียนใหม่ทั้งหมด
+/usr/bin/python3 -m scripts.backtest_scoring --limit 3  # ทดสอบเร็วกับหุ้น 3 ตัว
 ```
 
 * ผลลัพธ์เขียนลง `data/backtest_scoring.json`.
@@ -209,7 +209,7 @@ for m in ['fwd60','fwd20','mdd60']:
    ```
 3. ถ้าแก้แค่หน้า Chart ให้สร้างเฉพาะหน้านั้น.
    ```bash
-   /usr/bin/python3 -c "import sys;sys.path.insert(0,'.');from pathlib import Path;import portfolio as p;p._chart_page(Path('reports'))"
+   /usr/bin/python3 -c "from pathlib import Path;import portfolio as p;p._chart_page(Path('reports'))"
    ```
 4. เปิดทุกหน้าด้วย Chrome แบบ headless เพื่อถ่าย screenshot และเก็บ console log.
    ```bash

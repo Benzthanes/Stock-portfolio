@@ -18,7 +18,7 @@ This skill automatically synthesizes:
 ## ก่อนเริ่ม
 
 อ่าน `AGENTS.md` ที่ root ของโปรเจกต์ให้จบก่อน. จุดที่ต้องระวังเฉพาะ skill นี้มีดังนี้:
-* ตัวเลขเงินบาทของต้นทุนหุ้นที่ซื้อด้วย Dime! USD ยังคิดที่ 33.62 THB/USD. ส่วนที่จ่ายจาก Dime! Save (THB) ปรับตาม slip ได้ด้วย `python3 scripts/reconcile_cost_thb.py` (dry-run ก่อนเสมอ).
+* ตัวเลขเงินบาทของต้นทุนหุ้นที่ซื้อด้วย Dime! USD ยังคิดที่ 33.62 THB/USD. ส่วนที่จ่ายจาก Dime! Save (THB) ปรับตาม slip ได้ด้วย `python3 -m scripts.reconcile_cost_thb` (dry-run ก่อนเสมอ).
 * LLY มีจำนวนหุ้นใน slip ไม่ตรงกับพอร์ต (27.7467 กับ 27.6477631). ถ้าผู้ใช้ถามเรื่องต้นทุน LLY ให้แจ้งเรื่องนี้ด้วย.
 * คำสั่ง `trades.py` ทุกคำสั่งต้องรันด้วย `--dry-run` ก่อน แล้วให้ผู้ใช้ยืนยันก่อนรันจริง.
 
@@ -31,7 +31,7 @@ This skill automatically synthesizes:
 1. **ห้ามตอบโดยสั่งให้ผู้ใช้ไปพิมพ์คำสั่ง Terminal เองเด็ดขาด.**
 2. **AI Agent ต้องรันสคริปต์ประมวลผลให้ผู้ใช้โดยอัตโนมัติทันที:**
    ```bash
-   python3 scripts/generate_master_report.py
+   python3 -m scripts.generate_master_report
    ```
 3. **อ่านข้อมูลผลลัพธ์จาก `data/account_summary.json` และรายงานผลลัพธ์ลงในแชททันที:**
    - 🌟 **มูลค่าพอร์ตรวมสุทธิ (Total Net Worth / NAV):** ยอดหุ้นสด + เงินสดคงเหลือ ทั้ง $ และ ฿.

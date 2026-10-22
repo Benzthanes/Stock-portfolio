@@ -4,8 +4,6 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from src.nav import nav_bar_html
 
 FIXED = datetime(2026, 10, 15, 9, 5)

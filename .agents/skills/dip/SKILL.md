@@ -36,11 +36,11 @@ description: Scans US Top 100 stocks (S&P 100 + Nasdaq 100) for pullback-in-uptr
 
 | ผู้ใช้พิมพ์ | คำสั่งที่รัน |
 | :--- | :--- |
-| `ซื้อ BNY ในพอร์ตจำลอง` หรือ `ช้อน JPM 20000 ใน sim` | `python3 scripts/generate_dip_sim_report.py --buy TICKER [--capital THB]` |
-| `ขาย TICKER ในพอร์ตจำลอง` | `python3 scripts/generate_dip_sim_report.py --sell TICKER` |
-| `ล้างพอร์ตจำลอง` | `python3 scripts/generate_dip_sim_report.py --reset` |
-| `ดูพอร์ตจำลอง` | `python3 scripts/generate_dip_sim_report.py` |
-| `ปิดไม้ที่ถึง TP/SL` | `python3 scripts/generate_dip_sim_report.py --close-triggers` |
+| `ซื้อ BNY ในพอร์ตจำลอง` หรือ `ช้อน JPM 20000 ใน sim` | `python3 -m scripts.generate_dip_sim_report --buy TICKER [--capital THB]` |
+| `ขาย TICKER ในพอร์ตจำลอง` | `python3 -m scripts.generate_dip_sim_report --sell TICKER` |
+| `ล้างพอร์ตจำลอง` | `python3 -m scripts.generate_dip_sim_report --reset` |
+| `ดูพอร์ตจำลอง` | `python3 -m scripts.generate_dip_sim_report` |
+| `ปิดไม้ที่ถึง TP/SL` | `python3 -m scripts.generate_dip_sim_report --close-triggers` |
 
 การซื้อจำลองใช้ราคาตลาด. SL อยู่ที่ 1.5 ATR. TP อยู่ที่เส้น 50 วัน. ทุกคำสั่งอัปเดต `reports/portfolio_dip_sim.html`.
 

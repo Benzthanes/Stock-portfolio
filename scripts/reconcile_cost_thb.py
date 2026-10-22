@@ -11,9 +11,9 @@ Buys (slips) and sells (data/trades.json) for each ticker are replayed in date o
 average cost: a sell removes the same fraction of the THB-paid and USD-paid parts.
 
 Usage:
-    python3 scripts/reconcile_cost_thb.py            # dry run, prints the plan, writes nothing
-    python3 scripts/reconcile_cost_thb.py --apply    # writes portfolio.json and trades.json (backup first)
-    python3 scripts/reconcile_cost_thb.py --apply --force   # also writes tickers whose slip shares do not match
+    python3 -m scripts.reconcile_cost_thb            # dry run, prints the plan, writes nothing
+    python3 -m scripts.reconcile_cost_thb --apply    # writes portfolio.json and trades.json (backup first)
+    python3 -m scripts.reconcile_cost_thb --apply --force   # also writes tickers whose slip shares do not match
 """
 
 import argparse
@@ -21,12 +21,8 @@ import json
 import shutil
 import sys
 from collections import defaultdict
-from datetime import date, datetime
-from pathlib import Path
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
-
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
 
 from scripts.generate_master_report import load_ocr_buy_orders
 from src.fx import FALLBACK_USDTHB

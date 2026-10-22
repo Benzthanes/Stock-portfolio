@@ -11,7 +11,6 @@ from pathlib import Path
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
 
 import recovery
 from src import ai_news, news, trades
@@ -51,7 +50,9 @@ class LedgerWriteTest(unittest.TestCase):
     def test_data_dir_follows_env_not_cwd(self):
         with tempfile.TemporaryDirectory() as d, mock.patch.dict(os.environ, {"FILTER_STOCK_DATA_DIR": d}):
             self.assertEqual(trades.data_path("ledger.json"), Path(d) / "ledger.json")
-        self.assertEqual(trades.data_path("ledger.json"), ROOT / "data" / "ledger.json")
+        with mock.patch.dict(os.environ):
+            os.environ.pop("FILTER_STOCK_DATA_DIR", None)
+            self.assertEqual(trades.data_path("ledger.json"), ROOT / "data" / "ledger.json")
 
 
 class SellTest(unittest.TestCase):

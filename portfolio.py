@@ -10,9 +10,6 @@ import os
 import sys
 from pathlib import Path
 
-# Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 from src.portfolio import load_portfolio, analyze_portfolio, generate_portfolio_markdown
 from src.html_report import generate_portfolio_html
 from src.trades import load_trades, generate_trades_markdown, generate_trades_html

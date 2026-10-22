@@ -182,6 +182,37 @@ class StockScore(TypedDict):
     timing: TimingScore
 
 
+class ROEDisplayRule(NamedTuple):
+    min_val: Optional[float]
+    css_class: str
+    suffix: str
+    strict_gt: bool = False
+
+
+ROE_DISPLAY_RULES: tuple = (
+    ROEDisplayRule(20.0, "text-emerald fw-bold", " 🏆"),
+    ROEDisplayRule(0.0, "text-emerald", "", strict_gt=True),
+    ROEDisplayRule(None, "text-rose fw-bold", " 🔻"),
+)
+
+
+def format_roe_html(roe: Optional[float]) -> str:
+    """Format ROE percentage as HTML badge with color and icon from ROE_DISPLAY_RULES."""
+    if roe is None:
+        return "-"
+    for rule in ROE_DISPLAY_RULES:
+        if rule.min_val is not None:
+            if rule.strict_gt:
+                if roe > rule.min_val:
+                    return f"<span class='{rule.css_class}'>{roe:+.1f}%{rule.suffix}</span>"
+            else:
+                if roe >= rule.min_val:
+                    return f"<span class='{rule.css_class}'>{roe:+.1f}%{rule.suffix}</span>"
+        else:
+            return f"<span class='{rule.css_class}'>{roe:+.1f}%{rule.suffix}</span>"
+    return f"<span class='text-rose fw-bold'>{roe:+.1f}% 🔻</span>"
+
+
 def format_score(score: Optional["StockScore"]) -> str:
     """Short label shared by the Markdown and HTML reports, e.g. "เกรด A · 75/100 ⤴"."""
     if not score:

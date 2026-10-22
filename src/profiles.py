@@ -3,7 +3,7 @@ Stock Business Profile & Description Registry
 Provides concise business descriptions (ทำอะไร คร่าวๆ) for US large cap stocks.
 """
 
-from typing import Dict, Optional
+from typing import Dict
 
 CURATED_PROFILES: Dict[str, str] = {
     # Tech & Software

@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 from src.fmt import money, pct
 from src.fx import resolve_usdthb
 from src.nav import nav_bar_html
-from src.scoring import format_score
+from src.scoring import format_roe_html, format_score
 
 NA = "n/a"
 HEALTH_BADGE_CLASS = {"A+": "badge-emerald", "A": "badge-emerald", "B": "badge-amber", "C": "badge-amber", "F": "badge-rose"}
@@ -295,16 +295,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         peg_str = f"{p['peg']:.2f}" if p.get('peg') is not None else "-"
         pe_str = f"{p['pe']:.1f}x" if p.get('pe') is not None else "-"
 
-        roe_val = p.get('roe')
-        if roe_val is not None:
-            if roe_val >= 20.0:
-                roe_html = f"<span class='text-emerald fw-bold'>{roe_val:+.1f}% 🏆</span>"
-            elif roe_val > 0:
-                roe_html = f"<span class='text-emerald'>{roe_val:+.1f}%</span>"
-            else:
-                roe_html = f"<span class='text-rose fw-bold'>{roe_val:+.1f}% 🔻</span>"
-        else:
-            roe_html = "-"
+        roe_html = format_roe_html(p.get('roe'))
 
         de_val = p.get('debt_to_equity')
         if de_val is not None:

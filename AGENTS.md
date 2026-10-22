@@ -18,12 +18,12 @@ AI agent ทุกตัว (Gemini, Claude, Codex และตัวอื่�
 | :--- | :--- |
 | เทสต์ทั้งหมด | `/usr/bin/python3 -m unittest discover -s tests` |
 | สร้างรายงานทั้ง 6 หน้า | `/usr/bin/python3 portfolio.py --all` |
-| Backtest ตัวชี้วัด | `/usr/bin/python3 scripts/backtest_scoring.py` (ใช้เวลาราว 6 นาที ให้รันแบบ background) |
-| ปรับต้นทุนบาทตาม slip | `/usr/bin/python3 scripts/reconcile_cost_thb.py` (dry-run). ใส่ `--apply` เมื่อผู้ใช้อนุมัติแล้ว |
+| Backtest ตัวชี้วัด | `/usr/bin/python3 -m scripts.backtest_scoring` (ใช้เวลาราว 6 นาที ให้รันแบบ background) |
+| ปรับต้นทุนบาทตาม slip | `/usr/bin/python3 -m scripts.reconcile_cost_thb` (dry-run). ใส่ `--apply` เมื่อผู้ใช้อนุมัติแล้ว |
 | ข่าวที่รอวิเคราะห์ | `/usr/bin/python3 -m src.ai_news --pending` |
 
 * ใช้ `/usr/bin/python3` และห้ามใช้ `uv run` เพราะจะสร้างไฟล์ `uv.lock` ที่ไม่ต้องการ. โค้ดใช้แค่ standard library.
-* ห้ามเรียก `--help` กับสคริปต์ที่ไม่มี argparse เช่น `scripts/generate_master_report.py`. สคริปต์แบบนี้จะรันจริงและเขียนทับ `data/account_summary.json` กับ `reports/`.
+* ห้ามเรียก `--help` กับสคริปต์ที่ไม่มี argparse เช่น `scripts/generate_master_report.py` (หรือ `python3 -m scripts.generate_master_report`). สคริปต์แบบนี้จะรันจริงและเขียนทับ `data/account_summary.json` กับ `reports/`.
 * GitHub Actions (`.github/workflows/update_portfolio.yml`) รันเทสต์และ `portfolio.py --all` แล้ว commit ทั้ง `reports/` และ `data/`. งานที่ทิ้งไฟล์ค้างไว้ใน `data/` จะหลุดเข้า repo ด้วย.
 
 ## 3. ระบบคะแนนมีแหล่งเดียว

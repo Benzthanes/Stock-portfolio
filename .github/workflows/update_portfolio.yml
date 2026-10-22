@@ -56,7 +56,7 @@ jobs:
 
       - name: Run all portfolio reports
         id: reports
-        run: python3 portfolio.py --all
+        run: python3 -m portfolio --all
 
       - name: Commit and push updated reports
         # Push whatever was generated even if one report step failed. The job still fails afterwards.

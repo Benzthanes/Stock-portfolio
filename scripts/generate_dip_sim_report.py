@@ -7,21 +7,18 @@ Fetches live TradingView data, evaluates TP/SL status, and produces an interacti
 
 import argparse
 import json
+import os
 from html import escape
-import math
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from src.tradingview import fetch_screener_data
 from src.screener import FALLBACK_SL_RATIO, atr_stop_loss, evaluate_stock
 from src.outlook import get_forward_outlook
 from src.fmt import money, pct
-from src.fx import resolve_usdthb
+from src.fx import FALLBACK_USDTHB, resolve_usdthb
 from src.html_report import get_chart_modal_component, _make_chart_onclick, score_badge_html
 from src.nav import nav_bar_html
 
@@ -44,19 +41,26 @@ def _make_dip_chart_onclick(p: Dict[str, Any]) -> str:
     })
 
 
+def sim_data_path() -> Path:
+    base = Path(os.environ.get("FILTER_STOCK_DATA_DIR") or (Path(__file__).resolve().parent.parent / "data"))
+    return base / "portfolio_dip_sim.json"
+
+
 DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "portfolio_dip_sim.json"
 DEFAULT_HTML_PATH = Path(__file__).resolve().parent.parent / "reports" / "portfolio_dip_sim.html"
 
 
 def load_simulation_data() -> Dict[str, Any]:
-    if not DATA_PATH.exists():
-        raise FileNotFoundError(f"Simulation data file not found at {DATA_PATH}")
-    with open(DATA_PATH, "r", encoding="utf-8") as f:
+    path = sim_data_path()
+    if not path.exists():
+        raise FileNotFoundError(f"Simulation data file not found at {path}")
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_simulation_data(data: Dict[str, Any]):
-    with open(DATA_PATH, "w", encoding="utf-8") as f:
+    path = sim_data_path()
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
@@ -735,7 +739,7 @@ def close_triggered_holdings(now: Optional[datetime] = None) -> List[Dict[str, A
     """
     sim_data = load_simulation_data()
     analyzed = analyze_simulation(sim_data)
-    fx_rate = analyzed.get("fx_rate", 33.62)
+    fx_rate = analyzed.get("fx_rate", FALLBACK_USDTHB)
     today_dt = now or datetime.now()
     today_str = today_dt.strftime("%Y-%m-%d")
 

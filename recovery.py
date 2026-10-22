@@ -13,9 +13,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 from src.portfolio import load_portfolio, cost_basis
 from src.fx import resolve_usdthb
 from src.tradingview import fetch_screener_data

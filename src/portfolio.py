@@ -6,15 +6,8 @@ and formats comprehensive Markdown reports with earnings calendars and live news
 """
 
 import json
-import math
-import sys
-import time
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-
-# Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.tradingview import fetch_screener_data
 from src.screener import evaluate_stock
