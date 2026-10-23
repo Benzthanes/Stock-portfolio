@@ -1039,7 +1039,7 @@ def get_live_refresh_script(data):
             localStorage.setItem('portfolio_live_interval', liveIntervalSec);
         }} catch (e) {{}}
 
-        [0, 15, 30, 60].forEach(s => {{
+        [0, 5, 15, 30, 60].forEach(s => {{
             const b = document.getElementById('btn-live-' + s);
             if (b) b.classList.toggle('active', s === liveIntervalSec);
             const rb = document.getElementById('rnav-live-' + s);

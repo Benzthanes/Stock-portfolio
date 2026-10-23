@@ -107,7 +107,7 @@ _SCRIPT = """<script>
       localStorage.setItem('portfolio_live_interval', globalIntervalSec);
     } catch (e) {}
 
-    [0, 15, 30, 60].forEach(function(s) {
+    [0, 5, 15, 30, 60].forEach(function(s) {
       var b = document.getElementById('rnav-live-' + s);
       if (b) b.classList.toggle('active', s === globalIntervalSec);
     });
@@ -237,9 +237,10 @@ def nav_bar_html(active: str, now: Optional[datetime] = None) -> str:
         f'<span id="rnav-refresh-text">รีเฟรชราคา</span> '
         f'<span class="rnav-live-badge">Live</span>'
         f'</button>'
-        f'<div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)">'
+        f'<div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)">'
         f'<span class="rnav-int-label">⏱️ อัปเดตสด:</span>'
         f'<button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button>'
+        f'<button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button>'
         f'<button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button>'
         f'<button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button>'
         f'<button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button>'

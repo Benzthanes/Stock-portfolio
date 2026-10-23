@@ -57,6 +57,12 @@ class NavBarTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             nav_bar_html("no_such_page", FIXED)
 
+    def test_live_refresh_intervals(self):
+        html = nav_bar_html("chart", FIXED)
+        for interval in ["0", "5", "15", "30", "60"]:
+            self.assertIn(f'id="rnav-live-{interval}"', html)
+        self.assertIn(">5s</button>", html)
+
 
 if __name__ == "__main__":
     unittest.main()

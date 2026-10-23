@@ -4537,7 +4537,7 @@
             localStorage.setItem('portfolio_live_interval', chartLiveIntervalSec);
         } catch (e) {}
 
-        [0, 15, 30, 60].forEach(s => {
+        [0, 5, 15, 30, 60].forEach(s => {
             const b = document.getElementById('btn-chart-live-' + s);
             if (b) b.classList.toggle('active', s === chartLiveIntervalSec);
             const rb = document.getElementById('rnav-live-' + s);
@@ -4722,20 +4722,56 @@
     }
     window.fetchChartLiveQuotes = fetchChartLiveQuotes;
 
+    let previousQuotesPriceMap = {};
+    let previousExtPriceMap = {};
+
+    function triggerFlashEffect(elem, isUp) {
+        if (!elem) return;
+        const upClass = 'price-flash-up';
+        const downClass = 'price-flash-down';
+        elem.classList.remove(upClass, downClass);
+        void elem.offsetWidth;
+        elem.classList.add(isUp ? upClass : downClass);
+        setTimeout(() => {
+            elem.classList.remove(upClass, downClass);
+        }, 850);
+    }
+
+    function triggerCardFlashEffect(elem, isUp) {
+        if (!elem) return;
+        const upClass = 'card-flash-up';
+        const downClass = 'card-flash-down';
+        elem.classList.remove(upClass, downClass);
+        void elem.offsetWidth;
+        elem.classList.add(isUp ? upClass : downClass);
+        setTimeout(() => {
+            elem.classList.remove(upClass, downClass);
+        }, 900);
+    }
     // Cross-Tab & Self Live Quote Handler
     function handleLiveQuotesBroadcast(data) {
         if (!data || !data.quotes) return;
         const quotes = data.quotes;
         latestLiveQuotesMap = Object.assign(latestLiveQuotesMap, quotes);
 
-        // 1. Update pills at the top
+        // 1. Update stock cards in sidebar with live glow
         Object.keys(quotes).forEach(tk => {
             const q = quotes[tk];
             if (q && typeof q.close === 'number') {
+                const prev = previousQuotesPriceMap[tk];
+                const isChanged = prev !== undefined && Math.abs(prev - q.close) > 0.0001;
+                const isUp = isChanged ? q.close > prev : (q.change >= 0);
+
                 const pillElem = document.querySelector('#pill_' + tk + ' .sp-pill-p');
+                const cardElem = document.getElementById('pill_' + tk);
                 if (pillElem) {
                     pillElem.textContent = '$' + q.close.toFixed(2);
+                    if (isChanged) {
+                        triggerFlashEffect(pillElem, isUp);
+                        if (cardElem) triggerCardFlashEffect(cardElem, isUp);
+                    }
                 }
+                previousQuotesPriceMap[tk] = q.close;
             }
         });
 
@@ -4744,8 +4780,16 @@
             const q = quotes[currentStockTicker];
             const headPriceElem = document.getElementById('st_head_price');
             const headChangeElem = document.getElementById('st_head_change');
+            const prevHeadPrice = parseFloat(headPriceElem ? headPriceElem.dataset.lastPrice : '') || 0;
+            const isHeadChanged = prevHeadPrice > 0 && Math.abs(prevHeadPrice - q.close) > 0.0001;
+            const isHeadUp = isHeadChanged ? q.close > prevHeadPrice : (q.change >= 0);
+
             if (headPriceElem && typeof q.close === 'number') {
                 headPriceElem.textContent = '$' + q.close.toFixed(2);
+                headPriceElem.dataset.lastPrice = q.close;
+                if (isHeadChanged) {
+                    triggerFlashEffect(headPriceElem, isHeadUp);
+                }
             }
             if (headChangeElem && typeof q.change === 'number') {
                 const isUp = q.change >= 0;
@@ -4763,17 +4807,24 @@
             if (ext) {
                 const isUp = ext.change >= 0;
                 const sign = isUp ? '+' : '';
+                const prevExt = previousExtPriceMap[currentStockTicker];
+                const isExtChanged = prevExt !== undefined && Math.abs(prevExt - ext.price) > 0.0001;
+                const isExtUp = isExtChanged ? ext.price > prevExt : (ext.change >= 0);
+                previousExtPriceMap[currentStockTicker] = ext.price;
+
                 if (extChip) {
                     extChip.style.display = 'inline-flex';
                     extChip.className = 'header-ext-chip ' + (isUp ? 'up' : 'down');
                     extChip.innerHTML = `<span class="ext-tag">${ext.shortLabel}</span> $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`;
                     extChip.title = `${ext.label}: $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`;
+                    if (isExtChanged) triggerFlashEffect(extChip, isExtUp);
                 }
                 if (extCard && extVal) {
                     extCard.style.display = 'flex';
                     if (extLabel) extLabel.textContent = ext.label;
                     extVal.style.color = isUp ? '#38bdf8' : '#fb7185';
                     extVal.innerHTML = `$${ext.price.toFixed(2)} <span style="font-size:0.72rem; font-weight:600;">(${sign}${ext.change.toFixed(2)}%)</span>`;
+                    if (isExtChanged) triggerFlashEffect(extVal, isExtUp);
                 }
             } else {
                 if (extChip) extChip.style.display = 'none';
@@ -4783,6 +4834,11 @@
             const hudPrice = document.getElementById('hud_price');
             if (hudPrice && typeof q.close === 'number') {
                 hudPrice.textContent = '$' + q.close.toFixed(2);
+                if (isHeadChanged) {
+                    triggerFlashEffect(hudPrice, isHeadUp);
+                    const hudCard = hudPrice.closest('.hud-card');
+                    if (hudCard) triggerCardFlashEffect(hudCard, isHeadUp);
+                }
             }
 
             // Update Extended Price Line on active chart

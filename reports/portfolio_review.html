@@ -590,7 +590,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-23 11:36</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-23 12:16</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -640,7 +640,7 @@
       localStorage.setItem('portfolio_live_interval', globalIntervalSec);
     } catch (e) {}
 
-    [0, 15, 30, 60].forEach(function(s) {
+    [0, 5, 15, 30, 60].forEach(function(s) {
       var b = document.getElementById('rnav-live-' + s);
       if (b) b.classList.toggle('active', s === globalIntervalSec);
     });
@@ -754,7 +754,7 @@
             </div>
             <div class="header-meta">
                 <span class="meta-pill">🏦 <strong>Broker:</strong> Dime! (KKP Securities)</span>
-                <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.72 THB/USD</span>
+                <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.69 THB/USD</span>
             </div>
         </header>
 
@@ -774,14 +774,14 @@
             <div class="card kpi-card">
                 <div class="kpi-label">💰 มูลค่าพอร์ตปัจจุบัน</div>
                 <div class="kpi-value">$47,604.14</div>
-                <div class="kpi-subtext">≈ ฿1,605,306.79 THB (ต้นทุน $40,397.78)</div>
+                <div class="kpi-subtext">≈ ฿1,603,783.46 THB (ต้นทุน $40,397.78)</div>
                 
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">📈 กำไร/ขาดทุนสุทธิ (Unrealized)</div>
                 <div class="kpi-value" style="color: var(--emerald);">+$7,206.36 (+17.84%)</div>
-                <div class="kpi-subtext">≈ +฿246,896.63 THB</div>
+                <div class="kpi-subtext">≈ +฿245,373.30 THB</div>
             </div>
 
             <div class="card kpi-card">
@@ -946,7 +946,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$36,127.06</div>
-                <div class="text-muted small">≈ ฿1,218,277</div>
+                <div class="text-muted small">≈ ฿1,217,121</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+27.97%</div>
@@ -955,7 +955,7 @@
             <td style="text-align: right;" class="text-emerald">+2.83%</td>
             <td style="text-align: center;">70.7</td>
             <td style="text-align: center;">+20.5%</td>
-            <td><span class="badge badge-rose">🚨 Extreme Concentration (75.9%)</span> <span class="badge badge-amber">⚠️ Earnings in 6.3d</span> </td>
+            <td><span class="badge badge-rose">🚨 Extreme Concentration (75.9%)</span> <span class="badge badge-amber">⚠️ Earnings in 6.2d</span> </td>
         </tr>
         
         <tr>
@@ -976,7 +976,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$3,627.93</div>
-                <div class="text-muted small">≈ ฿122,341</div>
+                <div class="text-muted small">≈ ฿122,225</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-5.12%</div>
@@ -1006,7 +1006,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,726.82</div>
-                <div class="text-muted small">≈ ฿58,232</div>
+                <div class="text-muted small">≈ ฿58,176</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+15.79%</div>
@@ -1036,7 +1036,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,645.87</div>
-                <div class="text-muted small">≈ ฿55,502</div>
+                <div class="text-muted small">≈ ฿55,449</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-25.81%</div>
@@ -1066,7 +1066,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,398.12</div>
-                <div class="text-muted small">≈ ฿47,147</div>
+                <div class="text-muted small">≈ ฿47,103</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-5.95%</div>
@@ -1096,7 +1096,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,123.42</div>
-                <div class="text-muted small">≈ ฿37,884</div>
+                <div class="text-muted small">≈ ฿37,848</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-9.05%</div>
@@ -1126,7 +1126,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$820.39</div>
-                <div class="text-muted small">≈ ฿27,665</div>
+                <div class="text-muted small">≈ ฿27,639</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+10.17%</div>
@@ -1156,7 +1156,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$786.79</div>
-                <div class="text-muted small">≈ ฿26,532</div>
+                <div class="text-muted small">≈ ฿26,507</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-7.37%</div>
@@ -1186,7 +1186,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$347.76</div>
-                <div class="text-muted small">≈ ฿11,727</div>
+                <div class="text-muted small">≈ ฿11,716</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+9.66%</div>
@@ -1243,7 +1243,7 @@
             <td style="text-align: right;"><strong>$1,368.14</strong> <span class='text-emerald small'>(+4.7%)</span></td>
             <td style="text-align: center;">$930 - $1,680</td>
             <td><span class='badge badge-emerald'>Buy 25</span> <span class='badge badge-amber'>Hold 3</span> <span class='badge badge-rose'>Sell 1</span></td>
-            <td><span class='badge badge-rose'>⚠️ 29 Oct 2026 (6.3d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 29 Oct 2026 (6.2d)</span></td>
         </tr>
         
         <tr>
@@ -1550,7 +1550,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ปฏิทินงบ (6.3 วัน)</span>
+                <span class="timeline-step-badge">ปฏิทินงบ (6.2 วัน)</span>
                 <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -1599,7 +1599,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Amgen vs. Eli Lilly: Does the GLP-1 Mania Make LLY Stock a Better Buy in 2026?</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMixwFBVV95cUxOSm1yUEl1NFF1ejFVb0dCaVQ1QjJCQ1hOb0c3ME1XR1lKMlM2OE5MMlZISTZqRm12ZGdpX0Z0Wk4xQnZxRWlUTjZMS0ppWHd2ZGRwWU9CeUJGMHlQVW5MalY5UmpieUNIOFM0XzFRMHZlbDh6MkZHU1NSRGU0ZjZsVU53b1VGdFN5TWpVVTNkbnFXT0hDamM4WXlDcXNmQ2txVnVoaGV5cTZaSWowNkYzeVN6R1RMblIyWGphMzl5UkxhUzN4ZEtz?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Amgen vs. Eli Lilly: Does the GLP-1 Mania Make LLY Stock a Better Buy in 2026? ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Amgen vs. Eli Lilly: Does the GLP-1 Mania Make LLY Stock a Better Buy in 2026?</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMijAFBVV95cUxQM3lITDNTRlNvaml2ZzJST2ViZmdMTU5kR2loUkl4clBpRU8wWEdFRUpwUEEyaUtNWm50dThpd1NJZ0RhZkxfXzNWa3FmSTFiYm9HMVRmN1R3b29QVTVDbDBBZUVYOGdKM1ZPU2l2U19uZ0JpUUI1ZU9MbF9EalFQa0VKWjZEbERua3ZkMg?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Amgen vs. Eli Lilly: Does the GLP-1 Mania Make LLY Stock a Better Buy in 2026? ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -1811,11 +1811,11 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Airbnb vs. DoorDash: Which Consumer Stock Is a Better Buy in 2026?</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMitwFBVV95cUxQdWk5UjgzQVU2NjZ0RExQZ09rdFoxY24zazJvc1BXWGI3VF9TcXhCZnVhMk1VSHdIR0FqaU82QVg4ZVUyTVI4Q3g5TlUzQXJvaVlRWEs1X2tzQzd3RUhITUlseGN1XzUzZDIyNlJpWDFyUmlXdGtReFBOXzByQmMxTjFaVk1QWFo4a2RCdEVMeGtnYW0zeXhOaWRCaHhMbU5OSENodjdkUW42VHUzdkZGaGd2cUxNVlk?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Airbnb vs. DoorDash: Which Consumer Stock Is a Better Buy in 2026? ↗</a> <span class='text-muted small'>(23 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[MarketWatch]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Airbnb Inc. Cl A stock rises Thursday, outperforms market</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizgFBVV95cUxNY25UYlVuMWlRZHFRVjQ0c0lGUVBuY192aHVkT2g1S0dPUU1mcFZmaXQ4Tlp5OWJ4NWFUa2M0V294ajdzV3pseU1PSTlQRGxjU05iRnBYU2habE1RdndkeEpGNVowaEZkdTlmU3QyNUg2elNTX3llQ1ZlVlJST2ZXQUl1Yl9rZ0VGMkFHdFMyWTdXWU92SlFETHJXeGRFMVRfanN4VjVYUXB6VFU5TzVVT0hwU1M5UnFYYW1NUktSTkRpYmVtcHl0WUVaRGRMZw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Airbnb Inc. Cl A stock rises Thursday, outperforms market ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com India]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ABNB ประกาศความร่วมมือทางธุรกิจหรือความคืบหน้านวัตกรรมใหม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>🤖 AI Verified</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiuwFBVV95cUxNajdHMUsyczNiWW9RYkN5OG1nNGU1V0Y1cG43YVNXR2h2SVBVREJLNFlMOTdTcmx3YU01dzk1aWVWV1FQZTg2czE3ZHByNGliV3ZPOUs4S2VMQlVKVWtUR2wxQXplSWViVGl0SnRhT1JTazM3WGE1LU1PdS1scGNKNHBXbGxVUTkxcnh6MkNCN2RiNVF5cVVRVFJjTnRYSkxUM3dQOWF3TzlUWno3aVFGZlJPOThrOUNoN2tZ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Amex partners with Airbnb to expand travel booking options By Investing.com ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>American Express and Airbnb Launch Exclusive Partnership, Bringing Over 1 Million Listings to American Express Travel®</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMirAFBVV95cUxOMEFCTlkzcUUweVotTnBEVEJFMjJULVEzWG1SenMzTWtmUnVXbkZ3X0ZSVjdMY3BkMzBVWTk5Z1pRMkhnbFpWLWswbVl6dEV3ZnVjSkh4NkFuUmY4d0prbzh2SmNYaktuelJENU9icVQ5aTNCQUN1VXdZcW55M2p5Q00zWkZuTU9SZGhQVVpieXp3U19xeGJqcmlFT1ppQVdFV1lETjVjMUpBNUg4?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>American Express and Airbnb Launch Exclusive Partnership, Bringing Over 1 Million Listings to American Express Travel® ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Airbnb vs. DoorDash: Which Consumer Stock Is a Better Buy in 2026?</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMitwFBVV95cUxQdWk5UjgzQVU2NjZ0RExQZ09rdFoxY24zazJvc1BXWGI3VF9TcXhCZnVhMk1VSHdIR0FqaU82QVg4ZVUyTVI4Q3g5TlUzQXJvaVlRWEs1X2tzQzd3RUhITUlseGN1XzUzZDIyNlJpWDFyUmlXdGtReFBOXzByQmMxTjFaVk1QWFo4a2RCdEVMeGtnYW0zeXhOaWRCaHhMbU5OSENodjdkUW42VHUzdkZGaGd2cUxNVlk?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Airbnb vs. DoorDash: Which Consumer Stock Is a Better Buy in 2026? ↗</a> <span class='text-muted small'>(23 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com India]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ABNB ประกาศความร่วมมือทางธุรกิจหรือความคืบหน้านวัตกรรมใหม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>🤖 AI Verified</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiuwFBVV95cUxNajdHMUsyczNiWW9RYkN5OG1nNGU1V0Y1cG43YVNXR2h2SVBVREJLNFlMOTdTcmx3YU01dzk1aWVWV1FQZTg2czE3ZHByNGliV3ZPOUs4S2VMQlVKVWtUR2wxQXplSWViVGl0SnRhT1JTazM3WGE1LU1PdS1scGNKNHBXbGxVUTkxcnh6MkNCN2RiNVF5cVVRVFJjTnRYSkxUM3dQOWF3TzlUWno3aVFGZlJPOThrOUNoN2tZ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Amex partners with Airbnb to expand travel booking options By Investing.com ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[MarketBeat]</strong> <span style='font-weight: 600; color: #f1f5f9;'>สถาบันการเงินลดสัดส่วนการถือครองหุ้น ABNB</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>🤖 AI Verified</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMivgFBVV95cUxOMU9JeTlETFNYd0F2eFZlYUd6S0tIb1Y1dmUyWG5iLThsUUVDdnB0YzJuWFZ4WjBTRWZGRldnbWFkV2d3d3hpT2NEUWlHOElLSDZUUWY4bV9JVDJYNWdBWXNUNmRPVTVwUFNGV2ZyMy01OVVuRm9DRldEOXV3dGtTTGtpYnBPQmZ6TXc1SU9wTG9VNGswVGYyZ0Q1VEFXRzlJMlRQMnE3bUtWMTJBZWxGcXdnVUxDTWlMaXNiY05n?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Airbnb, Inc. $ABNB Shares Sold by Crossmark Global Holdings Inc. ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -2023,11 +2023,11 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Bank of America vs. JPMorgan Chase: Which Financial Stock Is a Better Buy in 2026?</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizAFBVV95cUxPUWpkYS1GRFROZHBDb1loRnJlX0QtM2c2dXUxYjNOc2dEQ09OTGQwSHIxam5Qb0hSSTZrcGs2Q0pfMFNxVTd5bzFwV2ZKUVQ2eEt5c1lfTjU1eUJ6aWdRUUQ5Q01kWndveHlSZkk5WDRWd28wNFpBSzZ6b1U5X3RtMkpjXzk3Q3oyYzExRDZaRGt3d1NDUFE2RFVmNzVyTDZoTW5nS2FBUTRGUUR1SHZITnRQM1BNdF9Rc2hpQm5La0ZTenhnMUtub1RObjE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Bank of America vs. JPMorgan Chase: Which Financial Stock Is a Better Buy in 2026? ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[شبكة تواصل الإخبارية]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Bank of America Chief Brian Moynihan Sued by Angry Investors Following Staggering $1.2 Billion Money Laundering Penalty and Sharp Earnings Slump</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiU0FVX3lxTE45UThtWk9YdDFjTVpJeEVYenpxY21TS0dyNlJRMkJjQy04ODRUTTR0ODRfelp3TFQ2Wk5ncWRQcnh4UFFuZXVWYVVjeVo4eXZmMXdJ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Bank of America Chief Brian Moynihan Sued by Angry Investors Following Staggering $1.2 Billion Money Laundering Penalty and Sharp Earnings Slump ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[cristinaiglesias.com]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Bank of America Chief Brian Moynihan Sued by Angry Investors Following Staggering $1.2 Billion Money Laundering Penalty and Sharp Earnings Slump</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMijgJBVV95cUxNVS0xbV94MVBUSmptREtFNjZrbW1xd0tFeUxzX2JXUHJQSTNuRDRGQlhidEUwZXFzUmk4Rkk5NXJ0OEVfc1FpX1VlbV9KZmVxR1NiQm0tVWUzYkUxUzUtdy1wR2hPMzNjMVQ3YTAtc2dkbHRZYTdJYkpRZFF5cXg3NDhGVU5TRi1wMjBHSXdoNHh6NWRFa2VWRnEtWGlaRTlqejVYcXZnRmlTdHcxd05GMGNuSEU0eFlaYUFaZ3JVUFZhRzNFM2dhNEZHamxvVlJHaWxDUjBoWUpxbl9DeG14SnZaMGVwRXNGSHRnQmZEejkwc2RyVkVMcWRERVJwV3JQemJVMkpJWjFlSjdJb3c?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Bank of America Chief Brian Moynihan Sued by Angry Investors Following Staggering $1.2 Billion Money Laundering Penalty and Sharp Earnings Slump ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investopedia]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Moderna Stock Sinks Nearly 20% After Leak of Cancer-Vaccine Data</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMixwFBVV95cUxNdS1DYXlHTnF4NkZLVFBQMlctazMyQng1ckJpM1IxWDYxaG1CTGpYRVJKV19rel9LUmlZU3h6aUlxMWFQX1NhNkI3US02X3h6RUh3UWRpcGh0YXJNQW5IOHRfM1liU3BlazM3YkxqLTZPaVl3TVdUd3FTSk4zTThvb0hiYjJOa3pNRXpHTndwNHZXem1oSWJmZlVfT2J1dUIxRkVfZFU0alJGOFhPdE92aWtWRVhWakg4TS03Z1NabjBZaER5OGp3?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Moderna Stock Sinks Nearly 20% After Leak of Cancer-Vaccine Data ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[cristinaiglesias.com]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Bank of America Chief Brian Moynihan Sued by Angry Investors Following Staggering $1.2 Billion Money Laundering Penalty and Sharp Earnings Slump</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMijgJBVV95cUxNVS0xbV94MVBUSmptREtFNjZrbW1xd0tFeUxzX2JXUHJQSTNuRDRGQlhidEUwZXFzUmk4Rkk5NXJ0OEVfc1FpX1VlbV9KZmVxR1NiQm0tVWUzYkUxUzUtdy1wR2hPMzNjMVQ3YTAtc2dkbHRZYTdJYkpRZFF5cXg3NDhGVU5TRi1wMjBHSXdoNHh6NWRFa2VWRnEtWGlaRTlqejVYcXZnRmlTdHcxd05GMGNuSEU0eFlaYUFaZ3JVUFZhRzNFM2dhNEZHamxvVlJHaWxDUjBoWUpxbl9DeG14SnZaMGVwRXNGSHRnQmZEejkwc2RyVkVMcWRERVJwV3JQemJVMkpJWjFlSjdJb3c?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Bank of America Chief Brian Moynihan Sued by Angry Investors Following Staggering $1.2 Billion Money Laundering Penalty and Sharp Earnings Slump ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investopedia]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Moderna Stock Sinks Nearly 20% After Leak of Cancer-Vaccine Data</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMixwFBVV95cUxNdS1DYXlHTnF4NkZLVFBQMlctazMyQng1ckJpM1IxWDYxaG1CTGpYRVJKV19rel9LUmlZU3h6aUlxMWFQX1NhNkI3US02X3h6RUh3UWRpcGh0YXJNQW5IOHRfM1liU3BlazM3YkxqLTZPaVl3TVdUd3FTSk4zTThvb0hiYjJOa3pNRXpHTndwNHZXem1oSWJmZlVfT2J1dUIxRkVfZFU0alJGOFhPdE92aWtWRVhWakg4TS03Z1NabjBZaER5OGp3?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Moderna Stock Sinks Nearly 20% After Leak of Cancer-Vaccine Data ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -2129,7 +2129,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[TIKR.com]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Vertiv Rallies After Nvidia Partnership Targets 30% More First-Year Token Output</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiqAFBVV95cUxNVnc4MDVNWVp6b1Y3d3FlUEZYNkYxN0psdzZJMzQ4V3UwY2RYMEQ0UUhvYl81cERaZXpBSHAxQjU1TkpGZ211Rzg0WkF0S29fa2lpdnF0MFpXUXQxTF9rbW1ocDkzMFA3RTJOZnNocjV2a1dheFB0cnBkNVpMVURLc1NXLTRhbm5WMzlnMnBmYnJaaUhIbEFTYnF4VEpPMHJuYXgxLUNlVEk?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Vertiv Rallies After Nvidia Partnership Targets 30% More First-Year Token Output ↗</a> <span class='text-muted small'>(22 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
