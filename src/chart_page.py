@@ -73,7 +73,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
         "ABNB": ("Airbnb, Inc.", "Travel Services", "NASDAQ"),
         "APP": ("AppLovin Corporation", "Application Software", "NASDAQ"),
         "VST": ("Vistra Corp.", "Independent Power Producers", "NYSE"),
-        "SKHY": ("SK Hynix Inc.", "Memory Semiconductors", "OTC"),
+        "SKHY": ("SK hynix Inc. American Depositary Shares", "Memory Semiconductors", "NASDAQ"),
     }
 
     # 1. From portfolio.json
@@ -147,9 +147,9 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                 if t not in meta:
                     meta[t] = {
                         "ticker": t,
-                        "name": tr.get("name", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[0]),
+                        "name": KNOWN_NAMES.get(t, (tr.get("name", t), "", "NASDAQ"))[0],
                         "sector": "Closed / Realized Trade",
-                        "exchange": tr.get("exchange", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[2]),
+                        "exchange": KNOWN_NAMES.get(t, (t, "", tr.get("exchange", "NASDAQ")))[2],
                         "cost": tr.get("buy_price_usd", 0.0),
                         "shares": 0.0,
                         "total_cost": 0.0,
@@ -277,9 +277,9 @@ def generate_stock_chart_page_html() -> str:
         save_candles_cache(raw_cache)
     cache = compact_charts_for_page(raw_cache, meta)
 
-    # Ensure all cache entries have price if missing
+    # Ensure all cache entries have price if missing or for closed trades
     for t, entry in cache.items():
-        if t in meta and not meta[t]["price"] and entry.get("candles"):
+        if t in meta and (not meta[t]["price"] or not meta[t].get("is_holding")) and entry.get("candles"):
             meta[t]["price"] = entry["candles"][-1]["close"]
 
     all_tickers = sorted([t for t in cache.keys() if t in meta])
