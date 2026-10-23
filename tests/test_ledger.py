@@ -28,6 +28,11 @@ class LedgerCase(unittest.TestCase):
             {"ticker": "AAA", "exchange": "NASDAQ", "name": "Aaa Inc", "shares": 10.0,
              "avg_cost_usd": 40.0, "total_cost_usd": 400.0, "cost_thb": 13200.0, "buy_date": "2026-01-02"}]}), encoding="utf-8")
         shutil.copy(ROOT / "data" / "ledger.json", self.ledger)
+        base_ledger = json.loads(self.ledger.read_text(encoding="utf-8"))
+        self.base_capital = float(base_ledger.get("net_injected_capital_thb", 0.0))
+        self.base_gross = float(base_ledger.get("gross_deposits_thb", 0.0))
+        base_ledger["cash"] = {"dime_save_thb": 0.0, "dime_usd": 0.0}
+        self.ledger.write_text(json.dumps(base_ledger), encoding="utf-8")
 
     def tearDown(self):
         self._tmp.cleanup()
@@ -90,8 +95,8 @@ class CashTest(LedgerCase):
     def test_deposit_raises_capital_and_cash(self):
         record_deposit(20000.0, trade_date="2026-10-15", ledger_path=str(self.ledger))
         ledger = load_ledger(str(self.ledger))
-        self.assertEqual(ledger["net_injected_capital_thb"], 1265000.0)
-        self.assertEqual(ledger["gross_deposits_thb"], 1315000.0)
+        self.assertEqual(ledger["net_injected_capital_thb"], self.base_capital + 20000.0)
+        self.assertEqual(ledger["gross_deposits_thb"], self.base_gross + 20000.0)
         self.assertEqual(ledger["cash"]["dime_save_thb"], 20000.0)
         self.assertEqual(ledger["cash_movements"][-1]["balance_thb"], 20000.0)
         self.assertEqual(ledger["cash_movements"][-1]["channel"], "PROMPTPAY")
@@ -100,7 +105,7 @@ class CashTest(LedgerCase):
         record_deposit(500.0, ledger_path=str(self.ledger))
         record_withdraw(500.0, ledger_path=str(self.ledger))
         ledger = load_ledger(str(self.ledger))
-        self.assertEqual(ledger["net_injected_capital_thb"], 1245000.0)
+        self.assertEqual(ledger["net_injected_capital_thb"], self.base_capital)
         self.assertEqual(ledger["transfer_out_thb"], 50500.0)
         self.assertEqual(ledger["cash"]["dime_save_thb"], 0.0)
         self.assertEqual(ledger["cash_movements"][-1]["amount_thb"], -500.0)

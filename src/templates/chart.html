@@ -15,42 +15,75 @@
 __CHART_CSS__    </style>
 </head>
 <body>
-    <div class="chart-page-container">
-        <!-- Top Nav Bar -->
-        <div class="top-nav-bar">
-            <button class="nav-back-btn" onclick="goBackOrDashboard()">
-                <span>← ย้อนกลับ</span>
-            </button>
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <!-- Floating Tab to Open Stock Menu when Collapsed -->
+    <button class="floating-sidebar-toggle" id="floating_sidebar_toggle" onclick="toggleStockSidebar(true)" title="เปิดเมนูเลือกหุ้น (Open Stock Menu)">
+        <span class="fst-icon">☰</span>
+        <span class="fst-text">หุ้นในพอร์ต</span>
+        <span class="fst-badge" id="floating_stock_badge">15</span>
+    </button>
 
-                <div class="hotkey-badge">
-                    <span>คีย์ลัด:</span>
-                    <kbd>E</kbd> EMA 200
-                    <kbd>R</kbd> RSI
-                    <kbd>F</kbd> Fibo
-                    <kbd>S</kbd> Supertrend
-                    <kbd>V</kbd> VWAP
+    <!-- Mobile Drawer Backdrop -->
+    <div class="sidebar-backdrop" id="sidebar_backdrop" onclick="toggleStockSidebar(false)"></div>
+
+    <div class="chart-layout-root" id="chart_layout_root">
+        <!-- Left Stock Sidebar Drawer -->
+        <aside class="stock-left-sidebar" id="stock_left_sidebar" aria-label="Stock Selection Menu">
+            <div class="sidebar-header-pane">
+                <div class="sidebar-header-row">
+                    <div class="sidebar-brand-pill">
+                        <span class="sb-fire">🔥</span>
+                        <span class="sb-title">อัปเดตหุ้นล่าสุด</span>
+                        <span class="sb-count" id="sidebar_stock_count">15</span>
+                    </div>
+                    <button class="sidebar-hide-btn" onclick="toggleStockSidebar(false)" title="ซ่อนเมนู (Hide Menu)">
+                        <span>✕</span>
+                    </button>
                 </div>
-                <div class="hotkey-badge">
-                    <span>🖱️ ดับเบิ้ลคลิกแกนราคาเพื่อรีเซ็ตสเกล</span>
+                <div class="sidebar-search-box">
+                    <input type="text" id="ticker_search" class="sidebar-search-input" placeholder="🔍 ค้นหาหุ้น (NOK, LLY)..." oninput="filterTickers(this.value)">
                 </div>
             </div>
-        </div>
 
-        __NAV_BAR__
-
-        <!-- Ticker Switcher Carousel -->
-        <div class="ticker-carousel-wrap">
-            <div class="search-box">
-                <input type="text" id="ticker_search" class="search-input" placeholder="🔍 ค้นหาหุ้น (เช่น LLY)..." oninput="filterTickers(this.value)">
-            </div>
-            <div class="pills-scroll" id="pills_container">
+            <!-- Scrollable Stock Cards List -->
+            <div class="sidebar-cards-scroll" id="pills_container">
                 __PILLS_HTML__
             </div>
-        </div>
+        </aside>
 
-        <!-- 2-Column Cockpit Grid -->
-        <div class="cockpit-grid">
+        <!-- Main Chart Page Area -->
+        <div class="chart-main-content" id="chart_main_content">
+            <div class="chart-page-container">
+                <!-- Top Nav Bar -->
+                <div class="top-nav-bar">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="nav-back-btn" onclick="goBackOrDashboard()">
+                            <span>← ย้อนกลับ</span>
+                        </button>
+                        <button class="sidebar-top-toggle-btn" id="top_sidebar_toggle_btn" onclick="toggleStockSidebar()" title="เปิด/ปิดเมนูหุ้น (Toggle Stock Menu)">
+                            <span class="stb-icon">☰</span>
+                            <span class="stb-label">เมนูหุ้น</span>
+                        </button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+
+                        <div class="hotkey-badge">
+                            <span>คีย์ลัด:</span>
+                            <kbd>E</kbd> EMA 200
+                            <kbd>R</kbd> RSI
+                            <kbd>F</kbd> Fibo
+                            <kbd>S</kbd> Supertrend
+                            <kbd>V</kbd> VWAP
+                        </div>
+                        <div class="hotkey-badge">
+                            <span>🖱️ ดับเบิ้ลคลิกแกนราคาเพื่อรีเซ็ตสเกล</span>
+                        </div>
+                    </div>
+                </div>
+
+                __NAV_BAR__
+
+                <!-- 2-Column Cockpit Grid -->
+                <div class="cockpit-grid">
             <!-- Left: Main Chart Area -->
             <div class="cockpit-main">
                 <div class="stock-main-card">
@@ -536,6 +569,8 @@ __CHART_CSS__    </style>
             </div>
         </div>
     </div>
+        </div><!-- close chart-main-content -->
+    </div><!-- close chart-layout-root -->
 
     <!-- Technical Indicator Explainer Modal -->
     <div class="ind-modal-overlay" id="ind_modal" onclick="closeIndicatorHelp(event)">

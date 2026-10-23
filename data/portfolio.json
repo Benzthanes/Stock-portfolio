@@ -35,10 +35,10 @@
       "ticker": "NOK",
       "exchange": "NYSE",
       "name": "Nokia Oyj",
-      "shares": 137.7332496,
-      "avg_cost_usd": 11.8125,
-      "total_cost_usd": 1626.97,
-      "cost_thb": 54698.73
+      "shares": 208.8669845,
+      "avg_cost_usd": 10.6208,
+      "total_cost_usd": 2218.33,
+      "cost_thb": 74698.53
     },
     {
       "ticker": "BAC",
@@ -71,10 +71,10 @@
       "ticker": "VRT",
       "exchange": "NYSE",
       "name": "Vertiv Holdings Co.",
-      "shares": 2.7077294,
-      "avg_cost_usd": 237.8007,
-      "total_cost_usd": 643.9,
-      "cost_thb": 21647.92
+      "shares": 5.7437246,
+      "avg_cost_usd": 215.0625,
+      "total_cost_usd": 1235.26,
+      "cost_thb": 41647.72
     },
     {
       "ticker": "VOO",
@@ -85,5 +85,7 @@
       "total_cost_usd": 317.14,
       "cost_thb": 10662.25
     }
-  ]
+  ],
+  "total_cost_usd": 40397.78,
+  "total_cost_thb": 1358410.16
 }

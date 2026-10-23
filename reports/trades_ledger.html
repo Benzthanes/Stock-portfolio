@@ -159,7 +159,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link active" aria-current="page">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-22 14:38</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link active" aria-current="page">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-23 11:36</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -331,7 +331,7 @@
                 <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>
                 </button>
-                <span class="meta-pill">🕒 ข้อมูล ณ: 2026-10-22 14:38:42</span>
+                <span class="meta-pill">🕒 ข้อมูล ณ: 2026-10-23 11:36:52</span>
             </div>
         </div>
 
@@ -339,13 +339,13 @@
         <div class="grid-4-cols">
             <div class="card">
                 <div class="kpi-label">เงินต้นฝากสะสมสุทธิ (Net Capital)</div>
-                <div class="kpi-value" style="color: #60a5fa;">฿1,245,000.00</div>
-                <div class="kpi-subtext">ฝากรวม ฿1,295,000.00 (โอนออก -฿50,000.00)</div>
+                <div class="kpi-value" style="color: #60a5fa;">฿1,285,000.00</div>
+                <div class="kpi-subtext">ฝากรวม ฿1,335,000.00 (โอนออก -฿50,000.00)</div>
             </div>
             <div class="card">
                 <div class="kpi-label">ยอดคำสั่งซื้อหุ้นรวม (Total Buys)</div>
-                <div class="kpi-value" style="color: #38bdf8;">฿659,914.48</div>
-                <div class="kpi-subtext">$43,374.49 USD (55 คำสั่งซื้อ)</div>
+                <div class="kpi-value" style="color: #38bdf8;">฿679,914.28</div>
+                <div class="kpi-subtext">$44,556.26 USD (57 คำสั่งซื้อ)</div>
             </div>
             <div class="card">
                 <div class="kpi-label">กำไรปิดรอบที่ขายแล้ว (Realized P&L)</div>
@@ -354,24 +354,24 @@
             </div>
             <div class="card">
                 <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
-                <div class="kpi-value" style="color: #10b981;">+฿4,768.13</div>
+                <div class="kpi-value" style="color: #10b981;">+฿4,779.76</div>
                 <div class="kpi-subtext">+$141.74 USD (13 ครั้ง)</div>
             </div>
         </div>
 
         <!-- SUB-TAB BAR -->
         <div class="sub-tab-bar">
-            <button id="btn-sub-all" class="sub-tab-btn active" onclick="switchSubTab('all')">ทั้งหมด (129)</button>
-            <button id="btn-sub-buys" class="sub-tab-btn" onclick="switchSubTab('buys')">🛒 คำสั่งซื้อหุ้น (55)</button>
+            <button id="btn-sub-all" class="sub-tab-btn active" onclick="switchSubTab('all')">ทั้งหมด (134)</button>
+            <button id="btn-sub-buys" class="sub-tab-btn" onclick="switchSubTab('buys')">🛒 คำสั่งซื้อหุ้น (57)</button>
             <button id="btn-sub-sells" class="sub-tab-btn" onclick="switchSubTab('sells')">🏆 ปิดขายทำกำไร (7)</button>
             <button id="btn-sub-divs" class="sub-tab-btn" onclick="switchSubTab('divs')">💵 เงินปันผล (13)</button>
-            <button id="btn-sub-cash" class="sub-tab-btn" onclick="switchSubTab('cash')">🏦 เติมเงิน & เดินบัญชี (54)</button>
+            <button id="btn-sub-cash" class="sub-tab-btn" onclick="switchSubTab('cash')">🏦 เติมเงิน & เดินบัญชี (57)</button>
         </div>
 
         <!-- SECTION 1: COMPLETE BUY ORDERS HISTORY -->
         <div id="section-buys" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
-                <span>🛒</span> 1. ประวัติคำสั่งซื้อหุ้นทั้งหมดอย่างละเอียด (Complete Buy Orders History: 55 ไม้)
+                <span>🛒</span> 1. ประวัติคำสั่งซื้อหุ้นทั้งหมดอย่างละเอียด (Complete Buy Orders History: 57 ไม้)
                 <span class="badge badge-info">สกัดจากสลิปคำสั่งซื้อ Dime! 100% เรียงตามวันเวลาสำเร็จจริง</span>
             </div>
             <div class="table-container">
@@ -395,6 +395,34 @@
                         
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">01</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">22 ต.ค. 69 - 22:10 น.</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">VRT</td>
+            <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
+            <td style="text-align: center;"><span class="badge badge-info">Dime! USD</span></td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">3.0360</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$194.47</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$590.41</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">-</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">-</td>
+            <td style="text-align: center;"><button type="button" onclick="openSlipModal(&quot;../data/screenshots/IMG_5686.webp&quot;, &quot;IMG_5686.webp&quot;, &quot;VRT&quot;, &quot;22 ต.ค. 69 - 22:10 น.&quot;, &quot;3.0360 หุ้น @ $194.47&quot;)" class="slip-badge-btn" title="คลิกเพื่อดูสลิปคำสั่งซื้อ">🧾 IMG_5686.webp</button></td>
+        </tr>
+        
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">02</td>
+            <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">22 ต.ค. 69 - 21:58 น.</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
+            <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
+            <td style="text-align: center;"><span class="badge badge-success">Dime! Save (THB)</span></td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">71.1337</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">$8.30</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">$591.36</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif;">฿19,999.80</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">฿33.82</td>
+            <td style="text-align: center;"><button type="button" onclick="openSlipModal(&quot;../data/screenshots/IMG_5685.webp&quot;, &quot;IMG_5685.webp&quot;, &quot;NOK&quot;, &quot;22 ต.ค. 69 - 21:58 น.&quot;, &quot;71.1337 หุ้น @ $8.30&quot;)" class="slip-badge-btn" title="คลิกเพื่อดูสลิปคำสั่งซื้อ">🧾 IMG_5685.webp</button></td>
+        </tr>
+        
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">03</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">14 ต.ค. 69 - 21:03 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">APP</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -408,7 +436,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">02</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">04</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">14 ต.ค 69 - 20:33 น</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">BAC</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -422,7 +450,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">03</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">05</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">13 ต.ค. 69 - 22:39 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">VRT</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -436,7 +464,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">04</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">06</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">13 ต.ค. 69 - 21:16 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">BAC</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -450,7 +478,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">05</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">07</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">8 ต.ค. 69 - 23:09 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -464,7 +492,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">06</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">08</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">8 ต.ค. 69 - 01:38 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">VRT</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -478,7 +506,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">07</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">09</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">7 ต.ค. 69 - 23:30 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">BAC</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -492,7 +520,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">08</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">10</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">3 ต.ค. 69 - 00:13 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">APP</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -506,7 +534,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">09</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">11</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">30 ก.ย. 69 - 22:08 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">VST</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -520,7 +548,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">10</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">12</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">30 ก.ย. 69 - 22:06 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -534,7 +562,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">11</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">13</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">25 ก.ย. 69 - 00:24 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">ABNB</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -548,7 +576,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">12</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">14</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">25 ก.ย. 69 - 00:15 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">BAC</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -562,7 +590,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">13</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">15</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">24 ก.ย. 69 - 23:34 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">MNST</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -576,7 +604,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">14</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">16</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">24 ก.ย. 69 - 02:25 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">ABNB</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -590,7 +618,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">15</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">17</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">23 ก.ย. 69 - 21:47 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">ABNB</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -604,7 +632,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">16</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">18</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">23 ก.ย. 69 - 21:25 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">APP</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -618,7 +646,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">17</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">19</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">9 ก.ย. 69 - 20:32 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -632,7 +660,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">18</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">20</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">4 ส.ค. 69 - 23:48 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -646,7 +674,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">19</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">21</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">23 ก.ค. 69 - 21:38 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -660,7 +688,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">20</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">22</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">16 ก.ค. 69 - 23:05 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -674,7 +702,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">21</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">23</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">15 ก.ค. 69 - 21:20 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -688,7 +716,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">22</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">24</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">15 ก.ค. 69 - 21:00 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOW</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -702,7 +730,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">23</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">25</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">10 ก.ค. 69 - 22:34 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">SKHY</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -716,7 +744,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">24</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">26</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">29 มิ.ย. 69 - 20:56 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -730,7 +758,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">25</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">27</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">29 มิ.ย. 69 - 20:55 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -744,7 +772,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">26</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">28</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">29 มิ.ย. 69 - 20:50 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -758,7 +786,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">27</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">29</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">23 มิ.ย. 69 - 00:14 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -772,7 +800,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">28</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">30</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">23 มิ.ย. 69 - 00:14 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -786,7 +814,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">29</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">31</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">22 มิ.ย. 69 - 20:42 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOW</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -800,7 +828,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">30</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">32</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">22 มิ.ย. 69 - 20:41 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -814,7 +842,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">31</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">33</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">15 มิ.ย. 69 - 21:01 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -828,7 +856,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">32</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">34</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">15 มิ.ย. 69 - 21:00 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">GOOGL</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -842,7 +870,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">33</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">35</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">15 มิ.ย. 69 - 20:59 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOW</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -856,7 +884,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">34</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">36</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">12 มิ.ย. 69 - 22:46 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">SPCX</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -870,7 +898,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">35</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">37</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">1 มิ.ย. 69 - 22:34 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOW</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -884,7 +912,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">36</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">38</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">29 พ.ค. 69 - 21:38 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -898,7 +926,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">37</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">39</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">27 พ.ค. 69 - 22:35 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -912,7 +940,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">38</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">40</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">27 พ.ค. 69 - 22:34 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -926,7 +954,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">39</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">41</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">6 พ.ค. 69 - 21:57 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -940,7 +968,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">40</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">42</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">6 พ.ค. 69 - 21:56 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">NOK</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -954,7 +982,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">41</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">43</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">6 พ.ค. 69 - 21:55 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -968,7 +996,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">42</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">44</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">10 เม.ย. 69 - 21:02 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -982,7 +1010,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">43</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">45</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">1 เม.ย. 69 - 23:00 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -996,7 +1024,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">44</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">46</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">1 เม.ย. 69 - 23:00 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -1010,7 +1038,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">45</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">47</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">1 เม.ย. 69 - 22:59 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -1024,7 +1052,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">46</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">48</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">17 มี.ค. 69 - 22:49 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -1038,7 +1066,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">47</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">49</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">17 มี.ค. 69 - 02:36 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">MNST</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -1052,7 +1080,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">48</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">50</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">16 มี.ค. 69 - 22:51 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">MNST</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -1066,7 +1094,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">49</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">51</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">14 มี.ค. 69 - 00:50 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -1080,7 +1108,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">50</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">52</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">4 มี.ค. 69 - 22:14 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">PLTR</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -1094,7 +1122,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">51</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">53</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">4 ก.พ. 69 - 22:16 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -1108,7 +1136,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">52</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">54</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">4 ก.พ. 69 - 21:57 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-purple">Limit</span></td>
@@ -1122,7 +1150,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">53</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">55</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">3 ก.พ. 69 - 21:30 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">QQQI</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -1136,7 +1164,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">54</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">56</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">3 ก.พ. 69 - 21:30 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">VOO</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -1150,7 +1178,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">55</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">57</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">3 ก.พ. 69 - 21:30 น.</td>
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">LLY</td>
             <td style="text-align: center;"><span class="badge badge-neutral">Market</span></td>
@@ -1723,7 +1751,7 @@
         <div id="section-divs" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>💵</span> 3. ประวัติเงินปันผลรับสะสม (Dividends Received: 13 ครั้ง)
-                <span class="badge badge-success">รวม +$141.74 (~฿4,768.13)</span>
+                <span class="badge badge-success">รวม +$141.74 (~฿4,779.76)</span>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
                 <table>
@@ -1743,7 +1771,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">VOO</td>
             <td>1.8226/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$0.90</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿30.28</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿30.35</td>
         </tr>
         
         <tr>
@@ -1751,7 +1779,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">GOOGL</td>
             <td>0.22/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$1.95</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿65.60</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿65.76</td>
         </tr>
         
         <tr>
@@ -1759,7 +1787,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">LLY</td>
             <td>1.73/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$47.83</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿1,609.00</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿1,612.92</td>
         </tr>
         
         <tr>
@@ -1767,7 +1795,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">NOK</td>
             <td>0.0285/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$2.69</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿90.49</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿90.71</td>
         </tr>
         
         <tr>
@@ -1775,7 +1803,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">VOO</td>
             <td>1.9622/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$0.97</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿32.63</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿32.71</td>
         </tr>
         
         <tr>
@@ -1783,7 +1811,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">QQQI</td>
             <td>0.6572/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$3.84</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿129.18</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿129.49</td>
         </tr>
         
         <tr>
@@ -1791,7 +1819,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">LLY</td>
             <td>1.73/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$46.24</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿1,555.51</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿1,559.31</td>
         </tr>
         
         <tr>
@@ -1799,7 +1827,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">QQQI</td>
             <td>0.6589/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$3.85</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿129.51</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿129.83</td>
         </tr>
         
         <tr>
@@ -1807,7 +1835,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">QQQI</td>
             <td>0.6297/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$3.68</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿123.80</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿124.10</td>
         </tr>
         
         <tr>
@@ -1815,7 +1843,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">VOO</td>
             <td>1.8724/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$0.93</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿31.29</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿31.36</td>
         </tr>
         
         <tr>
@@ -1823,7 +1851,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">QQQI</td>
             <td>0.6089/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$3.55</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿119.42</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿119.71</td>
         </tr>
         
         <tr>
@@ -1831,7 +1859,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">LLY</td>
             <td>1.73/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$21.73</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿731.00</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿732.78</td>
         </tr>
         
         <tr>
@@ -1839,7 +1867,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif;">QQQI</td>
             <td>0.6140/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+$3.58</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿120.43</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">+฿120.72</td>
         </tr>
         
                     </tbody>
@@ -1850,7 +1878,7 @@
         <!-- SECTION 4: CAPITAL & CASH MOVEMENTS STATEMENT -->
         <div id="section-cash" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
-                <span>🏦</span> 4. ข้อมูลการเติมเงินและการเคลื่อนไหวเงินสดในบัญชี (Complete Cash Flow & Deposit Ledger: 54 รายการ)
+                <span>🏦</span> 4. ข้อมูลการเติมเงินและการเคลื่อนไหวเงินสดในบัญชี (Complete Cash Flow & Deposit Ledger: 57 รายการ)
                 <span class="badge badge-info">KKP Official Statement & สลิป Dime! Save ตั้งแต่วันเปิดบัญชี 2 ก.พ. 69</span>
             </div>
             <!-- STATEMENT OVERVIEW CARDS -->
@@ -1858,7 +1886,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 0.95rem;">
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดโอนเข้าจากต่างธนาคารรวม (PromptPay):</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">฿1,295,000.00</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">฿1,335,000.00</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(19 รายการ: Statement 18 ครั้ง + 14 ต.ค. 1 ครั้ง)</div>
                     </div>
                     <div>
@@ -1868,12 +1896,12 @@
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">ยอดเงินต้นสุทธิที่คงอยู่ใน Dime!:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #60a5fa;">฿1,245,000.00</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #60a5fa;">฿1,285,000.00</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(ใช้เป็นฐานคำนวณผลตอบแทนรวมจริง 100%)</div>
                     </div>
                     <div>
                         <div style="color: var(--text-secondary); margin-bottom: 4px;">เงินสดคงเหลือในบัญชี Dime! Save:</div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--emerald);">฿0.00</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: var(--emerald);">฿0.41</div>
                         <div style="color: var(--text-muted); font-size: 0.85rem;">(หักซื้อหุ้นชุดล่าสุด 4 ไม้ ฿35,001.63 เมื่อ 13-14 ต.ค. 69)</div>
                     </div>
                 </div>
@@ -1897,6 +1925,36 @@
                         
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">01</td>
+            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">22/10/2026 21:57 น.</td>
+            <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿19,999.80</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">฿0.41</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">Dime! Save</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">IMG_5687.webp</td>
+        </tr>
+        
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">02</td>
+            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">22/10/2026 21:49 น.</td>
+            <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿19,999.80</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">฿20,000.21</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">Dime! Save</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">IMG_5687.webp</td>
+        </tr>
+        
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">03</td>
+            <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">22/10/2026 21:48 น.</td>
+            <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿40,000.00</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">฿40,000.01</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">PROMPTPAY</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">IMG_5687.webp</td>
+        </tr>
+        
+        <tr>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">04</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">14/10/2026 21:03 น.</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿10,001.00</td>
@@ -1906,7 +1964,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">02</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">05</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">14/10/2026 20:33 น.</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.89</td>
@@ -1916,7 +1974,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">03</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">06</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">14/10/2026 20:26 น.</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿20,000.00</td>
@@ -1926,7 +1984,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">04</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">07</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">13/10/2026 21:23 น.</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿10,000.94</td>
@@ -1936,7 +1994,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">05</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">08</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">13/10/2026 21:16 น.</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿4,999.80</td>
@@ -1946,7 +2004,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">06</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">09</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">08/10/2026 23:09 น.</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿4,999.70</td>
@@ -1956,7 +2014,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">07</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">10</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">07/10/2026 23:30 น.</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿4,999.73</td>
@@ -1966,7 +2024,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">08</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">11</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/10/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿4,999.80</td>
@@ -1976,7 +2034,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">09</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">12</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">30/09/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -1986,7 +2044,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">10</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">13</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">30/09/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿40,000.00</td>
@@ -1996,7 +2054,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">11</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">14</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">30/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.87</td>
@@ -2006,7 +2064,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">12</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">15</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">30/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.87</td>
@@ -2016,7 +2074,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">13</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">16</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">25/09/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿30,000.00</td>
@@ -2026,7 +2084,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">14</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">17</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">25/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿29,999.85</td>
@@ -2036,7 +2094,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">15</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">18</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">24/09/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿50,000.00</td>
@@ -2046,7 +2104,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">16</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">19</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">24/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿39.00</td>
@@ -2056,7 +2114,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">17</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">20</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">24/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿24,999.97</td>
@@ -2066,7 +2124,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">18</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">21</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">24/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿24,961.67</td>
@@ -2076,7 +2134,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">19</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">22</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">23/09/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -2086,7 +2144,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">20</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">23</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">23/09/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.69</td>
@@ -2096,7 +2154,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">21</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">24</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">23/07/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿40,000.00</td>
@@ -2106,7 +2164,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">22</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">25</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">23/07/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿39.00</td>
@@ -2116,7 +2174,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">23</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">26</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">23/07/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿39,960.81</td>
@@ -2126,7 +2184,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">24</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">27</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">16/07/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿5,000.00</td>
@@ -2136,7 +2194,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">25</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">28</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">16/07/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿5,030.68</td>
@@ -2146,7 +2204,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">26</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">29</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">30/06/2026</td>
             <td><span class="badge badge-info">ดอกเบี้ยรับเงินฝาก</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #60a5fa;">+฿30.91</td>
@@ -2156,7 +2214,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">27</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">30</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">15/06/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿50,000.00</td>
@@ -2166,7 +2224,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">28</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">31</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">15/06/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿39.00</td>
@@ -2176,7 +2234,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">29</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">32</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">15/06/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.86</td>
@@ -2186,7 +2244,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">30</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">33</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">15/06/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿39,960.95</td>
@@ -2196,7 +2254,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">31</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">34</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">12/06/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -2206,7 +2264,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">32</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">35</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">12/06/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿20,000.00</td>
@@ -2216,7 +2274,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">33</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">36</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">12/06/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿30,000.71</td>
@@ -2226,7 +2284,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">34</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">37</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">27/05/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -2236,7 +2294,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">35</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">38</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">27/05/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -2246,7 +2304,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">36</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">39</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">27/05/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.99</td>
@@ -2256,7 +2314,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">37</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">40</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">27/05/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿4,999.83</td>
@@ -2266,7 +2324,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">38</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">41</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">27/05/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿4,999.83</td>
@@ -2276,7 +2334,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">39</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">42</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">05/05/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -2286,7 +2344,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">40</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">43</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">05/05/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿90,000.00</td>
@@ -2296,7 +2354,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">41</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">44</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">05/05/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿99,999.69</td>
@@ -2306,7 +2364,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">42</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">45</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">10/04/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿10,000.00</td>
@@ -2316,7 +2374,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">43</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">46</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">10/04/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.82</td>
@@ -2326,7 +2384,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">44</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">47</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">20/03/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿280,000.00</td>
@@ -2336,7 +2394,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">45</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">48</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">20/03/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿280,000.21</td>
@@ -2346,7 +2404,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">46</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">49</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/03/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿100,000.00</td>
@@ -2356,7 +2414,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">47</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">50</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/03/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿99,999.92</td>
@@ -2366,7 +2424,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">48</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">51</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">04/02/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿410,000.90</td>
@@ -2376,7 +2434,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">49</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">52</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/02/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.76</td>
@@ -2386,7 +2444,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">50</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">53</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/02/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.74</td>
@@ -2396,7 +2454,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">51</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">54</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/02/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.74</td>
@@ -2406,7 +2464,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">52</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">55</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/02/2026</td>
             <td><span class="badge badge-rose">โอนเงินออกไปต่างธนาคาร</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿50,000.00</td>
@@ -2416,7 +2474,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">53</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">56</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">03/02/2026</td>
             <td><span class="badge badge-rose">ตัดชำระค่าซื้อหุ้น</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #f43f5e;">-฿9,999.69</td>
@@ -2426,7 +2484,7 @@
         </tr>
         
         <tr>
-            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">54</td>
+            <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">57</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">02/02/2026</td>
             <td><span class="badge badge-success">ฝากเงินเข้าพอร์ต</span></td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">+฿500,000.00</td>

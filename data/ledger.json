@@ -1,10 +1,10 @@
 {
   "cash": {
-    "dime_save_thb": 0.0,
+    "dime_save_thb": 0.41,
     "dime_usd": 0.0
   },
-  "net_injected_capital_thb": 1245000.0,
-  "gross_deposits_thb": 1295000.0,
+  "net_injected_capital_thb": 1285000.0,
+  "gross_deposits_thb": 1335000.0,
   "transfer_out_thb": 50000.0,
   "dime_save_interest_thb": 30.91,
   "cash_movements": [
@@ -63,6 +63,30 @@
       "balance_thb": 0.01,
       "channel": "Dime! Save",
       "ref": "IMG_5684.webp"
+    },
+    {
+      "date_str": "22/10/2026 21:48 น.",
+      "type": "ฝากเงิน (โอนเข้า Dime! Save)",
+      "amount_thb": 40000.0,
+      "balance_thb": 40000.01,
+      "channel": "PROMPTPAY",
+      "ref": "IMG_5687.webp"
+    },
+    {
+      "date_str": "22/10/2026 21:49 น.",
+      "type": "ชำระค่าซื้อหุ้น VRT",
+      "amount_thb": -19999.8,
+      "balance_thb": 20000.21,
+      "channel": "Dime! Save",
+      "ref": "IMG_5687.webp"
+    },
+    {
+      "date_str": "22/10/2026 21:57 น.",
+      "type": "ชำระค่าซื้อหุ้น NOK",
+      "amount_thb": -19999.8,
+      "balance_thb": 0.41,
+      "channel": "Dime! Save",
+      "ref": "IMG_5687.webp"
     }
   ],
   "dividends": [

@@ -135,7 +135,7 @@ class TestWealthTimeline(unittest.TestCase):
 
         self.assertEqual(summary["start_date"], "2026-02-02")
         self.assertGreaterEqual(summary["total_days"], 250)
-        self.assertEqual(summary["current_capital_thb"], 1245000.0)
+        self.assertEqual(summary["current_capital_thb"], data.get("net_injected_capital_thb", 1245000.0))
         self.assertGreater(summary["current_nav_thb"], 1400000.0)
         self.assertGreater(summary["ath_nav_thb"], summary["current_capital_thb"])
 

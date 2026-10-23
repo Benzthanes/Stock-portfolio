@@ -168,31 +168,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
         except Exception:
             pass
 
-    # 4. Fill in remaining from KNOWN_NAMES
-    for t, (nm, sec, exch) in KNOWN_NAMES.items():
-        if t not in meta:
-            meta[t] = {
-                "ticker": t,
-                "name": nm,
-                "sector": sec,
-                "exchange": exch,
-                "cost": 0.0,
-                "shares": 0.0,
-                "total_cost": 0.0,
-                "cost_thb": 0.0,
-                "is_holding": False,
-                "price": 0.0,
-                "support": 0.0,
-                "resistance": 0.0,
-                "sl": 0.0,
-                "tp": 0.0,
-                "target": 0.0,
-                "days_to_earnings": None,
-                "earnings_date": "-",
-                "is_earnings_near": False,
-            }
-
-    # 5. Enrich with technical levels & earnings calendar from analysis JSON files
+    # 4. Enrich with technical levels & earnings calendar from analysis JSON files
     for an_file in [Path("data/.port_analysis.json"), Path("data/account_summary.json")]:
         if an_file.exists():
             try:
@@ -252,6 +228,23 @@ def attach_scores(meta: Dict[str, Any], tickers: List[str]) -> None:
             meta[t]["score"]["timing"] = {"entry_signal": score["timing"]["entry_signal"]}
 
 
+def _format_sr_levels(vals: List[float], max_count: int = 2) -> str:
+    seen = set()
+    res = []
+    for v in vals:
+        if v and v > 0:
+            vr = round(v, 2 if v < 10 else 1)
+            if vr not in seen:
+                seen.add(vr)
+                if vr < 10:
+                    res.append(f"${vr:.2f}")
+                else:
+                    res.append(f"${vr:,.1f}")
+    if not res:
+        return "-"
+    return ", ".join(res[:max_count])
+
+
 def generate_stock_chart_page_html() -> str:
     """
     Builds the full HTML document for reports/stock_chart.html.
@@ -284,35 +277,14 @@ def generate_stock_chart_page_html() -> str:
         save_candles_cache(raw_cache)
     cache = compact_charts_for_page(raw_cache, meta)
 
-    # Ensure all cache entries have price and name if missing
+    # Ensure all cache entries have price if missing
     for t, entry in cache.items():
-        if t in meta:
-            if not meta[t]["price"] and entry.get("candles"):
-                meta[t]["price"] = entry["candles"][-1]["close"]
-        else:
-            last_p = entry["candles"][-1]["close"] if entry.get("candles") else 0.0
-            meta[t] = {
-                "ticker": t,
-                "name": t,
-                "sector": "US Equity",
-                "exchange": "US",
-                "cost": 0.0,
-                "shares": 0.0,
-                "total_cost": 0.0,
-                "cost_thb": 0.0,
-                "is_holding": False,
-                "price": last_p,
-                "support": 0.0,
-                "resistance": 0.0,
-                "sl": 0.0,
-                "tp": 0.0,
-                "target": 0.0,
-                "whales": get_super_investors(t)
-            }
+        if t in meta and not meta[t]["price"] and entry.get("candles"):
+            meta[t]["price"] = entry["candles"][-1]["close"]
 
-    all_tickers = sorted(list(cache.keys()))
+    all_tickers = sorted([t for t in cache.keys() if t in meta])
     # Put portfolio core holdings first
-    priority_order = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "BMY", "JPM", "MU", "ARM", "C", "VRTX", "NOW", "SPCX", "QQQI", "JNJ"]
+    priority_order = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "NOW", "SPCX", "QQQI", "SKHY"]
     sorted_tickers = [t for t in priority_order if t in all_tickers] + [t for t in all_tickers if t not in priority_order]
     sorted_tickers_json = json.dumps(sorted_tickers)
 
@@ -348,13 +320,49 @@ def generate_stock_chart_page_html() -> str:
     pills_html = []
     for t in sorted_tickers:
         m = meta.get(t, {})
+        c = raw_cache.get(t, {})
         p = m.get("price") or 0.0
-        p_txt = f"${p:,.2f}" if p > 0 else ""
+        p_txt = f"${p:,.2f}" if p > 0 else "-"
+
+        piv = c.get("pivots") or {}
+        lux = c.get("luxalgo_sr") or {}
+        sups = [s for s in [m.get("support"), piv.get("s1"), lux.get("support"), piv.get("s2"), m.get("sl")] if s and s > 0]
+        ress = [r for r in [m.get("resistance"), piv.get("r1"), lux.get("resistance"), piv.get("r2"), m.get("tp"), m.get("target")] if r and r > 0]
+
+        below = [s for s in sups if s <= p * 1.01]
+        sups_chosen = sorted(below, reverse=True) if below else sorted(sups)
+        above = [r for r in ress if r >= p * 0.99]
+        ress_chosen = sorted(above) if above else sorted(ress, reverse=True)
+
+        sup_str = _format_sr_levels(sups_chosen)
+        res_str = _format_sr_levels(ress_chosen)
+
+        is_holding = m.get("is_holding", False)
+        if is_holding:
+            badge_html = '<span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span>'
+        else:
+            badge_html = '<span class="sc-badge sc-badge-closed">ขายแล้ว</span>'
+
+        name_escaped = escape(str(m.get("name") or t), quote=True)
         pills_html.append(
-            f'<button class="sp-pill" id="pill_{t}" onclick="selectStock(\'{t}\')" title="{escape(str(m.get("name") or t), quote=True)}">'
-            f'<span class="sp-pill-t">{t}</span>'
-            f'<span class="sp-pill-p">{p_txt}</span>'
-            f'</button>'
+            f'<div class="sp-pill stock-card" id="pill_{t}" onclick="selectStock(\'{t}\')" title="{name_escaped}">'
+            f'<div class="sc-row-top">'
+            f'<span class="sp-pill-t sc-ticker">{t}</span>'
+            f'<div class="sc-badges">{badge_html}</div>'
+            f'</div>'
+            f'<div class="sc-row-price">'
+            f'<span class="sc-label">Price</span>'
+            f'<span class="sp-pill-p sc-price">{p_txt}</span>'
+            f'</div>'
+            f'<div class="sc-row-level sc-support">'
+            f'<span class="sc-tag-support">รับ:</span>'
+            f'<span class="sc-vals-support">{sup_str}</span>'
+            f'</div>'
+            f'<div class="sc-row-level sc-resistance">'
+            f'<span class="sc-tag-resistance">ต้าน:</span>'
+            f'<span class="sc-vals-resistance">{res_str}</span>'
+            f'</div>'
+            f'</div>'
         )
     pills_html_str = "\n".join(pills_html)
 
@@ -363,7 +371,7 @@ def generate_stock_chart_page_html() -> str:
         "__PILLS_HTML__": pills_html_str,
         "__DEFAULT_TICKER__": sorted_tickers[0] if sorted_tickers else "LLY",
         "__SORTED_TICKERS_JSON__": sorted_tickers_json,
-        "__INIT_TICKER__": sorted_tickers[0] if sorted_tickers else "NVDA",
+        "__INIT_TICKER__": sorted_tickers[0] if sorted_tickers else "LLY",
     })
     (reports_dir / "stock_chart.html").write_text(html_content, encoding="utf-8")
     return html_content

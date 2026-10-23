@@ -67,9 +67,24 @@
             background: rgba(59, 130, 246, 0.5);
         }
 
-        /* Container */
+        /* Root Layout & Containers */
+        .chart-layout-root {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            background: var(--bg-page);
+        }
+
+        .chart-main-content {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         .chart-page-container {
-            max-width: 1600px;
+            max-width: 1650px;
             margin: 0 auto;
             padding: 16px 20px 60px 20px;
         }
@@ -108,6 +123,28 @@
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
         }
 
+        .sidebar-top-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fbbf24;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Prompt', sans-serif;
+        }
+        .sidebar-top-toggle-btn:hover {
+            background: #f59e0b;
+            color: #080c18;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+        }
+
         .hotkey-badge {
             display: inline-flex;
             align-items: center;
@@ -130,83 +167,326 @@
             font-weight: 700;
         }
 
-        /* Ticker Switcher Carousel */
-        .ticker-carousel-wrap {
-            background: #090e1c;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-bottom: 16px;
+        /* Left Stock Selection Sidebar Drawer */
+        .stock-left-sidebar {
+            width: 300px;
+            min-width: 300px;
+            max-width: 300px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            background: #090d19;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1000;
+            transition: margin-left 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.2s ease;
+            overflow: hidden;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
         }
 
-        .search-box {
-            flex-shrink: 0;
-            width: 160px;
+        /* Sidebar Collapsed State (Desktop) */
+        .chart-layout-root.sidebar-collapsed .stock-left-sidebar {
+            margin-left: -300px;
+            opacity: 0;
+            pointer-events: none;
         }
-        .search-input {
+
+        /* Floating Tab Button to Re-open Sidebar */
+        .floating-sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 110px;
+            left: 0;
+            z-index: 998;
+            background: #0f172a;
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+            padding: 9px 13px;
+            color: #f8fafc;
+            cursor: pointer;
+            box-shadow: 4px 6px 18px rgba(0, 0, 0, 0.6);
+            align-items: center;
+            gap: 7px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .chart-layout-root.sidebar-collapsed .floating-sidebar-toggle {
+            display: inline-flex;
+        }
+        .floating-sidebar-toggle:hover {
+            background: #f59e0b;
+            color: #080c18;
+            transform: translateX(4px);
+            box-shadow: 4px 8px 24px rgba(245, 158, 11, 0.4);
+        }
+        .fst-badge {
+            background: #f59e0b;
+            color: #080c18;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 0.70rem;
+            font-weight: 800;
+        }
+        .floating-sidebar-toggle:hover .fst-badge {
+            background: #080c18;
+            color: #f59e0b;
+        }
+
+        /* Mobile Backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+            z-index: 9999;
+        }
+
+        /* Sidebar Header Pane */
+        .sidebar-header-pane {
+            padding: 14px 14px 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: #0b1122;
+            flex-shrink: 0;
+        }
+        .sidebar-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .sidebar-brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 9999px;
+            padding: 4px 12px;
+            font-size: 0.80rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .sidebar-brand-pill .sb-count {
+            background: #f59e0b;
+            color: #080c18;
+            border-radius: 9999px;
+            padding: 1px 7px;
+            font-size: 0.70rem;
+            font-weight: 800;
+        }
+        .sidebar-hide-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #94a3b8;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0.80rem;
+            font-weight: 700;
+        }
+        .sidebar-hide-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+        .sidebar-search-box {
+            position: relative;
+            width: 100%;
+        }
+        .sidebar-search-input {
             width: 100%;
             background: #060914;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 8px;
-            padding: 7px 12px;
+            padding: 8px 12px;
             color: #f8fafc;
             font-size: 0.82rem;
             font-family: 'Prompt', sans-serif;
             outline: none;
-            transition: border 0.15s;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .search-input:focus {
+        .sidebar-search-input:focus {
             border-color: var(--blue);
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
         }
 
-        .pills-scroll {
+        /* Sidebar Cards Scrollable Area */
+        .sidebar-cards-scroll {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px 10px 24px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Stock Card Item */
+        .stock-card.sp-pill {
+            background: #0f1423;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            text-decoration: none;
+            user-select: none;
+            position: relative;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .stock-card.sp-pill:hover {
+            background: #141b2d;
+            border-color: rgba(255, 255, 255, 0.22);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        }
+        .stock-card.sp-pill.active {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.9));
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6, 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Stock Card Internal Layout */
+        .sc-row-top {
             display: flex;
             align-items: center;
-            gap: 6px;
-            overflow-x: auto;
-            padding: 2px 4px 6px 4px;
-            scroll-behavior: smooth;
+            justify-content: space-between;
         }
-        .sp-pill {
-            flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.035);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 5px 11px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s;
+        .sc-ticker {
+            font-weight: 800;
+            font-size: 1.02rem;
+            color: #ffffff;
+            letter-spacing: 0.4px;
             font-family: 'Inter', sans-serif;
         }
-        .sp-pill:hover {
-            background: rgba(255, 255, 255, 0.09);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
+        .sc-badges {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .sp-pill.active {
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-            border-color: #60a5fa;
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        .sc-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-family: 'Prompt', sans-serif;
         }
-        .sp-pill-t {
-            font-weight: 800;
-            font-size: 0.86rem;
-            color: #f8fafc;
+        .sc-badge-holding {
+            background: rgba(16, 185, 129, 0.16);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.35);
         }
-        .sp-pill-p {
-            font-size: 0.72rem;
+        .sc-badge-closed {
+            background: rgba(148, 163, 184, 0.12);
             color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .sc-live-dot {
+            color: #10b981;
+            font-size: 0.72rem;
+            line-height: 1;
+            text-shadow: 0 0 6px #10b981;
+        }
+
+        .sc-row-price {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-top: 3px;
+            margin-bottom: 2px;
+        }
+        .sc-label {
+            font-size: 0.80rem;
+            font-weight: 600;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+        }
+        .sc-price {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #fbbf24;
             font-family: 'JetBrains Mono', monospace;
         }
-        .sp-pill.active .sp-pill-p {
-            color: #dbeafe;
+        .stock-card.sp-pill.active .sc-price {
+            color: #fde047;
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+        }
+
+        .sc-row-level {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 0.78rem;
+            line-height: 1.35;
+        }
+        .sc-tag-support {
+            color: #10b981;
+            font-weight: 700;
+            flex-shrink: 0;
+            min-width: 30px;
+        }
+        .sc-vals-support {
+            color: #cbd5e1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .sc-tag-resistance {
+            color: #ef4444;
+            font-weight: 700;
+            flex-shrink: 0;
+            min-width: 30px;
+        }
+        .sc-vals-resistance {
+            color: #cbd5e1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Responsive Sidebar Drawer for Mobile & Tablets */
+        @media (max-width: 1100px) {
+            .stock-left-sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                margin-left: 0 !important;
+                transform: translateX(-100%);
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+                z-index: 10001;
+            }
+            .chart-layout-root.sidebar-open .stock-left-sidebar {
+                transform: translateX(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .chart-layout-root.sidebar-open .sidebar-backdrop {
+                display: block;
+            }
+            .floating-sidebar-toggle {
+                display: inline-flex !important;
+            }
         }
 
         /* 2-Column Cockpit Layout */
@@ -1279,29 +1559,86 @@
     </style>
 </head>
 <body>
-    <div class="chart-page-container">
-        <!-- Top Nav Bar -->
-        <div class="top-nav-bar">
-            <button class="nav-back-btn" onclick="goBackOrDashboard()">
-                <span>← ย้อนกลับ</span>
-            </button>
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <!-- Floating Tab to Open Stock Menu when Collapsed -->
+    <button class="floating-sidebar-toggle" id="floating_sidebar_toggle" onclick="toggleStockSidebar(true)" title="เปิดเมนูเลือกหุ้น (Open Stock Menu)">
+        <span class="fst-icon">☰</span>
+        <span class="fst-text">หุ้นในพอร์ต</span>
+        <span class="fst-badge" id="floating_stock_badge">15</span>
+    </button>
 
-                <div class="hotkey-badge">
-                    <span>คีย์ลัด:</span>
-                    <kbd>E</kbd> EMA 200
-                    <kbd>R</kbd> RSI
-                    <kbd>F</kbd> Fibo
-                    <kbd>S</kbd> Supertrend
-                    <kbd>V</kbd> VWAP
+    <!-- Mobile Drawer Backdrop -->
+    <div class="sidebar-backdrop" id="sidebar_backdrop" onclick="toggleStockSidebar(false)"></div>
+
+    <div class="chart-layout-root" id="chart_layout_root">
+        <!-- Left Stock Sidebar Drawer -->
+        <aside class="stock-left-sidebar" id="stock_left_sidebar" aria-label="Stock Selection Menu">
+            <div class="sidebar-header-pane">
+                <div class="sidebar-header-row">
+                    <div class="sidebar-brand-pill">
+                        <span class="sb-fire">🔥</span>
+                        <span class="sb-title">อัปเดตหุ้นล่าสุด</span>
+                        <span class="sb-count" id="sidebar_stock_count">15</span>
+                    </div>
+                    <button class="sidebar-hide-btn" onclick="toggleStockSidebar(false)" title="ซ่อนเมนู (Hide Menu)">
+                        <span>✕</span>
+                    </button>
                 </div>
-                <div class="hotkey-badge">
-                    <span>🖱️ ดับเบิ้ลคลิกแกนราคาเพื่อรีเซ็ตสเกล</span>
+                <div class="sidebar-search-box">
+                    <input type="text" id="ticker_search" class="sidebar-search-input" placeholder="🔍 ค้นหาหุ้น (NOK, LLY)..." oninput="filterTickers(this.value)">
                 </div>
             </div>
-        </div>
 
-        <style>
+            <!-- Scrollable Stock Cards List -->
+            <div class="sidebar-cards-scroll" id="pills_container">
+                <div class="sp-pill stock-card" id="pill_LLY" onclick="selectStock('LLY')" title="Eli Lilly and Company"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">LLY</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$1,306.69</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$1,250.7, $1,113.3</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$1,368.1, $1,411.2</span></div></div>
+<div class="sp-pill stock-card" id="pill_GOOGL" onclick="selectStock('GOOGL')" title="Alphabet Inc. Class A"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">GOOGL</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$324.22</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$326.5, $310.8</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$343.5, $362.9</span></div></div>
+<div class="sp-pill stock-card" id="pill_ABNB" onclick="selectStock('ABNB')" title="Airbnb, Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">ABNB</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$175.76</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$168.7, $152.3</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$179.1, $182.3</span></div></div>
+<div class="sp-pill stock-card" id="pill_NOK" onclick="selectStock('NOK')" title="Nokia Oyj"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">NOK</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$7.88</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$7.08</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$10.2, $11.0</span></div></div>
+<div class="sp-pill stock-card" id="pill_BAC" onclick="selectStock('BAC')" title="Bank of America Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">BAC</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$51.08</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$51.3, $49.7</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$58.0, $60.7</span></div></div>
+<div class="sp-pill stock-card" id="pill_MNST" onclick="selectStock('MNST')" title="Monster Beverage Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">MNST</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$47.30</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$45.8, $41.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$47.6, $48.0</span></div></div>
+<div class="sp-pill stock-card" id="pill_APP" onclick="selectStock('APP')" title="AppLovin Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">APP</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$264.28</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$258.4, $251.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$301.0, $322.4</span></div></div>
+<div class="sp-pill stock-card" id="pill_VRT" onclick="selectStock('VRT')" title="Vertiv Holdings Co."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VRT</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$195.59</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$195.1, $186.1</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$249.6, $258.1</span></div></div>
+<div class="sp-pill stock-card" id="pill_VOO" onclick="selectStock('VOO')" title="Vanguard S&amp;P 500 ETF"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VOO</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$702.30</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$692.1, $689.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$706.3, $713.8</span></div></div>
+<div class="sp-pill stock-card" id="pill_PLTR" onclick="selectStock('PLTR')" title="Palantir Technologies Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">PLTR</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$169.23</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$169.5, $164.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$169.2, $188.4</span></div></div>
+<div class="sp-pill stock-card" id="pill_VST" onclick="selectStock('VST')" title="Vistra Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VST</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$161.24</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$133.4, $129.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$161.2, $163.7</span></div></div>
+<div class="sp-pill stock-card" id="pill_NOW" onclick="selectStock('NOW')" title="ServiceNow, Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">NOW</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$109.82</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$115.3, $124.7</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$109.8, $145.5</span></div></div>
+<div class="sp-pill stock-card" id="pill_SPCX" onclick="selectStock('SPCX')" title="Space Exploration Technologies Corp. (SpaceX)"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">SPCX</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$206.91</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$140.0, $129.1</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$206.9</span></div></div>
+<div class="sp-pill stock-card" id="pill_QQQI" onclick="selectStock('QQQI')" title="NEOS Nasdaq-100 High Income ETF"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">QQQI</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$55.20</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$53.7, $53.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$55.2, $56.6</span></div></div>
+<div class="sp-pill stock-card" id="pill_SKHY" onclick="selectStock('SKHY')" title="SK hynix Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">SKHY</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$171.30</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$161.3, $138.4</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$171.3, $199.9</span></div></div>
+            </div>
+        </aside>
+
+        <!-- Main Chart Page Area -->
+        <div class="chart-main-content" id="chart_main_content">
+            <div class="chart-page-container">
+                <!-- Top Nav Bar -->
+                <div class="top-nav-bar">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="nav-back-btn" onclick="goBackOrDashboard()">
+                            <span>← ย้อนกลับ</span>
+                        </button>
+                        <button class="sidebar-top-toggle-btn" id="top_sidebar_toggle_btn" onclick="toggleStockSidebar()" title="เปิด/ปิดเมนูหุ้น (Toggle Stock Menu)">
+                            <span class="stb-icon">☰</span>
+                            <span class="stb-label">เมนูหุ้น</span>
+                        </button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+
+                        <div class="hotkey-badge">
+                            <span>คีย์ลัด:</span>
+                            <kbd>E</kbd> EMA 200
+                            <kbd>R</kbd> RSI
+                            <kbd>F</kbd> Fibo
+                            <kbd>S</kbd> Supertrend
+                            <kbd>V</kbd> VWAP
+                        </div>
+                        <div class="hotkey-badge">
+                            <span>🖱️ ดับเบิ้ลคลิกแกนราคาเพื่อรีเซ็ตสเกล</span>
+                        </div>
+                    </div>
+                </div>
+
+                <style>
 .rnav { display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; width: 100%; max-width: 100%;
   padding: 10px 14px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
   font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
@@ -1341,7 +1678,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-22 14:38</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (15วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-23 11:36</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -1499,39 +1836,8 @@
 })();
 </script>
 
-        <!-- Ticker Switcher Carousel -->
-        <div class="ticker-carousel-wrap">
-            <div class="search-box">
-                <input type="text" id="ticker_search" class="search-input" placeholder="🔍 ค้นหาหุ้น (เช่น LLY)..." oninput="filterTickers(this.value)">
-            </div>
-            <div class="pills-scroll" id="pills_container">
-                <button class="sp-pill" id="pill_LLY" onclick="selectStock('LLY')" title="Eli Lilly and Company"><span class="sp-pill-t">LLY</span><span class="sp-pill-p">$1,283.66</span></button>
-<button class="sp-pill" id="pill_GOOGL" onclick="selectStock('GOOGL')" title="Alphabet Inc. Class A"><span class="sp-pill-t">GOOGL</span><span class="sp-pill-p">$340.28</span></button>
-<button class="sp-pill" id="pill_ABNB" onclick="selectStock('ABNB')" title="Airbnb, Inc."><span class="sp-pill-t">ABNB</span><span class="sp-pill-p">$176.94</span></button>
-<button class="sp-pill" id="pill_NOK" onclick="selectStock('NOK')" title="Nokia Oyj"><span class="sp-pill-t">NOK</span><span class="sp-pill-p">$9.02</span></button>
-<button class="sp-pill" id="pill_BAC" onclick="selectStock('BAC')" title="Bank of America Corp"><span class="sp-pill-t">BAC</span><span class="sp-pill-p">$50.64</span></button>
-<button class="sp-pill" id="pill_MNST" onclick="selectStock('MNST')" title="Monster Beverage Corp"><span class="sp-pill-t">MNST</span><span class="sp-pill-p">$47.04</span></button>
-<button class="sp-pill" id="pill_APP" onclick="selectStock('APP')" title="AppLovin Corp"><span class="sp-pill-t">APP</span><span class="sp-pill-p">$272.46</span></button>
-<button class="sp-pill" id="pill_VRT" onclick="selectStock('VRT')" title="Vertiv Holdings Co."><span class="sp-pill-t">VRT</span><span class="sp-pill-p">$203.56</span></button>
-<button class="sp-pill" id="pill_VOO" onclick="selectStock('VOO')" title="Vanguard S&amp;P 500 ETF"><span class="sp-pill-t">VOO</span><span class="sp-pill-p">$706.80</span></button>
-<button class="sp-pill" id="pill_PLTR" onclick="selectStock('PLTR')" title="Palantir Technologies Inc."><span class="sp-pill-t">PLTR</span><span class="sp-pill-p">$169.23</span></button>
-<button class="sp-pill" id="pill_VST" onclick="selectStock('VST')" title="Vistra Corp"><span class="sp-pill-t">VST</span><span class="sp-pill-p">$161.24</span></button>
-<button class="sp-pill" id="pill_BMY" onclick="selectStock('BMY')" title="Bristol-Myers Squibb Company"><span class="sp-pill-t">BMY</span><span class="sp-pill-p">$59.75</span></button>
-<button class="sp-pill" id="pill_JPM" onclick="selectStock('JPM')" title="JPMorgan Chase &amp; Co."><span class="sp-pill-t">JPM</span><span class="sp-pill-p">$339.72</span></button>
-<button class="sp-pill" id="pill_MU" onclick="selectStock('MU')" title="Micron Technology, Inc."><span class="sp-pill-t">MU</span><span class="sp-pill-p">$878.84</span></button>
-<button class="sp-pill" id="pill_ARM" onclick="selectStock('ARM')" title="Arm Holdings plc"><span class="sp-pill-t">ARM</span><span class="sp-pill-p">$227.80</span></button>
-<button class="sp-pill" id="pill_C" onclick="selectStock('C')" title="Citigroup Inc."><span class="sp-pill-t">C</span><span class="sp-pill-p">$124.26</span></button>
-<button class="sp-pill" id="pill_VRTX" onclick="selectStock('VRTX')" title="Vertex Pharmaceuticals Inc."><span class="sp-pill-t">VRTX</span><span class="sp-pill-p">$499.74</span></button>
-<button class="sp-pill" id="pill_NOW" onclick="selectStock('NOW')" title="ServiceNow, Inc."><span class="sp-pill-t">NOW</span><span class="sp-pill-p">$109.82</span></button>
-<button class="sp-pill" id="pill_SPCX" onclick="selectStock('SPCX')" title="Space Exploration Technologies Corp. (SpaceX)"><span class="sp-pill-t">SPCX</span><span class="sp-pill-p">$206.91</span></button>
-<button class="sp-pill" id="pill_QQQI" onclick="selectStock('QQQI')" title="NEOS Nasdaq-100 High Income ETF"><span class="sp-pill-t">QQQI</span><span class="sp-pill-p">$55.20</span></button>
-<button class="sp-pill" id="pill_JNJ" onclick="selectStock('JNJ')" title="Johnson &amp; Johnson"><span class="sp-pill-t">JNJ</span><span class="sp-pill-p">$255.56</span></button>
-<button class="sp-pill" id="pill_SKHY" onclick="selectStock('SKHY')" title="SK hynix Inc."><span class="sp-pill-t">SKHY</span><span class="sp-pill-p">$171.30</span></button>
-            </div>
-        </div>
-
-        <!-- 2-Column Cockpit Grid -->
-        <div class="cockpit-grid">
+                <!-- 2-Column Cockpit Grid -->
+                <div class="cockpit-grid">
             <!-- Left: Main Chart Area -->
             <div class="cockpit-main">
                 <div class="stock-main-card">
@@ -2017,6 +2323,8 @@
             </div>
         </div>
     </div>
+        </div><!-- close chart-main-content -->
+    </div><!-- close chart-layout-root -->
 
     <!-- Technical Indicator Explainer Modal -->
     <div class="ind-modal-overlay" id="ind_modal" onclick="closeIndicatorHelp(event)">
@@ -2629,7 +2937,7 @@
         extPriceLine: null
     };
 
-    const ALL_TICKERS = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "BMY", "JPM", "MU", "ARM", "C", "VRTX", "NOW", "SPCX", "QQQI", "JNJ", "SKHY"];
+    const ALL_TICKERS = ["LLY", "GOOGL", "ABNB", "NOK", "BAC", "MNST", "APP", "VRT", "VOO", "PLTR", "VST", "NOW", "SPCX", "QQQI", "SKHY"];
     let currentAggTimeframe = 'D';
     let currentFiboMode = 'cycle';
 
@@ -5869,7 +6177,10 @@
         const activePill = document.getElementById('pill_' + ticker);
         if (activePill) {
             activePill.classList.add('active');
-            activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        if (window.innerWidth <= 1100 && typeof toggleStockSidebar === 'function') {
+            toggleStockSidebar(false);
         }
 
         // Update Page Title & URL hash
@@ -6546,17 +6857,49 @@
         });
     }
 
-    // Filter Tickers Carousel
+    // Filter Tickers Sidebar List
     function filterTickers(query) {
-        const q = query.trim().toUpperCase();
+        const q = (query || '').trim().toUpperCase();
         document.querySelectorAll('.sp-pill').forEach(pill => {
-            const t = pill.querySelector('.sp-pill-t').textContent.toUpperCase();
-            if (t.includes(q) || q === '') {
-                pill.style.display = 'inline-flex';
+            const t = (pill.querySelector('.sp-pill-t')?.textContent || '').toUpperCase();
+            const name = (pill.getAttribute('title') || '').toUpperCase();
+            if (t.includes(q) || name.includes(q) || q === '') {
+                pill.style.display = '';
             } else {
                 pill.style.display = 'none';
             }
         });
+    }
+
+    // Toggle Left Stock Sidebar Drawer (Open / Hide)
+    function toggleStockSidebar(forceOpen) {
+        const root = document.getElementById('chart_layout_root');
+        if (!root) return;
+
+        let shouldOpen;
+        if (typeof forceOpen === 'boolean') {
+            shouldOpen = forceOpen;
+        } else {
+            if (window.innerWidth <= 1100) {
+                shouldOpen = !root.classList.contains('sidebar-open');
+            } else {
+                shouldOpen = root.classList.contains('sidebar-collapsed');
+            }
+        }
+
+        if (shouldOpen) {
+            root.classList.remove('sidebar-collapsed');
+            root.classList.add('sidebar-open');
+            try { localStorage.setItem('stock_sidebar_collapsed', 'false'); } catch (e) {}
+        } else {
+            root.classList.add('sidebar-collapsed');
+            root.classList.remove('sidebar-open');
+            try { localStorage.setItem('stock_sidebar_collapsed', 'true'); } catch (e) {}
+        }
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 300);
     }
 
     function scrollToAiSection() {
@@ -6916,6 +7259,21 @@
             targetTicker = 'LLY';
         }
         selectStock(targetTicker);
+
+        // Restore sidebar state from localStorage or screen width
+        try {
+            const savedState = localStorage.getItem('stock_sidebar_collapsed');
+            const root = document.getElementById('chart_layout_root');
+            if (root) {
+                if (savedState === 'true' || (savedState === null && window.innerWidth <= 1100)) {
+                    root.classList.add('sidebar-collapsed');
+                    root.classList.remove('sidebar-open');
+                } else {
+                    root.classList.remove('sidebar-collapsed');
+                    root.classList.add('sidebar-open');
+                }
+            }
+        } catch (e) {}
 
         // Check for cached live quotes on load
         try {

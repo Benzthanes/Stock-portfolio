@@ -3758,7 +3758,10 @@
         const activePill = document.getElementById('pill_' + ticker);
         if (activePill) {
             activePill.classList.add('active');
-            activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        if (window.innerWidth <= 1100 && typeof toggleStockSidebar === 'function') {
+            toggleStockSidebar(false);
         }
 
         // Update Page Title & URL hash
@@ -4435,17 +4438,49 @@
         });
     }
 
-    // Filter Tickers Carousel
+    // Filter Tickers Sidebar List
     function filterTickers(query) {
-        const q = query.trim().toUpperCase();
+        const q = (query || '').trim().toUpperCase();
         document.querySelectorAll('.sp-pill').forEach(pill => {
-            const t = pill.querySelector('.sp-pill-t').textContent.toUpperCase();
-            if (t.includes(q) || q === '') {
-                pill.style.display = 'inline-flex';
+            const t = (pill.querySelector('.sp-pill-t')?.textContent || '').toUpperCase();
+            const name = (pill.getAttribute('title') || '').toUpperCase();
+            if (t.includes(q) || name.includes(q) || q === '') {
+                pill.style.display = '';
             } else {
                 pill.style.display = 'none';
             }
         });
+    }
+
+    // Toggle Left Stock Sidebar Drawer (Open / Hide)
+    function toggleStockSidebar(forceOpen) {
+        const root = document.getElementById('chart_layout_root');
+        if (!root) return;
+
+        let shouldOpen;
+        if (typeof forceOpen === 'boolean') {
+            shouldOpen = forceOpen;
+        } else {
+            if (window.innerWidth <= 1100) {
+                shouldOpen = !root.classList.contains('sidebar-open');
+            } else {
+                shouldOpen = root.classList.contains('sidebar-collapsed');
+            }
+        }
+
+        if (shouldOpen) {
+            root.classList.remove('sidebar-collapsed');
+            root.classList.add('sidebar-open');
+            try { localStorage.setItem('stock_sidebar_collapsed', 'false'); } catch (e) {}
+        } else {
+            root.classList.add('sidebar-collapsed');
+            root.classList.remove('sidebar-open');
+            try { localStorage.setItem('stock_sidebar_collapsed', 'true'); } catch (e) {}
+        }
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 300);
     }
 
     function scrollToAiSection() {
@@ -4805,6 +4840,21 @@
             targetTicker = '__INIT_TICKER__';
         }
         selectStock(targetTicker);
+
+        // Restore sidebar state from localStorage or screen width
+        try {
+            const savedState = localStorage.getItem('stock_sidebar_collapsed');
+            const root = document.getElementById('chart_layout_root');
+            if (root) {
+                if (savedState === 'true' || (savedState === null && window.innerWidth <= 1100)) {
+                    root.classList.add('sidebar-collapsed');
+                    root.classList.remove('sidebar-open');
+                } else {
+                    root.classList.remove('sidebar-collapsed');
+                    root.classList.add('sidebar-open');
+                }
+            }
+        } catch (e) {}
 
         // Check for cached live quotes on load
         try {
