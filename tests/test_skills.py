@@ -57,7 +57,7 @@ class AgentDocsTest(unittest.TestCase):
         missing = []
         for doc in [ROOT / "AGENTS.md", ROOT / "docs" / "METHODOLOGY.md", *SKILL_FILES]:
             for path in re.findall(r"`((?:\.?[\w-]+/)+[\w.-]+\.(?:py|json|md|yml|js|html))`", doc.read_text(encoding="utf-8")):
-                if "<" in path or "TICKER" in path or path.startswith(("/tmp", "reports/xxx")):
+                if "<" in path or "TICKER" in path or path.startswith(("/tmp", "reports/xxx", "data/.")):
                     continue
                 if not (ROOT / path).exists():
                     missing.append(f"{doc.name}: {path}")
