@@ -590,7 +590,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 07:42</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 10:05</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -774,14 +774,14 @@
             <div class="card kpi-card">
                 <div class="kpi-label">💰 มูลค่าพอร์ตปัจจุบัน</div>
                 <div class="kpi-value">$47,050.59</div>
-                <div class="kpi-subtext">≈ ฿1,590,074.82 THB (ต้นทุน $40,397.78)</div>
+                <div class="kpi-subtext">≈ ฿1,590,310.07 THB (ต้นทุน $40,397.78)</div>
                 
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">📈 กำไร/ขาดทุนสุทธิ (Unrealized)</div>
                 <div class="kpi-value" style="color: var(--emerald);">+$6,652.81 (+16.47%)</div>
-                <div class="kpi-subtext">≈ +฿231,664.66 THB</div>
+                <div class="kpi-subtext">≈ +฿231,899.91 THB</div>
             </div>
 
             <div class="card kpi-card">
@@ -946,7 +946,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$35,441.94</div>
-                <div class="text-muted small">≈ ฿1,197,760</div>
+                <div class="text-muted small">≈ ฿1,197,938</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+25.54%</div>
@@ -955,7 +955,7 @@
             <td style="text-align: right;" class="text-emerald">+0.22%</td>
             <td style="text-align: center;">63.5</td>
             <td style="text-align: center;">+17.9%</td>
-            <td><span class="badge badge-rose">🚨 Extreme Concentration (75.3%)</span> <span class="badge badge-amber">⚠️ Earnings in 1.4d</span> </td>
+            <td><span class="badge badge-rose">🚨 Extreme Concentration (75.3%)</span> <span class="badge badge-amber">⚠️ Earnings in 1.3d</span> </td>
         </tr>
         
         <tr>
@@ -976,7 +976,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$3,587.20</div>
-                <div class="text-muted small">≈ ฿121,229</div>
+                <div class="text-muted small">≈ ฿121,247</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-6.19%</div>
@@ -985,7 +985,7 @@
             <td style="text-align: right;" class="text-emerald">+1.19%</td>
             <td style="text-align: center;"><span class="badge badge-amber">34.0 📉</span></td>
             <td style="text-align: center;">-6.0%</td>
-            <td><span class="badge badge-amber">⚠️ Earnings in 0.8d</span> </td>
+            <td><span class="badge badge-amber">⚠️ Earnings in 0.7d</span> </td>
         </tr>
         
         <tr>
@@ -1006,7 +1006,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,856.83</div>
-                <div class="text-muted small">≈ ฿62,751</div>
+                <div class="text-muted small">≈ ฿62,761</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-16.30%</div>
@@ -1036,7 +1036,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,658.63</div>
-                <div class="text-muted small">≈ ฿56,053</div>
+                <div class="text-muted small">≈ ฿56,062</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+11.22%</div>
@@ -1045,7 +1045,7 @@
             <td style="text-align: right;" class="text-rose">-1.30%</td>
             <td style="text-align: center;">49.9</td>
             <td style="text-align: center;">+15.4%</td>
-            <td><span class="badge badge-amber">⚠️ Earnings in 8.8d</span> </td>
+            <td><span class="badge badge-amber">⚠️ Earnings in 8.7d</span> </td>
         </tr>
         
         <tr>
@@ -1066,7 +1066,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,387.17</div>
-                <div class="text-muted small">≈ ฿46,879</div>
+                <div class="text-muted small">≈ ฿46,886</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-6.69%</div>
@@ -1096,7 +1096,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$1,197.91</div>
-                <div class="text-muted small">≈ ฿40,483</div>
+                <div class="text-muted small">≈ ฿40,489</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-3.02%</div>
@@ -1105,7 +1105,7 @@
             <td style="text-align: right;" class="text-emerald">+4.39%</td>
             <td style="text-align: center;">39.0</td>
             <td style="text-align: center;">-22.6%</td>
-            <td><span class="badge badge-amber">⚠️ Earnings in 0.4d</span> </td>
+            <td><span class="badge badge-amber">⚠️ Earnings in 0.3d</span> </td>
         </tr>
         
         <tr>
@@ -1126,7 +1126,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$788.13</div>
-                <div class="text-muted small">≈ ฿26,635</div>
+                <div class="text-muted small">≈ ฿26,639</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+5.83%</div>
@@ -1135,7 +1135,7 @@
             <td style="text-align: right;" class="text-rose">-2.15%</td>
             <td style="text-align: center;">52.8</td>
             <td style="text-align: center;">+5.8% <span title="Value Zone">💎</span></td>
-            <td><span class="badge badge-amber">⚠️ Earnings in 1.5d</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
+            <td><span class="badge badge-amber">⚠️ Earnings in 1.4d</span> <span class="badge badge-emerald">💎 Value Zone</span> </td>
         </tr>
         
         <tr>
@@ -1156,7 +1156,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$782.44</div>
-                <div class="text-muted small">≈ ฿26,443</div>
+                <div class="text-muted small">≈ ฿26,447</div>
             </td>
             <td style="text-align: right;" class="text-rose">
                 <div class="fw-bold">-7.89%</div>
@@ -1165,7 +1165,7 @@
             <td style="text-align: right;" class="text-emerald">+0.80%</td>
             <td style="text-align: center;">37.7</td>
             <td style="text-align: center;">-37.7%</td>
-            <td><span class="badge badge-amber">⚠️ Earnings in 7.8d</span> </td>
+            <td><span class="badge badge-amber">⚠️ Earnings in 7.7d</span> </td>
         </tr>
         
         <tr>
@@ -1186,7 +1186,7 @@
             </td>
             <td style="text-align: right;">
                 <div>$350.35</div>
-                <div class="text-muted small">≈ ฿11,840</div>
+                <div class="text-muted small">≈ ฿11,842</div>
             </td>
             <td style="text-align: right;" class="text-emerald">
                 <div class="fw-bold">+10.47%</div>
@@ -1243,7 +1243,7 @@
             <td style="text-align: right;"><strong>$1,370.46</strong> <span class='text-emerald small'>(+6.9%)</span></td>
             <td style="text-align: center;">$930 - $1,680</td>
             <td><span class='badge badge-emerald'>Buy 25</span> <span class='badge badge-amber'>Hold 3</span> <span class='badge badge-rose'>Sell 1</span></td>
-            <td><span class='badge badge-rose'>⚠️ 29 Oct 2026 (1.4d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 29 Oct 2026 (1.3d)</span></td>
         </tr>
         
         <tr>
@@ -1263,7 +1263,7 @@
             <td style="text-align: right;"><strong>$426.45</strong> <span class='text-emerald small'>(+33.0%)</span></td>
             <td style="text-align: center;">$340 - $500</td>
             <td><span class='badge badge-emerald'>Buy 60</span> <span class='badge badge-amber'>Hold 6</span> <span class='badge badge-rose'>Sell 0</span></td>
-            <td><span class='badge badge-rose'>⚠️ 28 Oct 2026 (0.8d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 28 Oct 2026 (0.7d)</span></td>
         </tr>
         
         <tr>
@@ -1283,7 +1283,7 @@
             <td style="text-align: right;"><strong>$12.82</strong> <span class='text-emerald small'>(+44.2%)</span></td>
             <td style="text-align: center;">$7 - $20</td>
             <td><span class='badge badge-emerald'>Buy 21</span> <span class='badge badge-amber'>Hold 6</span> <span class='badge badge-rose'>Sell 2</span></td>
-            <td><span class='text-muted'>28 Jan 2027 (92.2d)</span></td>
+            <td><span class='text-muted'>28 Jan 2027 (92.1d)</span></td>
         </tr>
         
         <tr>
@@ -1303,7 +1303,7 @@
             <td style="text-align: right;"><strong>$185.29</strong> <span class='text-emerald small'>(+9.8%)</span></td>
             <td style="text-align: center;">$135 - $220</td>
             <td><span class='badge badge-emerald'>Buy 22</span> <span class='badge badge-amber'>Hold 17</span> <span class='badge badge-rose'>Sell 1</span></td>
-            <td><span class='badge badge-rose'>⚠️ 05 Nov 2026 (8.8d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 05 Nov 2026 (8.7d)</span></td>
         </tr>
         
         <tr>
@@ -1323,7 +1323,7 @@
             <td style="text-align: right;"><strong>$62.74</strong> <span class='text-emerald small'>(+23.8%)</span></td>
             <td style="text-align: center;">$55 - $71</td>
             <td><span class='badge badge-emerald'>Buy 19</span> <span class='badge badge-amber'>Hold 5</span> <span class='badge badge-rose'>Sell 0</span></td>
-            <td><span class='text-muted'>15 Jan 2027 (79.5d)</span></td>
+            <td><span class='text-muted'>15 Jan 2027 (79.4d)</span></td>
         </tr>
         
         <tr>
@@ -1343,7 +1343,7 @@
             <td style="text-align: right;"><strong>$328.89</strong> <span class='text-emerald small'>(+57.7%)</span></td>
             <td style="text-align: center;">$188 - $427</td>
             <td><span class='badge badge-emerald'>Buy 26</span> <span class='badge badge-amber'>Hold 5</span> <span class='badge badge-rose'>Sell 1</span></td>
-            <td><span class='badge badge-rose'>⚠️ 28 Oct 2026 (0.4d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 28 Oct 2026 (0.3d)</span></td>
         </tr>
         
         <tr>
@@ -1363,7 +1363,7 @@
             <td style="text-align: right;"><strong>$50.69</strong> <span class='text-emerald small'>(+11.6%)</span></td>
             <td style="text-align: center;">$42 - $57</td>
             <td><span class='badge badge-emerald'>Buy 14</span> <span class='badge badge-amber'>Hold 13</span> <span class='badge badge-rose'>Sell 0</span></td>
-            <td><span class='badge badge-rose'>⚠️ 29 Oct 2026 (1.5d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 29 Oct 2026 (1.4d)</span></td>
         </tr>
         
         <tr>
@@ -1383,7 +1383,7 @@
             <td style="text-align: right;"><strong>$472.89</strong> <span class='text-emerald small'>(+79.9%)</span></td>
             <td style="text-align: center;">$325 - $790</td>
             <td><span class='badge badge-emerald'>Buy 28</span> <span class='badge badge-amber'>Hold 7</span> <span class='badge badge-rose'>Sell 0</span></td>
-            <td><span class='badge badge-rose'>⚠️ 04 Nov 2026 (7.8d)</span></td>
+            <td><span class='badge badge-rose'>⚠️ 04 Nov 2026 (7.7d)</span></td>
         </tr>
         
         <tr>
@@ -1506,27 +1506,27 @@
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ GOOGL</span>
-            <div><strong>Alphabet Inc. Class A:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 0.8 วัน (28 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>Alphabet Inc. Class A:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 0.7 วัน (28 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ ABNB</span>
-            <div><strong>Airbnb, Inc.:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 8.8 วัน (05 Nov 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>Airbnb, Inc.:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 8.7 วัน (05 Nov 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ VRT</span>
-            <div><strong>Vertiv Holdings Co.:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 0.4 วัน (28 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>Vertiv Holdings Co.:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 0.3 วัน (28 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ MNST</span>
-            <div><strong>Monster Beverage Corp:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 1.5 วัน (29 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>Monster Beverage Corp:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 1.4 วัน (29 Oct 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         <div class="forbidden-item">
             <span class="badge badge-rose">❌ ห้ามซื้อ APP</span>
-            <div><strong>AppLovin Corp:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 7.8 วัน (04 Nov 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
+            <div><strong>AppLovin Corp:</strong> วันประกาศงบการเงินใกล้เข้ามาในอีก 7.7 วัน (04 Nov 2026) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก.</div>
         </div>
         
         </div>
@@ -1571,7 +1571,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ปฏิทินงบ (1.4 วัน)</span>
+                <span class="timeline-step-badge">ปฏิทินงบ (1.3 วัน)</span>
                 <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -1620,7 +1620,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>โนโว นอร์ดิสก์ vs. ตัวอย่าง Eli Lilly Q3: ฉัน (ตอนนี้) ซื้อทั้งสองอย่าง แต่ลิลลี่คือตัวเลือกอันดับต้นๆ ของฉัน (NVO)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiugFBVV95cUxOdThxQ3V4b1RqMXktQklBMTg0ZjRMLUxaLWtGcndLT2toU2g2czNoQnJnWWJYV3R6ZjJLR01YSFd3bTVmVTZhVE5tVnpFbjI5RFF2VDJFTlJoWVdmNEdIcmoxRS03VnZBaVVFUUF6TVNTbkhIOExhWF9Ed19mRGFTQ2tORWpBQ2JWNExHQ21yeG80aHZYTU55cmtaU3o1bm9BUGZLTjZsM3JNMEN2Q3hkWnV2cVB3Y3loVVE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Novo Nordisk Vs. Eli Lilly Q3 Preview: I&#x27;d (Now) Buy Both, But Lilly Is My Top Pick (NVO) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Novo Nordisk Vs. Eli Lilly Q3 Preview: I&#x27;d (Now) Buy Both, But Lilly Is My Top Pick (NVO)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiugFBVV95cUxOdThxQ3V4b1RqMXktQklBMTg0ZjRMLUxaLWtGcndLT2toU2g2czNoQnJnWWJYV3R6ZjJLR01YSFd3bTVmVTZhVE5tVnpFbjI5RFF2VDJFTlJoWVdmNEdIcmoxRS03VnZBaVVFUUF6TVNTbkhIOExhWF9Ed19mRGFTQ2tORWpBQ2JWNExHQ21yeG80aHZYTU55cmtaU3o1bm9BUGZLTjZsM3JNMEN2Q3hkWnV2cVB3Y3loVVE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Novo Nordisk Vs. Eli Lilly Q3 Preview: I&#x27;d (Now) Buy Both, But Lilly Is My Top Pick (NVO) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -1677,7 +1677,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ปฏิทินงบ (0.8 วัน)</span>
+                <span class="timeline-step-badge">ปฏิทินงบ (0.7 วัน)</span>
                 <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -1726,11 +1726,11 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Google รายงานผลประกอบการไตรมาส 3 เนื่องจากนักลงทุนมุ่งเน้นไปที่การเติบโตของ AI และชั่งน้ำหนักความเสี่ยง Meta Muse AI</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMi2wFBVV95cUxPeFNCNzhFanV1OTduaTk2dkZ3VzcxSF9zcWl3NzJVdTIwUGNDLXZZMTNnVjA2S3A0eUpOQ1R1Qk1VS3dkbHpzaVBEQ1lMUUdhTExFUDFuRTEySGh1aGdzVXlWeGVrdy0ta1FDelc0NWVHal9GODJfdjJ0Qy1PMWJzQ3psLTNvZWJBWWJMdXVxdk9hZkFfVi1pLXpwdVFtU0pMZVRLalM0NlZnZlE4WUl2OXhXbGp5OWhtYUNiRjRuWVprQlNycjhlbTZQa21yZTV2bFVSY0hqWnVYU1k?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google to report Q3 results as investors focus on AI growth, weigh Meta Muse AI risk ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Zacks Investment Research]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ตัวอย่างผลประกอบการของตัวอักษรและ Microsoft: การเติบโตของ AI Cloud ก้าวขึ้นมาเป็นศูนย์กลาง</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisAFBVV95cUxNNDJVMGRTOTZRNGJfYkNXSC1adjhOOGdLclktLUc0MmdYNVIxVUVKVVpKVnc5OHRad3M5bEdKbEphU3FjQjJla0NfSEh4a2hTY0IzYVh3eXRVYnZhRG0zbldBeEJlbVVkU2s1Z013VUdnMWM5c3FzckhzTnFUakRabVF1ZlJpdTAzS1VQM1prb2I0TG9RbnZzU2lXb1NtOE1CVmp1UWVZMTkzbkVlbElBZA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Alphabet &amp; Microsoft Earnings Preview: AI Cloud Growth Takes Center Stage ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>รายได้จากตัวอักษรเพื่อเร่งให้เกิด AI Bubble Burst (NASDAQ:GOOG)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxPTUZhTTJ5OXZzZjJtNmFDNTF5THFzSTRKeXJQemFEbUZoMndDSVd2UFp6V3N1QnFYRWhNejN5NW9GbkdhbTBpckRRMXc1eDZVenZWWV9tZUtYNnVoVExMWlBOTUFCcXVfeFBuMlNyV2NaaUdWOXZpUDJzNV93dGZMNlBaYlBRNHNWc3RqMUxBUVNkU19tV2tJ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Alphabet Earnings To Accelerate The AI Bubble Burst (NASDAQ:GOOG) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
                 </div>
             </div>
 
@@ -1783,7 +1783,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ระยะประชิด (92.2 วัน)</span>
+                <span class="timeline-step-badge">ระยะประชิด (92.1 วัน)</span>
                 <div class="timeline-step-desc">ประกาศผลประกอบการไตรมาส 3: ตัวชี้ขาด Gross Margin และคำสั่งซื้อ Network Infrastructure</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะกลาง (1-3 เดือน)</span>
@@ -1832,11 +1832,11 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Timothy Sykes]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Nokia ดีดตัวขึ้นเมื่อผู้ค้าประเมิน AI และเรื่องราวรายได้อีกครั้ง</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiigFBVV95cUxPZ0lyb3BPX0Vkd3hualBPcF9seVZHTk5rcVZyUzJuUWNjVmtkVkVzYmZfeGpLVkI1RldjdWlwUUpJZHFlNTY5V25DYUMwV2gxcjI5eDBSc1dlR2Y3SkxLSVpWRE9pSGJraURTLVFBNU1pSGxmQXdPU1Z1VG8zRWtqT1JELVFoTkxRWVE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Nokia Stock Rebounds As Traders Reassess AI And Earnings Story ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Timothy Sykes]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Nokia Stock Rebounds As Traders Reassess AI And Earnings Story</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMihAFBVV95cUxQZ1NaOGFESFAzWEN0Q2V2VEp2aERWcTd1Z1VkMVBvcGdsOUljVHYzNF9zcExub2FnX0pOZ2cxNWI5YUhKVjg4OWUtOUFubXlXTFloSjZFQVVla3EyeVhKenJvMkl3bTdwSVo5cEVJbWQxQXhqOWM4ZDJkNlFKU2gwWjVNSWo?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Nokia Stock Rebounds As Traders Reassess AI And Earnings Story ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Nokia: แนวโน้มด้านออปติคัลและ IP ที่แข็งแกร่งยิ่งขึ้นทำให้การดึงกลับมีความน่าดึงดูด (NYSE: NOK)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMirAFBVV95cUxPTnk4azBiRlJzbnB6anNsWm8zeXlDeWl1R1pQaVRVd2ljWVBPdWRDbjhtc0RyQ3BuRE5DTzViUUk3UGxJb0Z1RnFuMk1tZjFRdmVwQXZQNnRfODF6LVNma0R5cklaLTMwaEYxSWduOEFKX2F5WDFsRWlHY25mWXdnSTlyRFY3Vi1Ja0R1Y0ZfeVNNZGRtdmpEbVRfQXkzX1JuR2pNNjU4M19sNFNZ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Nokia: Stronger Optical And IP Outlook Makes The Pullback Attractive (NYSE:NOK) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Nokia: Stronger Optical And IP Outlook Makes The Pullback Attractive (NYSE:NOK)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMirAFBVV95cUxPTnk4azBiRlJzbnB6anNsWm8zeXlDeWl1R1pQaVRVd2ljWVBPdWRDbjhtc0RyQ3BuRE5DTzViUUk3UGxJb0Z1RnFuMk1tZjFRdmVwQXZQNnRfODF6LVNma0R5cklaLTMwaEYxSWduOEFKX2F5WDFsRWlHY25mWXdnSTlyRFY3Vi1Ja0R1Y0ZfeVNNZGRtdmpEbVRfQXkzX1JuR2pNNjU4M19sNFNZ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Nokia: Stronger Optical And IP Outlook Makes The Pullback Attractive (NYSE:NOK) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -1889,7 +1889,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ปฏิทินงบ (8.8 วัน)</span>
+                <span class="timeline-step-badge">ปฏิทินงบ (8.7 วัน)</span>
                 <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -1942,7 +1942,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[MarketWatch]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Airbnb Inc. Cl หุ้น A ร่วงลงเมื่อวันอังคาร ต่ำกว่าตลาด</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizwFBVV95cUxQbzR2dTgydURJRF83ckxPdW5LeldrSTZsTE41WlhRbEFGdEpIMk5WeTVsaFp4NzN2S2FGYnY3S0J2ZFZkYko4REZGM3FPRlRRZHF2Uk1vcG5BNHNPZXdhdWZpQnVWNkd1OGx2VzdVd2lrYXVHUjFkaW9CRnlTYm1yTnBuNDlUS01MdmFOdkFURW53eWUxSU84NjRxMzRrSUJPNTZCRXg2Zi1xMWh5TFp0aTdfS2thVmIxRGlvZjF2dzJtd0FfbGU2T1J4WklsTlk?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Airbnb Inc. Cl A stock falls Tuesday, underperforms market ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ชิ้นส่วนรถยนต์ขั้นสูงกับ Airbnb: เส้นทางรายได้ที่แตกต่างส่งคำเตือนสำหรับนักลงทุน</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizwFBVV95cUxNRVVkR0RnUlUwYWYxaVd6ME43RHlyeldLZUdreEN5dUk1eEJVOU1pV3BETFQxWjQ5Zmt2WTVEaUZxNmRlS2FJMVAxMjZOTnRpUzZKbXJvT3dmcmlVd2lLZmZ6VE1MQVpLYUtTN21CdHY0X1pEbm0tUE5ZR0NGLWhfb3RJX2E1X3JSbncwMzgwT1dlRnUyLWZPbklQT0thV3pzRlQxYlVrLS1LcnJOV19iVEs4N1l6TW1aUkQ2Yk01RzhxVWJOS0hZejJOQllsNGs?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Advance Auto Parts vs. Airbnb: Diverging Paths in Revenue Flash a Warning for Investors ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[MarketWatch]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Airbnb Inc. Cl A stock falls Tuesday, underperforms market</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizwFBVV95cUxQbzR2dTgydURJRF83ckxPdW5LeldrSTZsTE41WlhRbEFGdEpIMk5WeTVsaFp4NzN2S2FGYnY3S0J2ZFZkYko4REZGM3FPRlRRZHF2Uk1vcG5BNHNPZXdhdWZpQnVWNkd1OGx2VzdVd2lrYXVHUjFkaW9CRnlTYm1yTnBuNDlUS01MdmFOdkFURW53eWUxSU84NjRxMzRrSUJPNTZCRXg2Zi1xMWh5TFp0aTdfS2thVmIxRGlvZjF2dzJtd0FfbGU2T1J4WklsTlk?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Airbnb Inc. Cl A stock falls Tuesday, underperforms market ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Advance Auto Parts vs. Airbnb: Diverging Paths in Revenue Flash a Warning for Investors</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizwFBVV95cUxNRVVkR0RnUlUwYWYxaVd6ME43RHlyeldLZUdreEN5dUk1eEJVOU1pV3BETFQxWjQ5Zmt2WTVEaUZxNmRlS2FJMVAxMjZOTnRpUzZKbXJvT3dmcmlVd2lLZmZ6VE1MQVpLYUtTN21CdHY0X1pEbm0tUE5ZR0NGLWhfb3RJX2E1X3JSbncwMzgwT1dlRnUyLWZPbklQT0thV3pzRlQxYlVrLS1LcnJOV19iVEs4N1l6TW1aUkQ2Yk01RzhxVWJOS0hZejJOQllsNGs?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Advance Auto Parts vs. Airbnb: Diverging Paths in Revenue Flash a Warning for Investors ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -2044,11 +2044,11 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>SpaceX ถูกเพิ่มเข้าในรายการหุ้นเด่น &#x27;US 1&#x27; ของ BofA (SPCX: NASDAQ)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxNMG5Ga3Y2VjJhcHB0aTBwVXlDQllMTTFrMFJ4Ym5KVlE0a0pCWHc5UUxHZWhfQlJRVVBFdzVYYnoxdWZ3TjVmS0xFTTAtTExNb1hLcHliNWFwY19iejl6MzRROVlZN1FLZ0toVktmTnNVZ3NkX3I4OHUxQTA4YXZqQVRoVjNkeG9fZ3dHRDVST3V6QQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>SpaceX added to BofA&#x27;s &#x27;US 1&#x27; list of top stock picks (SPCX:NASDAQ) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[https://tech-insider.org/]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Take-Two Stock: BofA Buy, $330 Target [2026]</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMif0FVX3lxTFB1ZC1yYjhoWlBKT1BZNnBhZmJvcTJXUVBBcDd4eUxtNnRIdUgtUHMwaGw3b0dneTQzQXZNOWtDWWJEWHdsVXhRUGlBaHMwVDFMQUwtNUw4d3NYTW1sem4zN1BfdzVabmNoSlEtR3RrWTNONnhlMllYN3ZsMU45b1U?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Take-Two Stock: BofA Buy, $330 Target [2026] ↗</a> <span class='text-muted small'>(28 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Seeking Alpha]</strong> <span style='font-weight: 600; color: #f1f5f9;'>SpaceX added to BofA&#x27;s &#x27;US 1&#x27; list of top stock picks (SPCX:NASDAQ)</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxNMG5Ga3Y2VjJhcHB0aTBwVXlDQllMTTFrMFJ4Ym5KVlE0a0pCWHc5UUxHZWhfQlJRVVBFdzVYYnoxdWZ3TjVmS0xFTTAtTExNb1hLcHliNWFwY19iejl6MzRROVlZN1FLZ0toVktmTnNVZ3NkX3I4OHUxQTA4YXZqQVRoVjNkeG9fZ3dHRDVST3V6QQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>SpaceX added to BofA&#x27;s &#x27;US 1&#x27; list of top stock picks (SPCX:NASDAQ) ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[PR Newswire]</strong> <span style='font-weight: 600; color: #f1f5f9;'>อะไรต่อไปสำหรับผู้ถือหุ้นของ Bank Of America Corporation หลังจากหุ้นตก 4.76% Glancy Prongay Wolke &amp; Rotter LLP อธิบายกำหนดเวลาการดำเนินการของกลุ่มการฉ้อโกงหลักทรัพย์ของโจทก์</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizgJBVV95cUxPajlzazF2cnZiSXF0TXBlR3d0ZTlnNXVmZU1IbnFNRVNwcEotM3Z3UlVOa1I2S3hmOG9KVlNXWU16VnN3cThSUmNuZ1kyX1NKR1A4M3BuNl9nQk1uZ01YdkRSQVZzVDV2VURhd2xGMmljU0liMVhJX3l1WC04Y29Qdi1aTlVLTFhVRmFfWnUyWTlxOFlpb1pYQmFmMlZ6czg5ZlFPYmlBMkM2VElZU2c4YXV3amFhaTFmQTNzUDNGcG45V0RDc0NMN0VKWDh3UnBYZGVCNXdLOVE3MjRTdHhpeWwwTTVXTEVmWHdJcjR0ejFNVzd4dXFTZEdSai1PSmU5QlJyckJGekNpOVJWQktURFRudFVxU0ZZYlF1SllmaEtLbUNwR2dyakFSRmdaLUJuNXRDQzhWTDNNdWNZUjNheEc1b3JwSzcxVXV5SWpB?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>What&#x27;s Next for Bank Of America Corporation Shareholders After 4.76% Stock Drop? Glancy Prongay Wolke &amp; Rotter LLP Explains Securities Fraud Class Action Lead Plaintiff Deadline ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
                 </div>
             </div>
 
@@ -2058,7 +2058,7 @@
                     🧭 แผนกลยุทธ์ฟันธงสำหรับ BAC (Action Roadmap):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    วันงบถัดไปอยู่ห่างอีก 80 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ
+                    วันงบถัดไปอยู่ห่างอีก 79 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> หากราคาปิดหลุดแนวรับ Stop-Loss และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง
@@ -2101,7 +2101,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ระยะประชิด (0.4 วัน)</span>
+                <span class="timeline-step-badge">ระยะประชิด (0.3 วัน)</span>
                 <div class="timeline-step-desc">ประกาศผลประกอบการ Q3: จับตาการเร่งส่งมอบคำสั่งซื้อและ Guidance ปี 2027</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -2150,7 +2150,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[TradingView]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Vertiv ขยายขอบเขตการใช้งานศูนย์ข้อมูล AI: สามารถเอาชนะ APH และ SMCI ได้หรือไม่</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMivAFBVV95cUxPNzBNTmhPaDV3SjNnYWQ2T0ZZNXBHdWVDaDc5YjR3NTNKVnNzWDE5ck05aGNpRlVSU1NzcDBSdS0wRjBWM01CN191VDZUSk1HaFVzVEMyYWNMSE1XLTUzRGdfWWxwZDFVWWtWdmxFX1V5cmlSelNvbXFYYjhpbDB6cFVjdXdQMW1YcHlySENsNm1PRy1GZ0hoeFhWZVJSZUZ5UVFKOWljU3J0MkZMWFEtYVlYSXoxNmloZHZXSg?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Vertiv Expands AI Data Center Footprint: Can It Beat APH and SMCI? ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -2164,7 +2164,7 @@
                     🧭 แผนกลยุทธ์ฟันธงสำหรับ VRT (Action Roadmap):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    มีวันงบออกในอีก 0.4 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก
+                    มีวันงบออกในอีก 0.3 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> หากประกาศงบแล้วพบว่าปัญหา Supply Chain คอขวดรุนแรงจนยกเลิกออเดอร์ หรือราคาปิดหลุดแนวรับ Stop-Loss ให้พิจารณาลดสัดส่วนเพื่อถือเงินสด
@@ -2207,7 +2207,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ปฏิทินงบ (1.5 วัน)</span>
+                <span class="timeline-step-badge">ปฏิทินงบ (1.4 วัน)</span>
                 <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -2313,7 +2313,7 @@
                 <div style="font-size: 0.88rem; font-weight: 700; color: #cbd5e1; margin-bottom: 10px;">📅 ปฏิทินตัวเร่งราคาและปัจจัยสำคัญตามช่วงเวลา (Catalyst Timeline):</div>
                 <div class="timeline-strip">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ระยะประชิด (7.8 วัน)</span>
+                <span class="timeline-step-badge">ระยะประชิด (7.7 วัน)</span>
                 <div class="timeline-step-desc">รายงานงบการเงิน Q3: จับตาการเติบโตของรายได้จากลูกค้า Web Advertising และการเติบโตของซอฟต์แวร์ AXON 2.0</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -2376,7 +2376,7 @@
                     🧭 แผนกลยุทธ์ฟันธงสำหรับ APP (Action Roadmap):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    มีวันงบออกในอีก 7.8 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับสำคัญแล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่
+                    มีวันงบออกในอีก 7.7 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับสำคัญแล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดระวัง (Invalidation Risk):</strong> จุดยอมจำนนคือการหลุดเส้น Stop-Loss หรือหากตัวเลขอัตรากำไร AXON ชะลอตัวลงต่ำกว่า 20% อย่างมีนัยสำคัญ
@@ -2468,7 +2468,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Warren Buffett บอกว่าซื้อกองทุนดัชนี S&amp;P 500 นี่คือมูลค่า 500 ดอลลาร์ต่อเดือนใน 20 ปี โดยมีอัตราผลตอบแทนที่แตกต่างกัน 3 แบบ</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMikAFBVV95cUxPd0hOYmpGeS1HUklUT0lvRlZoTi1CRzN1WkNwbk8tZTEyR0RjbXhoUDg1aTk0ZlZDUEtSZTRON1dGQkpTa0Uzb3pRLXJYZk9UVl9QQjNlLUdCbXlNMkZMRy1UU2ltVXJmd3RCVS1BaDJVQmw5S2s0ZEFLOTZCSENoWmdDc2FqS2N2M3kyYThNV0c?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Warren Buffett Says Buy an S&amp;P 500 Index Fund. Here&#x27;s What $500 a Month Is Worth in 20 Years at 3 Different Return Rates. ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Warren Buffett Says Buy an S&amp;P 500 Index Fund. Here&#x27;s What $500 a Month Is Worth in 20 Years at 3 Different Return Rates.</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMikAFBVV95cUxPd0hOYmpGeS1HUklUT0lvRlZoTi1CRzN1WkNwbk8tZTEyR0RjbXhoUDg1aTk0ZlZDUEtSZTRON1dGQkpTa0Uzb3pRLXJYZk9UVl9QQjNlLUdCbXlNMkZMRy1UU2ltVXJmd3RCVS1BaDJVQmw5S2s0ZEFLOTZCSENoWmdDc2FqS2N2M3kyYThNV0c?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Warren Buffett Says Buy an S&amp;P 500 Index Fund. Here&#x27;s What $500 a Month Is Worth in 20 Years at 3 Different Return Rates. ↗</a> <span class='text-muted small'>(27 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>

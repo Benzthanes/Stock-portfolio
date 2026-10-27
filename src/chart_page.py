@@ -307,14 +307,30 @@ def generate_stock_chart_page_html() -> str:
         if t in meta:
             meta[t]["news"] = t_news
 
+    # 8. Fetch & attach quarterly financials (8 quarters / 2 years)
+    try:
+        from src.financials import get_all_financials_payload
+        financials_data = get_all_financials_payload(sorted_tickers, candles_cache=raw_cache)
+    except Exception:
+        financials_data = {}
+
+    for t in sorted_tickers:
+        if t in meta:
+            meta[t]["financials"] = financials_data.get(t, {})
+
     attach_scores(meta, sorted_tickers)
 
     chart_data_json = json.dumps(cache, ensure_ascii=False, separators=(",", ":"))
     meta_json = json.dumps(meta, ensure_ascii=False)
+    financials_json = json.dumps(financials_data, ensure_ascii=False, separators=(",", ":"))
 
     reports_dir = REPORTS_DIR
     reports_dir.mkdir(parents=True, exist_ok=True)
-    js_content = f"window.CHARTS_DATA = {chart_data_json};\nwindow.STOCKS_META = {meta_json};\n"
+    js_content = (
+        f"window.CHARTS_DATA = {chart_data_json};\n"
+        f"window.STOCKS_META = {meta_json};\n"
+        f"window.FINANCIALS_DATA = {financials_json};\n"
+    )
     (reports_dir / "chart_data.js").write_text(js_content, encoding="utf-8")
 
     pills_html = []

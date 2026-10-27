@@ -3875,6 +3875,9 @@
         renderAiDecisionSection(tData);
         renderPatternDeepDive(tData);
 
+        // Render Financial Statements & Quarterly Trends
+        updateFinancialsSection(ticker);
+
         // Render Chart
         if (currentChartMode === 'tech') {
             renderLightweightChart(ticker);
@@ -4377,6 +4380,401 @@
         if (psych) psych.textContent = pat.psychology || '-';
         if (act) act.textContent = pat.action_plan || '-';
         if (inv) inv.textContent = pat.invalidation || '-';
+    }
+
+    // =========================================================================
+    // Financial Statements & Quarterly Trends Engine (8 Quarters / 2 Years)
+    // =========================================================================
+    let currentFinView = 'all';
+
+    function switchFinView(mode) {
+        currentFinView = mode;
+        const btnAll = document.getElementById('fin_tab_all');
+        const btnTable = document.getElementById('fin_tab_table');
+        const chartPanel = document.getElementById('fin_chart_panel');
+        const tablePanel = document.getElementById('fin_table_panel');
+
+        if (mode === 'table') {
+            if (btnAll) btnAll.classList.remove('active');
+            if (btnTable) btnTable.classList.add('active');
+            if (chartPanel) chartPanel.style.display = 'none';
+            if (tablePanel) tablePanel.style.display = 'block';
+        } else {
+            if (btnAll) btnAll.classList.add('active');
+            if (btnTable) btnTable.classList.remove('active');
+            if (chartPanel) chartPanel.style.display = 'block';
+            if (tablePanel) tablePanel.style.display = 'block';
+        }
+    }
+
+    function scrollToFinancials() {
+        const elem = document.getElementById('financials_card');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function toggleFScoreCriteria() {
+        const el = document.getElementById('fin_fscore_criteria');
+        const arrow = document.getElementById('fin_fscore_arrow');
+        if (!el) return;
+        const isOpen = el.style.display !== 'none';
+        el.style.display = isOpen ? 'none' : 'flex';
+        if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+    }
+
+    window.switchFinView = switchFinView;
+    window.scrollToFinancials = scrollToFinancials;
+    window.toggleFScoreCriteria = toggleFScoreCriteria;
+
+    function _formatFinCurrency(val) {
+        if (val === undefined || val === null || isNaN(val)) return '-';
+        const absVal = Math.abs(val);
+        const sign = val < 0 ? '-' : '';
+        if (absVal >= 1e12) return `${sign}$${(absVal / 1e12).toFixed(2)}T`;
+        if (absVal >= 1e9) return `${sign}$${(absVal / 1e9).toFixed(2)}B`;
+        if (absVal >= 1e6) return `${sign}$${(absVal / 1e6).toFixed(2)}M`;
+        if (absVal >= 1e3) return `${sign}$${(absVal / 1e3).toFixed(1)}K`;
+        return `${sign}$${Number(absVal).toFixed(2)}`;
+    }
+
+    function _renderGrowthBadge(pct, label) {
+        if (pct === undefined || pct === null || isNaN(pct)) return '<span class="fin-badge-neutral">-</span>';
+        const isPos = pct >= 0;
+        const sign = isPos ? '+' : '';
+        const arrow = isPos ? '▲' : '▼';
+        const cls = isPos ? 'fin-badge-pos' : 'fin-badge-neg';
+        const lbl = label ? ` ${label}` : '';
+        return `<span class="${cls}">${sign}${Number(pct).toFixed(1)}% ${arrow}${lbl}</span>`;
+    }
+
+    function updateFinancialsSection(ticker) {
+        const card = document.getElementById('financials_card');
+        if (!card) return;
+
+        const finData = (window.FINANCIALS_DATA && window.FINANCIALS_DATA[ticker]) ||
+                        (STOCKS_META[ticker] && STOCKS_META[ticker].financials);
+
+        const badge = document.getElementById('fin_latest_quarter_badge');
+        const hudGrid = document.getElementById('fin_hud_grid');
+        const insightsGrid = document.getElementById('fin_insights_grid');
+        const chartPanel = document.getElementById('fin_chart_panel');
+        const tablePanel = document.getElementById('fin_table_panel');
+        const emptyState = document.getElementById('fin_empty_state');
+        const emptyTitle = document.getElementById('fin_empty_title');
+        const emptyDesc = document.getElementById('fin_empty_desc');
+
+        if (!finData || !finData.has_data || !finData.quarters || finData.quarters.length === 0) {
+            const isEtf = (finData && finData.is_etf) || ['VOO', 'QQQI', 'SPY', 'IVV'].includes(ticker);
+            if (emptyState) emptyState.style.display = 'block';
+            if (hudGrid) hudGrid.style.display = 'none';
+            if (insightsGrid) insightsGrid.style.display = 'none';
+            if (chartPanel) chartPanel.style.display = 'none';
+            if (tablePanel) tablePanel.style.display = 'none';
+
+            if (badge) {
+                badge.textContent = isEtf ? 'กองทุน ETF' : 'ไม่มีข้อมูลงบ';
+                badge.style.background = 'rgba(245, 158, 11, 0.15)';
+                badge.style.color = '#fbbf24';
+                badge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+            }
+
+            if (isEtf) {
+                if (emptyTitle) emptyTitle.textContent = `${ticker} เป็นกองทุน ETF ไม่มีรายงานงบการเงินรายไตรมาสแบบหุ้นรายตัว`;
+                if (emptyDesc) emptyDesc.textContent = `กองทุนดัชนีและ High Income ETF (เช่น VOO, QQQI) ไม่มีรายงานรายได้ กำไร หรือหนี้สินแบบบริษัทจดทะเบียน โปรดดูผลตอบแทน เงินปันผล และราคาตลาดจากกราฟและแถบข้อมูลด้านขวา`;
+            } else {
+                if (emptyTitle) emptyTitle.textContent = `ยังไม่มีรายงานงบการเงินรายไตรมาสสำหรับ ${ticker}`;
+                if (emptyDesc) emptyDesc.textContent = `บริษัทอาจเป็นหุ้นที่เพิ่งเข้าตลาด หรือยังไม่มีรายงานงบการเงินรอบล่าสุดส่งตลาดหลักทรัพย์`;
+            }
+            return;
+        }
+
+        // Show data containers
+        if (emptyState) emptyState.style.display = 'none';
+        if (hudGrid) hudGrid.style.display = 'grid';
+        if (insightsGrid) insightsGrid.style.display = 'grid';
+        if (chartPanel) chartPanel.style.display = (currentFinView === 'table') ? 'none' : 'block';
+        if (tablePanel) tablePanel.style.display = 'block';
+
+        const quarters = finData.quarters;
+        const latest = quarters[quarters.length - 1] || {};
+
+        if (badge) {
+            badge.textContent = `งบล่าสุด ${latest.quarter_label || '-'} (${latest.date || '-'})`;
+            badge.style.background = 'rgba(59, 130, 246, 0.15)';
+            badge.style.color = '#60a5fa';
+            badge.style.borderColor = 'rgba(59, 130, 246, 0.35)';
+        }
+
+        // 1. HUD Strip
+        const revTtmElem = document.getElementById('fin_hud_rev_ttm');
+        const revSubElem = document.getElementById('fin_hud_rev_sub');
+        if (revTtmElem) revTtmElem.textContent = finData.ttm_revenue_fmt || '-';
+        if (revSubElem) {
+            const yoyRev = latest.rev_growth_yoy;
+            const yoyBadge = yoyRev != null ? _renderGrowthBadge(yoyRev, 'YoY') : '';
+            revSubElem.innerHTML = `ล่าสุด: <strong>${latest.revenue_fmt || '-'}</strong> ${yoyBadge}`;
+        }
+
+        const niTtmElem = document.getElementById('fin_hud_ni_ttm');
+        const niSubElem = document.getElementById('fin_hud_ni_sub');
+        if (niTtmElem) niTtmElem.textContent = finData.ttm_net_income_fmt || '-';
+        if (niSubElem) {
+            const margin = latest.net_margin;
+            const marginColor = (margin != null && margin >= 20) ? '#34d399' : ((margin != null && margin >= 0) ? '#38bdf8' : '#fb7185');
+            niSubElem.innerHTML = `Net Margin ล่าสุด: <strong style="color:${marginColor}">${margin != null ? margin.toFixed(1) + '%' : '-'}</strong> (กำไร ${latest.net_income_fmt || '-'})`;
+        }
+
+        const deElem = document.getElementById('fin_hud_de');
+        const deSubElem = document.getElementById('fin_hud_de_sub');
+        if (deElem) {
+            const de = latest.debt_to_equity;
+            deElem.textContent = de != null ? `${de.toFixed(2)}x` : '-';
+            deElem.style.color = (de != null && de > 2.5) ? '#fb7185' : ((de != null && de <= 1.0) ? '#34d399' : '#f8fafc');
+        }
+        if (deSubElem) deSubElem.textContent = `หนี้สินรวม: ${latest.total_debt_fmt || '-'} • ทุน: ${latest.stockholders_equity_fmt || '-'}`;
+
+        const fcfElem = document.getElementById('fin_hud_fcf');
+        const fcfSubElem = document.getElementById('fin_hud_fcf_sub');
+        if (fcfElem) fcfElem.textContent = latest.fcf_fmt || '-';
+        if (fcfSubElem) fcfSubElem.textContent = `12M รวม (TTM): ${finData.ttm_fcf_fmt || '-'}`;
+
+        // 2. Piotroski F-Score Card
+        const fScore = finData.f_score || {};
+        const fScoreValElem = document.getElementById('fin_fscore_val');
+        const fScoreLabelElem = document.getElementById('fin_fscore_label');
+        if (fScoreValElem) {
+            if (fScore.score != null) {
+                fScoreValElem.innerHTML = `${fScore.score}<span>/${fScore.max_score || 9}</span>`;
+                fScoreValElem.style.color = fScore.color || '#34d399';
+            } else {
+                fScoreValElem.innerHTML = `-<span>/9</span>`;
+                fScoreValElem.style.color = '#94a3b8';
+            }
+        }
+        if (fScoreLabelElem) {
+            fScoreLabelElem.textContent = fScore.label || '-';
+            fScoreLabelElem.style.color = fScore.color || '#cbd5e1';
+        }
+
+        const criteriaList = document.getElementById('fin_fscore_criteria');
+        if (criteriaList && fScore.criteria) {
+            criteriaList.innerHTML = fScore.criteria.map(c => {
+                const passClass = c.passed ? 'fin-criteria-pass' : 'fin-criteria-fail';
+                const passIcon = c.passed ? '✓' : '✗';
+                return `<div class="fin-criteria-item">
+                    <span class="${passClass}">${passIcon} ${escapeHtml(c.name || '')}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;color:#cbd5e1;">${escapeHtml(c.detail || '')}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // 3. 3-Dimension Executive Summary Card
+        const execSummary = finData.executive_summary || {};
+        const growthElem = document.getElementById('fin_summary_growth');
+        const profElem = document.getElementById('fin_summary_profitability');
+        const debtElem = document.getElementById('fin_summary_debt');
+        if (growthElem) growthElem.textContent = execSummary.growth || '-';
+        if (profElem) profElem.textContent = execSummary.profitability || '-';
+        if (debtElem) debtElem.textContent = execSummary.debt || '-';
+
+        // 4. Render SVG Interactive Chart
+        renderFinancialTrendChart(quarters);
+
+        // 5. Render Detailed 8-Quarter Statement Table
+        renderFinancialStatementTable(quarters);
+    }
+
+    function renderFinancialTrendChart(quarters) {
+        const wrap = document.getElementById('fin_svg_wrap');
+        if (!wrap || !quarters || quarters.length === 0) return;
+
+        const W = 960;
+        const H = 250;
+        const padL = 70;
+        const padR = 25;
+        const padT = 30;
+        const padB = 45;
+        const plotW = W - padL - padR;
+        const plotH = H - padT - padB;
+
+        // Find max value across revenue, net income, fcf
+        let maxVal = 0;
+        quarters.forEach(q => {
+            if (q.revenue && q.revenue > maxVal) maxVal = q.revenue;
+            if (q.net_income && q.net_income > maxVal) maxVal = q.net_income;
+            if (q.fcf && q.fcf > maxVal) maxVal = q.fcf;
+        });
+        if (maxVal <= 0) maxVal = 1000000;
+        maxVal = maxVal * 1.15; // 15% headroom
+
+        // Y-axis grid levels (4 steps)
+        let gridLines = '';
+        for (let i = 0; i <= 4; i++) {
+            const ratio = i / 4;
+            const y = padT + plotH - (ratio * plotH);
+            const val = ratio * maxVal;
+            gridLines += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3,3" />`;
+            gridLines += `<text x="${padL - 10}" y="${y + 4}" fill="#64748b" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="end">${_formatFinCurrency(val)}</text>`;
+        }
+
+        const slotW = plotW / quarters.length;
+        const barW = Math.min(slotW * 0.22, 28);
+        const gap = Math.min(slotW * 0.04, 6);
+
+        let barsSvg = '';
+        quarters.forEach((q, idx) => {
+            const slotCenter = padL + (idx * slotW) + (slotW / 2);
+            const isLatest = idx === quarters.length - 1;
+
+            // X-axis quarter labels
+            const qX = slotCenter;
+            const qY = H - 22;
+            const labelColor = isLatest ? '#60a5fa' : '#94a3b8';
+            const fontWt = isLatest ? '800' : '600';
+            barsSvg += `<text x="${qX}" y="${qY}" fill="${labelColor}" font-size="11" font-weight="${fontWt}" font-family="'Inter', sans-serif" text-anchor="middle">${q.quarter_label}</text>`;
+            barsSvg += `<text x="${qX}" y="${qY + 14}" fill="#64748b" font-size="9" font-family="'JetBrains Mono', monospace" text-anchor="middle">${q.date.slice(2)}</text>`;
+
+            // Highlight latest column subtle background
+            if (isLatest) {
+                barsSvg += `<rect x="${slotCenter - (slotW / 2) + 2}" y="${padT}" width="${slotW - 4}" height="${plotH}" fill="rgba(59,130,246,0.04)" rx="6" />`;
+            }
+
+            // Bar 1: Revenue (Left)
+            const rev = q.revenue || 0;
+            const revH = Math.max((rev / maxVal) * plotH, 2);
+            const revX = slotCenter - barW - (gap / 2) - (barW / 2);
+            const revY = padT + plotH - revH;
+            const revTip = `${q.quarter_label} (${q.date})&#10;รายได้รวม: ${q.revenue_fmt || '-'} (${q.rev_growth_yoy != null ? (q.rev_growth_yoy >= 0 ? '+' : '') + q.rev_growth_yoy + '% YoY' : 'QoQ: ' + (q.rev_growth_qoq || '-') + '%'})`;
+            barsSvg += `<rect x="${revX}" y="${revY}" width="${barW}" height="${revH}" fill="url(#finGradRev)" rx="3" ry="3"><title>${revTip}</title></rect>`;
+
+            // Bar 2: Net Income (Center)
+            const ni = q.net_income || 0;
+            const niH = Math.max((Math.abs(ni) / maxVal) * plotH, 2);
+            const niX = slotCenter - (barW / 2);
+            const niY = padT + plotH - niH;
+            const niGrad = ni >= 0 ? 'url(#finGradNiPos)' : 'url(#finGradNiNeg)';
+            const niTip = `${q.quarter_label} (${q.date})&#10;กำไรสุทธิ: ${q.net_income_fmt || '-'} (Net Margin: ${q.net_margin != null ? q.net_margin + '%' : '-'})`;
+            barsSvg += `<rect x="${niX}" y="${niY}" width="${barW}" height="${niH}" fill="${niGrad}" rx="3" ry="3"><title>${niTip}</title></rect>`;
+
+            // Bar 3: FCF (Right)
+            const fcf = q.fcf || 0;
+            const fcfH = Math.max((Math.abs(fcf) / maxVal) * plotH, 2);
+            const fcfX = slotCenter + (gap / 2) + (barW / 2);
+            const fcfY = padT + plotH - fcfH;
+            const fcfTip = `${q.quarter_label} (${q.date})&#10;กระแสเงินสดอิสระ (FCF): ${q.fcf_fmt || '-'}`;
+            barsSvg += `<rect x="${fcfX}" y="${fcfY}" width="${barW}" height="${fcfH}" fill="url(#finGradFcf)" rx="3" ry="3"><title>${fcfTip}</title></rect>`;
+
+            // Revenue value pill on top
+            if (revH > 25) {
+                barsSvg += `<text x="${revX + (barW / 2)}" y="${revY - 4}" fill="#38bdf8" font-size="9" font-weight="700" font-family="'JetBrains Mono', monospace" text-anchor="middle">${q.revenue_fmt}</text>`;
+            }
+        });
+
+        const svgContent = `
+            <svg width="100%" height="250" viewBox="0 0 ${W} ${H}" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="finGradRev" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#0284c7" stop-opacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="finGradNiPos" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#34d399" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#059669" stop-opacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="finGradNiNeg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#fb7185" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#e11d48" stop-opacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="finGradFcf" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#c084fc" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#7e22ce" stop-opacity="0.75" />
+                    </linearGradient>
+                </defs>
+                ${gridLines}
+                ${barsSvg}
+            </svg>
+        `;
+        wrap.innerHTML = svgContent;
+    }
+
+    function renderFinancialStatementTable(quarters) {
+        const container = document.getElementById('fin_table_container');
+        if (!container || !quarters || quarters.length === 0) return;
+
+        // Header Columns
+        let thCols = '<th class="th-metric">รายการตัวชี้วัด (Financial Metrics)</th>';
+        quarters.forEach((q, idx) => {
+            const isLatest = idx === quarters.length - 1;
+            const latestBadge = isLatest ? ' <span style="font-size:0.65rem; background:#3b82f6; color:#fff; padding:1px 5px; border-radius:3px;">ล่าสุด</span>' : '';
+            thCols += `<th class="th-quarter ${isLatest ? 'th-latest' : ''}"><div>${q.quarter_label}${latestBadge}</div><div style="font-size:0.65rem; color:#64748b; font-weight:normal; margin-top:2px;">${q.date}</div></th>`;
+        });
+
+        // Helper to build a table row
+        function buildRow(title, getter, isSub = false) {
+            let rowHtml = `<tr class="${isSub ? 'fin-row-sub' : ''}"><td class="fin-row-header">${title}</td>`;
+            quarters.forEach((q, idx) => {
+                const isLatest = idx === quarters.length - 1;
+                const cellVal = getter(q, idx);
+                rowHtml += `<td class="fin-cell ${isLatest ? 'td-latest' : ''}">${cellVal}</td>`;
+            });
+            rowHtml += `</tr>`;
+            return rowHtml;
+        }
+
+        let rowsHtml = '';
+        // 1. Revenue
+        rowsHtml += buildRow('💰 รายได้รวม (Total Revenue)', q => `<strong>${q.revenue_fmt || '-'}</strong>`);
+        // 2. QoQ Revenue Growth
+        rowsHtml += buildRow('⚡ เติบโต QoQ (%)', q => _renderGrowthBadge(q.rev_growth_qoq), true);
+        // 3. YoY Revenue Growth
+        rowsHtml += buildRow('🚀 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true);
+        // 4. Gross Profit
+        rowsHtml += buildRow('📈 กำไรขั้นต้น (Gross Profit)', q => q.gross_profit_fmt || '-');
+        // 5. Gross Margin
+        rowsHtml += buildRow('⚙️ อัตรากำไรขั้นต้น (Gross Margin)', q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-', true);
+        // 6. Operating Income
+        rowsHtml += buildRow('🏢 กำไรจากการดำเนินงาน (Operating Income)', q => q.operating_income_fmt || '-');
+        // 7. Net Income
+        rowsHtml += buildRow('🎯 กำไรสุทธิ (Net Income)', q => {
+            const ni = q.net_income;
+            const col = (ni != null && ni >= 0) ? '#34d399' : '#fb7185';
+            return `<strong style="color:${col}">${q.net_income_fmt || '-'}</strong>`;
+        });
+        // 8. Net Margin
+        rowsHtml += buildRow('📊 อัตรากำไรสุทธิ (Net Margin)', q => {
+            const m = q.net_margin;
+            if (m == null) return '-';
+            const col = m >= 15 ? '#34d399' : (m >= 0 ? '#38bdf8' : '#fb7185');
+            return `<span style="color:${col}; font-weight:700;">${m.toFixed(1)}%</span>`;
+        }, true);
+        // 9. Diluted EPS
+        rowsHtml += buildRow('💵 กำไรต่อหุ้น (Diluted EPS)', q => {
+            const eps = q.eps;
+            if (eps == null) return '-';
+            const epsBadge = q.eps_growth_yoy != null ? ` ${_renderGrowthBadge(q.eps_growth_yoy)}` : '';
+            return `$${eps.toFixed(2)}${epsBadge}`;
+        });
+        // 10. Free Cash Flow
+        rowsHtml += buildRow('🌊 กระแสเงินสดอิสระ (FCF)', q => `<span style="color:#c084fc;">${q.fcf_fmt || '-'}</span>`);
+        // 11. Total Debt
+        rowsHtml += buildRow('💳 หนี้สินรวม (Total Debt)', q => q.total_debt_fmt || '-');
+        // 12. Stockholders Equity
+        rowsHtml += buildRow('🏛️ ส่วนของผู้ถือหุ้น (Stockholders Equity)', q => q.stockholders_equity_fmt || '-');
+        // 13. Debt to Equity
+        rowsHtml += buildRow('⚖️ หนี้สินต่อทุน (D/E Ratio)', q => {
+            const de = q.debt_to_equity;
+            if (de == null) return '-';
+            const col = de > 2.5 ? '#fb7185' : (de <= 1.0 ? '#34d399' : '#f8fafc');
+            return `<span style="color:${col}; font-weight:700;">${de.toFixed(2)}x</span>`;
+        }, true);
+        // 14. Quarterly P/E
+        rowsHtml += buildRow('🏷️ P/E อ้างอิงไตรมาส', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-', true);
+
+        container.innerHTML = `
+            <table class="fin-table">
+                <thead><tr>${thCols}</tr></thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        `;
     }
 
     // Switch Tabs (Lightweight Chart vs TradingView Full Embed)

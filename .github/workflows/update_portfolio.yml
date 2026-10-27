@@ -45,6 +45,7 @@ jobs:
           path: |
             data/candles_cache.json
             data/.news_cache.json
+            data/financials_cache.json
           # Keys are immutable, so the run id makes every run save a fresh copy. Restore falls back to today, then any day.
           key: portfolio-caches-${{ steps.date.outputs.date }}-${{ github.run_id }}
           restore-keys: |

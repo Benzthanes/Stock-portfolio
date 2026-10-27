@@ -1630,6 +1630,488 @@
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
         }
+
+        /* ==========================================================================
+           Financial Statements & Performance Styling
+           ========================================================================== */
+        .financials-main-card {
+            margin-top: 20px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            padding: 22px 24px;
+            scroll-margin-top: 70px;
+        }
+        .fin-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 16px;
+        }
+        .fin-title-group {
+            flex: 1;
+            min-width: 280px;
+        }
+        .fin-main-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .fin-icon {
+            font-size: 1.25rem;
+        }
+        .fin-quarter-badge {
+            font-size: 0.74rem;
+            font-weight: 700;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            padding: 3px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.3px;
+        }
+        .fin-subtitle {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-top: 5px;
+            line-height: 1.45;
+        }
+        .fin-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fin-view-toggles {
+            display: inline-flex;
+            gap: 4px;
+            background: #060914;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .fin-tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Prompt', sans-serif;
+        }
+        .fin-tab-btn:hover {
+            color: #ffffff;
+        }
+        .fin-tab-btn.active {
+            background: var(--blue);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+        .fin-hud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .fin-hud-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 13px 16px;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .fin-hud-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .fin-hud-label {
+            font-size: 0.70rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .fin-hud-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #f8fafc;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 4px 0 2px 0;
+        }
+        .fin-hud-sub {
+            font-size: 0.72rem;
+            color: #cbd5e1;
+        }
+        .fin-insights-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 992px) {
+            .fin-insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .fin-fscore-card, .fin-exec-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .fin-card-sublabel {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .fin-fscore-title, .fin-exec-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-top: 2px;
+        }
+        .fin-fscore-score-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .fin-fscore-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1;
+            color: #34d399;
+        }
+        .fin-fscore-number span {
+            font-size: 1.05rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .fin-fscore-meta {
+            flex: 1;
+        }
+        .fin-fscore-status {
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .fin-fscore-desc {
+            font-size: 0.70rem;
+            color: #94a3b8;
+            line-height: 1.35;
+        }
+        .fin-fscore-toggle-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.15s;
+        }
+        .fin-fscore-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+        }
+        .fin-fscore-criteria-list {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .fin-criteria-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            padding: 5px 8px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            gap: 8px;
+        }
+        .fin-criteria-pass {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .fin-criteria-fail {
+            color: #fb7185;
+            font-weight: 600;
+        }
+        .fin-exec-points {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-top: 12px;
+            flex: 1;
+            justify-content: space-between;
+        }
+        .fin-exec-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .fin-exec-point-icon {
+            font-size: 1.15rem;
+            line-height: 1.2;
+            flex-shrink: 0;
+        }
+        .fin-exec-point-content {
+            flex: 1;
+        }
+        .fin-exec-point-label {
+            font-size: 0.70rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 2px;
+        }
+        .fin-exec-point-text {
+            font-size: 0.79rem;
+            color: #e2e8f0;
+            line-height: 1.45;
+        }
+        .fin-chart-panel {
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 22px;
+        }
+        .fin-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .fin-chart-title {
+            font-size: 0.90rem;
+            font-weight: 800;
+            color: #e2e8f0;
+        }
+        .fin-chart-legend {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            flex-wrap: wrap;
+        }
+        .fin-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .fin-legend-color {
+            width: 11px;
+            height: 11px;
+            border-radius: 3px;
+        }
+        .fin-legend-color.bar-rev {
+            background: #38bdf8;
+        }
+        .fin-legend-color.bar-ni {
+            background: #34d399;
+        }
+        .fin-legend-color.line-fcf {
+            background: #a855f7;
+        }
+        .fin-svg-wrap {
+            width: 100%;
+            overflow-x: auto;
+            min-height: 250px;
+            padding: 8px 0;
+        }
+        .fin-table-panel {
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+        .fin-table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .fin-table-title {
+            font-size: 0.90rem;
+            font-weight: 800;
+            color: #e2e8f0;
+        }
+        .fin-unit-label {
+            font-size: 0.70rem;
+            color: #64748b;
+            font-style: italic;
+        }
+        .fin-table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #090e1a;
+        }
+        .fin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            min-width: 680px;
+        }
+        .fin-table th, .fin-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .fin-table th {
+            background: #0f172a;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .fin-table th.th-metric {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: #0c1427;
+            z-index: 3;
+            min-width: 220px;
+            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.4);
+        }
+        .fin-table th.th-quarter {
+            text-align: right;
+            min-width: 105px;
+        }
+        .fin-table th.th-latest {
+            color: #60a5fa;
+            border-bottom: 2px solid #3b82f6;
+        }
+        .fin-row-header {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            background: #0c1427;
+            z-index: 2;
+            font-weight: 700;
+            color: #cbd5e1;
+            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
+        }
+        .fin-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.80rem;
+            color: #f1f5f9;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .fin-table tr:hover td {
+            background: rgba(255, 255, 255, 0.025);
+        }
+        .fin-table tr:hover td.fin-row-header {
+            background: #111a33;
+        }
+        .fin-row-sub td {
+            font-size: 0.74rem;
+            color: #94a3b8;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .fin-badge-pos {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.70rem;
+            font-weight: 700;
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.14);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
+        .fin-badge-neg {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.70rem;
+            font-weight: 700;
+            color: #fb7185;
+            background: rgba(251, 113, 133, 0.14);
+            border: 1px solid rgba(251, 113, 133, 0.25);
+        }
+        .fin-badge-neutral {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.70rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .fin-empty-state {
+            padding: 45px 24px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+        }
+        .fin-empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+        .fin-empty-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-bottom: 8px;
+        }
+        .fin-empty-desc {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.55;
+        }
+
     </style>
 </head>
 <body>
@@ -1664,21 +2146,21 @@
 
             <!-- Scrollable Stock Cards List -->
             <div class="sidebar-cards-scroll" id="pills_container">
-                <div class="sp-pill stock-card" id="pill_LLY" onclick="selectStock('LLY')" title="Eli Lilly and Company"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">LLY</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$1,279.15</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$1,227.4, $1,131.2</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$1,292.7, $1,324.7</span></div></div>
-<div class="sp-pill stock-card" id="pill_GOOGL" onclick="selectStock('GOOGL')" title="Alphabet Inc. Class A"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">GOOGL</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$323.77</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$326.5, $318.3</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$341.9, $362.9</span></div></div>
-<div class="sp-pill stock-card" id="pill_ABNB" onclick="selectStock('ABNB')" title="Airbnb, Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">ABNB</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$168.86</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$162.0, $156.4</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$171.5, $182.3</span></div></div>
-<div class="sp-pill stock-card" id="pill_NOK" onclick="selectStock('NOK')" title="Nokia Oyj"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">NOK</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$8.93</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$8.65, $8.12</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$10.0, $11.0</span></div></div>
-<div class="sp-pill stock-card" id="pill_BAC" onclick="selectStock('BAC')" title="Bank of America Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">BAC</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$50.72</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$49.3, $48.9</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$57.2, $60.7</span></div></div>
+                <div class="sp-pill stock-card" id="pill_LLY" onclick="selectStock('LLY')" title="Eli Lilly and Company"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">LLY</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$1,281.91</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$1,227.4, $1,131.2</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$1,292.7, $1,324.7</span></div></div>
+<div class="sp-pill stock-card" id="pill_GOOGL" onclick="selectStock('GOOGL')" title="Alphabet Inc. Class A"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">GOOGL</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$320.58</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$318.3, $308.9</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$341.9, $362.9</span></div></div>
+<div class="sp-pill stock-card" id="pill_ABNB" onclick="selectStock('ABNB')" title="Airbnb, Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">ABNB</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$168.82</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$162.0, $156.4</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$171.5, $182.3</span></div></div>
+<div class="sp-pill stock-card" id="pill_NOK" onclick="selectStock('NOK')" title="Nokia Oyj"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">NOK</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$8.89</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$8.65, $8.12</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$10.0, $11.0</span></div></div>
+<div class="sp-pill stock-card" id="pill_BAC" onclick="selectStock('BAC')" title="Bank of America Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">BAC</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$50.68</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$49.3, $48.9</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$57.2, $60.7</span></div></div>
 <div class="sp-pill stock-card" id="pill_MNST" onclick="selectStock('MNST')" title="Monster Beverage Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">MNST</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$45.44</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$43.9, $43.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$48.0, $49.1</span></div></div>
-<div class="sp-pill stock-card" id="pill_APP" onclick="selectStock('APP')" title="AppLovin Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">APP</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$263.67</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$258.4, $255.8</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$297.9, $322.4</span></div></div>
-<div class="sp-pill stock-card" id="pill_VRT" onclick="selectStock('VRT')" title="Vertiv Holdings Co."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VRT</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$209.60</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$191.1, $186.1</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$244.1, $258.1</span></div></div>
-<div class="sp-pill stock-card" id="pill_VOO" onclick="selectStock('VOO')" title="Vanguard S&amp;P 500 ETF"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VOO</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$708.58</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$697.6, $689.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$713.8, $718.5</span></div></div>
-<div class="sp-pill stock-card" id="pill_PLTR" onclick="selectStock('PLTR')" title="Palantir Technologies Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">PLTR</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$200.11</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$169.5, $164.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$199.6, $212.2</span></div></div>
-<div class="sp-pill stock-card" id="pill_VST" onclick="selectStock('VST')" title="Vistra Corp."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VST</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$147.24</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$133.4, $129.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$151.0, $161.2</span></div></div>
-<div class="sp-pill stock-card" id="pill_NOW" onclick="selectStock('NOW')" title="ServiceNow, Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">NOW</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$155.45</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$126.8, $124.7</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$156.9</span></div></div>
-<div class="sp-pill stock-card" id="pill_SPCX" onclick="selectStock('SPCX')" title="SpaceX (Space Exploration Technologies)"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">SPCX</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$149.67</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$140.0, $129.1</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$159.9, $169.0</span></div></div>
-<div class="sp-pill stock-card" id="pill_QQQI" onclick="selectStock('QQQI')" title="NEOS Nasdaq 100 High Income ETF"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">QQQI</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$53.88</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$53.7, $53.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$55.2, $56.6</span></div></div>
-<div class="sp-pill stock-card" id="pill_SKHY" onclick="selectStock('SKHY')" title="SK hynix Inc. American Depositary Shares"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">SKHY</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$145.57</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$138.4</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$171.3, $199.9</span></div></div>
+<div class="sp-pill stock-card" id="pill_APP" onclick="selectStock('APP')" title="AppLovin Corp"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">APP</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$262.82</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$258.4, $255.8</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$297.9, $322.4</span></div></div>
+<div class="sp-pill stock-card" id="pill_VRT" onclick="selectStock('VRT')" title="Vertiv Holdings Co."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VRT</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$208.56</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$191.1, $186.1</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$244.1, $258.1</span></div></div>
+<div class="sp-pill stock-card" id="pill_VOO" onclick="selectStock('VOO')" title="Vanguard S&amp;P 500 ETF"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VOO</span><div class="sc-badges"><span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$707.52</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$697.6, $689.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$713.8, $718.5</span></div></div>
+<div class="sp-pill stock-card" id="pill_PLTR" onclick="selectStock('PLTR')" title="Palantir Technologies Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">PLTR</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$198.73</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$169.5, $164.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$199.6, $212.2</span></div></div>
+<div class="sp-pill stock-card" id="pill_VST" onclick="selectStock('VST')" title="Vistra Corp."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">VST</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$146.66</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$133.4, $129.6</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$151.0, $161.2</span></div></div>
+<div class="sp-pill stock-card" id="pill_NOW" onclick="selectStock('NOW')" title="ServiceNow, Inc."><div class="sc-row-top"><span class="sp-pill-t sc-ticker">NOW</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$154.78</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$126.8, $124.7</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$156.9</span></div></div>
+<div class="sp-pill stock-card" id="pill_SPCX" onclick="selectStock('SPCX')" title="SpaceX (Space Exploration Technologies)"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">SPCX</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$148.58</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$140.0, $129.1</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$159.9, $169.0</span></div></div>
+<div class="sp-pill stock-card" id="pill_QQQI" onclick="selectStock('QQQI')" title="NEOS Nasdaq 100 High Income ETF"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">QQQI</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$53.81</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$53.7, $53.0</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$55.2, $56.6</span></div></div>
+<div class="sp-pill stock-card" id="pill_SKHY" onclick="selectStock('SKHY')" title="SK hynix Inc. American Depositary Shares"><div class="sc-row-top"><span class="sp-pill-t sc-ticker">SKHY</span><div class="sc-badges"><span class="sc-badge sc-badge-closed">ขายแล้ว</span></div></div><div class="sc-row-price"><span class="sc-label">Price</span><span class="sp-pill-p sc-price">$145.36</span></div><div class="sc-row-level sc-support"><span class="sc-tag-support">รับ:</span><span class="sc-vals-support">$138.4</span></div><div class="sc-row-level sc-resistance"><span class="sc-tag-resistance">ต้าน:</span><span class="sc-vals-resistance">$171.3, $199.9</span></div></div>
             </div>
         </aside>
 
@@ -1752,7 +2234,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 07:42</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 10:05</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -1937,6 +2419,7 @@
                                 <button class="v-tab-btn" id="tab_tv" onclick="switchChartTab('tv')">🌐 TradingView</button>
                             </div>
                             <button class="jump-btn" onclick="scrollToAiSection()">🤖 จุดตัดสินใจ</button>
+                            <button class="jump-btn" onclick="scrollToFinancials()">📊 งบการเงิน</button>
                             <a id="st_ext_link" href="#" target="_blank" class="ext-tv-btn" title="เปิดดูกราฟตัวเต็มบน TradingView">
                                 <span>เปิดบน TradingView ↗</span>
                             </a>
@@ -2171,6 +2654,137 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Financial Statements & Performance Section -->
+                <div class="financials-main-card" id="financials_card">
+                    <div class="fin-header-row">
+                        <div class="fin-title-group">
+                            <div class="fin-main-title">
+                                <span class="fin-icon">📊</span>
+                                <span>งบการเงินรายไตรมาส (Financial Performance & Trends)</span>
+                                <span class="fin-quarter-badge" id="fin_latest_quarter_badge">กำลังตรวจสอบงบ...</span>
+                            </div>
+                            <div class="fin-subtitle">สรุปผลประกอบการ 8 ไตรมาสย้อนหลัง • รายได้ • กำไรสุทธิ • EPS • สัดส่วนหนี้สิน (D/E) • กระแสเงินสดอิสระ (FCF) • P/E</div>
+                        </div>
+                        <div class="fin-actions">
+                            <div class="fin-view-toggles">
+                                <button class="fin-tab-btn active" id="fin_tab_all" onclick="switchFinView('all')">📑 ภาพรวม & กราฟแนวโน้ม</button>
+                                <button class="fin-tab-btn" id="fin_tab_table" onclick="switchFinView('table')">📋 ตารางงบละเอียด</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Summary HUD Cards Strip -->
+                    <div class="fin-hud-grid" id="fin_hud_grid">
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">รายได้รวม 12M ล่าสุด (TTM Revenue)</div>
+                            <div class="fin-hud-value" id="fin_hud_rev_ttm">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_rev_sub">ล่าสุด: -</div>
+                        </div>
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">กำไรสุทธิ 12M ล่าสุด (TTM Net Income)</div>
+                            <div class="fin-hud-value" id="fin_hud_ni_ttm">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_ni_sub">อัตรากำไรสุทธิ: -</div>
+                        </div>
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">หนี้สินต่อทุนล่าสุด (D/E Ratio)</div>
+                            <div class="fin-hud-value" id="fin_hud_de">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_de_sub">หนี้สินรวม: -</div>
+                        </div>
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">กระแสเงินสดอิสระล่าสุด (FCF)</div>
+                            <div class="fin-hud-value" id="fin_hud_fcf">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_fcf_sub">TTM FCF: -</div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Insights & Piotroski F-Score Section -->
+                    <div class="fin-insights-grid" id="fin_insights_grid">
+                        <!-- Piotroski F-Score Card -->
+                        <div class="fin-fscore-card" id="fin_fscore_card">
+                            <div class="fin-fscore-header">
+                                <div class="fin-card-sublabel">PIOTROSKI FINANCIAL STRENGTH</div>
+                                <div class="fin-fscore-title">🏆 Piotroski F-Score</div>
+                            </div>
+                            <div class="fin-fscore-score-row">
+                                <div class="fin-fscore-number" id="fin_fscore_val">-<span>/9</span></div>
+                                <div class="fin-fscore-meta">
+                                    <div class="fin-fscore-status" id="fin_fscore_label">-</div>
+                                    <div class="fin-fscore-desc">วัดสุขภาพการเงินจริงจาก 9 ปัจจัยรอบด้าน</div>
+                                </div>
+                            </div>
+                            <button type="button" class="fin-fscore-toggle-btn" id="fin_fscore_toggle_btn" onclick="toggleFScoreCriteria()">
+                                <span>ดู 9 เกณฑ์ตรวจสอบคุณภาพ</span>
+                                <span class="fin-fscore-arrow" id="fin_fscore_arrow">▼</span>
+                            </button>
+                            <div class="fin-fscore-criteria-list" id="fin_fscore_criteria" style="display: none;">
+                                <!-- Injected dynamically by chart.js -->
+                            </div>
+                        </div>
+
+                        <!-- 3-Dimension Executive Summary Card -->
+                        <div class="fin-exec-card" id="fin_exec_card">
+                            <div class="fin-card-sublabel">EXECUTIVE SUMMARY</div>
+                            <div class="fin-exec-title">💡 บทสรุปสุขภาพการเงิน 3 มิติ (Financial Insights)</div>
+                            <div class="fin-exec-points">
+                                <div class="fin-exec-point">
+                                    <div class="fin-exec-point-icon">🚀</div>
+                                    <div class="fin-exec-point-content">
+                                        <div class="fin-exec-point-label">การเติบโตของธุรกิจ (Growth Trajectory)</div>
+                                        <div class="fin-exec-point-text" id="fin_summary_growth">-</div>
+                                    </div>
+                                </div>
+                                <div class="fin-exec-point">
+                                    <div class="fin-exec-point-icon">💰</div>
+                                    <div class="fin-exec-point-content">
+                                        <div class="fin-exec-point-label">ประสิทธิภาพทำกำไร & กระแสเงินสด (Profitability & Cash Flow)</div>
+                                        <div class="fin-exec-point-text" id="fin_summary_profitability">-</div>
+                                    </div>
+                                </div>
+                                <div class="fin-exec-point">
+                                    <div class="fin-exec-point-icon">🛡️</div>
+                                    <div class="fin-exec-point-content">
+                                        <div class="fin-exec-point-label">โครงสร้างเงินทุน & หนี้สิน (Capital Structure & Solvency)</div>
+                                        <div class="fin-exec-point-text" id="fin_summary_debt">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend Chart Container (Interactive Responsive SVG Bar Chart) -->
+                    <div class="fin-chart-panel" id="fin_chart_panel">
+                        <div class="fin-chart-header">
+                            <span class="fin-chart-title">📈 กราฟเปรียบเทียบแนวโน้ม รายได้ vs กำไรสุทธิ vs FCF รายไตรมาส</span>
+                            <div class="fin-chart-legend">
+                                <span class="fin-legend-item"><span class="fin-legend-color bar-rev"></span> รายได้รวม (Revenue)</span>
+                                <span class="fin-legend-item"><span class="fin-legend-color bar-ni"></span> กำไรสุทธิ (Net Income)</span>
+                                <span class="fin-legend-item"><span class="fin-legend-color line-fcf"></span> กระแสเงินสดอิสระ (FCF)</span>
+                            </div>
+                        </div>
+                        <div class="fin-svg-wrap" id="fin_svg_wrap">
+                            <!-- Injected dynamically by chart.js -->
+                        </div>
+                    </div>
+
+                    <!-- 8 Quarters Detailed Statement Table -->
+                    <div class="fin-table-panel" id="fin_table_panel">
+                        <div class="fin-table-header">
+                            <span class="fin-table-title">📑 ตารางสรุปงบการเงินรายไตรมาสแบบละเอียด (พร้อม Heatmap เติบโต QoQ / YoY)</span>
+                            <span class="fin-unit-label">* ตัวเลขในตารางหน่วยเป็น USD (B = พันล้าน, M = ล้าน)</span>
+                        </div>
+                        <div class="fin-table-responsive" id="fin_table_container">
+                            <!-- Injected dynamically by chart.js -->
+                        </div>
+                    </div>
+
+                    <!-- Empty / ETF State Notice -->
+                    <div class="fin-empty-state" id="fin_empty_state" style="display: none;">
+                        <div class="fin-empty-icon">🏦</div>
+                        <div class="fin-empty-title" id="fin_empty_title">สินทรัพย์นี้เป็นกองทุน ETF หรือยังไม่มีงบการเงินรายไตรมาสในตลาดหลักทรัพย์</div>
+                        <div class="fin-empty-desc" id="fin_empty_desc">กองทุนรวมดัชนี (เช่น VOO, QQQI) ไม่มีรายงานงบกำไรขาดทุนแบบบริษัทจดทะเบียน โปรดดูข้อมูลผลการดำเนินงานและเงินปันผลจากแถบข้อมูลด้านขวา</div>
                     </div>
                 </div>
             </div>
@@ -6368,6 +6982,9 @@
         renderAiDecisionSection(tData);
         renderPatternDeepDive(tData);
 
+        // Render Financial Statements & Quarterly Trends
+        updateFinancialsSection(ticker);
+
         // Render Chart
         if (currentChartMode === 'tech') {
             renderLightweightChart(ticker);
@@ -6870,6 +7487,401 @@
         if (psych) psych.textContent = pat.psychology || '-';
         if (act) act.textContent = pat.action_plan || '-';
         if (inv) inv.textContent = pat.invalidation || '-';
+    }
+
+    // =========================================================================
+    // Financial Statements & Quarterly Trends Engine (8 Quarters / 2 Years)
+    // =========================================================================
+    let currentFinView = 'all';
+
+    function switchFinView(mode) {
+        currentFinView = mode;
+        const btnAll = document.getElementById('fin_tab_all');
+        const btnTable = document.getElementById('fin_tab_table');
+        const chartPanel = document.getElementById('fin_chart_panel');
+        const tablePanel = document.getElementById('fin_table_panel');
+
+        if (mode === 'table') {
+            if (btnAll) btnAll.classList.remove('active');
+            if (btnTable) btnTable.classList.add('active');
+            if (chartPanel) chartPanel.style.display = 'none';
+            if (tablePanel) tablePanel.style.display = 'block';
+        } else {
+            if (btnAll) btnAll.classList.add('active');
+            if (btnTable) btnTable.classList.remove('active');
+            if (chartPanel) chartPanel.style.display = 'block';
+            if (tablePanel) tablePanel.style.display = 'block';
+        }
+    }
+
+    function scrollToFinancials() {
+        const elem = document.getElementById('financials_card');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function toggleFScoreCriteria() {
+        const el = document.getElementById('fin_fscore_criteria');
+        const arrow = document.getElementById('fin_fscore_arrow');
+        if (!el) return;
+        const isOpen = el.style.display !== 'none';
+        el.style.display = isOpen ? 'none' : 'flex';
+        if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+    }
+
+    window.switchFinView = switchFinView;
+    window.scrollToFinancials = scrollToFinancials;
+    window.toggleFScoreCriteria = toggleFScoreCriteria;
+
+    function _formatFinCurrency(val) {
+        if (val === undefined || val === null || isNaN(val)) return '-';
+        const absVal = Math.abs(val);
+        const sign = val < 0 ? '-' : '';
+        if (absVal >= 1e12) return `${sign}$${(absVal / 1e12).toFixed(2)}T`;
+        if (absVal >= 1e9) return `${sign}$${(absVal / 1e9).toFixed(2)}B`;
+        if (absVal >= 1e6) return `${sign}$${(absVal / 1e6).toFixed(2)}M`;
+        if (absVal >= 1e3) return `${sign}$${(absVal / 1e3).toFixed(1)}K`;
+        return `${sign}$${Number(absVal).toFixed(2)}`;
+    }
+
+    function _renderGrowthBadge(pct, label) {
+        if (pct === undefined || pct === null || isNaN(pct)) return '<span class="fin-badge-neutral">-</span>';
+        const isPos = pct >= 0;
+        const sign = isPos ? '+' : '';
+        const arrow = isPos ? '▲' : '▼';
+        const cls = isPos ? 'fin-badge-pos' : 'fin-badge-neg';
+        const lbl = label ? ` ${label}` : '';
+        return `<span class="${cls}">${sign}${Number(pct).toFixed(1)}% ${arrow}${lbl}</span>`;
+    }
+
+    function updateFinancialsSection(ticker) {
+        const card = document.getElementById('financials_card');
+        if (!card) return;
+
+        const finData = (window.FINANCIALS_DATA && window.FINANCIALS_DATA[ticker]) ||
+                        (STOCKS_META[ticker] && STOCKS_META[ticker].financials);
+
+        const badge = document.getElementById('fin_latest_quarter_badge');
+        const hudGrid = document.getElementById('fin_hud_grid');
+        const insightsGrid = document.getElementById('fin_insights_grid');
+        const chartPanel = document.getElementById('fin_chart_panel');
+        const tablePanel = document.getElementById('fin_table_panel');
+        const emptyState = document.getElementById('fin_empty_state');
+        const emptyTitle = document.getElementById('fin_empty_title');
+        const emptyDesc = document.getElementById('fin_empty_desc');
+
+        if (!finData || !finData.has_data || !finData.quarters || finData.quarters.length === 0) {
+            const isEtf = (finData && finData.is_etf) || ['VOO', 'QQQI', 'SPY', 'IVV'].includes(ticker);
+            if (emptyState) emptyState.style.display = 'block';
+            if (hudGrid) hudGrid.style.display = 'none';
+            if (insightsGrid) insightsGrid.style.display = 'none';
+            if (chartPanel) chartPanel.style.display = 'none';
+            if (tablePanel) tablePanel.style.display = 'none';
+
+            if (badge) {
+                badge.textContent = isEtf ? 'กองทุน ETF' : 'ไม่มีข้อมูลงบ';
+                badge.style.background = 'rgba(245, 158, 11, 0.15)';
+                badge.style.color = '#fbbf24';
+                badge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+            }
+
+            if (isEtf) {
+                if (emptyTitle) emptyTitle.textContent = `${ticker} เป็นกองทุน ETF ไม่มีรายงานงบการเงินรายไตรมาสแบบหุ้นรายตัว`;
+                if (emptyDesc) emptyDesc.textContent = `กองทุนดัชนีและ High Income ETF (เช่น VOO, QQQI) ไม่มีรายงานรายได้ กำไร หรือหนี้สินแบบบริษัทจดทะเบียน โปรดดูผลตอบแทน เงินปันผล และราคาตลาดจากกราฟและแถบข้อมูลด้านขวา`;
+            } else {
+                if (emptyTitle) emptyTitle.textContent = `ยังไม่มีรายงานงบการเงินรายไตรมาสสำหรับ ${ticker}`;
+                if (emptyDesc) emptyDesc.textContent = `บริษัทอาจเป็นหุ้นที่เพิ่งเข้าตลาด หรือยังไม่มีรายงานงบการเงินรอบล่าสุดส่งตลาดหลักทรัพย์`;
+            }
+            return;
+        }
+
+        // Show data containers
+        if (emptyState) emptyState.style.display = 'none';
+        if (hudGrid) hudGrid.style.display = 'grid';
+        if (insightsGrid) insightsGrid.style.display = 'grid';
+        if (chartPanel) chartPanel.style.display = (currentFinView === 'table') ? 'none' : 'block';
+        if (tablePanel) tablePanel.style.display = 'block';
+
+        const quarters = finData.quarters;
+        const latest = quarters[quarters.length - 1] || {};
+
+        if (badge) {
+            badge.textContent = `งบล่าสุด ${latest.quarter_label || '-'} (${latest.date || '-'})`;
+            badge.style.background = 'rgba(59, 130, 246, 0.15)';
+            badge.style.color = '#60a5fa';
+            badge.style.borderColor = 'rgba(59, 130, 246, 0.35)';
+        }
+
+        // 1. HUD Strip
+        const revTtmElem = document.getElementById('fin_hud_rev_ttm');
+        const revSubElem = document.getElementById('fin_hud_rev_sub');
+        if (revTtmElem) revTtmElem.textContent = finData.ttm_revenue_fmt || '-';
+        if (revSubElem) {
+            const yoyRev = latest.rev_growth_yoy;
+            const yoyBadge = yoyRev != null ? _renderGrowthBadge(yoyRev, 'YoY') : '';
+            revSubElem.innerHTML = `ล่าสุด: <strong>${latest.revenue_fmt || '-'}</strong> ${yoyBadge}`;
+        }
+
+        const niTtmElem = document.getElementById('fin_hud_ni_ttm');
+        const niSubElem = document.getElementById('fin_hud_ni_sub');
+        if (niTtmElem) niTtmElem.textContent = finData.ttm_net_income_fmt || '-';
+        if (niSubElem) {
+            const margin = latest.net_margin;
+            const marginColor = (margin != null && margin >= 20) ? '#34d399' : ((margin != null && margin >= 0) ? '#38bdf8' : '#fb7185');
+            niSubElem.innerHTML = `Net Margin ล่าสุด: <strong style="color:${marginColor}">${margin != null ? margin.toFixed(1) + '%' : '-'}</strong> (กำไร ${latest.net_income_fmt || '-'})`;
+        }
+
+        const deElem = document.getElementById('fin_hud_de');
+        const deSubElem = document.getElementById('fin_hud_de_sub');
+        if (deElem) {
+            const de = latest.debt_to_equity;
+            deElem.textContent = de != null ? `${de.toFixed(2)}x` : '-';
+            deElem.style.color = (de != null && de > 2.5) ? '#fb7185' : ((de != null && de <= 1.0) ? '#34d399' : '#f8fafc');
+        }
+        if (deSubElem) deSubElem.textContent = `หนี้สินรวม: ${latest.total_debt_fmt || '-'} • ทุน: ${latest.stockholders_equity_fmt || '-'}`;
+
+        const fcfElem = document.getElementById('fin_hud_fcf');
+        const fcfSubElem = document.getElementById('fin_hud_fcf_sub');
+        if (fcfElem) fcfElem.textContent = latest.fcf_fmt || '-';
+        if (fcfSubElem) fcfSubElem.textContent = `12M รวม (TTM): ${finData.ttm_fcf_fmt || '-'}`;
+
+        // 2. Piotroski F-Score Card
+        const fScore = finData.f_score || {};
+        const fScoreValElem = document.getElementById('fin_fscore_val');
+        const fScoreLabelElem = document.getElementById('fin_fscore_label');
+        if (fScoreValElem) {
+            if (fScore.score != null) {
+                fScoreValElem.innerHTML = `${fScore.score}<span>/${fScore.max_score || 9}</span>`;
+                fScoreValElem.style.color = fScore.color || '#34d399';
+            } else {
+                fScoreValElem.innerHTML = `-<span>/9</span>`;
+                fScoreValElem.style.color = '#94a3b8';
+            }
+        }
+        if (fScoreLabelElem) {
+            fScoreLabelElem.textContent = fScore.label || '-';
+            fScoreLabelElem.style.color = fScore.color || '#cbd5e1';
+        }
+
+        const criteriaList = document.getElementById('fin_fscore_criteria');
+        if (criteriaList && fScore.criteria) {
+            criteriaList.innerHTML = fScore.criteria.map(c => {
+                const passClass = c.passed ? 'fin-criteria-pass' : 'fin-criteria-fail';
+                const passIcon = c.passed ? '✓' : '✗';
+                return `<div class="fin-criteria-item">
+                    <span class="${passClass}">${passIcon} ${escapeHtml(c.name || '')}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;color:#cbd5e1;">${escapeHtml(c.detail || '')}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // 3. 3-Dimension Executive Summary Card
+        const execSummary = finData.executive_summary || {};
+        const growthElem = document.getElementById('fin_summary_growth');
+        const profElem = document.getElementById('fin_summary_profitability');
+        const debtElem = document.getElementById('fin_summary_debt');
+        if (growthElem) growthElem.textContent = execSummary.growth || '-';
+        if (profElem) profElem.textContent = execSummary.profitability || '-';
+        if (debtElem) debtElem.textContent = execSummary.debt || '-';
+
+        // 4. Render SVG Interactive Chart
+        renderFinancialTrendChart(quarters);
+
+        // 5. Render Detailed 8-Quarter Statement Table
+        renderFinancialStatementTable(quarters);
+    }
+
+    function renderFinancialTrendChart(quarters) {
+        const wrap = document.getElementById('fin_svg_wrap');
+        if (!wrap || !quarters || quarters.length === 0) return;
+
+        const W = 960;
+        const H = 250;
+        const padL = 70;
+        const padR = 25;
+        const padT = 30;
+        const padB = 45;
+        const plotW = W - padL - padR;
+        const plotH = H - padT - padB;
+
+        // Find max value across revenue, net income, fcf
+        let maxVal = 0;
+        quarters.forEach(q => {
+            if (q.revenue && q.revenue > maxVal) maxVal = q.revenue;
+            if (q.net_income && q.net_income > maxVal) maxVal = q.net_income;
+            if (q.fcf && q.fcf > maxVal) maxVal = q.fcf;
+        });
+        if (maxVal <= 0) maxVal = 1000000;
+        maxVal = maxVal * 1.15; // 15% headroom
+
+        // Y-axis grid levels (4 steps)
+        let gridLines = '';
+        for (let i = 0; i <= 4; i++) {
+            const ratio = i / 4;
+            const y = padT + plotH - (ratio * plotH);
+            const val = ratio * maxVal;
+            gridLines += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="3,3" />`;
+            gridLines += `<text x="${padL - 10}" y="${y + 4}" fill="#64748b" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="end">${_formatFinCurrency(val)}</text>`;
+        }
+
+        const slotW = plotW / quarters.length;
+        const barW = Math.min(slotW * 0.22, 28);
+        const gap = Math.min(slotW * 0.04, 6);
+
+        let barsSvg = '';
+        quarters.forEach((q, idx) => {
+            const slotCenter = padL + (idx * slotW) + (slotW / 2);
+            const isLatest = idx === quarters.length - 1;
+
+            // X-axis quarter labels
+            const qX = slotCenter;
+            const qY = H - 22;
+            const labelColor = isLatest ? '#60a5fa' : '#94a3b8';
+            const fontWt = isLatest ? '800' : '600';
+            barsSvg += `<text x="${qX}" y="${qY}" fill="${labelColor}" font-size="11" font-weight="${fontWt}" font-family="'Inter', sans-serif" text-anchor="middle">${q.quarter_label}</text>`;
+            barsSvg += `<text x="${qX}" y="${qY + 14}" fill="#64748b" font-size="9" font-family="'JetBrains Mono', monospace" text-anchor="middle">${q.date.slice(2)}</text>`;
+
+            // Highlight latest column subtle background
+            if (isLatest) {
+                barsSvg += `<rect x="${slotCenter - (slotW / 2) + 2}" y="${padT}" width="${slotW - 4}" height="${plotH}" fill="rgba(59,130,246,0.04)" rx="6" />`;
+            }
+
+            // Bar 1: Revenue (Left)
+            const rev = q.revenue || 0;
+            const revH = Math.max((rev / maxVal) * plotH, 2);
+            const revX = slotCenter - barW - (gap / 2) - (barW / 2);
+            const revY = padT + plotH - revH;
+            const revTip = `${q.quarter_label} (${q.date})&#10;รายได้รวม: ${q.revenue_fmt || '-'} (${q.rev_growth_yoy != null ? (q.rev_growth_yoy >= 0 ? '+' : '') + q.rev_growth_yoy + '% YoY' : 'QoQ: ' + (q.rev_growth_qoq || '-') + '%'})`;
+            barsSvg += `<rect x="${revX}" y="${revY}" width="${barW}" height="${revH}" fill="url(#finGradRev)" rx="3" ry="3"><title>${revTip}</title></rect>`;
+
+            // Bar 2: Net Income (Center)
+            const ni = q.net_income || 0;
+            const niH = Math.max((Math.abs(ni) / maxVal) * plotH, 2);
+            const niX = slotCenter - (barW / 2);
+            const niY = padT + plotH - niH;
+            const niGrad = ni >= 0 ? 'url(#finGradNiPos)' : 'url(#finGradNiNeg)';
+            const niTip = `${q.quarter_label} (${q.date})&#10;กำไรสุทธิ: ${q.net_income_fmt || '-'} (Net Margin: ${q.net_margin != null ? q.net_margin + '%' : '-'})`;
+            barsSvg += `<rect x="${niX}" y="${niY}" width="${barW}" height="${niH}" fill="${niGrad}" rx="3" ry="3"><title>${niTip}</title></rect>`;
+
+            // Bar 3: FCF (Right)
+            const fcf = q.fcf || 0;
+            const fcfH = Math.max((Math.abs(fcf) / maxVal) * plotH, 2);
+            const fcfX = slotCenter + (gap / 2) + (barW / 2);
+            const fcfY = padT + plotH - fcfH;
+            const fcfTip = `${q.quarter_label} (${q.date})&#10;กระแสเงินสดอิสระ (FCF): ${q.fcf_fmt || '-'}`;
+            barsSvg += `<rect x="${fcfX}" y="${fcfY}" width="${barW}" height="${fcfH}" fill="url(#finGradFcf)" rx="3" ry="3"><title>${fcfTip}</title></rect>`;
+
+            // Revenue value pill on top
+            if (revH > 25) {
+                barsSvg += `<text x="${revX + (barW / 2)}" y="${revY - 4}" fill="#38bdf8" font-size="9" font-weight="700" font-family="'JetBrains Mono', monospace" text-anchor="middle">${q.revenue_fmt}</text>`;
+            }
+        });
+
+        const svgContent = `
+            <svg width="100%" height="250" viewBox="0 0 ${W} ${H}" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="finGradRev" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#0284c7" stop-opacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="finGradNiPos" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#34d399" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#059669" stop-opacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="finGradNiNeg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#fb7185" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#e11d48" stop-opacity="0.75" />
+                    </linearGradient>
+                    <linearGradient id="finGradFcf" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#c084fc" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#7e22ce" stop-opacity="0.75" />
+                    </linearGradient>
+                </defs>
+                ${gridLines}
+                ${barsSvg}
+            </svg>
+        `;
+        wrap.innerHTML = svgContent;
+    }
+
+    function renderFinancialStatementTable(quarters) {
+        const container = document.getElementById('fin_table_container');
+        if (!container || !quarters || quarters.length === 0) return;
+
+        // Header Columns
+        let thCols = '<th class="th-metric">รายการตัวชี้วัด (Financial Metrics)</th>';
+        quarters.forEach((q, idx) => {
+            const isLatest = idx === quarters.length - 1;
+            const latestBadge = isLatest ? ' <span style="font-size:0.65rem; background:#3b82f6; color:#fff; padding:1px 5px; border-radius:3px;">ล่าสุด</span>' : '';
+            thCols += `<th class="th-quarter ${isLatest ? 'th-latest' : ''}"><div>${q.quarter_label}${latestBadge}</div><div style="font-size:0.65rem; color:#64748b; font-weight:normal; margin-top:2px;">${q.date}</div></th>`;
+        });
+
+        // Helper to build a table row
+        function buildRow(title, getter, isSub = false) {
+            let rowHtml = `<tr class="${isSub ? 'fin-row-sub' : ''}"><td class="fin-row-header">${title}</td>`;
+            quarters.forEach((q, idx) => {
+                const isLatest = idx === quarters.length - 1;
+                const cellVal = getter(q, idx);
+                rowHtml += `<td class="fin-cell ${isLatest ? 'td-latest' : ''}">${cellVal}</td>`;
+            });
+            rowHtml += `</tr>`;
+            return rowHtml;
+        }
+
+        let rowsHtml = '';
+        // 1. Revenue
+        rowsHtml += buildRow('💰 รายได้รวม (Total Revenue)', q => `<strong>${q.revenue_fmt || '-'}</strong>`);
+        // 2. QoQ Revenue Growth
+        rowsHtml += buildRow('⚡ เติบโต QoQ (%)', q => _renderGrowthBadge(q.rev_growth_qoq), true);
+        // 3. YoY Revenue Growth
+        rowsHtml += buildRow('🚀 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true);
+        // 4. Gross Profit
+        rowsHtml += buildRow('📈 กำไรขั้นต้น (Gross Profit)', q => q.gross_profit_fmt || '-');
+        // 5. Gross Margin
+        rowsHtml += buildRow('⚙️ อัตรากำไรขั้นต้น (Gross Margin)', q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-', true);
+        // 6. Operating Income
+        rowsHtml += buildRow('🏢 กำไรจากการดำเนินงาน (Operating Income)', q => q.operating_income_fmt || '-');
+        // 7. Net Income
+        rowsHtml += buildRow('🎯 กำไรสุทธิ (Net Income)', q => {
+            const ni = q.net_income;
+            const col = (ni != null && ni >= 0) ? '#34d399' : '#fb7185';
+            return `<strong style="color:${col}">${q.net_income_fmt || '-'}</strong>`;
+        });
+        // 8. Net Margin
+        rowsHtml += buildRow('📊 อัตรากำไรสุทธิ (Net Margin)', q => {
+            const m = q.net_margin;
+            if (m == null) return '-';
+            const col = m >= 15 ? '#34d399' : (m >= 0 ? '#38bdf8' : '#fb7185');
+            return `<span style="color:${col}; font-weight:700;">${m.toFixed(1)}%</span>`;
+        }, true);
+        // 9. Diluted EPS
+        rowsHtml += buildRow('💵 กำไรต่อหุ้น (Diluted EPS)', q => {
+            const eps = q.eps;
+            if (eps == null) return '-';
+            const epsBadge = q.eps_growth_yoy != null ? ` ${_renderGrowthBadge(q.eps_growth_yoy)}` : '';
+            return `$${eps.toFixed(2)}${epsBadge}`;
+        });
+        // 10. Free Cash Flow
+        rowsHtml += buildRow('🌊 กระแสเงินสดอิสระ (FCF)', q => `<span style="color:#c084fc;">${q.fcf_fmt || '-'}</span>`);
+        // 11. Total Debt
+        rowsHtml += buildRow('💳 หนี้สินรวม (Total Debt)', q => q.total_debt_fmt || '-');
+        // 12. Stockholders Equity
+        rowsHtml += buildRow('🏛️ ส่วนของผู้ถือหุ้น (Stockholders Equity)', q => q.stockholders_equity_fmt || '-');
+        // 13. Debt to Equity
+        rowsHtml += buildRow('⚖️ หนี้สินต่อทุน (D/E Ratio)', q => {
+            const de = q.debt_to_equity;
+            if (de == null) return '-';
+            const col = de > 2.5 ? '#fb7185' : (de <= 1.0 ? '#34d399' : '#f8fafc');
+            return `<span style="color:${col}; font-weight:700;">${de.toFixed(2)}x</span>`;
+        }, true);
+        // 14. Quarterly P/E
+        rowsHtml += buildRow('🏷️ P/E อ้างอิงไตรมาส', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-', true);
+
+        container.innerHTML = `
+            <table class="fin-table">
+                <thead><tr>${thCols}</tr></thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        `;
     }
 
     // Switch Tabs (Lightweight Chart vs TradingView Full Embed)

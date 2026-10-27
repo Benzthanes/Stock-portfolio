@@ -109,6 +109,7 @@ __CHART_CSS__    </style>
                                 <button class="v-tab-btn" id="tab_tv" onclick="switchChartTab('tv')">🌐 TradingView</button>
                             </div>
                             <button class="jump-btn" onclick="scrollToAiSection()">🤖 จุดตัดสินใจ</button>
+                            <button class="jump-btn" onclick="scrollToFinancials()">📊 งบการเงิน</button>
                             <a id="st_ext_link" href="#" target="_blank" class="ext-tv-btn" title="เปิดดูกราฟตัวเต็มบน TradingView">
                                 <span>เปิดบน TradingView ↗</span>
                             </a>
@@ -343,6 +344,137 @@ __CHART_CSS__    </style>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Financial Statements & Performance Section -->
+                <div class="financials-main-card" id="financials_card">
+                    <div class="fin-header-row">
+                        <div class="fin-title-group">
+                            <div class="fin-main-title">
+                                <span class="fin-icon">📊</span>
+                                <span>งบการเงินรายไตรมาส (Financial Performance & Trends)</span>
+                                <span class="fin-quarter-badge" id="fin_latest_quarter_badge">กำลังตรวจสอบงบ...</span>
+                            </div>
+                            <div class="fin-subtitle">สรุปผลประกอบการ 8 ไตรมาสย้อนหลัง • รายได้ • กำไรสุทธิ • EPS • สัดส่วนหนี้สิน (D/E) • กระแสเงินสดอิสระ (FCF) • P/E</div>
+                        </div>
+                        <div class="fin-actions">
+                            <div class="fin-view-toggles">
+                                <button class="fin-tab-btn active" id="fin_tab_all" onclick="switchFinView('all')">📑 ภาพรวม & กราฟแนวโน้ม</button>
+                                <button class="fin-tab-btn" id="fin_tab_table" onclick="switchFinView('table')">📋 ตารางงบละเอียด</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Summary HUD Cards Strip -->
+                    <div class="fin-hud-grid" id="fin_hud_grid">
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">รายได้รวม 12M ล่าสุด (TTM Revenue)</div>
+                            <div class="fin-hud-value" id="fin_hud_rev_ttm">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_rev_sub">ล่าสุด: -</div>
+                        </div>
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">กำไรสุทธิ 12M ล่าสุด (TTM Net Income)</div>
+                            <div class="fin-hud-value" id="fin_hud_ni_ttm">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_ni_sub">อัตรากำไรสุทธิ: -</div>
+                        </div>
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">หนี้สินต่อทุนล่าสุด (D/E Ratio)</div>
+                            <div class="fin-hud-value" id="fin_hud_de">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_de_sub">หนี้สินรวม: -</div>
+                        </div>
+                        <div class="fin-hud-card">
+                            <div class="fin-hud-label">กระแสเงินสดอิสระล่าสุด (FCF)</div>
+                            <div class="fin-hud-value" id="fin_hud_fcf">-</div>
+                            <div class="fin-hud-sub" id="fin_hud_fcf_sub">TTM FCF: -</div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Insights & Piotroski F-Score Section -->
+                    <div class="fin-insights-grid" id="fin_insights_grid">
+                        <!-- Piotroski F-Score Card -->
+                        <div class="fin-fscore-card" id="fin_fscore_card">
+                            <div class="fin-fscore-header">
+                                <div class="fin-card-sublabel">PIOTROSKI FINANCIAL STRENGTH</div>
+                                <div class="fin-fscore-title">🏆 Piotroski F-Score</div>
+                            </div>
+                            <div class="fin-fscore-score-row">
+                                <div class="fin-fscore-number" id="fin_fscore_val">-<span>/9</span></div>
+                                <div class="fin-fscore-meta">
+                                    <div class="fin-fscore-status" id="fin_fscore_label">-</div>
+                                    <div class="fin-fscore-desc">วัดสุขภาพการเงินจริงจาก 9 ปัจจัยรอบด้าน</div>
+                                </div>
+                            </div>
+                            <button type="button" class="fin-fscore-toggle-btn" id="fin_fscore_toggle_btn" onclick="toggleFScoreCriteria()">
+                                <span>ดู 9 เกณฑ์ตรวจสอบคุณภาพ</span>
+                                <span class="fin-fscore-arrow" id="fin_fscore_arrow">▼</span>
+                            </button>
+                            <div class="fin-fscore-criteria-list" id="fin_fscore_criteria" style="display: none;">
+                                <!-- Injected dynamically by chart.js -->
+                            </div>
+                        </div>
+
+                        <!-- 3-Dimension Executive Summary Card -->
+                        <div class="fin-exec-card" id="fin_exec_card">
+                            <div class="fin-card-sublabel">EXECUTIVE SUMMARY</div>
+                            <div class="fin-exec-title">💡 บทสรุปสุขภาพการเงิน 3 มิติ (Financial Insights)</div>
+                            <div class="fin-exec-points">
+                                <div class="fin-exec-point">
+                                    <div class="fin-exec-point-icon">🚀</div>
+                                    <div class="fin-exec-point-content">
+                                        <div class="fin-exec-point-label">การเติบโตของธุรกิจ (Growth Trajectory)</div>
+                                        <div class="fin-exec-point-text" id="fin_summary_growth">-</div>
+                                    </div>
+                                </div>
+                                <div class="fin-exec-point">
+                                    <div class="fin-exec-point-icon">💰</div>
+                                    <div class="fin-exec-point-content">
+                                        <div class="fin-exec-point-label">ประสิทธิภาพทำกำไร & กระแสเงินสด (Profitability & Cash Flow)</div>
+                                        <div class="fin-exec-point-text" id="fin_summary_profitability">-</div>
+                                    </div>
+                                </div>
+                                <div class="fin-exec-point">
+                                    <div class="fin-exec-point-icon">🛡️</div>
+                                    <div class="fin-exec-point-content">
+                                        <div class="fin-exec-point-label">โครงสร้างเงินทุน & หนี้สิน (Capital Structure & Solvency)</div>
+                                        <div class="fin-exec-point-text" id="fin_summary_debt">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend Chart Container (Interactive Responsive SVG Bar Chart) -->
+                    <div class="fin-chart-panel" id="fin_chart_panel">
+                        <div class="fin-chart-header">
+                            <span class="fin-chart-title">📈 กราฟเปรียบเทียบแนวโน้ม รายได้ vs กำไรสุทธิ vs FCF รายไตรมาส</span>
+                            <div class="fin-chart-legend">
+                                <span class="fin-legend-item"><span class="fin-legend-color bar-rev"></span> รายได้รวม (Revenue)</span>
+                                <span class="fin-legend-item"><span class="fin-legend-color bar-ni"></span> กำไรสุทธิ (Net Income)</span>
+                                <span class="fin-legend-item"><span class="fin-legend-color line-fcf"></span> กระแสเงินสดอิสระ (FCF)</span>
+                            </div>
+                        </div>
+                        <div class="fin-svg-wrap" id="fin_svg_wrap">
+                            <!-- Injected dynamically by chart.js -->
+                        </div>
+                    </div>
+
+                    <!-- 8 Quarters Detailed Statement Table -->
+                    <div class="fin-table-panel" id="fin_table_panel">
+                        <div class="fin-table-header">
+                            <span class="fin-table-title">📑 ตารางสรุปงบการเงินรายไตรมาสแบบละเอียด (พร้อม Heatmap เติบโต QoQ / YoY)</span>
+                            <span class="fin-unit-label">* ตัวเลขในตารางหน่วยเป็น USD (B = พันล้าน, M = ล้าน)</span>
+                        </div>
+                        <div class="fin-table-responsive" id="fin_table_container">
+                            <!-- Injected dynamically by chart.js -->
+                        </div>
+                    </div>
+
+                    <!-- Empty / ETF State Notice -->
+                    <div class="fin-empty-state" id="fin_empty_state" style="display: none;">
+                        <div class="fin-empty-icon">🏦</div>
+                        <div class="fin-empty-title" id="fin_empty_title">สินทรัพย์นี้เป็นกองทุน ETF หรือยังไม่มีงบการเงินรายไตรมาสในตลาดหลักทรัพย์</div>
+                        <div class="fin-empty-desc" id="fin_empty_desc">กองทุนรวมดัชนี (เช่น VOO, QQQI) ไม่มีรายงานงบกำไรขาดทุนแบบบริษัทจดทะเบียน โปรดดูข้อมูลผลการดำเนินงานและเงินปันผลจากแถบข้อมูลด้านขวา</div>
                     </div>
                 </div>
             </div>
