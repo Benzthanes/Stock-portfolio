@@ -2234,7 +2234,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 11:13</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 21:28</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -2541,6 +2541,11 @@
 
                     <!-- Main Chart Canvas Body -->
                     <div id="chart_container_wrap" style="position: relative; width: 100%;">
+                        <!-- Live Crosshair Date & OHLC Tooltip Bar -->
+                        <div id="chart_hover_bar" style="position: absolute; top: 10px; left: 14px; z-index: 8; pointer-events: none; background: rgba(10, 14, 26, 0.90); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 4px 10px; font-size: 0.74rem; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                            <span id="chb_date" style="color: #facc15; font-weight: 700;">📅 วันที่: -</span>
+                            <span id="chb_ohlc" style="color: #cbd5e1;"></span>
+                        </div>
                         <div id="chart_container" class="main-chart-pane"></div>
                         <!-- Vertical Earnings Line Overlay (Perpendicular to time axis) -->
                         <div id="earnings_vertical_line_overlay" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; z-index: 10; display: none; overflow: hidden;">
@@ -5785,6 +5790,22 @@
             },
             crosshair: {
                 mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
+                horzLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
             },
             rightPriceScale: {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -5795,7 +5816,7 @@
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
-                visible: isLast,
+                visible: true,
                 rightOffset: 15,
             },
             handleScroll: {
@@ -6153,6 +6174,22 @@
             },
             crosshair: {
                 mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
+                horzLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
             },
             rightPriceScale: {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -6164,7 +6201,7 @@
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
-                visible: (numSubpanes === 0),
+                visible: true,
                 rightOffset: 15,
             },
             handleScroll: {
@@ -6526,11 +6563,47 @@
             });
         });
 
+        const updateHoverBar = (tStr, bar) => {
+            const dateEl = document.getElementById('chb_date');
+            const ohlcEl = document.getElementById('chb_ohlc');
+            if (dateEl && tStr) {
+                dateEl.textContent = '📅 วันที่: ' + tStr;
+            }
+            if (ohlcEl && bar && bar.open !== undefined) {
+                const isUp = bar.close >= bar.open;
+                const cColor = isUp ? '#10b981' : '#f43f5e';
+                const chg = bar.open > 0 ? (((bar.close - bar.open) / bar.open) * 100).toFixed(2) : '0.00';
+                const sign = Number(chg) >= 0 ? '+' : '';
+                ohlcEl.innerHTML = `O: <b>$${Number(bar.open).toFixed(2)}</b> &nbsp;H: <b>$${Number(bar.high).toFixed(2)}</b> &nbsp;L: <b>$${Number(bar.low).toFixed(2)}</b> &nbsp;C: <b style="color:${cColor};">$${Number(bar.close).toFixed(2)} (${sign}${chg}%)</b>`;
+            }
+        };
+
+        if (currentCandles && currentCandles.length > 0) {
+            const lastBar = currentCandles[currentCandles.length - 1];
+            updateHoverBar(lastBar.time, lastBar);
+        }
+
         const handleCrosshair = (param) => {
-            if (!param || !param.time) return;
+            if (!param || !param.time) {
+                if (currentCandles && currentCandles.length > 0) {
+                    const lastBar = currentCandles[currentCandles.length - 1];
+                    updateHoverBar(lastBar.time, lastBar);
+                }
+                return;
+            }
             const tStr = (typeof param.time === 'object')
                 ? `${param.time.year}-${String(param.time.month).padStart(2, '0')}-${String(param.time.day).padStart(2, '0')}`
                 : param.time;
+
+            let bar = null;
+            if (param.seriesData && candleSeries) {
+                bar = param.seriesData.get(candleSeries);
+            }
+            if (!bar && currentCandles) {
+                bar = currentCandles.find(c => c.time === tStr);
+            }
+            updateHoverBar(tStr, bar);
+
             activeSubpaneCharts.forEach(item => {
                 if (item.updateHover) item.updateHover(tStr);
             });

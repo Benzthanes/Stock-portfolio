@@ -332,6 +332,60 @@ class EarningsHistoryEdgeTest(unittest.TestCase):
         self.assertEqual(history[0]["time"], candles[-1]["time"])
         self.assertEqual(history[0]["reaction_pct"], 20.0)
 
+    def test_pending_earnings_window_does_not_place_fake_marker(self):
+        from src.chart_data import detect_earnings_history
+        candles = [
+            {"time": f"2024-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}", "open": 100.0, "high": 101.0, "low": 99.0, "close": 100.0, "volume": 1000}
+            for i in range(130)
+        ]
+        # Volume surge 10 days before upcoming earnings must NOT be falsely marked as earnings reaction
+        candles[-10] = {**candles[-10], "close": 95.0, "volume": 9000}
+        history = detect_earnings_history(candles, days_to_earnings=0.3)
+        self.assertEqual(history, [])
+
+    def test_etf_has_no_earnings_history(self):
+        from src.chart_data import detect_earnings_history
+        candles = [
+            {"time": f"2024-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}", "open": 100.0, "high": 101.0, "low": 99.0, "close": 100.0, "volume": 9000}
+            for i in range(130)
+        ]
+        self.assertEqual(detect_earnings_history(candles, is_etf=True), [])
+        self.assertEqual(detect_earnings_history(candles, ticker="VOO"), [])
+        self.assertEqual(detect_earnings_history(candles, ticker="QQQI"), [])
+
+    def test_vrt_confirmed_earnings_calendar_excludes_false_volume_spikes(self):
+        from src.chart_data import detect_earnings_history, load_candles_cache
+        cache = load_candles_cache()
+        if "VRT" in cache and cache["VRT"].get("candles"):
+            candles = cache["VRT"]["candles"]
+            history = detect_earnings_history(candles, ticker="VRT")
+            times = [h["time"] for h in history]
+            # 2026-10-15 was a false heuristic volume spike, not an earnings date
+            self.assertNotIn("2026-10-15", times)
+            # 2026-07-29 was actual Q2 earnings
+            self.assertIn("2026-07-29", times)
+            h_jul29 = next(h for h in history if h["time"] == "2026-07-29")
+            self.assertEqual(h_jul29["reaction_pct"], -17.3)
+            # 2026-02-11 was actual Q4 earnings (+24.5%)
+            self.assertIn("2026-02-11", times)
+            h_feb11 = next(h for h in history if h["time"] == "2026-02-11")
+            self.assertEqual(h_feb11["reaction_pct"], 24.5)
+            # 2026-10-28 has not closed in cached daily bars yet, so no premature marker
+            if candles[-1]["time"] < "2026-10-28":
+                self.assertNotIn("2026-10-28", times)
+
+    def test_nok_confirmed_earnings_calendar(self):
+        from src.chart_data import detect_earnings_history, load_candles_cache
+        cache = load_candles_cache()
+        if "NOK" in cache and cache["NOK"].get("candles"):
+            candles = cache["NOK"]["candles"]
+            history = detect_earnings_history(candles, ticker="NOK")
+            times = [h["time"] for h in history]
+            # 2026-10-22 was actual Q3 earnings (-14.8%)
+            self.assertIn("2026-10-22", times)
+            h_oct22 = next(h for h in history if h["time"] == "2026-10-22")
+            self.assertEqual(h_oct22["reaction_pct"], -14.8)
+
 
 class SuperInvestorsAsOfTest(unittest.TestCase):
     def test_every_entry_carries_as_of_note(self):

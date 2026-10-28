@@ -2678,6 +2678,22 @@
             },
             crosshair: {
                 mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
+                horzLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
             },
             rightPriceScale: {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -2688,7 +2704,7 @@
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
-                visible: isLast,
+                visible: true,
                 rightOffset: 15,
             },
             handleScroll: {
@@ -3046,6 +3062,22 @@
             },
             crosshair: {
                 mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
+                horzLine: {
+                    color: 'rgba(148, 163, 184, 0.45)',
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    visible: true,
+                    labelVisible: true,
+                    labelBackgroundColor: '#1e293b',
+                },
             },
             rightPriceScale: {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -3057,7 +3089,7 @@
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
-                visible: (numSubpanes === 0),
+                visible: true,
                 rightOffset: 15,
             },
             handleScroll: {
@@ -3419,11 +3451,47 @@
             });
         });
 
+        const updateHoverBar = (tStr, bar) => {
+            const dateEl = document.getElementById('chb_date');
+            const ohlcEl = document.getElementById('chb_ohlc');
+            if (dateEl && tStr) {
+                dateEl.textContent = '📅 วันที่: ' + tStr;
+            }
+            if (ohlcEl && bar && bar.open !== undefined) {
+                const isUp = bar.close >= bar.open;
+                const cColor = isUp ? '#10b981' : '#f43f5e';
+                const chg = bar.open > 0 ? (((bar.close - bar.open) / bar.open) * 100).toFixed(2) : '0.00';
+                const sign = Number(chg) >= 0 ? '+' : '';
+                ohlcEl.innerHTML = `O: <b>$${Number(bar.open).toFixed(2)}</b> &nbsp;H: <b>$${Number(bar.high).toFixed(2)}</b> &nbsp;L: <b>$${Number(bar.low).toFixed(2)}</b> &nbsp;C: <b style="color:${cColor};">$${Number(bar.close).toFixed(2)} (${sign}${chg}%)</b>`;
+            }
+        };
+
+        if (currentCandles && currentCandles.length > 0) {
+            const lastBar = currentCandles[currentCandles.length - 1];
+            updateHoverBar(lastBar.time, lastBar);
+        }
+
         const handleCrosshair = (param) => {
-            if (!param || !param.time) return;
+            if (!param || !param.time) {
+                if (currentCandles && currentCandles.length > 0) {
+                    const lastBar = currentCandles[currentCandles.length - 1];
+                    updateHoverBar(lastBar.time, lastBar);
+                }
+                return;
+            }
             const tStr = (typeof param.time === 'object')
                 ? `${param.time.year}-${String(param.time.month).padStart(2, '0')}-${String(param.time.day).padStart(2, '0')}`
                 : param.time;
+
+            let bar = null;
+            if (param.seriesData && candleSeries) {
+                bar = param.seriesData.get(candleSeries);
+            }
+            if (!bar && currentCandles) {
+                bar = currentCandles.find(c => c.time === tStr);
+            }
+            updateHoverBar(tStr, bar);
+
             activeSubpaneCharts.forEach(item => {
                 if (item.updateHover) item.updateHover(tStr);
             });

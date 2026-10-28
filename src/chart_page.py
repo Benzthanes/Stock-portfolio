@@ -17,6 +17,7 @@ from src.chart_data import (
     INDICATOR_SCHEMA_VERSION,
     get_super_investors,
 )
+from src.scoring import ETF_TICKERS
 from src.nav import nav_bar_html
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
@@ -265,7 +266,9 @@ def generate_stock_chart_page_html() -> str:
     for t, entry in raw_cache.items():
         if isinstance(entry, dict) and entry.get("candles") and entry.get("schema_version") != INDICATOR_SCHEMA_VERSION:
             try:
-                new_data = compute_fibo_and_indicators(entry["candles"])
+                m_t = meta.get(t, {})
+                d_earn = m_t.get("days_to_earnings")
+                new_data = compute_fibo_and_indicators(entry["candles"], days_to_earnings=d_earn, is_etf=(t in ETF_TICKERS), ticker=t)
                 new_data["timestamp"] = entry.get("timestamp", 0)
                 new_data["full_history"] = entry.get("full_history", True)
                 new_data["schema_version"] = INDICATOR_SCHEMA_VERSION
@@ -319,6 +322,13 @@ def generate_stock_chart_page_html() -> str:
             meta[t]["financials"] = financials_data.get(t, {})
 
     attach_scores(meta, sorted_tickers)
+
+    # Sanitize earnings_history for chart output:
+    # ETFs never have corporate earnings announcements.
+    for t in sorted_tickers:
+        c = cache.get(t)
+        if isinstance(c, dict) and "earnings_history" in c and t in ETF_TICKERS:
+            c["earnings_history"] = []
 
     chart_data_json = json.dumps(cache, ensure_ascii=False, separators=(",", ":"))
     meta_json = json.dumps(meta, ensure_ascii=False)

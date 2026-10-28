@@ -231,6 +231,11 @@ __CHART_CSS__    </style>
 
                     <!-- Main Chart Canvas Body -->
                     <div id="chart_container_wrap" style="position: relative; width: 100%;">
+                        <!-- Live Crosshair Date & OHLC Tooltip Bar -->
+                        <div id="chart_hover_bar" style="position: absolute; top: 10px; left: 14px; z-index: 8; pointer-events: none; background: rgba(10, 14, 26, 0.90); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 4px 10px; font-size: 0.74rem; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                            <span id="chb_date" style="color: #facc15; font-weight: 700;">📅 วันที่: -</span>
+                            <span id="chb_ohlc" style="color: #cbd5e1;"></span>
+                        </div>
                         <div id="chart_container" class="main-chart-pane"></div>
                         <!-- Vertical Earnings Line Overlay (Perpendicular to time axis) -->
                         <div id="earnings_vertical_line_overlay" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none; z-index: 10; display: none; overflow: hidden;">

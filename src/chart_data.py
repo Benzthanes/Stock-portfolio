@@ -17,6 +17,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.http import http_get
+from src.scoring import ETF_TICKERS
+from src.earnings_calendar import get_confirmed_earnings_dates, calculate_confirmed_earnings_reaction
 
 CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.json"
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
@@ -1323,25 +1325,56 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
     }
 
 
-def detect_earnings_history(candles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def detect_earnings_history(
+    candles: List[Dict[str, Any]],
+    ticker: Optional[str] = None,
+    days_to_earnings: Optional[float] = None,
+    is_etf: bool = False,
+) -> List[Dict[str, Any]]:
     """
-    Approximates quarterly earnings reactions by taking the highest-volume candle
-    in each ~62-bar window, anchored backwards from the latest candle so that
-    recent announcement reactions are never truncated into an ignored stub.
-    These are volume spikes, not confirmed announcement dates.
+    Quarterly earnings announcement reaction detection.
+    When a ticker with confirmed announcement dates (2024-2026) is provided,
+    calculates exact price reactions for those confirmed announcement dates.
+    For ETFs or unannounced pending periods, returns no premature or false markers.
+    If ticker is None, falls back to volume spike detection for mock candle tests.
     """
-    if not candles or len(candles) < 2:
+    if is_etf or not candles or len(candles) < 2:
         return []
 
+    if ticker:
+        ticker = ticker.strip().upper()
+        if ticker in ETF_TICKERS:
+            return []
+        confirmed_dates = get_confirmed_earnings_dates(ticker)
+        if confirmed_dates:
+            return calculate_confirmed_earnings_reaction(candles, confirmed_dates)
+        return []
+
+    # Fallback to volume spike heuristic only when ticker is not provided (e.g. synthetic test candles)
     recent = candles[-750:] if len(candles) >= 750 else candles
     q_len = 62 if len(recent) >= 62 else len(recent)
+
+    is_pending = False
+    if days_to_earnings is not None:
+        try:
+            val = float(days_to_earnings)
+            if 0.0 <= val <= 45.0:
+                is_pending = True
+        except (ValueError, TypeError):
+            pass
 
     # Slice backwards from the most recent candle
     chunks = []
     end = len(recent)
+    is_first = True
     while end > 0:
         start = max(0, end - q_len)
         chunk = recent[start:end]
+        if is_first and is_pending:
+            is_first = False
+            end = start
+            continue
+        is_first = False
         if len(chunk) >= min(20, q_len):
             chunks.append((start, chunk))
         end = start
@@ -1361,13 +1394,12 @@ def detect_earnings_history(candles: List[Dict[str, Any]]) -> List[Dict[str, Any
                         "idx": idx,
                         "volume": max_c.get("volume", 0),
                         "reaction_pct": pct,
-                        "text": f"📊 Vol {pct:+.1f}%",
+                        "text": f"🗓️ {pct:+.1f}%",
                         "color": "#10b981" if pct >= 0 else "#f43f5e",
                         "position": "belowBar" if pct >= 0 else "aboveBar",
                     })
 
     raw_events.sort(key=lambda x: x["time"])
-    # Deduplicate events that fall too close (< 35 trading days) by keeping the higher volume spike
     deduped = []
     for ev in raw_events:
         if not deduped:
@@ -3685,7 +3717,12 @@ def _previous_month_hlc(candles: List[Dict[str, Any]]) -> tuple:
     return max(c["high"] for c in month), min(c["low"] for c in month), month[-1]["close"]
 
 
-def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]:
+def compute_fibo_and_indicators(
+    candles: List[Dict[str, Any]],
+    days_to_earnings: Optional[float] = None,
+    is_etf: bool = False,
+    ticker: Optional[str] = None,
+) -> Dict[str, Any]:
     """
     Compute Inception High/Low (ATH/ATL), Fibonacci retracements (52W cycle and 2Y macro),
     VWAP and Volume Profile POC anchored to the last ANCHOR_BARS daily bars, Moving Averages,
@@ -4055,7 +4092,7 @@ def compute_fibo_and_indicators(candles: List[Dict[str, Any]]) -> Dict[str, Any]
         "elliott_wave": elliott_wave,
         "elliott_wave_macro": elliott_wave_macro,
         "ai_signals": ai_signals,
-        "earnings_history": detect_earnings_history(candles),
+        "earnings_history": detect_earnings_history(candles, ticker=ticker, days_to_earnings=days_to_earnings, is_etf=is_etf),
         "cdc_actionzone": cdc_actionzone,
         "luxalgo_sr": luxalgo_sr,
         "smc": smc,
@@ -4101,7 +4138,7 @@ def save_candles_cache(cache: Dict[str, Any]):
 
 
 # Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 11
+INDICATOR_SCHEMA_VERSION = 13
 
 
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
@@ -4143,7 +4180,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
                     fetched_ts = now_ts
                 if not candles:
                     raise ValueError("no candles returned")
-                chart_data = compute_fibo_and_indicators(candles)
+                chart_data = compute_fibo_and_indicators(candles, ticker=t, is_etf=(t in ETF_TICKERS))
                 chart_data["timestamp"] = fetched_ts
                 chart_data["full_history"] = True
                 chart_data["schema_version"] = INDICATOR_SCHEMA_VERSION
