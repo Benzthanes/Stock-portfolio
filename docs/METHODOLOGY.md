@@ -245,6 +245,8 @@ for m in ['fwd60','fwd20','mdd60']:
 * Python ของ macOS เก็บ bytecode ไว้ที่ `~/Library/Caches/com.apple.python/<path>`. ถ้าแก้ไฟล์ชั่วคราวเพื่อทดสอบว่าเทสต์จับ bug ได้ แล้ว copy ไฟล์เดิมกลับมาภายในวินาทีเดียวกันและขนาดเท่าเดิม Python จะใช้ bytecode ของไฟล์ที่ถูกแก้ต่อ. ให้ลบโฟลเดอร์ cache นั้นหลังทดสอบทุกครั้ง.
 * การวัดตำแหน่งบนกราฟด้วย headless Chrome ต้องรออย่างน้อย 500 ms หลัง `selectStock()`. `setVisibleLogicalRange` มีผลในเฟรมถัดไป ถ้าวัดทันทีจะเห็นว่า pane ไม่ตรงกันทั้งที่จริงตรงกัน.
 * Confluence Engine ในหน้า Chart (`compute_ai_confluence_signals()`) เป็น heuristic ที่ยังไม่ผ่าน backtest. ห้ามนำสัญญาณ STRONG BUY ของมันไปใช้แทนคะแนนรวม.
+* วันประกาศงบย้อนหลัง (Historical Earnings Calendar) ต้องใช้ข้อมูลวันประกาศจริงจาก `src/earnings_calendar.py` เท่านั้น. ห้ามใช้วิธีเดาสุ่มจากแท่งโวลุ่มสูงสุด (Volume Heuristic) เพราะจะเกิด false positive ในวันที่ตลาดผันผวนหรือก่อนวันงบจริง. การรันแบบอัตโนมัติจะอ่านจากไฟล์นี้โดยไม่ต่อเน็ตภายนอก.
+* Crosshair Synchronization บนกราฟ Lightweight Charts เมื่อมีหลายหน้าต่าง (แท่งเทียน + Subpane เช่น RSI) ต้องใช้ `setCrosshairPosition` และ `clearCrosshairPosition` เพื่อให้เส้นตัดแนวตั้งและป้ายวันที่เชื่อมต่อกันเป็นเส้นเดียวจากบนลงล่าง.
 
 ---
 

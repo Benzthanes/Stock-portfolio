@@ -12,6 +12,7 @@ description: Refreshes all 6 HTML reports in one run (Master Dashboard, Health R
 
 อ่าน `AGENTS.md` ที่ root ของโปรเจกต์ให้จบก่อน. จุดที่ต้องระวังเฉพาะ skill นี้มีดังนี้:
 * ห้ามแก้ `data/portfolio.json`, `data/trades.json` และ `data/ledger.json` ในงานนี้. ไฟล์ที่ `/all` เขียนได้มีแค่ `data/ai_news_cache.json`, `data/account_summary.json`, `data/candles_cache.json` และ `reports/`.
+* **วันประกาศงบย้อนหลัง.** ใช้ข้อมูลที่ยืนยันแล้วใน `src/earnings_calendar.py` เท่านั้น ห้ามเดาจากโวลุ่มและห้ามค้นหาใหม่ระหว่างรันอัตโนมัติ. ค้นหาใหม่ต่อเมื่อผู้ใช้สั่งในแชทนี้เท่านั้น.
 * ก่อนเขียนบทวิเคราะห์ข่าว ให้ยืนยันว่า ticker คือบริษัทอะไร (หัวข้อ 4 ของ `AGENTS.md`). SPCX คือหุ้น SpaceX.
 * ถ้า `portfolio.py --all` แจ้งว่ามีขั้นตอนที่อัปเดตไม่สำเร็จ หน้านั้นยังเป็นข้อมูลเก่า. ให้บอกผู้ใช้ตรงๆ ว่าหน้าไหนไม่ได้อัปเดต.
 

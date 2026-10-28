@@ -2699,12 +2699,14 @@
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 scaleMargins: { top: 0.1, bottom: 0.1 },
                 autoScale: true,
+                alignLabels: true,
+                minimumWidth: 70,
             },
             timeScale: {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
-                visible: true,
+                visible: isLast,
                 rightOffset: 15,
             },
             handleScroll: {
@@ -2721,6 +2723,8 @@
             },
         });
 
+        let targetSeries = null;
+        let getValue = null;
         let updateHover = null;
 
         if (oscKey === 'sqz') {
@@ -2747,6 +2751,12 @@
                 const entry = sqzByTime.get(c.time);
                 return entry ? { time: c.time, value: entry.value, color: entry.color } : { time: c.time, value: 0 };
             }));
+
+            targetSeries = sqzSeries;
+            getValue = (timeStr) => {
+                const entry = sqzByTime.get(timeStr);
+                return entry ? entry.value : 0;
+            };
 
             const valElem = document.getElementById('sub_hover_' + oscKey);
             if (tData.squeeze_momentum && valElem) {
@@ -2811,6 +2821,12 @@
                 return { time: c.time, value: w ? w.dead_zone : 0 };
             }));
 
+            targetSeries = waeHist;
+            getValue = (timeStr) => {
+                const w = waeByTime.get(timeStr);
+                return w ? (w.trend_up > 0 ? w.trend_up : w.trend_down) : 0;
+            };
+
             const valElem = document.getElementById('sub_hover_' + oscKey);
             if (tData.wae && valElem) {
                 const w = tData.wae;
@@ -2868,6 +2884,12 @@
                 return { time: c.time, value: v ? v.signal : 0 };
             }));
 
+            targetSeries = vfiLine;
+            getValue = (timeStr) => {
+                const v = vfiByTime.get(timeStr);
+                return v ? v.vfi : 0;
+            };
+
             const valElem = document.getElementById('sub_hover_' + oscKey);
             if (tData.vfi && valElem) {
                 const v = tData.vfi;
@@ -2921,6 +2943,12 @@
                 const w = wtByTime.get(c.time);
                 return { time: c.time, value: w ? w.wt2 : 0 };
             }));
+
+            targetSeries = wt1Line;
+            getValue = (timeStr) => {
+                const w = wtByTime.get(timeStr);
+                return w ? w.wt1 : 0;
+            };
 
             const valElem = document.getElementById('sub_hover_' + oscKey);
             if (tData.wavetrend && valElem) {
@@ -2977,6 +3005,12 @@
             const rsiByTime = new Map(rsiData.map(r => [r.time, r.value]));
             rsiSeries.setData(candles.map(c => rsiByTime.has(c.time) ? { time: c.time, value: rsiByTime.get(c.time) } : { time: c.time }));
 
+            targetSeries = rsiSeries;
+            getValue = (timeStr) => {
+                const r = rsiByTime.get(timeStr);
+                return r !== undefined ? r : 50;
+            };
+
             const valElem = document.getElementById('sub_hover_' + oscKey);
             if (rsiData.length > 0 && valElem) {
                 const latestR = rsiData[rsiData.length - 1].value;
@@ -2993,7 +3027,7 @@
             };
         }
 
-        return { key: oscKey, chart: subChart, updateHover };
+        return { key: oscKey, chart: subChart, series: targetSeries, getValue, updateHover };
     }
 
     // Render Multi-Pane Charts (Candles + Stacked Oscillators)
@@ -3084,12 +3118,13 @@
                 scaleMargins: { top: 0.10, bottom: 0.22 },
                 autoScale: true,
                 alignLabels: true,
+                minimumWidth: 70,
             },
             timeScale: {
                 borderColor: 'rgba(255, 255, 255, 0.1)',
                 timeVisible: false,
                 secondsVisible: false,
-                visible: true,
+                visible: (numSubpanes === 0),
                 rightOffset: 15,
             },
             handleScroll: {
@@ -3466,39 +3501,76 @@
             }
         };
 
+        const candleByTime = new Map((currentCandles || []).map(c => [c.time, c]));
         if (currentCandles && currentCandles.length > 0) {
             const lastBar = currentCandles[currentCandles.length - 1];
             updateHoverBar(lastBar.time, lastBar);
         }
 
-        const handleCrosshair = (param) => {
-            if (!param || !param.time) {
-                if (currentCandles && currentCandles.length > 0) {
-                    const lastBar = currentCandles[currentCandles.length - 1];
-                    updateHoverBar(lastBar.time, lastBar);
-                }
-                return;
+        const mainEntry = {
+            key: 'main',
+            chart: chart,
+            series: candleSeries,
+            getValue: (tStr) => {
+                const c = candleByTime.get(tStr);
+                return c ? c.close : null;
             }
-            const tStr = (typeof param.time === 'object')
-                ? `${param.time.year}-${String(param.time.month).padStart(2, '0')}-${String(param.time.day).padStart(2, '0')}`
-                : param.time;
-
-            let bar = null;
-            if (param.seriesData && candleSeries) {
-                bar = param.seriesData.get(candleSeries);
-            }
-            if (!bar && currentCandles) {
-                bar = currentCandles.find(c => c.time === tStr);
-            }
-            updateHoverBar(tStr, bar);
-
-            activeSubpaneCharts.forEach(item => {
-                if (item.updateHover) item.updateHover(tStr);
-            });
         };
+        const allEntries = [mainEntry, ...activeSubpaneCharts];
+        let isSyncingCrosshair = false;
 
-        allCharts.forEach(c => {
-            c.subscribeCrosshairMove(handleCrosshair);
+        allEntries.forEach(source => {
+            source.chart.subscribeCrosshairMove(param => {
+                if (isSyncingCrosshair) return;
+                isSyncingCrosshair = true;
+                try {
+                    if (!param || !param.time || !param.point) {
+                        allEntries.forEach(target => {
+                            if (target.chart !== source.chart) {
+                                try { target.chart.clearCrosshairPosition(); } catch(e) {}
+                            }
+                        });
+                        if (currentCandles && currentCandles.length > 0) {
+                            const lastBar = currentCandles[currentCandles.length - 1];
+                            updateHoverBar(lastBar.time, lastBar);
+                        }
+                        return;
+                    }
+
+                    const tStr = (typeof param.time === 'object')
+                        ? `${param.time.year}-${String(param.time.month).padStart(2, '0')}-${String(param.time.day).padStart(2, '0')}`
+                        : param.time;
+
+                    let bar = null;
+                    if (param.seriesData && candleSeries) {
+                        bar = param.seriesData.get(candleSeries);
+                    }
+                    if (!bar && candleByTime) {
+                        bar = candleByTime.get(tStr);
+                    }
+                    updateHoverBar(tStr, bar);
+
+                    activeSubpaneCharts.forEach(item => {
+                        if (item.updateHover) item.updateHover(tStr);
+                    });
+
+                    // Seamlessly propagate vertical crosshair line & date badge across all charts
+                    allEntries.forEach(target => {
+                        if (target.chart !== source.chart && target.series) {
+                            try {
+                                const val = target.getValue ? target.getValue(tStr) : null;
+                                if (val !== null && val !== undefined) {
+                                    target.chart.setCrosshairPosition(val, param.time, target.series);
+                                } else {
+                                    target.chart.setCrosshairPosition(0, param.time, target.series);
+                                }
+                            } catch(e) {}
+                        }
+                    });
+                } finally {
+                    isSyncingCrosshair = false;
+                }
+            });
         });
 
         // Set Default 1Y View with Right Offset after layout
