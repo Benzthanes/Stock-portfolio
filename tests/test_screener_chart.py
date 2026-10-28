@@ -309,14 +309,28 @@ class ConfluenceScoringTest(unittest.TestCase):
 
 
 class EarningsHistoryEdgeTest(unittest.TestCase):
-    def test_short_trailing_window_is_ignored(self):
+    def test_short_leading_window_is_ignored(self):
         from src.chart_data import detect_earnings_history
         candles = [
             {"time": f"2024-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}", "open": 100.0, "high": 101.0, "low": 99.0, "close": 100.0, "volume": 1000}
             for i in range(130)
         ]
-        candles[-1] = {**candles[-1], "close": 120.0, "volume": 9000}
+        # In backward slicing of 130 bars (62 + 62 + 6), the short stub of 6 bars is at the beginning (index 0..5)
+        candles[0] = {**candles[0], "close": 120.0, "volume": 9000}
         self.assertEqual(detect_earnings_history(candles), [])
+
+    def test_recent_earnings_spike_in_latest_window_is_detected(self):
+        from src.chart_data import detect_earnings_history
+        candles = [
+            {"time": f"2024-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}", "open": 100.0, "high": 101.0, "low": 99.0, "close": 100.0, "volume": 1000}
+            for i in range(130)
+        ]
+        # Spike on the latest bar is in the full trailing 62-day window and must be detected
+        candles[-1] = {**candles[-1], "close": 120.0, "volume": 9000}
+        history = detect_earnings_history(candles)
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]["time"], candles[-1]["time"])
+        self.assertEqual(history[0]["reaction_pct"], 20.0)
 
 
 class SuperInvestorsAsOfTest(unittest.TestCase):

@@ -1326,36 +1326,64 @@ def detect_elliott_wave(candles: List[Dict[str, Any]], is_macro: bool = False) -
 def detect_earnings_history(candles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Approximates quarterly earnings reactions by taking the highest-volume candle
-    in each ~62-bar window. These are volume spikes, not confirmed announcement dates.
+    in each ~62-bar window, anchored backwards from the latest candle so that
+    recent announcement reactions are never truncated into an ignored stub.
+    These are volume spikes, not confirmed announcement dates.
     """
     if not candles or len(candles) < 2:
         return []
 
     recent = candles[-750:] if len(candles) >= 750 else candles
-    events = []
     q_len = 62 if len(recent) >= 62 else len(recent)
-    for start in range(0, len(recent), q_len):
-        chunk = recent[start:start + q_len]
-        if len(chunk) < min(20, q_len):
-            continue
+
+    # Slice backwards from the most recent candle
+    chunks = []
+    end = len(recent)
+    while end > 0:
+        start = max(0, end - q_len)
+        chunk = recent[start:end]
+        if len(chunk) >= min(20, q_len):
+            chunks.append((start, chunk))
+        end = start
+
+    raw_events = []
+    for start_idx, chunk in chunks:
         max_c = max(chunk, key=lambda c: c.get("volume", 0))
-        idx = recent.index(max_c)
+        idx = start_idx + chunk.index(max_c)
         if idx > 0:
             avg_vol = sum(c.get("volume", 0) for c in chunk) / len(chunk)
             if avg_vol > 0 and max_c.get("volume", 0) >= avg_vol * 1.3:
                 prev_c = recent[idx - 1]
                 if prev_c.get("close", 0) > 0:
                     pct = round(((max_c["close"] - prev_c["close"]) / prev_c["close"]) * 100, 1)
-                    events.append({
+                    raw_events.append({
                         "time": max_c["time"],
+                        "idx": idx,
+                        "volume": max_c.get("volume", 0),
                         "reaction_pct": pct,
                         "text": f"📊 Vol {pct:+.1f}%",
                         "color": "#10b981" if pct >= 0 else "#f43f5e",
                         "position": "belowBar" if pct >= 0 else "aboveBar",
                     })
 
-    events.sort(key=lambda x: x["time"])
-    return events
+    raw_events.sort(key=lambda x: x["time"])
+    # Deduplicate events that fall too close (< 35 trading days) by keeping the higher volume spike
+    deduped = []
+    for ev in raw_events:
+        if not deduped:
+            deduped.append(ev)
+        else:
+            prev = deduped[-1]
+            if abs(ev["idx"] - prev["idx"]) < 35:
+                if ev["volume"] > prev["volume"]:
+                    deduped[-1] = ev
+            else:
+                deduped.append(ev)
+
+    for ev in deduped:
+        ev.pop("idx", None)
+        ev.pop("volume", None)
+    return deduped
 
 
 def _rsi_value(avg_gain: float, avg_loss: float) -> float:
@@ -4073,7 +4101,7 @@ def save_candles_cache(cache: Dict[str, Any]):
 
 
 # Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 10
+INDICATOR_SCHEMA_VERSION = 11
 
 
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:

@@ -1270,7 +1270,7 @@
             dEarn = Math.round(diffMs / (1000 * 60 * 60 * 24));
         }
 
-        if (dEarn < 0 || dEarn > 90) {
+        if (dEarn < 0 || dEarn > 120) {
             currentEarningsIso = null;
             syncVerticalEarningsPosition();
             if (upcomingEarningsSeries && activeLwChart) {
