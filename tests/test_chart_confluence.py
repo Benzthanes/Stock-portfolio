@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from src.chart_data import compute_ai_confluence_signals, compute_fibo_and_indicators
 from src.scoring import EARNINGS_GUARD_DAYS, FundamentalScore, score_fundamentals, score_stock, score_timing
 
@@ -270,6 +271,21 @@ class ChartConfluenceTest(unittest.TestCase):
         self.assertEqual(sig_b["type"], "TRIM")
         self.assertEqual(sig_b["action"], "แบ่งทำกำไร / รอ")
 
+    def test_latest_signal_levels_are_long_side_for_every_type(self):
+        """The portfolio is long only, so the latest stop sits below price and the target above it, TRIM and AVOID included."""
+        last_close = self.candles[-1]["close"]
+        scores = {
+            "TRIM": ({"total": 60.0, "grade": "B", "stars": 3, "pillars": {}, "coverage": 1.0, "earnings_guard": False, "reasons": []}, 75.0),
+            "AVOID": ({"total": 20.0, "grade": "F", "stars": 1, "pillars": {}, "coverage": 1.0, "earnings_guard": False, "reasons": []}, 78.0),
+            "HOLD": ({"total": 60.0, "grade": "B", "stars": 3, "pillars": {}, "coverage": 1.0, "earnings_guard": False, "reasons": []}, 45.0),
+        }
+        for expected_type, (score, rsi) in scores.items():
+            sig = compute_ai_confluence_signals(**self._base_kwargs(stock_score=score, current_rsi=rsi))[-1]
+            self.assertEqual(sig["type"], expected_type)
+            self.assertEqual(sig["stop_loss"], round(last_close - 1.5 * 2.0, 2))
+            self.assertEqual(sig["target"], round(last_close + 2.5 * 2.0, 2))
+            self.assertEqual(sig["rr"], "1:1.7")
+
     def test_guard_days_threshold_and_levels_informational(self):
         """current_signal must have guard_days_threshold == 14 and levels_informational flag."""
         # AVOID signal
@@ -287,6 +303,98 @@ class ChartConfluenceTest(unittest.TestCase):
         # ENTRY signal
         sig_entry = compute_ai_confluence_signals(**self._base_kwargs(stock_score={**a_score, "earnings_guard": False, "timing": {"entry_signal": True}}))[-1]
         self.assertFalse(sig_entry["levels_informational"])
+
+    def test_historical_rule_tp_levels_are_long_side(self):
+        """Historical RULE_TP swing sell signals must set stop below price and target above price (long-only)."""
+        candles = [
+            {"time": f"2026-01-{i+1:02d}", "open": 100.0 + i, "high": 101.0 + i, "low": 99.0 + i, "close": 100.5 + i, "volume": 1000000}
+            for i in range(25)
+        ]
+        # Bar 25 is peak
+        candles.append({"time": "2026-01-26", "open": 125.0, "high": 135.0, "low": 124.0, "close": 134.0, "volume": 1000000})
+        # Bars 26, 27, 28 drop slightly
+        candles.append({"time": "2026-01-27", "open": 132.0, "high": 133.0, "low": 128.0, "close": 130.0, "volume": 1000000})
+        candles.append({"time": "2026-01-28", "open": 129.0, "high": 130.0, "low": 126.0, "close": 128.0, "volume": 1000000})
+        candles.append({"time": "2026-01-29", "open": 127.0, "high": 128.0, "low": 124.0, "close": 125.0, "volume": 2000000})  # confirm_idx=28, vol spike
+        for i in range(5):
+            candles.append({"time": f"2026-02-{i+1:02d}", "open": 124.0, "high": 125.0, "low": 123.0, "close": 124.0, "volume": 1000000})
+
+        signals = compute_ai_confluence_signals(
+            candles=candles,
+            fibo_levels={"0.0": 135.0, "50.0": 110.0, "61.8": 107.0, "78.6": 103.0},
+            pattern=None,
+            poc_price=105.0,
+            current_st_trend="BULLISH",
+            current_rsi=50.0,
+            current_macd_hist=0.5,
+            atr_val=2.0,
+        )
+        tp_sigs = [s for s in signals if s.get("type") == "RULE_TP"]
+        self.assertGreaterEqual(len(tp_sigs), 1)
+        sig = tp_sigs[0]
+        self.assertLess(sig["stop_loss"], sig["price"])
+        self.assertGreater(sig["target"], sig["price"])
+        self.assertEqual(sig["stop_loss"], round(sig["price"] - 1.5 * 2.0, 2))
+        self.assertEqual(sig["target"], round(sig["price"] + 2.5 * 2.0, 2))
+        self.assertEqual(sig["rr"], "1:1.7")
+
+    def test_ticker_near_earnings_resolves_calendar_guard_days(self):
+        """When days_to_earnings is None, compute_fibo_and_indicators resolves it via get_next_earnings_info."""
+        # Case A: days_to_earnings == 0 (today)
+        with patch(
+            "src.chart_data.get_next_earnings_info",
+            return_value={
+                "days_to_earnings": 0,
+                "earnings_date_str": "29 Oct 2026",
+                "is_earnings_near": True,
+                "source": "calendar",
+                "earnings_iso": "2026-10-29",
+            },
+        ):
+            fibo_data_0 = compute_fibo_and_indicators(self.candles, ticker="LLY", days_to_earnings=None)
+            latest_sig_0 = fibo_data_0["ai_signals"][-1]
+            self.assertTrue(latest_sig_0["earnings_guard"])
+            self.assertEqual(latest_sig_0["guard_days"], 0)
+            self.assertEqual(latest_sig_0["type"], "EARNINGS_GUARD")
+            self.assertEqual(latest_sig_0["action"], "พักสัญญาณ (งบออกวันนี้)")
+
+        # Case B: days_to_earnings == 7 (in 7 days)
+        with patch(
+            "src.chart_data.get_next_earnings_info",
+            return_value={
+                "days_to_earnings": 7,
+                "earnings_date_str": "05 Nov 2026",
+                "is_earnings_near": True,
+                "source": "calendar",
+                "earnings_iso": "2026-11-05",
+            },
+        ):
+            fibo_data_7 = compute_fibo_and_indicators(self.candles, ticker="ABNB", days_to_earnings=None)
+            latest_sig_7 = fibo_data_7["ai_signals"][-1]
+            self.assertTrue(latest_sig_7["earnings_guard"])
+            self.assertEqual(latest_sig_7["guard_days"], 7)
+            self.assertEqual(latest_sig_7["type"], "EARNINGS_GUARD")
+            self.assertEqual(latest_sig_7["action"], "พักสัญญาณ (งบออกใน 7 วัน)")
+
+        # Case C: Date-independence verification (running on future date 2026-11-15)
+        with patch(
+            "src.chart_data.get_next_earnings_info",
+            return_value={
+                "days_to_earnings": 3,
+                "earnings_date_str": "18 Nov 2026",
+                "is_earnings_near": True,
+                "source": "calendar",
+                "earnings_iso": "2026-11-18",
+            },
+        ):
+            fibo_data_future = compute_fibo_and_indicators(self.candles, ticker="XYZ", days_to_earnings=None)
+            latest_sig_future = fibo_data_future["ai_signals"][-1]
+            self.assertTrue(latest_sig_future["earnings_guard"])
+            self.assertEqual(latest_sig_future["guard_days"], 3)
+            self.assertEqual(latest_sig_future["type"], "EARNINGS_GUARD")
+            self.assertEqual(latest_sig_future["action"], "พักสัญญาณ (งบออกใน 3 วัน)")
+
+
 
 
 if __name__ == "__main__":

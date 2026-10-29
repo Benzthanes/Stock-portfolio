@@ -35,13 +35,14 @@ from src.earnings_calendar import (
     calculate_confirmed_earnings_reaction,
     get_earnings_timing,
     get_earnings_calendar_hash,
+    get_next_earnings_info,
 )
 
 CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.json"
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
 PATTERN_WIN_RATE_NOTE = "ไม่มีสถิติยืนยัน (heuristic)"
 ANCHOR_BARS = 504
-INDICATOR_SCHEMA_VERSION = 17
+INDICATOR_SCHEMA_VERSION = 19
 EARNINGS_CALENDAR_HASH = get_earnings_calendar_hash()
 
 # Heuristic constants for swing signals (heuristic ไม่ผ่าน backtest)
@@ -53,9 +54,9 @@ SWING_SL_RATIO_BUY = 0.965        # heuristic ไม่ผ่าน backtest: St
 SWING_TP_RATIO_BUY = 1.12         # heuristic ไม่ผ่าน backtest: Take Profit 12%
 SWING_RSI_OVERBOUGHT = 68.0       # heuristic ไม่ผ่าน backtest: ระดับ Overbought ฝั่งขาย swing
 SWING_VOL_RATIO_SELL = 1.25       # heuristic ไม่ผ่าน backtest: อัตราส่วนวอลุ่มเทขาย
-SWING_SL_RATIO_SELL = 1.025       # heuristic ไม่ผ่าน backtest: Stop Loss 2.5% เหนือ swing peak
-SWING_TP_RATIO_SELL = 0.92        # heuristic ไม่ผ่าน backtest: Take Profit 8% ใต้ราคาขาย
 RSI_OVERBOUGHT_THRESHOLD = 70.0   # heuristic ไม่ผ่าน backtest: ระดับ RSI Overbought สำหรับ TRIM
+LATEST_SL_ATR = 1.5               # heuristic ไม่ผ่าน backtest: Stop Loss ของสัญญาณล่าสุด 1.5 ATR ใต้ราคา
+LATEST_TP_ATR = 2.5               # heuristic ไม่ผ่าน backtest: เป้าหมายของสัญญาณล่าสุด 2.5 ATR เหนือราคา
 
 # Heuristic constants for chart pattern detection (heuristic ไม่ผ่าน backtest)
 MAX_BOX_RANGE_SPAN_PCT = 0.15          # heuristic: เพดานความกว้างกรอบ (high - low) / low สูงสุด 15% สำหรับ Consolidation Box
@@ -3159,8 +3160,9 @@ def compute_ai_confluence_signals(
                 reasons.append("สภาพคล่องเทขาย: วอลุ่มพุ่งสูง สะท้อนการขายทำกำไรของรายใหญ่ (Distribution)")
 
             if score >= 3:
-                sl = round(c_high * SWING_SL_RATIO_SELL, 2)
-                tp = round(c_close * SWING_TP_RATIO_SELL, 2)
+                sl = round(c_close - LATEST_SL_ATR * atr_val, 2)
+                tp = round(c_close + LATEST_TP_ATR * atr_val, 2)
+                rr = round((tp - c_close) / max(0.01, c_close - sl), 1)
                 signals.append({
                     "time": times[confirm_idx],
                     "price": round(c_close, 2),
@@ -3173,7 +3175,7 @@ def compute_ai_confluence_signals(
                     "reasons": reasons,
                     "stop_loss": sl,
                     "target": tp,
-                    "rr": "1:2.0",
+                    "rr": f"1:{rr}",
                     "marker_shape": "arrowDown",
                     "marker_color": "#f43f5e",
                 })
@@ -3279,18 +3281,23 @@ def compute_ai_confluence_signals(
         isinstance(resolved_stock_score.get("timing"), dict) and bool(resolved_stock_score["timing"].get("entry_signal"))
     )
 
-    if is_guard and days_to_earnings is not None:
-        d_val = int(round(days_to_earnings))
-        if d_val <= 0:
+    if is_guard:
+        d_val = int(round(days_to_earnings)) if days_to_earnings is not None else None
+        if d_val is not None and d_val <= 0:
             act = "พักสัญญาณ (งบออกวันนี้)"
             b_type = "EARNINGS_GUARD"
             badge = "🟠 พักสัญญาณ (งบออกวันนี้)"
             summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบออกวันนี้ (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
-        else:
+        elif d_val is not None:
             act = f"พักสัญญาณ (งบออกใน {d_val} วัน)"
             b_type = "EARNINGS_GUARD"
             badge = f"🟠 พักสัญญาณ (งบออกใน {d_val} วัน)"
             summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบออกใน {d_val} วัน (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
+        else:
+            act = "พักสัญญาณ (งบใกล้ประกาศ)"
+            b_type = "EARNINGS_GUARD"
+            badge = "🟠 พักสัญญาณ (งบใกล้ประกาศ)"
+            summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบใกล้ประกาศ (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
         m_shape = "circle"
         m_col = "#fb923c"
     elif grade == "F":
@@ -3356,9 +3363,10 @@ def compute_ai_confluence_signals(
         "badge": badge,
         "summary": summary_txt,
         "reasons": curr_reasons,
-        "stop_loss": round(curr_close - 1.5 * atr_val, 2) if b_type != "TRIM" and b_type != "AVOID" else round(curr_close + 1.5 * atr_val, 2),
-        "target": round(curr_close + 2.5 * atr_val, 2) if b_type != "TRIM" and b_type != "AVOID" else round(curr_close - 2.0 * atr_val, 2),
-        "rr": "1:2.5" if b_type != "TRIM" and b_type != "AVOID" else "1:2.0",
+        # The portfolio is long only, so TRIM and AVOID keep a stop below price too (a trailing stop for the shares held).
+        "stop_loss": round(curr_close - LATEST_SL_ATR * atr_val, 2),
+        "target": round(curr_close + LATEST_TP_ATR * atr_val, 2),
+        "rr": f"1:{LATEST_TP_ATR / LATEST_SL_ATR:.1f}",
         "marker_shape": m_shape,
         "marker_color": m_col,
         "is_latest": True,
@@ -3420,6 +3428,11 @@ def compute_fibo_and_indicators(
             "volume_profile": {"poc": 0.0},
             "pattern": None
         }
+
+    if days_to_earnings is None and ticker and not is_etf and ticker not in ETF_TICKERS:
+        earn_info = get_next_earnings_info(ticker)
+        if earn_info.get("days_to_earnings") is not None:
+            days_to_earnings = float(earn_info["days_to_earnings"])
 
     # Sanitize input candles to enforce OHLC invariant: high >= max(open, close), low <= min(open, close)
     for c in candles:
