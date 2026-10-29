@@ -152,7 +152,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link active" aria-current="page">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-28 21:56</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link active" aria-current="page">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-29 12:05</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -320,7 +320,7 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div class="meta-pill">FX: 33.75 THB/USD</div>
+                <div class="meta-pill">FX: 33.74 THB/USD</div>
             </div>
         </div>
 
@@ -337,59 +337,32 @@
                 <div class="kpi-subtext">~$0.00 USD</div>
                 
             </div>
-            <div class="card" style="border-left: 4px solid #10b981;">
+            <div class="card" style="border-left: 4px solid #94a3b8;">
                 <div class="kpi-label">กำไร/ขาดทุนจำลองรวม (Simulated P/L)</div>
-                <div class="kpi-value" style="color: #10b981;">฿0.00</div>
-                <div class="kpi-subtext" style="color: #10b981; font-weight: 700;">0.00% ($0.00 USD)</div>
+                <div class="kpi-value" style="color: #94a3b8;">฿0.00</div>
+                <div class="kpi-subtext" style="color: #94a3b8; font-weight: 700;">0.00% ($0.00 USD)</div>
             </div>
-            <div class="card" style="border-left: 4px solid var(--purple);">
+            <div class="card" style="border-left: 4px solid var(--border-color);">
                 <div class="kpi-label">สถานะการเทรดจำลอง (Trade Progress)</div>
-                <div class="kpi-value" style="font-size: 1.55rem; color: #a855f7;">0/0 แดนบวก</div>
+                <div class="kpi-value" style="font-size: 1.55rem; color: #94a3b8;">0/0 แดนบวก</div>
                 <div class="kpi-subtext">ชน TP: 0 | ชน SL: 0</div>
             </div>
         </div>
 
         <!-- SECTION 1: SIMULATION HOLDINGS TABLE -->
-        <div style="margin-bottom: 32px;">
-            <div class="section-title">
-                <span>📊</span> 1. ตารางจำลองการถือครองหุ้น Dip รายตัว (ราคาตลาดสดจาก TradingView)
-                <span class="badge badge-info">0 หุ้น</span>
-            </div>
-            <div class="card" style="padding: 0; overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Ticker</th>
-                            <th>บริษัท & ลักษณะธุรกิจ</th>
-                            <th style="text-align: center;">วันที่จำลองซื้อ</th>
-                            <th style="text-align: right;">ต้นทุนเข้าซื้อ ($)</th>
-                            <th style="text-align: right;">ราคาตลาดสด ($)</th>
-                            <th style="text-align: right;">เงินลงทุน (฿ / $)</th>
-                            <th style="text-align: right;">มูลค่าปัจจุบัน (฿ / $)</th>
-                            <th style="text-align: right;">กำไร/ขาดทุนจำลอง</th>
-                            <th style="min-width: 170px;">แถบวัดเป้าหมาย (SL ↔ TP)</th>
-                            <th style="text-align: center;">สถานะ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                    </tbody>
-                </table>
-            </div>
+        
+        <div class="card" style="text-align: center; padding: 48px 24px; margin-bottom: 32px; border: 1px dashed var(--border-color);">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">🌱</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px;">ยังไม่มีไม้จำลอง</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0;">ใช้ <code>/dip</code> เพื่อสแกนหุ้นย่อ</p>
         </div>
+        
 
         <!-- SECTION 1.5: CLOSED TRADES / STOP-LOSS & TAKE-PROFIT EXECUTIONS -->
         
 
         <!-- SECTION 2: TRADE STRATEGY CARDS -->
-        <div style="margin-bottom: 32px;">
-            <div class="section-title">
-                <span>🎯</span> 2. รายละเอียดกลยุทธ์และเหตุผลการช้อนซื้อของแต่ละตัว
-            </div>
-            <div class="grid-3-cols">
-                
-            </div>
-        </div>
+        
 
         <!-- SECTION 3: RULES & PHILOSOPHY -->
         <div class="card" style="background: rgba(13, 21, 39, 0.6); border: 1px dashed var(--border-color); margin-bottom: 32px;">
