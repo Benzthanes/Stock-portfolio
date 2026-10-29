@@ -1,7 +1,41 @@
 {
   "NOK": {
-    "updated_at": "2026-10-29T12:04:05.323220",
+    "updated_at": "2026-10-29T12:45:52.251132",
     "articles": [
+      {
+        "ticker": "NOK",
+        "title": "What Did Nokia (NYSE:NOK) Show in Its Quarterly Interim Report?",
+        "source": "Kalkine Media",
+        "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQTTFCb0xLR3pwcUpCTVFxRW1BV0M3eHdPZGV3ZWNKUklRcHlNZUlSRzhKdkVaYkVYcTZLLUhzY0VGYlhTTlRNUGxpanJsek1VRVpFVEVYUlVHaHUwNGJsQjFJRlkweThOV0VSOW5NZHAwTmpSZVJtclV0TGN4c1lyQ1ExanFyczZ1czA3NXFxbVFPYUVoeE1jOGdKU0Z1cU9xWFE?oc=5",
+        "published": "28 Oct 2026",
+        "raw_date": "Wed, 28 Oct 2026 12:25:00 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "Nokia แสดงอะไรในรายงานระหว่างกาลไตรมาสล่าสุด",
+        "summary_th": "• บทความสรุปรายงานผลประกอบการระหว่างกาลของ Nokia\n• ไม่มีตัวเลขในหัวข่าว",
+        "impact_th": "ช่วยทบทวนพื้นฐาน ไม่มีข้อมูลใหม่",
+        "action_th": "พิจารณาตามเกรด C และกติกา /fix",
+        "sentiment": "neutral",
+        "topic": "งบการเงิน (Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.251106"
+      },
+      {
+        "ticker": "NOK",
+        "title": "T-Mobile completes world's first AI-RAN call on commercial 5G network",
+        "source": "디지털투데이",
+        "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOS1lLTzlzMjhGWk9kSmVETjBVWkRKaGFuSG5LUXZGWjVSZVhtZjZHeVpvbUNhVVFrcWVyMEVxZEZMWHgtWTJ3ZlNiRVpwc0hMTkUzd2tMQ3RZNU13N1h1NklRR1NsbHNVc2tKVHpvZWw0N3VXNllLMXVJZzMxdkdzdnpqajE2YUYxLVM5a1VOVkFEWWM1b21kQlkwQnNGNlltREkwalBDcU5ReVh4N2cwMGRhcjc?oc=5",
+        "published": "27 Oct 2026",
+        "raw_date": "Tue, 27 Oct 2026 23:52:36 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "T-Mobile ทำการโทร AI-RAN ครั้งแรกของโลกบนเครือข่าย 5G เชิงพาณิชย์",
+        "summary_th": "• T-Mobile ทดสอบ AI-RAN บนเครือข่ายจริงสำเร็จ\n• หัวข่าวไม่ระบุผู้ขายอุปกรณ์",
+        "impact_th": "หนุนตลาด AI-RAN ที่ Nokia แข่งขันอยู่ แต่ผลต่อ Nokia ยังไม่ชัด",
+        "action_th": "ติดตามว่า Nokia เป็นผู้ขายหรือไม่",
+        "sentiment": "mixed",
+        "topic": "เทคโนโลยีใหม่ (Technology)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.251113"
+      },
       {
         "ticker": "NOK",
         "title": "NOK Stock Jumps As Starlink And Q4 Guidance Energize Bulls",
@@ -325,8 +359,76 @@
     ]
   },
   "GOOGL": {
-    "updated_at": "2026-10-29T12:04:05.449721",
+    "updated_at": "2026-10-29T12:45:52.289445",
     "articles": [
+      {
+        "ticker": "GOOGL",
+        "title": "Google Stock Plunges 9% as Earnings Miss and AI Spending Concerns Investors",
+        "source": "Coinpaper",
+        "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPUURCeGE0ekZ5M0lpSUxCX05oOW1mUDQ1elZET3Zsdk16Wm1hSzRTaVp3LTFBUTlTOGZqUlhkVG0xLWxvNmZlQUhNbU4teW1HdnloT0RqLUJrUzgxeS1xVVFfb19uU2ZocVRianRDbU8zaE91d3VYZ0t3YVNibEdXYzdLbWoyUFY1a0J2cHZLNlN4YkotYUpPYksxckFpb0FWZDZwTA?oc=5",
+        "published": "29 Oct 2026",
+        "raw_date": "Thu, 29 Oct 2026 05:34:21 GMT",
+        "current_sentiment": "bearish",
+        "title_th": "หุ้น Google ร่วง 9% จากงบต่ำกว่าคาดและความกังวลเรื่องรายจ่าย AI",
+        "summary_th": "• ราคาร่วงราว 9% หลังงบ\n• นักลงทุนกังวลรายจ่ายลงทุนด้าน AI",
+        "impact_th": "กดดันมูลค่าระยะสั้นและมุมมองอัตรากำไร",
+        "action_th": "ไม่ถัวจนกว่าราคาหยุดลงและเกรดยังผ่าน",
+        "sentiment": "bearish",
+        "topic": "งบการเงิน (Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.289404"
+      },
+      {
+        "ticker": "GOOGL",
+        "title": "Asian shares and U.S. futures are mixed after Google parent Alphabet’s earnings disappoint",
+        "source": "The Spec",
+        "link": "https://news.google.com/rss/articles/CBMiggJBVV95cUxNa0EtQkZpaXk4U0preUZfUkFxeHg3dFBQcmVEbWpXSHoyREdDWkJCUEE1ZF9PSmx5dUdzRXYyazV2LS1hbW1wUlQxSnN6X1hvZzRIUFlNN1dDelN5ZEEtWDVqZi1lQkNfbjZ0MFoxNjhPQ0podWF1R1JGTVVUUGt3amsteFFMcGE0RE0tVzRpY29ramQ1d05PbFJlVFdxOTFwZDVBRHhoQXd3WmZzVEhsN1podlZCVmE3ZFBRNjcwek9RTUxFaTJIWGpGeENKQk1ZNkk1NHVuSzFjX0pybTZfeUdYRTJnZjIwSnhiTEJzcTJ2X0w1QVAxWlVUSXlTODRfY0E?oc=5",
+        "published": "29 Oct 2026",
+        "raw_date": "Thu, 29 Oct 2026 05:07:19 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "ตลาดเอเชียและฟิวเจอร์สสหรัฐฯ ผสม หลังงบ Alphabet น่าผิดหวัง (The Spec)",
+        "summary_th": "• งบ Alphabet ต่ำกว่าคาด กดดันอารมณ์ตลาด\n• ตลาดเอเชียและฟิวเจอร์สสหรัฐฯ เคลื่อนไหวผสม",
+        "impact_th": "ข่าวซ้ำจากสำนักข่าวท้องถิ่น ยืนยันแรงกดดันต่อ GOOGL",
+        "action_th": "ไม่ต้องทำอะไรเพิ่ม รอราคานิ่ง",
+        "sentiment": "bearish",
+        "topic": "งบการเงิน (Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.289418"
+      },
+      {
+        "ticker": "GOOGL",
+        "title": "Alphabet Q3 Earnings Call Highlights",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPcllaSGNUVkRXenRVM211dFEtbVc5Y0IwS1I2MVMwRjh1WDZaUFNWcVJmaWduY19MWVdqUlVJbzhNa0tRU0gtYlh0TUVzdmZ3NmNTZkZnUTFJdjdfc3RMamkwUmVpZzB2TEJ3UWZ5eGgtOFNjN0luUFNrR19hUTlFYVlVYlBGZFdOcXN4VjR1SmZTRGQ3M0pHMmp4VXdweW0wV3g0?oc=5",
+        "published": "29 Oct 2026",
+        "raw_date": "Thu, 29 Oct 2026 05:04:16 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "ไฮไลต์การประชุมนักวิเคราะห์งบ Q3 ของ Alphabet",
+        "summary_th": "• สรุปประเด็นจาก earnings call ไตรมาส 3\n• หัวข่าวไม่ระบุตัวเลข",
+        "impact_th": "ช่วยดูแนวโน้มธุรกิจหลังงบ",
+        "action_th": "อ่านรายละเอียดก่อนตัดสินใจเพิ่มหรือลดสถานะ",
+        "sentiment": "neutral",
+        "topic": "งบการเงิน (Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.289420"
+      },
+      {
+        "ticker": "GOOGL",
+        "title": "Asian shares and U.S. futures are mixed after Google parent Alphabet's earnings disappoint",
+        "source": "Oskaloosa Herald",
+        "link": "https://news.google.com/rss/articles/CBMikAJBVV95cUxPeHFfc2hWN1lhYmQ1SWRfYkEzNjFGODd6RW93elhNMmxLZUk3UnUyQ2g3NnphaXhXZTFzSFN6cjBjUVpWWHJ2MTU2RDNYbFRPYi13M0toQ2ctZTNqTXRUYy1zQUR2UzFCdHhiNDNDN0VzTWUyYXNuMWxzUG1wOFd0eW9UQmxhdGc1LVJrVW9fRGdDRnpJMnM4MFpZNElpU2YzQ3J4am5UN2lodTVxZEYyUVZkMDdyMDU5M0g3T21BTlBJTmQxT1E5QlNmUFJBRFFiRG9kbVZiVTlYT2FseEdUQlRwWEhoT3dvYXZ6MW1BcmNEbk1xSWlXV0JURDlCa2RRVXF3dWo1Y3VDMklycXc3Uw?oc=5",
+        "published": "29 Oct 2026",
+        "raw_date": "Thu, 29 Oct 2026 05:03:56 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "ตลาดเอเชียและฟิวเจอร์สสหรัฐฯ ผสม หลังงบ Alphabet น่าผิดหวัง (Oskaloosa Herald)",
+        "summary_th": "• งบ Alphabet ต่ำกว่าคาด กดดันอารมณ์ตลาด\n• ตลาดเอเชียและฟิวเจอร์สสหรัฐฯ เคลื่อนไหวผสม",
+        "impact_th": "ข่าวซ้ำจากสำนักข่าวท้องถิ่น ยืนยันแรงกดดันต่อ GOOGL",
+        "action_th": "ไม่ต้องทำอะไรเพิ่ม รอราคานิ่ง",
+        "sentiment": "bearish",
+        "topic": "งบการเงิน (Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.289422"
+      },
       {
         "ticker": "GOOGL",
         "title": "US Stock Futures Fall After Alphabet, Fed Holds: Markets Wrap",
@@ -974,8 +1076,25 @@
     ]
   },
   "PLTR": {
-    "updated_at": "2026-10-29T12:04:05.431545",
+    "updated_at": "2026-10-29T12:45:52.278589",
     "articles": [
+      {
+        "ticker": "PLTR",
+        "title": "Palantir Technologies Inc. (PLTR) Stock Sinks As Market Gains: Here's Why",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPZjRIV1hIV2x4bWZEMlJUcW40RXo1WmdINEs1dzFHSkdGOGQ1aDZkWTR1Wm1UckVXY2kxdFhGOGZpOUFhXzZPUmpVbHc4cmRqZXl6RE9IbUZzNWJ2aF9sYkoyTW51UzhDc0FHeElic1gwQTE5Mk5kZFEyUGNybGpKeWtqRzFrc3c3TnlCLU1uci1OS0YxdEh5OXBTNmxVUW4wLXhZ?oc=5",
+        "published": "28 Oct 2026",
+        "raw_date": "Wed, 28 Oct 2026 20:45:04 GMT",
+        "current_sentiment": "mixed",
+        "title_th": "หุ้น Palantir (PLTR) ลดลงขณะที่ตลาดปรับขึ้น",
+        "summary_th": "• ราคาอ่อนกว่าตลาด\n• ไม่มีเหตุผลใหม่ในหัวข่าว",
+        "impact_th": "ความผันผวนระยะสั้น",
+        "action_th": "ไม่ต้องทำอะไร เพราะขาย PLTR ไปแล้ว",
+        "sentiment": "bearish",
+        "topic": "การเคลื่อนไหวราคา (Price Action)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.278562"
+      },
       {
         "ticker": "PLTR",
         "title": "(PLTR) Risk Channels and Responsive Allocation",
@@ -1859,8 +1978,25 @@
     ]
   },
   "BAC": {
-    "updated_at": "2026-10-29T12:04:05.496199",
+    "updated_at": "2026-10-29T12:45:52.325848",
     "articles": [
+      {
+        "ticker": "BAC",
+        "title": "BAC's NII Growth Accelerates in 2026: Is the Stock Worth Buying Now?",
+        "source": "TradingView",
+        "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQZ1ZmSk1xMlBRbGZiNmlLaGM2bElwd2k4dkpmajBYS19ocDVmMzZYUzgtNks5aXp5alh4djBsT3k5Mk12QlBpTnlKa3lYbVBWUURPWnFNXzFlQmlBU3ZsTUxjcDVFZjl0ZEFDM01KQTVpdlRvSmxqSnluZFVRMW1ieV9PRXRac1JhNGVsRGVXUGpwRHc2UFU3dU9lUzlfdk82S0J4aEhnanM4Nk4tOGc2ZThpVUZhTl9pemFsOEI2SQ?oc=5",
+        "published": "28 Oct 2026",
+        "raw_date": "Wed, 28 Oct 2026 14:26:00 GMT",
+        "current_sentiment": "bullish",
+        "title_th": "รายได้ดอกเบี้ยสุทธิ (NII) ของ BAC เร่งตัวในปี 2026 ควรซื้อตอนนี้หรือไม่",
+        "summary_th": "• NII ของ Bank of America เติบโตเร่งขึ้นในปี 2026\n• บทความประเมินความน่าซื้อ",
+        "impact_th": "หนุนพื้นฐานรายได้หลักของธนาคาร",
+        "action_th": "พิจารณาตามเกรด F ปัจจุบันก่อน ไม่ซื้อเพิ่มจากข่าวนี้",
+        "sentiment": "bullish",
+        "topic": "งบการเงิน (Earnings)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.325814"
+      },
       {
         "ticker": "BAC",
         "title": "Bank of America (BAC) Stock May Be 40% Undervalued After AI Financing News",
@@ -2170,8 +2306,25 @@
     ]
   },
   "MNST": {
-    "updated_at": "2026-10-29T12:04:05.483524",
+    "updated_at": "2026-10-29T12:45:52.311332",
     "articles": [
+      {
+        "ticker": "MNST",
+        "title": "Monster Beverage Corp. stock underperforms Tuesday when compared to competitors",
+        "source": "MarketWatch",
+        "link": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQS2lIYUg2NDVlb1dXdG1TYUVvcUFlSTlRQllIVEpjSDR1MlVhaXo4NWZCWnBsc3IycW15bU01SWNMWThoRnJkU29XZlBFYWhfSGdSUkVUZktVa3ZtMDN4SnlLY21ObjBZUUU2SUVKOVFuVHZ2LTRybW9JNzZfbEp4X1lpTzBTZDBhb2ZhZVVEUnJDV1lZRkt6RzNQb0NTZmRybE1IQWJGbkQ2VkFLeEpzaEVvZ2dua3JHMTFHTjBNUTBIakd4UWZOaUhGZ195cWtqeHVRRA?oc=5",
+        "published": "27 Oct 2026",
+        "raw_date": "Tue, 27 Oct 2026 20:40:00 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "หุ้น Monster Beverage แย่กว่าคู่แข่งในวันอังคาร",
+        "summary_th": "• ราคาอ่อนกว่าหุ้นกลุ่มเดียวกัน\n• ไม่มีเหตุผลใหม่ในหัวข่าว",
+        "impact_th": "ความผันผวนระยะสั้นก่อนงบ 5 พ.ย.",
+        "action_th": "อยู่ในช่วง guard วันงบ ไม่เพิ่มสถานะ",
+        "sentiment": "bearish",
+        "topic": "การเคลื่อนไหวราคา (Price Action)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.311305"
+      },
       {
         "ticker": "MNST",
         "title": "Monster Beverage vs. On Holding: Which Is the Better Growth Stock?",
@@ -2822,8 +2975,25 @@
     ]
   },
   "VOO": {
-    "updated_at": "2026-10-29T12:04:05.461257",
+    "updated_at": "2026-10-29T12:45:52.300174",
     "articles": [
+      {
+        "ticker": "VOO",
+        "title": "Vanguard S&P 500 ETF (VOO) options chain – Yahoo Finance",
+        "source": "Yahoo Finance Singapore",
+        "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOeGVWcnhOUmItbUlQZTB3SzN6dW5ETndmVVNvZzEtSUhoVkhhVmdPdU81ZFVkeEgyRUJLSExwYTc4Z245dVdMakJrUnlxYU81TExVLTVTajcxVkdmU00xM1F3N2NhREFVMUV2NGg0NHVYZFBDVTg1cU02cUVfcy1rZHBwWQ?oc=5",
+        "published": "28 Oct 2026",
+        "raw_date": "Wed, 28 Oct 2026 12:46:00 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "หน้าข้อมูลสัญญาออปชัน VOO",
+        "summary_th": "• หน้าข้อมูลราคาหรือสัญญาออปชันทั่วไป ไม่มีเนื้อหาข่าวใหม่",
+        "impact_th": "ไม่มีผลต่อพื้นฐานหรือราคา",
+        "action_th": "ไม่ต้องทำอะไร ใช้เป็นข้อมูลอ้างอิงเท่านั้น",
+        "sentiment": "neutral",
+        "topic": "หน้าข้อมูลราคา (Quote Page)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.300151"
+      },
       {
         "ticker": "VOO",
         "title": "Vanguard S&P 500 ETF (VOO) Stock Price, News, Quote & History",
@@ -3086,8 +3256,25 @@
     ]
   },
   "SKHY": {
-    "updated_at": "2026-10-29T12:04:05.303253",
+    "updated_at": "2026-10-29T12:45:52.232634",
     "articles": [
+      {
+        "ticker": "SKHY",
+        "title": "SK hynix: A Bargain For The Ages (Earnings Analysis) (NASDAQ:SKHY)",
+        "source": "Seeking Alpha",
+        "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNNS0xQVZ4MUZoWnJ2b2hIMnN0UTc4WFJVdkpMdFo3Q20yOUZZT2o0b2JqSmpCOVlidkJ6QjNXZFJVSVpiMHZGbUdkOHU4ekxxeXJTRi02RFZ1Q3J5X1kyakN5dmdJOWpoWHdmZHZya0hmOFpsaEY5VnJZSUtCbmRPSFljSl9qbE5YY1pVenlYWDd1bDRX?oc=5",
+        "published": "28 Oct 2026",
+        "raw_date": "Wed, 28 Oct 2026 20:50:26 GMT",
+        "current_sentiment": "neutral",
+        "title_th": "SK hynix: ราคาถูกที่สุดในรอบหลายปี (บทวิเคราะห์งบ)",
+        "summary_th": "• นักเขียน Seeking Alpha มองว่าหุ้นยังถูกหลังงบ Q3\n• เน้นแรงหนุนจากหน่วยความจำ AI",
+        "impact_th": "มุมมองเชิงบวกต่อมูลค่า แต่เป็นความเห็นของผู้เขียน",
+        "action_th": "ไม่ต้องทำอะไร เพราะขาย SKHY ไปแล้ว",
+        "sentiment": "bullish",
+        "topic": "บทวิเคราะห์ (Analyst View)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.232609"
+      },
       {
         "ticker": "SKHY",
         "title": "SKHY Oct 2026 132.000 put (SKHY261030P00132000) Stock Price, News, Quote & History",
@@ -3635,8 +3822,25 @@
     ]
   },
   "NOW": {
-    "updated_at": "2026-10-29T12:04:05.391027",
+    "updated_at": "2026-10-29T12:45:52.267179",
     "articles": [
+      {
+        "ticker": "NOW",
+        "title": "Why Vertiv Stock Soared Today",
+        "source": "Yahoo Finance",
+        "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOdDRqUFBmU09GR0hxekRrLTJ6bUJRZmdMeGUtVF9mb0VBM1BZSmFxRmFMMVR0Uk5ibDV1QVFQRDdGNnM4VHpBWk9Bal91SVBBOG5ucTZVWnZ4SkZZcnpaTXpEWlh6WWwxbGtsMHRjcHpLOURYajFyUC0xUXdTX1ZjN0pjaktOeUtyV1l2dnFNWnZlOFpRdTZWQ0Z3?oc=5",
+        "published": "29 Oct 2026",
+        "raw_date": "Thu, 29 Oct 2026 02:27:00 GMT",
+        "current_sentiment": "bullish",
+        "title_th": "ทำไมหุ้น Vertiv พุ่งแรงวันนี้ (ข่าวจับคู่ผิด ticker)",
+        "summary_th": "• ข่าวนี้เกี่ยวกับ Vertiv ไม่ใช่ ServiceNow\n• ระบบดึงข่าวจับคู่ผิด ticker",
+        "impact_th": "ไม่มีผลต่อ NOW",
+        "action_th": "ไม่ต้องทำอะไร",
+        "sentiment": "neutral",
+        "topic": "ข่าวไม่เกี่ยวข้อง (Unrelated)",
+        "ai_analyzed": true,
+        "ai_analyzed_at": "2026-10-29T12:45:52.267157"
+      },
       {
         "ticker": "NOW",
         "title": "Tech Futures Fall On Google, These Huge Losers",
