@@ -8,8 +8,10 @@ corporate investor relations releases and regulatory filings, avoiding volume-ba
 import hashlib
 import json
 import sys
-from typing import Dict, List, Any, Optional
-from src.scoring import ETF_TICKERS
+from datetime import date, datetime, timezone
+from zoneinfo import ZoneInfo
+from typing import Dict, List, Any, Optional, Union
+from src.scoring import ETF_TICKERS, EARNINGS_GUARD_DAYS
 
 # Confirmed 3-year historical and scheduled earnings announcement dates (2024-2026).
 # For stocks reporting Before Market Open (BMO), reaction occurs on the same calendar day.
@@ -157,6 +159,98 @@ def get_confirmed_earnings_dates(ticker: str) -> List[str]:
     if ticker in ETF_TICKERS:
         return []
     return CONFIRMED_EARNINGS_DATES.get(ticker, [])
+
+
+def get_next_earnings_info(
+    ticker: str,
+    tv_data: Optional[Dict[str, Any]] = None,
+    today: Optional[Union[date, datetime, str]] = None,
+    tz_name: str = "America/New_York",
+) -> Dict[str, Any]:
+    """
+    Returns unified next earnings information for the given ticker.
+    Precedence:
+    1. src/earnings_calendar.py (CONFIRMED_EARNINGS_DATES) for next date >= today.
+    2. Fallback to TradingView scanner data (earnings_release_next_date or earnings_release_date)
+       if ticker is not in the confirmed calendar or all calendar dates have passed.
+    3. Returns None/empty defaults if no upcoming date is available or for ETF tickers.
+
+    Calendar math:
+    Calculates calendar day difference (date - today) in the specified market timezone (default America/New_York).
+    """
+    if not ticker:
+        return {
+            "days_to_earnings": None,
+            "earnings_date_str": "-",
+            "is_earnings_near": False,
+            "source": None,
+        }
+
+    t_clean = ticker.strip().upper()
+    if t_clean in ETF_TICKERS:
+        return {
+            "days_to_earnings": None,
+            "earnings_date_str": "-",
+            "is_earnings_near": False,
+            "source": None,
+        }
+
+    # Resolve today date
+    if today is None:
+        today_date = datetime.now(ZoneInfo(tz_name)).date()
+    elif isinstance(today, str):
+        today_date = datetime.strptime(today.strip(), "%Y-%m-%d").date()
+    elif isinstance(today, datetime):
+        today_date = today.date()
+    elif isinstance(today, date):
+        today_date = today
+    else:
+        today_date = datetime.now(ZoneInfo(tz_name)).date()
+
+    # 1. Primary source: Confirmed Earnings Calendar
+    confirmed_dates = get_confirmed_earnings_dates(t_clean)
+    if confirmed_dates:
+        for d_str in sorted(confirmed_dates):
+            try:
+                cand_date = datetime.strptime(d_str, "%Y-%m-%d").date()
+                if cand_date >= today_date:
+                    diff_days = (cand_date - today_date).days
+                    return {
+                        "days_to_earnings": diff_days,
+                        "earnings_date_str": cand_date.strftime("%d %b %Y"),
+                        "is_earnings_near": (0 <= diff_days <= EARNINGS_GUARD_DAYS),
+                        "source": "calendar",
+                        "earnings_iso": d_str,
+                    }
+            except Exception:
+                continue
+
+    # 2. Fallback source: TradingView scanner data
+    if tv_data:
+        next_ts = tv_data.get("earnings_release_next_date")
+        past_ts = tv_data.get("earnings_release_date")
+        for cand_ts in [next_ts, past_ts]:
+            if cand_ts and isinstance(cand_ts, (int, float)) and cand_ts > 0:
+                try:
+                    cand_date = datetime.fromtimestamp(cand_ts, tz=ZoneInfo(tz_name)).date()
+                    if cand_date >= today_date:
+                        diff_days = (cand_date - today_date).days
+                        return {
+                            "days_to_earnings": diff_days,
+                            "earnings_date_str": cand_date.strftime("%d %b %Y"),
+                            "is_earnings_near": (0 <= diff_days <= EARNINGS_GUARD_DAYS),
+                            "source": "tradingview",
+                            "earnings_iso": cand_date.strftime("%Y-%m-%d"),
+                        }
+                except Exception:
+                    continue
+
+    return {
+        "days_to_earnings": None,
+        "earnings_date_str": "-",
+        "is_earnings_near": False,
+        "source": None,
+    }
 
 
 def get_earnings_timing(ticker: str, date: Optional[str] = None) -> Optional[str]:

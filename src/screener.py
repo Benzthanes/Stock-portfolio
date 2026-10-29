@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from src.news import fetch_batch_news, fetch_batch_catalysts
 from src.profiles import get_business_summary
+from src.earnings_calendar import get_next_earnings_info
 from src.scoring import EARNINGS_GUARD_DAYS, TIMING_RULES, format_score, score_fundamentals, score_stock, score_timing
 
 FALLBACK_SL_RATIO = 0.95
@@ -210,29 +211,12 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     key_resistance = levels["key_resistance"]
     resistance_desc = levels["resistance_desc"]
 
-    # Earnings Proximity Calculation
-    now_ts = int(time.time())
-    next_earnings_ts = data.get("earnings_release_next_date")
-    past_earnings_ts = data.get("earnings_release_date")
-    
-    days_to_earnings = None
-    earnings_date_str = "-"
-    is_earnings_near = False
-    
-    selected_earnings_ts = None
-    if next_earnings_ts and next_earnings_ts > now_ts:
-        selected_earnings_ts = next_earnings_ts
-    elif past_earnings_ts and past_earnings_ts > now_ts:
-        selected_earnings_ts = past_earnings_ts
-        
-    if selected_earnings_ts:
-        diff_days = (selected_earnings_ts - now_ts) / 86400.0
-        days_to_earnings = round(diff_days, 1)
-        is_earnings_near = (0.0 <= days_to_earnings <= EARNINGS_GUARD_DAYS)
-        try:
-            earnings_date_str = datetime.fromtimestamp(selected_earnings_ts, tz=timezone.utc).strftime("%d %b %Y")
-        except Exception:
-            earnings_date_str = str(selected_earnings_ts)
+    # Earnings Proximity Calculation using unified calendar source
+    ticker = data.get("ticker", data.get("name", ""))
+    earn_info = get_next_earnings_info(ticker, tv_data=data)
+    days_to_earnings = earn_info["days_to_earnings"]
+    earnings_date_str = earn_info["earnings_date_str"]
+    is_earnings_near = earn_info["is_earnings_near"]
 
     # Score calculation & informational signal tags (technicals kept as tags without arbitrary score points)
     score_points = 0.0
@@ -728,8 +712,11 @@ def generate_markdown_report(
         chart_link = f"[📈 Chart]({s['tv_url']})"
         
         earnings_alert = ""
-        if s["is_earnings_near"]:
-            earnings_alert = f" <br>⚠️ *Earnings in {s['days_to_earnings']}d ({s['earnings_date_str']})*"
+        if s.get("is_earnings_near"):
+            if s.get("days_to_earnings") == 0:
+                earnings_alert = f" <br>⚠️ *Earnings today ({s['earnings_date_str']})*"
+            else:
+                earnings_alert = f" <br>⚠️ *Earnings in {s['days_to_earnings']}d ({s['earnings_date_str']})*"
             
         biz = s.get("business_summary", "")
         lines.append(f"| **[{ticker}]({s['tv_url']})** | {name}<br><small>*{biz}*</small> | {price} | {chg_color} | {rsi_str} | <small>{trend_str}</small> | <small>{stoch_str}</small> | {mfi_str} | <small>{fund_str}</small> | <small>{plan_str}</small> | {rr_badge} | {badge}<br><small>{tags_str}{earnings_alert}</small> | {chart_link} |")

@@ -19,6 +19,7 @@ from src.fx import FALLBACK_USDTHB, resolve_usdthb, resolve_usdthb_with_source
 from src.tradingview import fetch_screener_data
 from src.news import get_catalyst_breakdown, fetch_batch_catalysts
 from src.profiles import get_business_summary
+from src.earnings_calendar import get_next_earnings_info
 from src.screener import trade_levels
 from src.html_report import generate_recovery_html
 from src.scoring import EARNINGS_GUARD_DAYS, format_score, score_fundamentals, score_stock, score_timing
@@ -153,20 +154,11 @@ def analyze_recovery(
     unrealized_pl_pct = (unrealized_pl / total_cost * 100.0) if total_cost > 0 else 0.0
     pct_to_breakeven = ((avg_cost - close) / close * 100.0) if close > 0 else 0.0
 
-    # Earnings Proximity
-    now_ts = time.time()
-    next_earnings_ts = data.get("earnings_release_next_date") or data.get("earnings_release_date")
-    days_to_earnings = None
-    earnings_date_str = "-"
-    is_earnings_imminent = False
-    if next_earnings_ts and next_earnings_ts > now_ts:
-        diff_days = (next_earnings_ts - now_ts) / 86400.0
-        days_to_earnings = round(diff_days, 1)
-        is_earnings_imminent = (days_to_earnings <= EARNINGS_GUARD_DAYS)
-        try:
-            earnings_date_str = datetime.fromtimestamp(next_earnings_ts, tz=timezone.utc).strftime("%d %b %Y")
-        except Exception:
-            earnings_date_str = str(next_earnings_ts)
+    # Earnings Proximity using unified calendar source
+    earn_info = get_next_earnings_info(ticker, tv_data=data)
+    days_to_earnings = earn_info["days_to_earnings"]
+    earnings_date_str = earn_info["earnings_date_str"]
+    is_earnings_imminent = earn_info["is_earnings_near"]
 
     # Fundamental Health
     fundamentals = evaluate_fundamental_health(data)
@@ -215,10 +207,12 @@ def analyze_recovery(
 
     # Concrete Recovery Classification
     if is_earnings_imminent:
-        action_verdict = f"🟠 Freeze DCA (งบออกใน {days_to_earnings} วัน ห้ามถัวเด็ดขาด)"
+        earn_txt = "งบออกวันนี้" if days_to_earnings == 0 else f"งบออกใน {days_to_earnings} วัน"
+        action_verdict = f"🟠 Freeze DCA ({earn_txt} ห้ามถัวเด็ดขาด)"
         dca_permitted = False
         primary_playbook = "Freeze & Hedge"
-        layman_action = f"งบจะออกในอีก {days_to_earnings} วัน ให้หยุดเติมเงินทันที รอให้งบออกก่อน ค่อยตัดสินใจเพื่อป้องกันราคาเปิดกระโดดลงแรง."
+        earn_txt2 = "งบจะออกวันนี้" if days_to_earnings == 0 else f"งบจะออกในอีก {days_to_earnings} วัน"
+        layman_action = f"{earn_txt2} ให้หยุดเติมเงินทันที รอให้งบออกก่อน ค่อยตัดสินใจเพื่อป้องกันราคาเปิดกระโดดลงแรง."
     elif fundamentals["quality_score"] == 3 and not deep_below_trend and ((rsi is not None and rsi <= 35) or timing["entry_signal"]):
         action_verdict = "🟢 Smart DCA เมื่อคอนเฟิร์มฐาน (พื้นฐานโตแกร่ง ทยอยดึงทุนต่ำได้)"
         dca_permitted = True
@@ -460,7 +454,8 @@ def generate_single_report(res: Dict[str, Any]) -> str:
         lines.append("- ไม่พบหัวข้อข่าวเชิงลบรุนแรงในรอบสัปดาห์นี้.")
     
     if res["is_earnings_imminent"]:
-        lines.append(f"- ⚠️ **ความเสี่ยงวันประกาศงบ:** บริษัทมีกำหนดประกาศงบในอีก **{res['days_to_earnings']} วัน ({res['earnings_date_str']})** มีความเสี่ยงราคาเหวี่ยงแรง.")
+        earn_txt = "วันนี้" if res['days_to_earnings'] == 0 else f"ในอีก **{res['days_to_earnings']} วัน**"
+        lines.append(f"- ⚠️ **ความเสี่ยงวันประกาศงบ:** บริษัทมีกำหนดประกาศงบ{earn_txt} ({res['earnings_date_str']}) มีความเสี่ยงราคาเหวี่ยงแรง.")
 
     # Institutional Price Targets section
     if res.get("price_target_average"):
@@ -518,7 +513,8 @@ def generate_single_report(res: Dict[str, Any]) -> str:
     ])
 
     if res['is_earnings_imminent']:
-        lines.append(f"- **คำเตือนความเสี่ยงวันงบ:** งบการเงินจะประกาศในอีก {res['days_to_earnings']} วัน. การซื้อถัวก่อนงบมีความเสี่ยงเกิด Gap Down รุนแรง. ต้องรอให้งบออกและตลาดซึมซับข่าวก่อน.")
+        earn_txt = "วันนี้" if res['days_to_earnings'] == 0 else f"ในอีก {res['days_to_earnings']} วัน"
+        lines.append(f"- **คำเตือนความเสี่ยงวันงบ:** งบการเงินจะประกาศ{earn_txt}. การซื้อถัวก่อนงบมีความเสี่ยงเกิด Gap Down รุนแรง. ต้องรอให้งบออกและตลาดซึมซับข่าวก่อน.")
     elif res['fundamentals']['quality_score'] == 1:
         lines.append("- **เหตุผลที่ห้ามถัว:** กำไรสุทธิของบริษัทยังหดตัวหนัก. การถัวเฉลี่ยในหุ้นที่พื้นฐานอ่อนแอจะกลายเป็นการติดกับดักมูลค่า (Value Trap).")
     else:
@@ -581,7 +577,10 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
         loss_thb = p.get("loss_thb", abs(loss_usd) * summary["fx_rate"])
         be_gap = p["pct_to_breakeven"]
         f = p["fundamentals"]
-        earnings_str = f"{p['days_to_earnings']}d" if p['days_to_earnings'] is not None else "-"
+        if p['days_to_earnings'] is not None:
+            earnings_str = "วันนี้" if p['days_to_earnings'] == 0 else f"{p['days_to_earnings']}d"
+        else:
+            earnings_str = "-"
         if p["is_earnings_imminent"]:
             earnings_str = f"⚠️ **{earnings_str}**"
 
@@ -654,7 +653,8 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
                     lines.append(f"- **เปรียบเทียบกับทุนของคุณ:** ราคาเป้าหมายเฉลี่ยสถาบัน **ต่ำกว่าทุนของคุณ ({curr_sym}{p['avg_cost']:.2f}) อยู่ {abs(p['target_vs_cost_pct']):.1f}%**. สถาบันมองว่าราคายังขึ้นไปไม่ถึงทุนเดิมใน 1 ปี ควรใช้แผน Rebound Exit หรือโยกเงิน.")
 
         if p["is_earnings_imminent"]:
-            lines.append(f"- ⚠️ **วันประกาศงบการเงินใกล้เข้ามา:** อีก **{p['days_to_earnings']} วัน ({p['earnings_date_str']})** มีความเสี่ยง Gap รุนแรง.")
+            earn_txt = "วันนี้" if p['days_to_earnings'] == 0 else f"อีก **{p['days_to_earnings']} วัน**"
+            lines.append(f"- ⚠️ **วันประกาศงบการเงินใกล้เข้ามา:** {earn_txt} ({p['earnings_date_str']}) มีความเสี่ยง Gap รุนแรง.")
 
         lines.append("")
 
@@ -723,7 +723,8 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
         ])
 
         if p["is_earnings_imminent"]:
-            lines.append(f"- ⚠️ **คำเตือนวันประกาศงบ:** บริษัทมีกำหนดประกาศงบในอีก **{p['days_to_earnings']} วัน ({p['earnings_date_str']})** ให้ระงับการซื้อถัวเฉลี่ยเพื่อหลีกเลี่ยงความผันผวนของ Gap.")
+            earn_txt = "วันนี้" if p['days_to_earnings'] == 0 else f"ในอีก **{p['days_to_earnings']} วัน**"
+            lines.append(f"- ⚠️ **คำเตือนวันประกาศงบ:** บริษัทมีกำหนดประกาศงบ{earn_txt} ({p['earnings_date_str']}) ให้ระงับการซื้อถัวเฉลี่ยเพื่อหลีกเลี่ยงความผันผวนของ Gap.")
 
         lines.append("")
 

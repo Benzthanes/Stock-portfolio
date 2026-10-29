@@ -41,8 +41,8 @@ class TestRemovedIndicators(unittest.TestCase):
             )
 
     def test_schema_version_incremented(self):
-        """INDICATOR_SCHEMA_VERSION must be incremented to 16."""
-        self.assertEqual(INDICATOR_SCHEMA_VERSION, 16)
+        """INDICATOR_SCHEMA_VERSION must be at least 16 (the removal bump)."""
+        self.assertGreaterEqual(INDICATOR_SCHEMA_VERSION, 16)
 
     def test_payload_keys_removed_and_retained(self):
         """Removed keys must be absent in payload while retained indicators remain present."""

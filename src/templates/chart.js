@@ -1098,7 +1098,9 @@
 
     function parseEarningsDateToIso(str) {
         if (!str || str === '-' || str === 'None') return null;
-        const parts = str.trim().split(/\s+/);
+        const trimmed = str.trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+        const parts = trimmed.split(/\s+/);
         if (parts.length === 3) {
             const months = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
             const day = parts[0].padStart(2, '0');
@@ -1240,7 +1242,8 @@
         const vText = document.getElementById('v_earn_text');
         if (vText) {
             const roundedDays = getDaysToEarningsDisplay(dEarn);
-            vText.textContent = 'วันประกาศงบ: ' + (mInfo.earnings_date || '') + ' (ใน ' + (roundedDays !== null ? roundedDays : 0) + ' วัน)';
+            const earnDayTxt = roundedDays === 0 ? 'วันนี้' : (roundedDays !== null ? 'ใน ' + roundedDays + ' วัน' : '');
+            vText.textContent = 'วันประกาศงบ: ' + (mInfo.earnings_date || '') + (earnDayTxt ? ' (' + earnDayTxt + ')' : '');
         }
 
         try {
@@ -3611,8 +3614,9 @@
             const isShockZone = guardThresh != null ? (roundedDays <= guardThresh) : Boolean(meta.earnings_guard_active || (latestSig && latestSig.earnings_guard) || (meta.score && meta.score.earnings_guard));
             if (isShockZone) {
                 const zoneHint = guardThresh != null ? ` ภายใน ${guardThresh} วัน` : '';
+                const earnText = roundedDays === 0 ? 'งบออกวันนี้' : `งบออกใน ${roundedDays} วัน`;
                 radarBody.innerHTML = `
-                    <div style="color: #fb7185; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;">⚠️ งบออกใน ${roundedDays} วัน (${dDate})</div>
+                    <div style="color: #fb7185; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;">⚠️ ${earnText} (${dDate})</div>
                     <div>ความผันผวนสูง (Earnings Shock Zone${zoneHint}) แนะนำหลีกเลี่ยงการเปิดสถานะใหม่ขนาดใหญ่ก่อนงบออก</div>
                 `;
                 if (radarCard) {
@@ -3858,7 +3862,8 @@
 
     function getSignalBadgeText(sig, isGuard, guardDays) {
         if (isGuard) {
-            return `พักสัญญาณ (${guardDays != null ? 'งบออกใน ' + guardDays + ' วัน' : 'ใกล้วันประกาศงบ'})`;
+            const guardText = guardDays === 0 ? 'งบออกวันนี้' : (guardDays != null ? 'งบออกใน ' + guardDays + ' วัน' : 'ใกล้วันประกาศงบ');
+            return `พักสัญญาณ (${guardText})`;
         }
         if (!sig) return '-';
         let type = (sig.type || '').toUpperCase();
@@ -3884,7 +3889,8 @@
         if (type === 'HOLD') return 'รอจังหวะ';
         if (type === 'WAIT') return 'รอ';
         if (type === 'EARNINGS_GUARD') {
-            return `พักสัญญาณ (${guardDays != null ? 'งบออกใน ' + guardDays + ' วัน' : 'ใกล้วันประกาศงบ'})`;
+            const guardText = guardDays === 0 ? 'งบออกวันนี้' : (guardDays != null ? 'งบออกใน ' + guardDays + ' วัน' : 'ใกล้วันประกาศงบ');
+            return `พักสัญญาณ (${guardText})`;
         }
         if (sig.badge && !sig.badge.includes('BUY')) {
             return String(sig.badge).replace(/🚀\s*/g, '').replace(/[\u{1F916}]\s*/gu, '');

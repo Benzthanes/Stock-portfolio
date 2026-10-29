@@ -41,7 +41,7 @@ CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.js
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
 PATTERN_WIN_RATE_NOTE = "ไม่มีสถิติยืนยัน (heuristic)"
 ANCHOR_BARS = 504
-INDICATOR_SCHEMA_VERSION = 16
+INDICATOR_SCHEMA_VERSION = 17
 EARNINGS_CALENDAR_HASH = get_earnings_calendar_hash()
 
 # Heuristic constants for swing signals (heuristic ไม่ผ่าน backtest)
@@ -3281,12 +3281,18 @@ def compute_ai_confluence_signals(
 
     if is_guard and days_to_earnings is not None:
         d_val = int(round(days_to_earnings))
-        act = f"พักสัญญาณ (งบออกใน {d_val} วัน)"
-        b_type = "EARNINGS_GUARD"
-        badge = f"🟠 พักสัญญาณ (งบออกใน {d_val} วัน)"
+        if d_val <= 0:
+            act = "พักสัญญาณ (งบออกวันนี้)"
+            b_type = "EARNINGS_GUARD"
+            badge = "🟠 พักสัญญาณ (งบออกวันนี้)"
+            summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบออกวันนี้ (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
+        else:
+            act = f"พักสัญญาณ (งบออกใน {d_val} วัน)"
+            b_type = "EARNINGS_GUARD"
+            badge = f"🟠 พักสัญญาณ (งบออกใน {d_val} วัน)"
+            summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบออกใน {d_val} วัน (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
         m_shape = "circle"
         m_col = "#fb923c"
-        summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบออกใน {d_val} วัน (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
     elif grade == "F":
         act = "เลี่ยง"
         b_type = "AVOID"

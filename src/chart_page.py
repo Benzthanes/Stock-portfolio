@@ -238,6 +238,10 @@ def attach_scores(meta: Dict[str, Any], tickers: List[str]) -> None:
             meta[t]["fundamental"] = ev.get("fundamental")
             if ev.get("days_to_earnings") is not None:
                 meta[t]["days_to_earnings"] = ev["days_to_earnings"]
+            if ev.get("earnings_date_str"):
+                meta[t]["earnings_date"] = ev["earnings_date_str"]
+            if "is_earnings_near" in ev:
+                meta[t]["is_earnings_near"] = ev["is_earnings_near"]
 
 
 def _format_sr_levels(vals: List[float], max_count: int = 2) -> str:

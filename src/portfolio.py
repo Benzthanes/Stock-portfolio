@@ -158,7 +158,10 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
     if dist_200 is not None and dist_200 < 0:
         risks.append(f"ราคาหลุดต่ำกว่าเส้น 200 วัน ({dist_200:.1f}%)")
     if is_earnings_near:
-        risks.append(f"วันประกาศงบใกล้เข้ามา ({pos.get('days_to_earnings')} วัน)")
+        if pos.get("days_to_earnings") == 0:
+            risks.append("วันประกาศงบคือวันนี้")
+        else:
+            risks.append(f"วันประกาศงบใกล้เข้ามา ({pos.get('days_to_earnings')} วัน)")
     risks.extend(m["label"] for m in fund["metrics"].values() if m["points"] == 0)
     risks.extend(m["label"] for m in stock_score["timing"]["metrics"].values() if m["points"] == 0)
     risk_desc = ", ".join(risks) if risks else "ไม่มีสัญญาณความเสี่ยงผิดปกติ."
@@ -497,7 +500,10 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
             alerts.append(f"🔻 Drawdown ({pos['unrealized_pl_pct']:.1f}%)")
 
         if pos.get("is_earnings_near"):
-            alerts.append(f"⚠️ Earnings in {pos.get('days_to_earnings')}d")
+            if pos.get("days_to_earnings") == 0:
+                alerts.append("⚠️ Earnings today")
+            else:
+                alerts.append(f"⚠️ Earnings in {pos.get('days_to_earnings')}d")
 
         pos["alerts"] = alerts
         pos["rating"] = compute_stock_rating(pos)
@@ -647,10 +653,11 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
             })
             continue
         if is_earn:
+            earn_prefix = "วันประกาศงบการเงินคือวันนี้" if p.get('days_to_earnings') == 0 else f"วันประกาศงบการเงินใกล้เข้ามาในอีก {p.get('days_to_earnings')} วัน"
             forbidden_buys.append({
                 "ticker": t,
                 "name": p["name"],
-                "reason": f"วันประกาศงบการเงินใกล้เข้ามาในอีก {p.get('days_to_earnings')} วัน ({p.get('earnings_date')}) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก."
+                "reason": f"{earn_prefix} ({p.get('earnings_date')}) มีความเสี่ยง Gap ผันผวน ห้ามซื้อเพิ่มก่อนวันงบออก."
             })
             continue
         if is_plunge:
@@ -999,7 +1006,13 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
         else:
             votes_str = "-"
 
-        earn_str = f"{p['earnings_date']} ({p['days_to_earnings']}d)" if p['days_to_earnings'] is not None else "-"
+        if p['days_to_earnings'] is not None:
+            if p['days_to_earnings'] == 0:
+                earn_str = f"{p['earnings_date']} (วันนี้)"
+            else:
+                earn_str = f"{p['earnings_date']} ({p['days_to_earnings']}d)"
+        else:
+            earn_str = "-"
         if p["is_earnings_near"]:
             earn_str = f"⚠️ **{earn_str}**"
 
@@ -1095,7 +1108,8 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
             verdict_text = f"หุ้นตัวนี้ติดลบลึก ({pl_p:.1f}%) อยู่ในช่วงปรับฐานหนัก ห้ามรีบร้อนซื้อถัวเฉลี่ย รอสัญญาณกลับตัว."
 
         if p.get("is_earnings_near"):
-            verdict_text += f" กำลังจะประกาศงบในอีก {p.get('days_to_earnings')} วัน ระวังความผันผวนของราคา."
+            earn_clause = " กำลังจะประกาศงบวันนี้" if p.get('days_to_earnings') == 0 else f" กำลังจะประกาศงบในอีก {p.get('days_to_earnings')} วัน"
+            verdict_text += f"{earn_clause} ระวังความผันผวนของราคา."
 
         lines.append(f"- {verdict_text}")
         lines.append(f"- **แนวรับสำคัญ:** **${p['key_support']:.2f} USD** ({p['support_desc']}) | **แนวต้านสำคัญ:** **${p['key_resistance']:.2f} USD** ({p['resistance_desc']}) | **จุดตัดขาดทุน (SL):** ${p['stop_loss']:.2f} USD.\n")

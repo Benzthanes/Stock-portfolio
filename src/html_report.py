@@ -273,6 +273,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                     a = "⚠️ งบออกวันนี้"
                 else:
                     a = f"⚠️ งบออกใน {d_rounded} วัน"
+            elif "Earnings today" in a or "งบออกวันนี้" in a:
+                a = "⚠️ งบออกวันนี้"
             if "Extreme" in a or "Drawdown" in a:
                 badges_html += f'<span class="badge badge-rose">{a}</span> '
             elif "Heavy" in a or "Earnings" in a or "งบออก" in a:

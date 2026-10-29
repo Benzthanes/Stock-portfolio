@@ -76,13 +76,16 @@ def get_forward_outlook(
     has_earnings_date = days_to_earnings is not None and days_to_earnings >= 0
     days_int = int(round(days_to_earnings)) if has_earnings_date else 0
     if has_earnings_date and days_to_earnings <= EARNINGS_GUARD_DAYS:
-        earnings_period = f"ระยะประชิด ({days_int} วัน)"
+        earnings_period = "งบออกวันนี้" if days_int == 0 else f"ระยะประชิด ({days_int} วัน)"
     elif has_earnings_date:
         earnings_period = f"รอบประกาศงบถัดไป ({days_int} วัน)"
     else:
         earnings_period = "รอบประกาศงบถัดไป"
     if has_earnings_date and days_to_earnings <= EARNINGS_GUARD_DAYS:
-        earnings_note = f"มีวันงบออกในอีก {days_int} วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. "
+        if days_int == 0:
+            earnings_note = "มีกำหนดงบออกวันนี้ จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. "
+        else:
+            earnings_note = f"มีวันงบออกในอีก {days_int} วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. "
     elif has_earnings_date:
         earnings_note = f"วันงบถัดไปอยู่ห่างอีก {days_int} วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. "
     else:
@@ -346,6 +349,6 @@ def get_forward_outlook(
             {"period": "ระยะ 6-12 เดือน", "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"}
         ],
         "wall_street_verdict": f"{consensus}ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ {m(t_avg)} (Upside {up_s})" if t_avg else f"{consensus}ยังไม่มีการตั้งราคาเป้าหมายจากสถาบัน",
-        "tailored_roadmap": "ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
+        "tailored_roadmap": f"{earnings_note}ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด",
         "invalidation_risk": "การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%"
     }
