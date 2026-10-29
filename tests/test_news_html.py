@@ -85,9 +85,17 @@ class NewsHtmlTest(unittest.TestCase):
             "ai_analyzed": True,
         }], "none")
         self.assertIn("พาดหัวข่าวภาษาไทย", out)
-        self.assertIn("🤖 AI Verified", out)
+        self.assertIn("สรุปโดย LLM ตรวจซ้ำก่อนใช้", out)
         self.assertIn("Raw English Title ↗", out)
         self.assertIn("href='https://bloomberg.com/news/1'", out)
+
+        out_heuristic = _news_items_html([{
+            "title": "Raw Title",
+            "title_th": "พาดหัวข่าว",
+            "source": "Reuters",
+            "ai_analyzed": False,
+        }], "none")
+        self.assertIn("heuristic", out_heuristic)
 
 
     def test_onclick_safe_in_double_quoted_attribute(self):
@@ -129,9 +137,20 @@ class OutlookTest(unittest.TestCase):
                 self.assertIn("-6.7%", txt)
 
     def test_earnings_freeze_only_when_near(self):
-        self.assertIn("5.0 วัน", get_forward_outlook("VRT", {}, {}, 5.0)["tailored_roadmap"])
+        self.assertIn("5 วัน", get_forward_outlook("VRT", {}, {}, 5.0)["tailored_roadmap"])
         self.assertNotIn("ห้ามถัว", get_forward_outlook("VRT", {}, {}, 60)["tailored_roadmap"])
         self.assertNotIn("วัน", get_forward_outlook("NOK", {}, {}, None)["catalyst_timeline"][0]["period"])
+
+    def test_earnings_zero_days(self):
+        outlook = get_forward_outlook("ZZZ", {}, {}, 0)
+        self.assertEqual(outlook["catalyst_timeline"][0]["period"], "ปฏิทินงบ (0 วัน)")
+
+    def test_earnings_period_label(self):
+        o_near = get_forward_outlook("VRT", {}, {}, 10.0)
+        self.assertEqual(o_near["catalyst_timeline"][0]["period"], "ระยะประชิด (10 วัน)")
+        o_far = get_forward_outlook("VRT", {}, {}, 60.0)
+        self.assertEqual(o_far["catalyst_timeline"][0]["period"], "รอบประกาศงบถัดไป (60 วัน)")
+        self.assertNotIn("ระยะประชิด", o_far["catalyst_timeline"][0]["period"])
 
 
 class LowerKeywordTest(unittest.TestCase):

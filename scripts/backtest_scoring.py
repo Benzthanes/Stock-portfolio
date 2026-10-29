@@ -112,35 +112,22 @@ def sample_states(window: List[Dict[str, Any]]) -> Dict[str, str]:
     close = closes[-1]
     dist = (close - ema_last(closes, 200)) / ema_last(closes, 200) * 100.0
     rsi = rsi_series(closes)
-    vfi = cd.compute_volume_flow_indicator(window)
-    wae = cd.compute_waddah_attar_explosion(window)
     sq = cd.compute_squeeze_momentum(window)
-    ut = cd.compute_ut_bot_alerts(window)
     ce = cd.compute_chandelier_exit(window)
-    wt = cd.compute_wavetrend_oscillator(window)
     smc = cd.compute_smart_money_concepts(window)
-    lz = cd.compute_lorentzian_classification(window)
     dip = -3.0 <= dist <= 8.0 and min(rsi[-5:]) < 40.0
-    knife_vfi = vfi["status"] == "DISTRIBUTION"
     knife_ce = close < (ce.get("long_stop") or 0)
     states = {
         "ema200_dist": band(dist, [-10, -3, 0, 5, 10], ["<-10%", "-10..-3%", "-3..0%", "0..5%", "5..10%", ">10%"]),
         "rsi": band(rsi[-1], [30, 40, 60, 70], ["<30", "30-40", "40-60", "60-70", ">70"]),
         "rsi_hook": str(rsi[-1] > rsi[-2] and min(rsi[-3:]) < 40.0),
-        "vfi": vfi["status"],
-        "wae": wae["status"],
         "squeeze": f"{sq['status']}:{sq['direction']}",
-        "ut_bot": ut["position"],
         "chandelier": ce["direction"],
-        "wavetrend": "BULL_CROSS_OVERSOLD" if wt["bullish_cross"] and wt["wt1"] < -50 else wt["direction"],
         "smc_structure": smc["market_structure"].split(" (")[0],
-        "lorentzian": lz["direction"],
         "dip": str(dip),
     }
     if dip:
-        states["dip_knife_vfi"] = str(knife_vfi)
         states["dip_knife_chandelier"] = str(knife_ce)
-        states["dip_knife_any"] = str(knife_vfi or knife_ce)
     return states
 
 

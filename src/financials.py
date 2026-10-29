@@ -7,6 +7,7 @@ caches them locally in data/financials_cache.json, and computes QoQ & YoY growth
 
 import json
 import os
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -15,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.http import http_get
+from src.scoring import ETF_TICKERS, FUNDAMENTAL_RULES, find_band
 
 DEFAULT_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 FINANCIALS_CACHE_FILE = "financials_cache.json"
@@ -112,7 +114,8 @@ def fetch_ticker_quarterly_raw(ticker: str, timeout: int = 10) -> Optional[Dict[
         raw_bytes = http_get(url, timeout=timeout)
         data = json.loads(raw_bytes.decode("utf-8"))
         return data
-    except Exception:
+    except Exception as e:
+        print(f"[financials] fetch failed for {ticker}: {e}", file=sys.stderr)
         return None
 
 
@@ -139,11 +142,18 @@ def process_quarterly_metrics(
     raw_data: Optional[Dict[str, Any]],
     existing_quarters: Optional[List[Dict[str, Any]]] = None,
     candles: Optional[List[Dict[str, Any]]] = None,
+    existing_timestamp: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     Parse raw Yahoo timeseries data, merge with existing historical quarters to accumulate
     a rich timeline (up to 8+ quarters), and calculate QoQ/YoY growth and margin ratios.
     """
+    is_stale = (raw_data is None)
+    if is_stale:
+        timestamp = existing_timestamp if existing_timestamp is not None else 0
+    else:
+        timestamp = int(time.time())
+
     # 1. Merge existing quarters by date
     merged_by_date: Dict[str, Dict[str, Any]] = {}
     if existing_quarters:
@@ -171,9 +181,10 @@ def process_quarterly_metrics(
     if not merged_by_date:
         return {
             "ticker": ticker,
-            "timestamp": int(time.time()),
+            "timestamp": existing_timestamp if (is_stale and existing_timestamp is not None) else 0,
             "quarters_count": 0,
             "has_data": False,
+            "stale": is_stale,
             "quarters": [],
         }
 
@@ -305,7 +316,8 @@ def process_quarterly_metrics(
 
     return {
         "ticker": ticker,
-        "timestamp": int(time.time()),
+        "timestamp": timestamp,
+        "stale": is_stale,
         "quarters_count": len(display_quarters),
         "has_data": len(display_quarters) > 0 and (latest.get("revenue") is not None or latest.get("net_income") is not None),
         "latest_quarter": latest.get("quarter_label", "-"),
@@ -328,103 +340,147 @@ def process_quarterly_metrics(
 
 def compute_piotroski_f_score(quarters: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Compute Piotroski F-Score (0-9) measuring business financial strength.
+    Compute financial checklist (0-9) measuring business financial strength.
     Scores 8-9 = Elite Strong, 6-7 = Good, 4-5 = Moderate, 0-3 = Weak.
     """
     if not quarters:
-        return {"score": None, "max_score": 9, "label": "ไม่มีข้อมูล", "color": "#94a3b8", "badge_class": "fin-badge-neutral", "criteria": []}
+        return {
+            "title": "เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)",
+            "name": "เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)",
+            "score": None,
+            "max_score": 9,
+            "label": "ไม่มีข้อมูล",
+            "color": "#94a3b8",
+            "badge_class": "fin-badge-neutral",
+            "criteria": [],
+        }
 
     latest = quarters[-1]
-    prev_year = quarters[-5] if len(quarters) >= 5 else (quarters[0] if len(quarters) > 1 else None)
+    has_yoy = len(quarters) >= 5
+    prev_year = quarters[-5] if has_yoy else None
 
     criteria = []
     score = 0
 
     # 1. Positive Net Income
-    ni = latest.get("net_income") or 0
-    if ni > 0:
+    ni = latest.get("net_income")
+    if ni is None:
+        criteria.append({"name": "กำไรสุทธิเป็นบวก (Positive Net Income)", "passed": None, "detail": "N/A"})
+    elif ni > 0:
         score += 1
         criteria.append({"name": "กำไรสุทธิเป็นบวก (Positive Net Income)", "passed": True, "detail": fmt_currency(ni)})
     else:
         criteria.append({"name": "กำไรสุทธิเป็นบวก (Positive Net Income)", "passed": False, "detail": fmt_currency(ni)})
 
     # 2. Positive Free Cash Flow
-    fcf = latest.get("fcf") or 0
-    if fcf > 0:
+    fcf = latest.get("fcf")
+    if fcf is None:
+        criteria.append({"name": "กระแสเงินสดอิสระเป็นบวก (Positive FCF)", "passed": None, "detail": "N/A"})
+    elif fcf > 0:
         score += 1
         criteria.append({"name": "กระแสเงินสดอิสระเป็นบวก (Positive FCF)", "passed": True, "detail": fmt_currency(fcf)})
     else:
         criteria.append({"name": "กระแสเงินสดอิสระเป็นบวก (Positive FCF)", "passed": False, "detail": fmt_currency(fcf)})
 
     # 3. Quality of Earnings: FCF > Net Income
-    if fcf > ni and ni > 0:
+    if fcf is None or ni is None:
+        criteria.append({"name": "คุณภาพกำไรสูง (FCF > Net Income)", "passed": None, "detail": "N/A"})
+    elif fcf > ni and ni > 0:
         score += 1
         criteria.append({"name": "คุณภาพกำไรสูง (FCF > Net Income)", "passed": True, "detail": "เงินสดเข้าจริงมากกว่ากำไรบัญชี"})
     else:
         criteria.append({"name": "คุณภาพกำไรสูง (FCF > Net Income)", "passed": False, "detail": "กำไรบัญชีสูงกว่าเงินสดจริง"})
 
     # 4. YoY Net Income Growth
-    ni_prev = prev_year.get("net_income") if prev_year else None
-    if ni_prev is not None and ni > ni_prev:
-        score += 1
-        criteria.append({"name": "กำไรสุทธิเติบโต YoY", "passed": True, "detail": f"โตจาก {fmt_currency(ni_prev)}"})
+    if not has_yoy:
+        criteria.append({"name": "กำไรสุทธิเติบโต YoY", "passed": None, "detail": "N/A"})
     else:
-        criteria.append({"name": "กำไรสุทธิเติบโต YoY", "passed": False, "detail": "กำไรชะลอตัว"})
+        ni_prev = prev_year.get("net_income") if prev_year else None
+        if ni is None or ni_prev is None:
+            criteria.append({"name": "กำไรสุทธิเติบโต YoY", "passed": None, "detail": "N/A"})
+        elif ni > ni_prev:
+            score += 1
+            criteria.append({"name": "กำไรสุทธิเติบโต YoY", "passed": True, "detail": f"โตจาก {fmt_currency(ni_prev)}"})
+        else:
+            criteria.append({"name": "กำไรสุทธิเติบโต YoY", "passed": False, "detail": "กำไรชะลอตัว"})
 
     # 5. Debt to Equity Safety
     de = latest.get("debt_to_equity")
-    de_prev = prev_year.get("debt_to_equity") if prev_year else None
-    if de is not None and ((de_prev and de <= de_prev) or de < 1.0):
+    de_prev = prev_year.get("debt_to_equity") if (has_yoy and prev_year) else None
+    if de is None:
+        criteria.append({"name": "สัดส่วนหนี้สินปลอดภัย (D/E ต่ำ)", "passed": None, "detail": "N/A"})
+    elif de >= 0 and ((de_prev is not None and de <= de_prev) or de < 1.0):
         score += 1
         criteria.append({"name": "สัดส่วนหนี้สินปลอดภัย (D/E ต่ำ)", "passed": True, "detail": f"{de:.2f}x"})
     else:
-        criteria.append({"name": "สัดส่วนหนี้สินปลอดภัย", "passed": False, "detail": f"{de:.2f}x" if de else "-"})
+        criteria.append({"name": "สัดส่วนหนี้สินปลอดภัย", "passed": False, "detail": f"{de:.2f}x"})
 
     # 6. Gross Margin Expansion or High Moat (>50%)
     gm = latest.get("gross_margin")
-    gm_prev = prev_year.get("gross_margin") if prev_year else None
-    if gm is not None and ((gm_prev and gm >= gm_prev) or gm >= 50.0):
+    gm_prev = prev_year.get("gross_margin") if (has_yoy and prev_year) else None
+    if gm is None:
+        criteria.append({"name": "อัตรากำไรขั้นต้นขยายตัว / มี Moat สูง", "passed": None, "detail": "N/A"})
+    elif (gm_prev is not None and gm >= gm_prev) or gm >= 50.0:
         score += 1
         criteria.append({"name": "อัตรากำไรขั้นต้นขยายตัว / มี Moat สูง", "passed": True, "detail": f"{gm:.1f}%"})
     else:
-        criteria.append({"name": "อัตรากำไรขั้นต้นขยายตัว", "passed": False, "detail": f"{gm:.1f}%" if gm else "-"})
+        criteria.append({"name": "อัตรากำไรขั้นต้นขยายตัว", "passed": False, "detail": f"{gm:.1f}%"})
 
     # 7. Revenue Growth YoY
-    rev = latest.get("revenue") or 0
-    rev_prev = prev_year.get("revenue") if prev_year else None
-    if rev_prev is not None and rev > rev_prev:
-        score += 1
-        criteria.append({"name": "รายได้รวมเติบโต YoY", "passed": True, "detail": f"โตจาก {fmt_currency(rev_prev)}"})
+    if not has_yoy:
+        criteria.append({"name": "รายได้รวมเติบโต YoY", "passed": None, "detail": "N/A"})
     else:
-        criteria.append({"name": "รายได้รวมเติบโต YoY", "passed": False, "detail": "รายได้ชะลอตัว"})
+        rev = latest.get("revenue")
+        rev_prev = prev_year.get("revenue") if prev_year else None
+        if rev is None or rev_prev is None:
+            criteria.append({"name": "รายได้รวมเติบโต YoY", "passed": None, "detail": "N/A"})
+        elif rev > rev_prev:
+            score += 1
+            criteria.append({"name": "รายได้รวมเติบโต YoY", "passed": True, "detail": f"โตจาก {fmt_currency(rev_prev)}"})
+        else:
+            criteria.append({"name": "รายได้รวมเติบโต YoY", "passed": False, "detail": "รายได้ชะลอตัว"})
 
     # 8. Operating Margin Expansion
     op_m = latest.get("operating_margin")
-    op_m_prev = prev_year.get("operating_margin") if prev_year else None
-    if op_m is not None and ((op_m_prev and op_m >= op_m_prev) or op_m >= 25.0):
+    op_m_prev = prev_year.get("operating_margin") if (has_yoy and prev_year) else None
+    if op_m is None:
+        criteria.append({"name": "กำไรดำเนินงานแข็งแกร่ง (Operating Margin)", "passed": None, "detail": "N/A"})
+    elif (op_m_prev is not None and op_m >= op_m_prev) or op_m >= 25.0:
         score += 1
         criteria.append({"name": "กำไรดำเนินงานแข็งแกร่ง (Operating Margin)", "passed": True, "detail": f"{op_m:.1f}%"})
     else:
-        criteria.append({"name": "กำไรดำเนินงานแข็งแกร่ง", "passed": False, "detail": f"{op_m:.1f}%" if op_m else "-"})
+        criteria.append({"name": "กำไรดำเนินงานแข็งแกร่ง", "passed": False, "detail": f"{op_m:.1f}%"})
 
     # 9. Equity Health
-    eq = latest.get("stockholders_equity") or 0
-    eq_prev = prev_year.get("stockholders_equity") if prev_year else 0
-    if eq > 0 and (not eq_prev or eq >= eq_prev):
+    eq = latest.get("stockholders_equity")
+    eq_prev = prev_year.get("stockholders_equity") if (has_yoy and prev_year) else None
+    if eq is None:
+        criteria.append({"name": "ส่วนของผู้ถือหุ้นมั่นคง (Growing Equity)", "passed": None, "detail": "N/A"})
+    elif eq > 0 and (eq_prev is None or eq >= eq_prev):
         score += 1
         criteria.append({"name": "ส่วนของผู้ถือหุ้นมั่นคง (Growing Equity)", "passed": True, "detail": fmt_currency(eq)})
     else:
-        criteria.append({"name": "ส่วนของผู้ถือหุ้นมั่นคง", "passed": False, "detail": fmt_currency(eq)})
+        criteria.append({"name": "ส่วนของผู้ถือหุ้นมั่นคง", "passed": False, "detail": fmt_currency(eq) if eq is not None else "N/A"})
 
-    if score >= 8:
+    evaluable = [c for c in criteria if c["passed"] is not None]
+    evaluable_count = len(evaluable)
+    max_score = evaluable_count if evaluable_count > 0 else 9
+    pct_score = (score / max_score * 100.0) if max_score > 0 else 0.0
+
+    MIN_EVALUABLE_CRITERIA = 5
+    if evaluable_count < MIN_EVALUABLE_CRITERIA:
+        label = "ข้อมูลไม่พอ"
+        color = "#94a3b8"
+        badge_class = "fin-badge-neutral"
+    elif pct_score >= 85.0:
         label = "สุขภาพการเงินแข็งแกร่งมาก (Elite)"
         color = "#34d399"
         badge_class = "fin-badge-pos"
-    elif score >= 6:
+    elif pct_score >= 65.0:
         label = "สุขภาพการเงินดี มั่นคง (Good)"
         color = "#60a5fa"
         badge_class = "fin-badge-pos"
-    elif score >= 4:
+    elif pct_score >= 40.0:
         label = "สุขภาพการเงินปานกลาง (Moderate)"
         color = "#fbbf24"
         badge_class = "fin-badge-neutral"
@@ -434,8 +490,11 @@ def compute_piotroski_f_score(quarters: List[Dict[str, Any]]) -> Dict[str, Any]:
         badge_class = "fin-badge-neg"
 
     return {
+        "title": "เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)",
+        "name": "เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)",
         "score": score,
-        "max_score": 9,
+        "max_score": max_score,
+        "evaluable_count": evaluable_count,
         "label": label,
         "color": color,
         "badge_class": badge_class,
@@ -475,11 +534,23 @@ def generate_financial_executive_summary(quarters: List[Dict[str, Any]]) -> Dict
         growth_text = f"รายได้ไตรมาสล่าสุดอยู่ที่ {latest.get('revenue_fmt', '-')}"
 
     # 2. Profitability
+    fcf_val = latest.get("fcf")
+    fcf_str = latest.get("fcf_fmt", "-")
+    fcf_clause = ""
+    fcf_pos_clause = ""
+    if fcf_val is not None:
+        if fcf_val > 0:
+            fcf_clause = f" และมีกระแสเงินสด FCF แข็งแกร่ง {fcf_str}"
+            fcf_pos_clause = f" พร้อม FCF เป็นบวก {fcf_str}"
+        else:
+            fcf_clause = f" แต่กระแสเงินสด FCF ติดลบ {fcf_str}"
+            fcf_pos_clause = f" แต่ FCF ติดลบ {fcf_str}"
+
     if net_margin is not None:
         if net_margin >= 25.0:
-            prof_text = f"ความสามารถในการทำกำไรระดับยอดเยี่ยม Net Margin สูงถึง {net_margin:.1f}% และมีกระแสเงินสด FCF แข็งแกร่ง {latest.get('fcf_fmt')}"
+            prof_text = f"ความสามารถในการทำกำไรระดับยอดเยี่ยม Net Margin สูงถึง {net_margin:.1f}%{fcf_clause}"
         elif net_margin >= 10.0:
-            prof_text = f"อัตรากำไรสุทธิอยู่ในเกณฑ์ดี {net_margin:.1f}% มีกำไรสุทธิ {latest.get('net_income_fmt')} พร้อม FCF เป็นบวก {latest.get('fcf_fmt')}"
+            prof_text = f"อัตรากำไรสุทธิอยู่ในเกณฑ์ดี {net_margin:.1f}% มีกำไรสุทธิ {latest.get('net_income_fmt')}{fcf_pos_clause}"
         elif net_margin >= 0:
             prof_text = f"อัตรากำไรสุทธิค่อนข้างบาง {net_margin:.1f}% ทำกำไรได้ {latest.get('net_income_fmt')} ต้องควบคุมต้นทุนเพิ่มเติม"
         else:
@@ -489,11 +560,20 @@ def generate_financial_executive_summary(quarters: List[Dict[str, Any]]) -> Dict
 
     # 3. Debt & Balance Sheet
     if de is not None:
-        if de <= 0.8:
+        try:
+            matching_band = find_band(FUNDAMENTAL_RULES["debt_to_equity"][1], de)
+            pts = matching_band.points
+        except Exception:
+            pts = 0
+        if de < 0.0:
+            debt_text = f"ส่วนของผู้ถือหุ้นติดลบ (Negative Equity D/E {de:.2f}x หนี้สินรวม {latest.get('total_debt_fmt')}) มีความเสี่ยงด้านโครงสร้างทุน"
+        elif pts == 3: # 0.0 <= de <= 0.8
             debt_text = f"โครงสร้างเงินทุนปลอดภัยสูงมาก สัดส่วนหนี้สินต่อทุน (D/E) เพียง {de:.2f}x ไร้แรงกดดันจากภาระดอกเบี้ยจ่าย"
-        elif de <= 2.0:
+        elif pts == 2: # 0.8 < de <= 1.5
             debt_text = f"ภาระหนี้สินอยู่ในเกณฑ์ปกติที่บริหารจัดการได้ D/E {de:.2f}x หนี้สินรวม {latest.get('total_debt_fmt')}"
-        else:
+        elif pts == 1: # 1.5 < de <= 2.5
+            debt_text = f"ภาระหนี้สินค่อนข้างสูง D/E {de:.2f}x หนี้สินรวม {latest.get('total_debt_fmt')} ต้องติดตามกระแสเงินสด"
+        else: # de > 2.5
             debt_text = f"สัดส่วนหนี้สินต่อทุนค่อนข้างตึงตัว D/E {de:.2f}x (หนี้สินรวม {latest.get('total_debt_fmt')}) ต้องระวังความผันผวนของดอกเบี้ย"
     else:
         debt_text = f"หนี้สินรวม {latest.get('total_debt_fmt', '-')}"
@@ -523,7 +603,7 @@ def get_all_financials_payload(
 
     for t in tickers:
         # Known ETFs have no corporate quarterly financial statements
-        if t in {"VOO", "QQQI", "SPY", "IVV"}:
+        if t in ETF_TICKERS:
             if t not in cache:
                 cache[t] = {
                     "ticker": t,
@@ -551,8 +631,16 @@ def get_all_financials_payload(
         def _worker(ticker_symbol: str):
             candles = candles_c.get(ticker_symbol, {}).get("candles", [])
             raw = fetch_ticker_quarterly_raw(ticker_symbol)
-            existing = cache.get(ticker_symbol, {}).get("quarters", [])
-            processed = process_quarterly_metrics(ticker_symbol, raw, existing_quarters=existing, candles=candles)
+            entry = cache.get(ticker_symbol, {})
+            existing = entry.get("quarters", [])
+            existing_ts = entry.get("timestamp")
+            processed = process_quarterly_metrics(
+                ticker_symbol,
+                raw,
+                existing_quarters=existing,
+                candles=candles,
+                existing_timestamp=existing_ts,
+            )
             return ticker_symbol, processed
 
         with ThreadPoolExecutor(max_workers=max_workers) as pool:

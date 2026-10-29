@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 from src.portfolio import load_portfolio, analyze_portfolio, generate_portfolio_markdown
+from src.fmt import money, pct
 from src.html_report import generate_portfolio_html
 from src.trades import load_trades, generate_trades_markdown, generate_trades_html
 
@@ -113,10 +114,13 @@ def run_all_reports():
         print(" 🎉 อัปเดตรายงานทั้งหมด 6 รายการเรียบร้อยสมบูรณ์!")
     print("=" * 74)
     if master_data is not None:
-        at_sign = "+" if master_data['all_time_profit_thb'] >= 0 else ""
-        print(f"💰 พอร์ตหลัก (NAV รวม)   : ฿{master_data['total_net_worth_thb']:,.2f} (~${master_data['total_net_worth_usd']:,.2f} USD)")
-        print(f"📈 กำไรสุทธิสะสม         : {at_sign}฿{master_data['all_time_profit_thb']:,.2f} ({at_sign}{master_data['all_time_roi_pct']:.2f}% ROI)")
-        print(f"💵 เงินสดรอลงทุน         : ฿{master_data['total_cash_thb']:,.2f}")
+        nav_thb = money(master_data['total_net_worth_thb'], 'THB')
+        nav_usd = money(master_data['total_net_worth_usd'], 'USD')
+        profit_thb = money(master_data['all_time_profit_thb'], 'THB', signed=True)
+        roi_str = pct(master_data['all_time_roi_pct'], signed=True, digits=2)
+        print(f"💰 พอร์ตหลัก (NAV รวม)   : {nav_thb} (~{nav_usd} USD)")
+        print(f"📈 กำไรสุทธิสะสม         : {profit_thb} ({roi_str} ROI)")
+        print(f"💵 เงินสดรอลงทุน         : {money(master_data['total_cash_thb'], 'THB')}")
         print(f"📊 หุ้นในพอร์ตปัจจุบัน   : {len(master_data['positions'])} ตัว")
         print("-" * 74)
     print("1. แดชบอร์ดภาพรวมพอร์ต   : reports/portfolio_master.html")

@@ -118,7 +118,7 @@ class SellTest(MoneyCase):
                                "total_cost_usd": 1000.0, "cost_thb": 33000.0}])
         t = self.sell("AAA", 100.0, shares=5, trade_date="2026-10-15")["trade"]
         self.assertEqual(t["fx_rate"], 35.0)
-        self.assertEqual(json.loads(self.portfolio.read_text(encoding="utf-8"))["fx_rate_usd_thb"], 35.0)
+        self.assertEqual(json.loads(self.portfolio.read_text(encoding="utf-8"))["fx_rate_usd_thb"], 33.0)
         self.assertEqual(sorted(p.name for p in self.tmp.iterdir()), ["ledger.json", "portfolio.json", "trades.json"])
 
     def test_thai_buy_date_gives_holding_days_and_iso_sell_date(self):

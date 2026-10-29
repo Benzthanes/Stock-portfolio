@@ -30,6 +30,11 @@ from src.trades import _atomic_write_many, _json_text, data_path, load_ledger, p
 
 SHARE_TOLERANCE = 1e-4
 
+# Tickers whose holdings in portfolio.json are confirmed by the user and locked.
+# Reconcile will never overwrite these tickers even when --force is passed.
+# User confirmed on 2026-10-29: LLY uses portfolio 27.6477631 shares; slip sum 27.7467 is not the reference.
+LOCKED_PORTFOLIO_TICKERS = frozenset({"LLY"})
+
 
 class Position:
     """Shares and cost split by how they were paid, so a sell can remove each part pro rata."""
@@ -114,10 +119,12 @@ def plan(usd_fx: float) -> Dict[str, Any]:
     for h in portfolio["holdings"]:
         pos = positions.get(h["ticker"], Position())
         new = cost_thb(pos.thb_paid, pos.usd_paid, usd_fx)
+        is_locked = h["ticker"] in LOCKED_PORTFOLIO_TICKERS
         holding_rows.append({
             "ticker": h["ticker"], "shares": h["shares"], "slip_shares": round(pos.shares, 7),
             "old": h.get("cost_thb"), "new": new, "thb_part": round(pos.thb_paid, 2), "usd_part": round(pos.usd_paid, 2),
-            "ok": abs(pos.shares - float(h["shares"])) <= SHARE_TOLERANCE,
+            "ok": abs(pos.shares - float(h["shares"])) <= SHARE_TOLERANCE and not is_locked,
+            "locked": is_locked,
         })
     return {"portfolio": portfolio, "trades_data": trades_data, "holdings": holding_rows, "trades": trade_rows, "problems": problems}
 
@@ -128,7 +135,12 @@ def print_plan(p: Dict[str, Any], usd_fx: float) -> None:
         print(f"  {'':24} {'shares':>12} {'slip shares':>12} {'THB paid':>11} {'USD paid':>10} {'old cost_thb':>13} {'new cost_thb':>13} {'change':>10}  status")
         for r in rows:
             change = r["new"] - float(r["old"] or 0.0)
-            status = "OK" if r["ok"] else "SHARES MISMATCH (skipped unless --force)"
+            if r.get("locked"):
+                status = "LOCKED (ผู้ใช้ยืนยันยอดพอร์ต)"
+            elif r["ok"]:
+                status = "OK"
+            else:
+                status = "SHARES MISMATCH (skipped unless --force)"
             print(f"  {r[key]:24} {r['shares']:>12.4f} {r['slip_shares']:>12.4f} {r['thb_part']:>11,.2f} {r['usd_part']:>10,.2f} "
                   f"{float(r['old'] or 0):>13,.2f} {r['new']:>13,.2f} {change:>+10,.2f}  {status}")
     print(f"USD-paid slips are valued at {usd_fx} THB/USD.")
@@ -147,6 +159,8 @@ def apply(p: Dict[str, Any], force: bool) -> List[str]:
     by_ticker = {r["ticker"]: r for r in p["holdings"]}
     for h in p["portfolio"]["holdings"]:
         r = by_ticker[h["ticker"]]
+        if r.get("locked"):
+            continue
         if (r["ok"] or force) and h.get("cost_thb") != r["new"]:
             h["cost_thb"] = r["new"]
             changed.append(h["ticker"])

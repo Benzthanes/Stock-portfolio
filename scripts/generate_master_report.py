@@ -24,15 +24,27 @@ from src.trades import (
 from html import escape
 
 from src.fmt import FMT_MONEY_JS, money, pct
-from src.fx import resolve_usdthb
-from src.html_report import get_chart_modal_component, _make_chart_onclick
+from src.fx import resolve_usdthb, resolve_usdthb_with_source
+from src.html_report import get_chart_modal_component, _make_chart_onclick, _format_fx_badge
 from src.nav import nav_bar_html
+from src.portfolio import CONCENTRATION_WARN_PCT
 from src.wealth_timeline import calculate_daily_wealth_timeline
 
 MONTH_MAP = {
     "มค": 1, "กพ": 2, "มีค": 3, "เมย": 4, "พค": 5, "มิย": 6,
     "กค": 7, "สค": 8, "กย": 9, "ตค": 10, "พย": 11, "ธค": 12
 }
+
+CONCENTRATION_RISK_THRESHOLD_PCT = CONCENTRATION_WARN_PCT
+
+
+def format_win_rate_text(winning_trades: int, total_trades: int, win_rate_pct: float) -> str:
+    """Format Win Rate: show % only when >= 20 trades, else show 'X/Y ไม้กำไร'."""
+    if total_trades >= 20:
+        return f"Win Rate {win_rate_pct:.1f}% ({winning_trades}/{total_trades} ไม้กำไร)"
+    elif total_trades > 0:
+        return f"{winning_trades}/{total_trades} ไม้กำไร"
+    return "0/0 ไม้กำไร"
 
 
 def parse_num(val_str):
@@ -253,7 +265,7 @@ def generate_master_dashboard_data(ledger_path=None):
     # 1. Active Portfolio Live Market Data
     portfolio_data = load_portfolio()
     live_summary = analyze_portfolio(portfolio_data)
-    fx_rate = resolve_usdthb(live_summary.get("fx_rate_usd_thb"))
+    fx_rate, fx_source = resolve_usdthb_with_source(live_summary.get("fx_rate_usd_thb"))
 
     # 2. Closed Trades Data
     trades_data = load_trades()
@@ -304,6 +316,7 @@ def generate_master_dashboard_data(ledger_path=None):
         "broker": "Dime! (KKP Securities)",
         "account_no": "2081682995",
         "fx_rate": fx_rate,
+        "fx_source": fx_source,
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "net_injected_capital_thb": net_injected_capital_thb,
         "gross_deposits_thb": gross_promptpay_deposits_thb,
@@ -1464,6 +1477,29 @@ def generate_master_dashboard_html(data):
     rz_color = "#10b981" if data["trades_summary"]["total_realized_pl_thb"] >= 0 else "#f43f5e"
     rd_color = "#10b981" if data["total_realized_and_div_thb"] >= 0 else "#f43f5e"
 
+    # Concentration risk check
+    heavy_positions = [
+        p for p in data.get("positions", [])
+        if (p.get("weight_pct") or 0.0) >= CONCENTRATION_RISK_THRESHOLD_PCT
+    ]
+    if heavy_positions:
+        items_desc = ", ".join(f"<strong>{p['ticker']} = {p['weight_pct']:.1f}%</strong>" for p in heavy_positions)
+        concentration_callout_html = f"""
+        <div class="card" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-left: 4px solid var(--amber); margin-bottom: 24px; padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 1.25rem;">⚠️</span>
+            <div>
+                <strong style="color: var(--amber);">แจ้งเตือนความเสี่ยงการกระจุกตัว:</strong> พอร์ตมีหุ้นเดี่ยวเกินเกณฑ์ {CONCENTRATION_RISK_THRESHOLD_PCT:.0f}% ({items_desc} ของพอร์ต) ควรระมัดระวังความผันผวนเฉพาะตัวของหุ้น
+            </div>
+        </div>
+        """
+    else:
+        concentration_callout_html = ""
+
+    fx_source = data.get("fx_source")
+    if not fx_source:
+        _, fx_source = resolve_usdthb_with_source(data.get("fx_rate"))
+    fx_badge_html = _format_fx_badge(fx_source)
+
     # 1. Active Holdings Rows
     holdings_rows = ""
     for p in data["positions"]:
@@ -1478,19 +1514,19 @@ def generate_master_dashboard_html(data):
         server_val_attr = f' data-server-val-usd="{server_val}"' if server_val is not None else ""
         holdings_rows += f"""
         <tr class="holding-row" data-ticker="{tk}" data-exchange="{ex}" data-shares="{p['shares']}" data-cost="{p['avg_cost_usd']}" data-cost-usd="{p.get('total_cost_usd') or ''}" data-cost-thb="{p.get('cost_thb') or ''}"{server_val_attr}>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif;">
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">
                 <span class="clickable-ticker" onclick="{onclick_js}" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{tk} 📈</span>
             </td>
             <td>{escape(str(p.get('name') or '-'))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{p['shares']:.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(p['avg_cost_usd'])}</td>
-            <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">{money(p.get('close_price'), na='n/a')}</td>
-            <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif;">{money(p.get('current_val_usd'), na='n/a')}</td>
-            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif;">{money(p.get('current_val_thb'), 'THB', na='n/a')}</td>
-            <td class="cell-pl-usd" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{money(p_pl_usd, signed=True, na='n/a')}</td>
-            <td class="cell-pl-thb" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{money(p_pl_thb, 'THB', signed=True, na='n/a')}</td>
-            <td class="cell-pl-pct" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{pct(p_pl_pct, digits=2, na='n/a')}</td>
-            <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif;">{pct(p.get('weight_pct'), signed=False)}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{p['shares']:.4f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(p['avg_cost_usd'])}</td>
+            <td class="cell-price" style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; white-space: nowrap;">{money(p.get('close_price'), na='n/a')}</td>
+            <td class="cell-val-usd" style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(p.get('current_val_usd'), na='n/a')}</td>
+            <td class="cell-val-thb" style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(p.get('current_val_thb'), 'THB', na='n/a')}</td>
+            <td class="cell-pl-usd" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700; white-space: nowrap;">{money(p_pl_usd, signed=True, na='n/a')}</td>
+            <td class="cell-pl-thb" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600; white-space: nowrap;">{money(p_pl_thb, 'THB', signed=True, na='n/a')}</td>
+            <td class="cell-pl-pct" style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700; white-space: nowrap;">{pct(p_pl_pct, digits=2, na='n/a')}</td>
+            <td class="cell-weight" style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{pct(p.get('weight_pct'), signed=False)}</td>
         </tr>
         """
 
@@ -1560,8 +1596,7 @@ def generate_master_dashboard_html(data):
             display: flex; align-items: center; gap: 10px;
         }}
         .table-container {{
-            max-height: 520px;
-            overflow-y: auto;
+            overflow-x: auto;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
             background: var(--bg-card);
@@ -1588,6 +1623,7 @@ def generate_master_dashboard_html(data):
         .badge-rose {{ background: rgba(244, 63, 94, 0.15); color: var(--rose); }}
         .badge-info {{ background: rgba(59, 130, 246, 0.15); color: var(--blue); }}
         .badge-purple {{ background: rgba(139, 92, 246, 0.15); color: var(--purple); }}
+        .badge-amber {{ background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }}
         .badge-neutral {{ background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }}
         .master-tab-bar {{
             display: flex;
@@ -1905,7 +1941,7 @@ def generate_master_dashboard_html(data):
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                    <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB</span>
+                    <span id="kpi-fx-pill" class="meta-pill">⚡ 1 USD = {data['fx_rate']:.2f} THB{fx_badge_html}</span>
                     <a href="https://github.com/Benzthanes/Stock-portfolio/actions/workflows/update_portfolio.yml" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399; padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease; font-family: inherit;">
                         <span>⚡ สั่งคำนวณสดบน Cloud ↗</span>
                     </a>
@@ -1916,31 +1952,33 @@ def generate_master_dashboard_html(data):
         <!-- 4 MAIN HERO KPIS -->
         <div class="grid-4-cols">
             <div class="card" style="border-left: 4px solid var(--blue);">
-                <div class="kpi-label">มูลค่าพอร์ตรวมสุทธิ (Total Net Worth / NAV)</div>
-                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa;">{money(data['total_net_worth_thb'], 'THB')}</div>
+                <div class="kpi-label" title="Total Net Worth / NAV">มูลค่าพอร์ตรวมสุทธิ</div>
+                <div id="kpi-net-worth-thb" class="kpi-value" style="color: #60a5fa; white-space: nowrap;">{money(data['total_net_worth_thb'], 'THB')}</div>
                 <div id="kpi-net-worth-usd-sub" class="kpi-subtext">~{money(data['total_net_worth_usd'])} USD (หุ้น + เงินสด)</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--purple);">
-                <div class="kpi-label">เงินต้นทุนเติมสุทธิ (Net Deposited Capital)</div>
-                <div class="kpi-value">{money(data['net_injected_capital_thb'], 'THB')}</div>
+                <div class="kpi-label" title="Net Deposited Capital">เงินต้นทุนเติมสุทธิ</div>
+                <div class="kpi-value" style="white-space: nowrap;">{money(data['net_injected_capital_thb'], 'THB')}</div>
                 <div class="kpi-subtext">จาก KKP Statement ทางการ 100% (PromptPay 19 ครั้ง - ถอนออก 1 ครั้ง)</div>
             </div>
             <div class="card" style="border-left: 4px solid {at_color};">
-                <div class="kpi-label">กำไรรวมสุทธิของพอร์ต (All-Time Net Profit)</div>
-                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: {at_color};">{money(data['all_time_profit_thb'], 'THB', signed=True)}</div>
+                <div class="kpi-label" title="All-Time Net Profit">กำไรรวมสุทธิของพอร์ต</div>
+                <div id="kpi-all-time-profit-thb" class="kpi-value" style="color: {at_color}; white-space: nowrap;">{money(data['all_time_profit_thb'], 'THB', signed=True)}</div>
                 <div id="kpi-all-time-roi-sub" class="kpi-subtext" style="color: {at_color}; font-weight: 700;">{pct(data['all_time_roi_pct'], digits=2)} All-Time ROI</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--emerald);">
-                <div class="kpi-label">เงินสดคงเหลือรวม (Total Idle Cash)</div>
-                <div id="kpi-total-cash-thb" class="kpi-value">{money(data['total_cash_thb'], 'THB')}</div>
+                <div class="kpi-label" title="Total Idle Cash">เงินสดคงเหลือรวม</div>
+                <div id="kpi-total-cash-thb" class="kpi-value" style="white-space: nowrap;">{money(data['total_cash_thb'], 'THB')}</div>
                 <div class="kpi-subtext">Dime! Save: {money(data['dime_save_cash_thb'], 'THB')} | Dime! USD: {money(data['dime_usd_cash'])}</div>
             </div>
         </div>
 
+        {concentration_callout_html}
+
         <!-- SECONDARY METRICS: 3-COLS -->
         <div class="grid-3-cols">
             <div class="card">
-                <div class="kpi-label">หุ้นที่กำลังถือครอง (Active Holdings)</div>
+                <div class="kpi-label" title="Active Holdings">หุ้นที่กำลังถือครอง</div>
                 <div style="font-size: 1.45rem; font-weight: 700;">{len(data['positions'])} บริษัท</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
                     มูลค่าตลาด: <strong id="kpi-stock-market-val-usd">{money(data['stock_market_val_usd'])}</strong> (<span id="kpi-stock-market-val-thb">{money(data['stock_market_val_thb'], 'THB')}</span>)<br>
@@ -1948,19 +1986,19 @@ def generate_master_dashboard_html(data):
                 </div>
             </div>
             <div class="card">
-                <div class="kpi-label">กำไรที่ขายทำกำไรจริง (Realized P&L)</div>
-                <div style="font-size: 1.45rem; font-weight: 700; color: {rz_color};">{money(data['trades_summary']['total_realized_pl_usd'], signed=True)}</div>
+                <div class="kpi-label" title="Realized P&L">กำไรที่ขายทำกำไรจริง</div>
+                <div style="font-size: 1.45rem; font-weight: 700; color: {rz_color}; white-space: nowrap;">{money(data['trades_summary']['total_realized_pl_thb'], 'THB', signed=True)}</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    คิดเป็นเงินไทย: <strong style="color: {rz_color};">{money(data['trades_summary']['total_realized_pl_thb'], 'THB', signed=True)}</strong><br>
-                    Win Rate: <strong style="color: #10b981;">{data['trades_summary']['win_rate_pct']:.1f}%</strong> (ปิด {data['trades_summary']['total_trades']} ชนะ {data['trades_summary']['winning_trades']} ไม้)
+                    คิดเป็นดอลลาร์: <strong style="color: {rz_color}; white-space: nowrap;">~{money(data['trades_summary']['total_realized_pl_usd'], signed=True)} USD</strong><br>
+                    ผลงานเทรด: <strong style="color: #10b981;">{format_win_rate_text(data['trades_summary'].get('winning_trades', 0), data['trades_summary'].get('total_trades', 0), data['trades_summary'].get('win_rate_pct', 0.0))}</strong>
                 </div>
             </div>
             <div class="card">
-                <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
-                <div style="font-size: 1.45rem; font-weight: 700; color: #10b981;">{money(data['total_dividends_usd'], signed=True)}</div>
+                <div class="kpi-label" title="Dividends">เงินปันผลรับสะสม</div>
+                <div style="font-size: 1.45rem; font-weight: 700; color: #10b981; white-space: nowrap;">{money(data['total_dividends_usd'], signed=True)}</div>
                 <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">
-                    คิดเป็นเงินไทย: <strong style="color: #10b981;">{money(data['total_dividends_thb'], 'THB', signed=True)}</strong> (รับรวม {len(data['dividends_list'])} ครั้ง)<br>
-                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: {rd_color};">{money(data['total_realized_and_div_thb'], 'THB', signed=True)}</strong>
+                    คิดเป็นเงินไทย: <strong style="color: #10b981; white-space: nowrap;">{money(data['total_dividends_thb'], 'THB', signed=True)}</strong> (รับรวม {len(data['dividends_list'])} ครั้ง)<br>
+                    รวมกำไรปิดไม้ + ปันผล: <strong style="color: {rd_color}; white-space: nowrap;">{money(data['total_realized_and_div_thb'], 'THB', signed=True)}</strong>
                 </div>
             </div>
         </div>
@@ -2047,7 +2085,13 @@ def generate_master_ledger_html(data):
     dividends_list = data.get("dividends_list", [])
     cash_movements = data.get("cash_movements", [])
     trades_summary = data.get("trades_summary", {})
-    fx_rate = data.get("fx_rate") or resolve_usdthb(None)
+    fx_rate = data.get("fx_rate")
+    fx_source = data.get("fx_source")
+    if not fx_rate or not fx_source:
+        r, s = resolve_usdthb_with_source(fx_rate)
+        fx_rate = fx_rate or r
+        fx_source = fx_source or s
+    fx_badge_html = _format_fx_badge(fx_source)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -2082,15 +2126,15 @@ def generate_master_ledger_html(data):
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
             <td style="white-space: nowrap; font-size: 0.85rem; color: var(--text-secondary);">{escape(str(b.get('date', '-')))}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa;">{escape(str(b.get('ticker', '-')))}</td>
-            <td style="text-align: center;">{type_badge}</td>
-            <td style="text-align: center;">{acc_badge}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600;">{b.get('shares', 0):.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(b.get('price_usd', 0))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(b.get('amt_usd', 0))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{thb_str}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{fx_str}</td>
-            <td style="text-align: center;">{slip_html}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; color: #60a5fa; white-space: nowrap;">{escape(str(b.get('ticker', '-')))}</td>
+            <td style="text-align: center; white-space: nowrap;">{type_badge}</td>
+            <td style="text-align: center; white-space: nowrap;">{acc_badge}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; white-space: nowrap;">{b.get('shares', 0):.4f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(b.get('price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff; white-space: nowrap;">{money(b.get('amt_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{thb_str}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted); white-space: nowrap;">{fx_str}</td>
+            <td style="text-align: center; white-space: nowrap;">{slip_html}</td>
         </tr>
         """
 
@@ -2132,14 +2176,14 @@ def generate_master_ledger_html(data):
                 <div>{escape(str(t.get('name') or '-'))}</div>
                 <div style="margin-top: 4px;">{tranche_btn}</div>
             </td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{t.get('shares', 0):.4f}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('buy_price_usd', 0))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(t.get('sell_price_usd', 0))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(t.get('total_cost_usd', 0))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(t.get('net_revenue_usd', 0))}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{money(t.get('realized_pl_usd', 0), signed=True)}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600;">{money(t.get('realized_pl_thb', 0), 'THB', signed=True)}</td>
-            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700;">{pct(t.get('realized_pl_pct', 0), digits=2)}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{t.get('shares', 0):.4f}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(t.get('buy_price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff; white-space: nowrap;">{money(t.get('sell_price_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(t.get('total_cost_usd', 0))}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff; white-space: nowrap;">{money(t.get('net_revenue_usd', 0))}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700; white-space: nowrap;">{money(t.get('realized_pl_usd', 0), signed=True)}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 600; white-space: nowrap;">{money(t.get('realized_pl_thb', 0), 'THB', signed=True)}</td>
+            <td style="text-align: right; color: {c}; font-family: 'Inter', sans-serif; font-weight: 700; white-space: nowrap;">{pct(t.get('realized_pl_pct', 0), digits=2)}</td>
         </tr>
         """
 
@@ -2162,14 +2206,14 @@ def generate_master_ledger_html(data):
 
                 tranche_subrows += f"""
                 <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem;">
-                    <td style="text-align: center; color: #c084fc; font-weight: 700;">ไม้ที่ {tr.get('tranche')}</td>
-                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif;">{escape(str(tr.get('date')))}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif;">{tr.get('shares', 0):.4f} หุ้น</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif;">{money(tr.get('price_usd', 0))}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff;">{money(tr.get('amt_usd', 0))}</td>
-                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted);">{t_thb_str}</td>
+                    <td style="text-align: center; color: #c084fc; font-weight: 700; white-space: nowrap;">ไม้ที่ {tr.get('tranche')}</td>
+                    <td style="color: #60a5fa; font-family: 'Inter', sans-serif; white-space: nowrap;">{escape(str(tr.get('date')))}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{tr.get('shares', 0):.4f} หุ้น</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; white-space: nowrap;">{money(tr.get('price_usd', 0))}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #fff; white-space: nowrap;">{money(tr.get('amt_usd', 0))}</td>
+                    <td style="text-align: right; font-family: 'Inter', sans-serif; color: var(--text-muted); white-space: nowrap;">{t_thb_str}</td>
                     <td style="color: var(--text-secondary);">{escape(str(tr.get('note', '-')))}</td>
-                    <td style="text-align: center;">{slip_col}</td>
+                    <td style="text-align: center; white-space: nowrap;">{slip_col}</td>
                 </tr>
                 """
 
@@ -2208,11 +2252,11 @@ def generate_master_ledger_html(data):
         div_amt_usd = d.get('amount_usd', 0)
         div_rows += f"""
         <tr>
-            <td style="text-align: center; color: var(--text-secondary);">{escape(str(d.get('date', '-')))}</td>
-            <td style="font-weight: 700; font-family: 'Inter', sans-serif;">{escape(str(d.get('ticker', '-')))}</td>
+            <td style="text-align: center; color: var(--text-secondary); white-space: nowrap;">{escape(str(d.get('date', '-')))}</td>
+            <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">{escape(str(d.get('ticker', '-')))}</td>
             <td>{escape(str(d.get('rate', '-')))}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981;">{money(div_amt_usd, signed=True)}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981;">{money(dividend_thb({**d, "amount_usd": div_amt_usd}, fx_rate), 'THB', signed=True)}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">{money(div_amt_usd, signed=True)}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">{money(dividend_thb({**d, "amount_usd": div_amt_usd}, fx_rate), 'THB', signed=True)}</td>
         </tr>
         """
 
@@ -2241,11 +2285,11 @@ def generate_master_ledger_html(data):
         <tr>
             <td style="text-align: center; color: var(--text-muted); font-family: 'Inter', sans-serif;">{idx+1:02d}</td>
             <td style="white-space: nowrap; font-size: 0.88rem; color: var(--text-secondary);">{escape(str(c.get('date_str', '-')))}</td>
-            <td>{badge}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: {amt_color};">{money(c.get('amount_thb', 0), 'THB', signed=True)}</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff;">{bal_str}</td>
-            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted);">{ch_str}</td>
-            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted);">{ref_str}</td>
+            <td style="white-space: nowrap;">{badge}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: {amt_color}; white-space: nowrap;">{money(c.get('amount_thb', 0), 'THB', signed=True)}</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; color: #fff; white-space: nowrap;">{bal_str}</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">{ch_str}</td>
+            <td style="text-align: center; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">{ref_str}</td>
         </tr>
         """
 
@@ -2314,8 +2358,7 @@ def generate_master_ledger_html(data):
             display: flex; align-items: center; gap: 10px;
         }}
         .table-container {{
-            max-height: 520px;
-            overflow-y: auto;
+            overflow-x: auto;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
             background: var(--bg-card);
@@ -2342,6 +2385,7 @@ def generate_master_ledger_html(data):
         .badge-rose {{ background: rgba(244, 63, 94, 0.15); color: var(--rose); }}
         .badge-info {{ background: rgba(59, 130, 246, 0.15); color: var(--blue); }}
         .badge-purple {{ background: rgba(139, 92, 246, 0.15); color: var(--purple); }}
+        .badge-amber {{ background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }}
         .badge-neutral {{ background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }}
         .sub-tab-bar {{
             display: flex;
@@ -2391,6 +2435,7 @@ def generate_master_ledger_html(data):
                 <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>
                 </button>
+                <span class="meta-pill">⚡ 1 USD = {fx_rate:.2f} THB{fx_badge_html}</span>
                 <span class="meta-pill">🕒 ข้อมูล ณ: {now_str}</span>
             </div>
         </div>
@@ -2398,23 +2443,23 @@ def generate_master_ledger_html(data):
         <!-- TRANSACTIONS KPI OVERVIEW (4-COLS) -->
         <div class="grid-4-cols">
             <div class="card">
-                <div class="kpi-label">เงินต้นฝากสะสมสุทธิ (Net Capital)</div>
-                <div class="kpi-value" style="color: #60a5fa;">{money(data.get('net_injected_capital_thb', 0), 'THB')}</div>
+                <div class="kpi-label" title="Net Capital">เงินต้นฝากสะสมสุทธิ</div>
+                <div class="kpi-value" style="color: #60a5fa; white-space: nowrap;">{money(data.get('net_injected_capital_thb', 0), 'THB')}</div>
                 <div class="kpi-subtext">ฝากรวม {money(gross_deposits, 'THB')} (โอนออก {money(-abs(transfer_out), 'THB')})</div>
             </div>
             <div class="card">
-                <div class="kpi-label">ยอดคำสั่งซื้อหุ้นรวม (Total Buys)</div>
-                <div class="kpi-value" style="color: #38bdf8;">{money(total_buys_thb, 'THB')}</div>
+                <div class="kpi-label" title="Total Buys">ยอดคำสั่งซื้อหุ้นรวม</div>
+                <div class="kpi-value" style="color: #38bdf8; white-space: nowrap;">{money(total_buys_thb, 'THB')}</div>
                 <div class="kpi-subtext">{money(total_buys_usd)} USD ({len(buy_orders)} คำสั่งซื้อ)</div>
             </div>
             <div class="card">
-                <div class="kpi-label">กำไรปิดรอบที่ขายแล้ว (Realized P&L)</div>
-                <div class="kpi-value" style="color: {rz_color};">{money(trades_summary.get('total_realized_pl_thb', 0), 'THB', signed=True)}</div>
-                <div class="kpi-subtext">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% ({trades_summary.get('winning_trades', 0)} ชนะ / {trades_summary.get('losing_trades', 0)} แพ้)</div>
+                <div class="kpi-label" title="Realized P&L">กำไรปิดรอบที่ขายแล้ว</div>
+                <div class="kpi-value" style="color: {rz_color}; white-space: nowrap;">{money(trades_summary.get('total_realized_pl_thb', 0), 'THB', signed=True)}</div>
+                <div class="kpi-subtext">~{money(trades_summary.get('total_realized_pl_usd', 0), signed=True)} USD • {format_win_rate_text(trades_summary.get('winning_trades', 0), trades_summary.get('total_trades', 0), trades_summary.get('win_rate_pct', 0))}</div>
             </div>
             <div class="card">
-                <div class="kpi-label">เงินปันผลรับสะสม (Dividends)</div>
-                <div class="kpi-value" style="color: #10b981;">{money(data.get('total_dividends_thb', 0), 'THB', signed=True)}</div>
+                <div class="kpi-label" title="Dividends">เงินปันผลรับสะสม</div>
+                <div class="kpi-value" style="color: #10b981; white-space: nowrap;">{money(data.get('total_dividends_thb', 0), 'THB', signed=True)}</div>
                 <div class="kpi-subtext">{money(data.get('total_dividends_usd', 0), signed=True)} USD ({len(dividends_list)} ครั้ง)</div>
             </div>
         </div>
@@ -2463,7 +2508,7 @@ def generate_master_ledger_html(data):
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <span>🏆</span> 2. รายการหุ้นที่ขายทำกำไรปิดรอบสำเร็จ (Closed Trades: {len(closed_trades)} ไม้)
-                    <span class="badge badge-success">Win Rate {trades_summary.get('win_rate_pct', 0):.1f}% (กำไรสะสม {money(trades_summary.get('total_realized_pl_thb', 0), 'THB', signed=True)})</span>
+                    <span class="badge badge-success">{format_win_rate_text(trades_summary.get('winning_trades', 0), trades_summary.get('total_trades', 0), trades_summary.get('win_rate_pct', 0))} (กำไรสะสม {money(trades_summary.get('total_realized_pl_thb', 0), 'THB', signed=True)})</span>
                 </div>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
@@ -2666,7 +2711,8 @@ def print_master_summary(data, html_path, json_path):
     print(f"All-Time Net Profit  : {money(data['all_time_profit_thb'], 'THB', signed=True)} ({pct(data['all_time_roi_pct'], digits=2)} All-Time ROI)")
     print(f"Total Idle Cash      : {money(data['total_cash_thb'], 'THB')} (Dime! Save: {money(data['dime_save_cash_thb'], 'THB')} | Dime! USD: {money(data['dime_usd_cash'])})")
     print(f"Active Stock Holdings: {len(data['positions'])} stocks | Market Val: {money(data['stock_market_val_usd'])} ({money(data['stock_market_val_thb'], 'THB')})")
-    print(f"Realized Trades P&L  : {money(ts['total_realized_pl_usd'], signed=True)} ({money(ts['total_realized_pl_thb'], 'THB', signed=True)}) | Win Rate {ts['win_rate_pct']:.1f}%")
+    wr_text = format_win_rate_text(ts.get('winning_trades', 0), ts.get('total_trades', 0), ts.get('win_rate_pct', 0.0))
+    print(f"Realized Trades P&L  : {money(ts['total_realized_pl_usd'], signed=True)} ({money(ts['total_realized_pl_thb'], 'THB', signed=True)}) | {wr_text}")
     print(f"Total Dividends Recv : {money(data['total_dividends_usd'], signed=True)} ({money(data['total_dividends_thb'], 'THB', signed=True)}) | {len(data['dividends_list'])} payments")
     print("==========================================================================")
     print(f"Master HTML Dashboard: {html_path.resolve()}")

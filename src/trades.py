@@ -11,6 +11,7 @@ import tempfile
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
+from src.fmt import money, pct
 from src.fx import FALLBACK_USDTHB, resolve_usdthb
 
 REPO_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -140,9 +141,7 @@ def _run_fx(portfolio_data: Dict[str, Any], fx_rate: Optional[float]) -> float:
         if not fx_rate > 0:
             raise ValueError(f"อัตราแลกเปลี่ยนต้องมากกว่า 0 / FX rate must be greater than 0 (got {fx_rate}).")
         return float(fx_rate)
-    rate = resolve_usdthb(portfolio_data.get("fx_rate_usd_thb"))
-    portfolio_data["fx_rate_usd_thb"] = rate
-    return rate
+    return resolve_usdthb(portfolio_data.get("fx_rate_usd_thb"))
 
 
 def resolve_slip_relative_path(filename: Optional[str], from_reports_dir: bool = True) -> str:
@@ -478,7 +477,13 @@ def save_ledger(ledger: Dict[str, Any], filepath: Optional[str] = None) -> None:
 def _when(trade_date: Optional[str]) -> datetime:
     if trade_date is None:
         return datetime.now().replace(second=0, microsecond=0)
-    return datetime.strptime(trade_date, "%Y-%m-%d").replace(hour=12)
+    parsed = parse_trade_date(trade_date)
+    if parsed is not None:
+        tm = re.search(r"(\d{1,2}):(\d{2})", trade_date)
+        hour = int(tm.group(1)) if tm else 12
+        minute = int(tm.group(2)) if tm else 0
+        return datetime(parsed.year, parsed.month, parsed.day, hour, minute)
+    raise ValueError(f"รูปแบบวันที่ไม่ถูกต้อง / Unrecognised trade date: {trade_date!r}.")
 
 
 def _cash_date_str(when: datetime, trade_date: Optional[str]) -> str:
@@ -564,15 +569,17 @@ def record_buy(
     when = _when(trade_date)
     exec_date = when.strftime("%Y-%m-%d")
 
+    buy_fx = float(fx_rate) if fx_rate is not None else (FALLBACK_USDTHB if pay == "usd" else current_fx)
+
     add_usd = shares * price_usd + fees
     amt_usd = round(add_usd, 2)
-    amt_thb = round(add_usd * current_fx, 2)
+    amt_thb = round(add_usd * buy_fx, 2)
 
     holding = next((h for h in holdings if h.get("ticker", "").upper() == target_ticker), None)
     if holding:
         old_shares = float(holding.get("shares", 0.0))
         old_total = float(holding.get("total_cost_usd", old_shares * float(holding.get("avg_cost_usd", 0.0))))
-        old_cost_thb = float(holding.get("cost_thb", old_total * current_fx))
+        old_cost_thb = float(holding.get("cost_thb", old_total * buy_fx))
         new_shares = old_shares + shares
         holding.update({
             "shares": round(new_shares, 7),
@@ -607,7 +614,7 @@ def record_buy(
         "price_usd": float(price_usd),
         "amt_usd": amt_usd,
         "amt_thb": amt_thb if pay == "thb" else 0.0,
-        "fx_rate": current_fx,
+        "fx_rate": buy_fx,
         "date": f"{_thai_date_str(when)} - {when.strftime('%H:%M')} น.",
         "order_type": "Market",
         "account": "Dime! Save (THB)" if pay == "thb" else "Dime! USD",
@@ -913,12 +920,16 @@ def generate_trades_markdown(trades_data: Dict[str, Any]) -> str:
     lines.append(f"**พอร์ตโฟลิโอ:** {trades_data.get('portfolio_name', 'My Portfolio')} | **โบรกเกอร์:** {trades_data.get('broker', 'InnovestX')}\n")
 
     lines.append("## 📊 ภาพรวมกำไรขาดทุนสะสม (Realized Performance)")
-    pl_sign = "+" if summary["total_realized_pl_usd"] >= 0 else ""
-    lines.append(f"- **กำไรขาดทุนสุทธิ (Net Realized P&L):** `{pl_sign}${summary['total_realized_pl_usd']:,.2f}` (`{pl_sign}฿{summary['total_realized_pl_thb']:,.2f}`)")
-    lines.append(f"- **ผลตอบแทนเฉลี่ย (Overall ROI):** `{pl_sign}{summary['roi_pct']:.2f}%`")
+    pl_usd_str = money(summary["total_realized_pl_usd"], "USD", signed=True)
+    pl_thb_str = money(summary["total_realized_pl_thb"], "THB", signed=True)
+    roi_str = pct(summary["roi_pct"], signed=True, digits=2)
+    lines.append(f"- **กำไรขาดทุนสุทธิ (Net Realized P&L):** `{pl_usd_str}` (`{pl_thb_str}`)")
+    lines.append(f"- **ผลตอบแทนเฉลี่ย (Overall ROI):** `{roi_str}`")
     lines.append(f"- **อัตราการเทรดชนะ (Win Rate):** `{summary['win_rate_pct']:.1f}%` ({summary['winning_trades']} ชนะ / {summary['losing_trades']} แพ้ จาก {summary['total_trades']} รายการ)")
     lines.append(f"- **Profit Factor:** `{summary['profit_factor_display']}`")
-    lines.append(f"- **ต้นทุนที่ปิดการขายไป:** `${summary['total_cost_usd']:,.2f}` | **เงินรับสุทธิ (Proceeds):** `${summary['total_revenue_usd']:,.2f}`\n")
+    cost_str = money(summary["total_cost_usd"], "USD", signed=False)
+    rev_str = money(summary["total_revenue_usd"], "USD", signed=False)
+    lines.append(f"- **ต้นทุนที่ปิดการขายไป:** `{cost_str}` | **เงินรับสุทธิ (Proceeds):** `{rev_str}`\n")
 
     lines.append("## 📝 รายการปิดการขาย (Closed Trades History)")
     if not trades:
@@ -930,14 +941,13 @@ def generate_trades_markdown(trades_data: Dict[str, Any]) -> str:
             pl_usd = t.get("realized_pl_usd", 0)
             pl_thb = t.get("realized_pl_thb", 0)
             pl_pct = t.get("realized_pl_pct", 0)
-            sign = "+" if pl_usd >= 0 else ""
             b_date = re.sub(r"\s*\(\d+\s*ไม้\)", "", str(t.get("buy_date", "-")))
             h_days = f"{t.get('holding_days')} วัน" if t.get('holding_days') is not None else "-"
             lines.append(
                 f"| {b_date} | {t.get('date', '-')} | {h_days} | **{t.get('ticker')}** | {t.get('shares'):.4f} | "
                 f"${t.get('buy_price_usd'):.2f} | ${t.get('sell_price_usd'):.2f} | "
                 f"${t.get('total_cost_usd'):,.2f} | ${t.get('net_revenue_usd'):,.2f} | "
-                f"`{sign}${pl_usd:,.2f}` | `{sign}฿{pl_thb:,.2f}` | `{sign}{pl_pct:.2f}%` |"
+                f"`{money(pl_usd, 'USD', signed=True)}` | `{money(pl_thb, 'THB', signed=True)}` | `{pct(pl_pct, signed=True, digits=2)}` |"
             )
 
     return "\n".join(lines)

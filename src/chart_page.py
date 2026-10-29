@@ -15,9 +15,10 @@ from src.chart_data import (
     save_candles_cache,
     compute_fibo_and_indicators,
     INDICATOR_SCHEMA_VERSION,
+    EARNINGS_CALENDAR_HASH,
     get_super_investors,
 )
-from src.scoring import ETF_TICKERS
+from src.scoring import EARNINGS_GUARD_DAYS, ETF_TICKERS
 from src.nav import nav_bar_html
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
@@ -103,6 +104,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                     "days_to_earnings": None,
                     "earnings_date": "-",
                     "is_earnings_near": False,
+                    "earnings_guard_days": EARNINGS_GUARD_DAYS,
                 }
         except Exception:
             pass
@@ -134,6 +136,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                         "days_to_earnings": None,
                         "earnings_date": "-",
                         "is_earnings_near": False,
+                        "earnings_guard_days": EARNINGS_GUARD_DAYS,
                     }
         except Exception:
             pass
@@ -165,6 +168,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                         "days_to_earnings": None,
                         "earnings_date": "-",
                         "is_earnings_near": False,
+                        "earnings_guard_days": EARNINGS_GUARD_DAYS,
                     }
         except Exception:
             pass
@@ -224,9 +228,16 @@ def attach_scores(meta: Dict[str, Any], tickers: List[str]) -> None:
     for row in rows:
         t = row.get("ticker")
         if t in meta:
-            score = evaluate_stock(row)["stock_score"]
+            ev = evaluate_stock(row)
+            score = ev["stock_score"]
             meta[t]["score"] = {k: score[k] for k in ("total", "grade", "stars", "pillars", "coverage", "earnings_guard", "reasons")}
             meta[t]["score"]["timing"] = {"entry_signal": score["timing"]["entry_signal"]}
+            meta[t]["score"]["guard_days_threshold"] = EARNINGS_GUARD_DAYS
+            meta[t]["earnings_guard_days"] = EARNINGS_GUARD_DAYS
+            meta[t]["stock_score"] = score
+            meta[t]["fundamental"] = ev.get("fundamental")
+            if ev.get("days_to_earnings") is not None:
+                meta[t]["days_to_earnings"] = ev["days_to_earnings"]
 
 
 def _format_sr_levels(vals: List[float], max_count: int = 2) -> str:
@@ -262,16 +273,38 @@ def generate_stock_chart_page_html() -> str:
     """
     meta = get_all_stocks_metadata()
     raw_cache = load_candles_cache()
+
+    # Pre-attach unified screener scores and fundamentals so recomputation has complete context
+    all_tickers_to_score = sorted(list(set(list(raw_cache.keys()) + list(meta.keys()))))
+    attach_scores(meta, all_tickers_to_score)
+
     updated_cache = False
     for t, entry in raw_cache.items():
-        if isinstance(entry, dict) and entry.get("candles") and entry.get("schema_version") != INDICATOR_SCHEMA_VERSION:
+        if (
+            isinstance(entry, dict)
+            and entry.get("candles")
+            and (
+                entry.get("schema_version") != INDICATOR_SCHEMA_VERSION
+                or entry.get("earnings_hash") != EARNINGS_CALENDAR_HASH
+            )
+        ):
             try:
                 m_t = meta.get(t, {})
                 d_earn = m_t.get("days_to_earnings")
-                new_data = compute_fibo_and_indicators(entry["candles"], days_to_earnings=d_earn, is_etf=(t in ETF_TICKERS), ticker=t)
+                sc = m_t.get("stock_score")
+                fund = m_t.get("fundamental")
+                new_data = compute_fibo_and_indicators(
+                    entry["candles"],
+                    days_to_earnings=d_earn,
+                    is_etf=(t in ETF_TICKERS),
+                    ticker=t,
+                    stock_score=sc,
+                    fundamental=fund,
+                )
                 new_data["timestamp"] = entry.get("timestamp", 0)
                 new_data["full_history"] = entry.get("full_history", True)
                 new_data["schema_version"] = INDICATOR_SCHEMA_VERSION
+                new_data["earnings_hash"] = EARNINGS_CALENDAR_HASH
                 raw_cache[t] = new_data
                 updated_cache = True
             except Exception:

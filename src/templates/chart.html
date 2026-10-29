@@ -15,6 +15,8 @@
 __CHART_CSS__    </style>
 </head>
 <body>
+    __NAV_BAR__
+
     <!-- Floating Tab to Open Stock Menu when Collapsed -->
     <button class="floating-sidebar-toggle" id="floating_sidebar_toggle" onclick="toggleStockSidebar(true)" title="เปิดเมนูเลือกหุ้น (Open Stock Menu)">
         <span class="fst-icon">☰</span>
@@ -56,9 +58,6 @@ __CHART_CSS__    </style>
                 <!-- Top Nav Bar -->
                 <div class="top-nav-bar">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="nav-back-btn" onclick="goBackOrDashboard()">
-                            <span>← ย้อนกลับ</span>
-                        </button>
                         <button class="sidebar-top-toggle-btn" id="top_sidebar_toggle_btn" onclick="toggleStockSidebar()" title="เปิด/ปิดเมนูหุ้น (Toggle Stock Menu)">
                             <span class="stb-icon">☰</span>
                             <span class="stb-label">เมนูหุ้น</span>
@@ -79,8 +78,6 @@ __CHART_CSS__    </style>
                         </div>
                     </div>
                 </div>
-
-                __NAV_BAR__
 
                 <!-- 2-Column Cockpit Grid -->
                 <div class="cockpit-grid">
@@ -108,7 +105,7 @@ __CHART_CSS__    </style>
                                 <button class="v-tab-btn active" id="tab_tech" onclick="switchChartTab('tech')">⚡ Pro Chart</button>
                                 <button class="v-tab-btn" id="tab_tv" onclick="switchChartTab('tv')">🌐 TradingView</button>
                             </div>
-                            <button class="jump-btn" onclick="scrollToAiSection()">🤖 จุดตัดสินใจ</button>
+                            <button class="jump-btn" onclick="scrollToAiSection()">🧭 จุดตัดสินใจ</button>
                             <button class="jump-btn" onclick="scrollToFinancials()">📊 งบการเงิน</button>
                             <a id="st_ext_link" href="#" target="_blank" class="ext-tv-btn" title="เปิดดูกราฟตัวเต็มบน TradingView">
                                 <span>เปิดบน TradingView ↗</span>
@@ -123,7 +120,7 @@ __CHART_CSS__    </style>
                             <span id="hud_cost" class="hud-val">-</span>
                         </div>
                         <div class="hud-card">
-                            <span class="hud-label">⚡ ราคาล่าสุด</span>
+                            <span class="hud-label" id="hud_price_label">⚡ ราคาสด</span>
                             <span id="hud_price" class="hud-val" style="color: #60a5fa;">-</span>
                         </div>
                         <div class="hud-card" id="hud_ext_card" style="display:none;">
@@ -131,11 +128,11 @@ __CHART_CSS__    </style>
                             <span id="hud_ext_val" class="hud-val" style="color: #38bdf8;">-</span>
                         </div>
                         <div class="hud-card">
-                            <span class="hud-label">🟢 แนวรับสำคัญ (S1)</span>
+                            <span class="hud-label" id="hud_support_label">🟢 แนวรับสำคัญ (S1) (swing)</span>
                             <span id="hud_support" class="hud-val" style="color: #34d399;">-</span>
                         </div>
                         <div class="hud-card">
-                            <span class="hud-label">🔴 แนวต้านสำคัญ (R1)</span>
+                            <span class="hud-label" id="hud_resistance_label">🔴 แนวต้านสำคัญ (R1) (swing)</span>
                             <span id="hud_resistance" class="hud-val" style="color: #fb7185;">-</span>
                         </div>
                         <div class="hud-card">
@@ -191,9 +188,7 @@ __CHART_CSS__    </style>
 
                         <div class="tb-group">
                             <span class="tb-group-title">LEVELS & SIGNALS:</span>
-                            <button class="ema-pill" id="tog_aisig" style="color: #38bdf8;" onclick="toggleIndicator('aisig')">🤖 AI Signals <span class="help-q" onclick="openIndicatorHelp('aisig', event)" title="วิธีดู AI Signals (BUY/DCA/TP)">?</span></button>
-                            <button class="ema-pill" id="tog_lorentzian" style="color: #c084fc;" onclick="toggleIndicator('lorentzian')">🤖 Lorentzian ML <span class="help-q" onclick="openIndicatorHelp('lorentzian', event)" title="วิธีดู Lorentzian Classification [jdehorty]">?</span></button>
-                            <button class="ema-pill" id="tog_utbot" style="color: #10b981;" onclick="toggleIndicator('utbot')">🤖 UT Bot <span class="help-q" onclick="openIndicatorHelp('utbot', event)" title="วิธีดู UT Bot Alerts [QuantNomad]">?</span></button>
+                            <button class="ema-pill" id="tog_aisig" style="color: #38bdf8;" onclick="toggleIndicator('aisig')">Rule markers <span class="help-q" onclick="openIndicatorHelp('aisig', event)" title="วิธีดู Rule markers (BUY/DCA/TP)">?</span></button>
                             <button class="ema-pill" id="tog_chand" style="color: #f59e0b;" onclick="toggleIndicator('chand')">🪔 Chandelier <span class="help-q" onclick="openIndicatorHelp('chand', event)" title="วิธีดู Chandelier Exit [everget]">?</span></button>
                             <button class="ema-pill" id="tog_pivots" style="color: #fb7185;" onclick="toggleIndicator('pivots')">🎯 Lux S/R (Breaks) <span class="help-q" onclick="openIndicatorHelp('pivots', event)" title="วิธีดู Support/Resistance Levels with Breaks [LuxAlgo]">?</span></button>
                             <button class="ema-pill" id="tog_smc" style="color: #38bdf8;" onclick="toggleIndicator('smc')">🏛️ SMC (FVG/OB) <span class="help-q" onclick="openIndicatorHelp('smc', event)" title="วิธีดู Smart Money Concepts (FVG & Order Blocks)">?</span></button>
@@ -206,7 +201,6 @@ __CHART_CSS__    </style>
 
                         <div class="tb-group">
                             <span class="tb-group-title">BANDS & TREND:</span>
-                            <button class="ema-pill" id="tog_hull" style="color: #2dd4bf;" onclick="toggleIndicator('hull')">🎨 Hull Suite <span class="help-q" onclick="openIndicatorHelp('hull', event)" title="วิธีดู Hull Suite [InSilico]">?</span></button>
                             <button class="ema-pill" id="tog_cdc" style="color: #22c55e;" onclick="toggleIndicator('cdc')">🚦 CDC ActionZone <span class="help-q" onclick="openIndicatorHelp('cdc', event)" title="วิธีดู CDC ActionZone V3">?</span></button>
                             <button class="ema-pill" id="tog_bb" style="color: #06b6d4;" onclick="toggleIndicator('bb')">Bollinger <span class="help-q" onclick="openIndicatorHelp('bb', event)" title="วิธีดู Bollinger Bands">?</span></button>
                             <button class="ema-pill" id="tog_st" style="color: #34d399;" onclick="toggleIndicator('st')">Supertrend <span class="help-q" onclick="openIndicatorHelp('st', event)" title="วิธีดู Supertrend">?</span></button>
@@ -219,9 +213,6 @@ __CHART_CSS__    </style>
                             <span class="tb-group-title">SUB-PANE:</span>
                             <button class="ema-pill active" id="tog_osc_rsi" style="color: #c084fc;" onclick="switchOscillatorPane('rsi')">⚡ RSI <span class="help-q" onclick="openIndicatorHelp('rsi', event)" title="วิธีดู RSI (14)">?</span></button>
                             <button class="ema-pill" id="tog_osc_sqz" style="color: #f59e0b;" onclick="switchOscillatorPane('sqz')">🎯 Squeeze Mom <span class="help-q" onclick="openIndicatorHelp('sqz', event)" title="วิธีดู Squeeze Momentum [LazyBear]">?</span></button>
-                            <button class="ema-pill" id="tog_osc_wae" style="color: #10b981;" onclick="switchOscillatorPane('wae')">💥 WAE Explosion <span class="help-q" onclick="openIndicatorHelp('wae', event)" title="วิธีดู Waddah Attar Explosion">?</span></button>
-                            <button class="ema-pill" id="tog_osc_vfi" style="color: #38bdf8;" onclick="switchOscillatorPane('vfi')">🌊 VFI Flow <span class="help-q" onclick="openIndicatorHelp('vfi', event)" title="วิธีดู Volume Flow Indicator [LazyBear]">?</span></button>
-                            <button class="ema-pill" id="tog_osc_wt" style="color: #818cf8;" onclick="switchOscillatorPane('wt')">🌊 WaveTrend <span class="help-q" onclick="openIndicatorHelp('wt', event)" title="วิธีดู WaveTrend [LazyBear]">?</span></button>
                         </div>
 
                         <div class="tb-group tb-actions">
@@ -251,7 +242,7 @@ __CHART_CSS__    </style>
                         </div>
                     </div>
 
-                    <!-- Synchronized Sub-Pane Stack (Multi-Pane Stacking for RSI, Squeeze, WAE, VFI, WaveTrend) -->
+                    <!-- Synchronized Sub-Pane Stack (Multi-Pane Stacking for RSI, Squeeze) -->
                     <div id="subpanes_stack" class="subpanes-stack"></div>
 
                     <!-- Bottom Bar (Timeframe & Zoom Presets like Rocket Tool) -->
@@ -280,11 +271,11 @@ __CHART_CSS__    </style>
                     <!-- TradingView Widget Box (Alternative Tab) -->
                     <div id="tv_widget_container" class="tv-widget-box"></div>
 
-                    <!-- AI Multi-Technical Confluence Decision Section -->
+                    <!-- Multi-Technical Confluence Decision Section -->
                     <div class="ai-decision-section" id="ai_decision_panel">
                         <div class="ai-sec-header">
                             <div class="ai-sec-title">
-                                <span>🤖 Rule-based Confluence Decision Engine</span>
+                                <span>Rule-based Confluence Decision Engine</span>
                                 <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">(ระบบตัดสินใจซื้อ-ขาย-ทยอยสะสม DCA ด้วยคอนฟลูเอนซ์ 5 มิติ • heuristic ยังไม่ผ่าน backtest ใช้คู่กับการ์ดคะแนนรวม)</span>
                             </div>
                             <div style="font-size: 0.74rem; color: #64748b;">
@@ -305,7 +296,6 @@ __CHART_CSS__    </style>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span id="pdd_badge" style="padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">🟢 กำลังวิเคราะห์...</span>
-                                <span id="pdd_winrate" style="padding: 4px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(250, 204, 21, 0.3); color: #facc15;">🎯 สถิติความแม่นยำ: -</span>
                                 <button class="botbar-btn active" id="btn_toggle_pat_chart" onclick="toggleIndicator('pat')" style="padding: 4px 12px; font-weight: 700; color: #34d399; border-color: rgba(52, 211, 153, 0.4);">✅ ซ่อนเส้นแพทเทิร์น</button>
                             </div>
                         </div>
@@ -395,13 +385,13 @@ __CHART_CSS__    </style>
                         </div>
                     </div>
 
-                    <!-- Financial Insights & Piotroski F-Score Section -->
+                    <!-- Financial Insights & Financial Checklist Section -->
                     <div class="fin-insights-grid" id="fin_insights_grid">
-                        <!-- Piotroski F-Score Card -->
+                        <!-- Financial Checklist Card -->
                         <div class="fin-fscore-card" id="fin_fscore_card">
                             <div class="fin-fscore-header">
-                                <div class="fin-card-sublabel">PIOTROSKI FINANCIAL STRENGTH</div>
-                                <div class="fin-fscore-title">🏆 Piotroski F-Score</div>
+                                <div class="fin-card-sublabel" id="fin_fscore_sublabel">FINANCIAL STRENGTH CHECKLIST</div>
+                                <div class="fin-fscore-title" id="fin_fscore_title">🏆 เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)</div>
                             </div>
                             <div class="fin-fscore-score-row">
                                 <div class="fin-fscore-number" id="fin_fscore_val">-<span>/9</span></div>
@@ -425,7 +415,7 @@ __CHART_CSS__    </style>
                             <div class="fin-exec-title">💡 บทสรุปสุขภาพการเงิน 3 มิติ (Financial Insights)</div>
                             <div class="fin-exec-points">
                                 <div class="fin-exec-point">
-                                    <div class="fin-exec-point-icon">🚀</div>
+                                    <div class="fin-exec-point-icon">📈</div>
                                     <div class="fin-exec-point-content">
                                         <div class="fin-exec-point-label">การเติบโตของธุรกิจ (Growth Trajectory)</div>
                                         <div class="fin-exec-point-text" id="fin_summary_growth">-</div>
@@ -546,7 +536,7 @@ __CHART_CSS__    </style>
                     </div>
                 </div>
 
-                <!-- Card 2: AI Narrative Summary -->
+                <!-- Card 2: Narrative Summary -->
                 <div class="sidebar-card">
                     <div class="sc-header">
                         <div class="sc-title">
@@ -567,33 +557,33 @@ __CHART_CSS__    </style>
                         <div class="sc-title">
                             <span>📊 ระดับราคาสำคัญ (Key Levels)</span>
                         </div>
-                        <span class="sc-subtitle">Pivots & ATR</span>
+                        <span class="sc-subtitle" id="kl_source_badge">Pivot รายเดือน</span>
                     </div>
 
                     <table class="kl-table">
                         <tbody>
                             <tr>
-                                <td class="kl-name">🔴 แนวต้าน 2 (R2)</td>
+                                <td class="kl-name" id="kl_r2_name">🔴 แนวต้าน 2 (R2)</td>
                                 <td class="kl-val" id="kl_r2" style="color: #fb7185;">-</td>
                             </tr>
                             <tr>
-                                <td class="kl-name">🔴 แนวต้าน 1 (R1)</td>
+                                <td class="kl-name" id="kl_r1_name">🔴 แนวต้าน 1 (R1)</td>
                                 <td class="kl-val" id="kl_r1" style="color: #fb7185;">-</td>
                             </tr>
                             <tr style="background: rgba(59, 130, 246, 0.08);">
-                                <td class="kl-name" style="color: #93c5fd; font-weight: 700;">⚡ ราคาตลาดปัจจุบัน</td>
+                                <td class="kl-name" id="kl_current_label" style="color: #93c5fd; font-weight: 700;">⚡ ราคาปิดแท่งล่าสุด</td>
                                 <td class="kl-val" id="kl_current" style="color: #60a5fa; font-size: 0.88rem;">-</td>
                             </tr>
                             <tr>
-                                <td class="kl-name">🟢 แนวรับ 1 (S1)</td>
+                                <td class="kl-name" id="kl_s1_name">🟢 แนวรับ 1 (S1)</td>
                                 <td class="kl-val" id="kl_s1" style="color: #34d399;">-</td>
                             </tr>
                             <tr>
-                                <td class="kl-name">🛡️ แนวรับ 2 (S2)</td>
+                                <td class="kl-name" id="kl_s2_name">🛡️ แนวรับ 2 (S2)</td>
                                 <td class="kl-val" id="kl_s2" style="color: #34d399;">-</td>
                             </tr>
                             <tr>
-                                <td class="kl-name">🛑 Stop Loss (1.5 ATR)</td>
+                                <td class="kl-name" id="kl_sl_name">🛑 Stop Loss</td>
                                 <td class="kl-val" id="kl_sl" style="color: #f43f5e;">-</td>
                             </tr>
                         </tbody>
@@ -639,29 +629,29 @@ __CHART_CSS__    </style>
                     </div>
                 </div>
 
-                <!-- Card 4.7: TradingView Pro Oscillators (Squeeze, WAE, VFI, WaveTrend) -->
+                <!-- Card 4.7: Squeeze Momentum -->
                 <div class="sidebar-card" id="osc_sidebar_card">
                     <div class="sc-header">
                         <div class="sc-title">
-                            <span>⚡ TradingView Pro Oscillators</span>
+                            <span>🎯 LazyBear Squeeze Momentum</span>
                         </div>
-                        <span class="sc-subtitle" id="osc_sidebar_badge">Squeeze • WAE • VFI • WT</span>
+                        <span class="sc-subtitle" id="osc_sidebar_badge" style="color: #f59e0b; font-weight: 700;">ไม่ผ่าน backtest ใช้ประกอบเท่านั้น</span>
                     </div>
                     <div id="osc_sidebar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
-                        กำลังคำนวณโมเมนตัม Squeeze, WAE, VFI & WaveTrend...
+                        กำลังคำนวณโมเมนตัม Squeeze...
                     </div>
                 </div>
 
-                <!-- Card 4.8: AI Machine Learning & Trend Armor (Lorentzian, UT Bot, Chandelier, Hull) -->
+                <!-- Card 4.8: Chandelier Exit -->
                 <div class="sidebar-card" id="ml_sidebar_card">
                     <div class="sc-header">
                         <div class="sc-title">
-                            <span>🤖 AI Machine Learning (Lorentzian)</span>
+                            <span>🪔 Chandelier Exit</span>
                         </div>
-                        <span class="sc-subtitle" id="ml_sidebar_badge">KNN Classifier • Trend Armor</span>
+                        <span class="sc-subtitle" id="ml_sidebar_badge" style="color: #f59e0b; font-weight: 700;">ไม่ผ่าน backtest ใช้ประกอบเท่านั้น</span>
                     </div>
                     <div id="ml_sidebar_body" style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;">
-                        กำลังประมวลผลโมเดล AI Lorentzian ML & Trend Trailing Stops...
+                        กำลังคำนวณ Chandelier Exit Trailing Stop...
                     </div>
                 </div>
 

@@ -72,7 +72,7 @@ def main():
     parser.add_argument(
         "--allow-falling-knife",
         action="store_true",
-        help="Do not exclude high ADX panic plunge stocks"
+        help="Do not exclude active plunge day stocks (-3%% or red candle <= -1.5%%)"
     )
     parser.add_argument(
         "--stoch-cross",
@@ -82,7 +82,7 @@ def main():
     parser.add_argument(
         "--actionable", "--require-reversal",
         action="store_true",
-        help="Strictly filter for actionable dip setups with green candle or RSI hook up (exclude active plunge days)"
+        help="Strictly filter for actionable dip setups with confirmed RSI hook up (exclude active plunge days and earnings guard)"
     )
     parser.add_argument(
         "--auto-fallback",

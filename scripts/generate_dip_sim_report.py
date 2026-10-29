@@ -224,7 +224,8 @@ def generate_html_report(data: Dict[str, Any]) -> str:
     total_pl_thb = data["total_pl_thb"]
     total_pl_usd = data["total_pl_usd"]
     total_pl_pct = data["total_pl_pct"]
-    pl_color = "#10b981" if total_pl_thb >= 0 else "#f43f5e"
+    pl_color = "#94a3b8" if total_pl_thb == 0 else ("#10b981" if total_pl_thb > 0 else "#f43f5e")
+    progress_color = "#94a3b8" if data.get("holdings_count", 0) == 0 else "#a855f7"
     missing_tickers = data.get("price_missing_tickers") or []
     missing_note = (
         f'<div class="kpi-subtext" style="color: #fbbf24;">⚠️ ไม่ได้ราคา {escape(", ".join(missing_tickers))} (ไม่รวมในยอดรวม)</div>'
@@ -551,14 +552,15 @@ def generate_html_report(data: Dict[str, Any]) -> str:
                 <div class="kpi-value" style="color: {pl_color};">{money(total_pl_thb, 'THB', signed=True)}</div>
                 <div class="kpi-subtext" style="color: {pl_color}; font-weight: 700;">{pct(total_pl_pct, digits=2)} ({money(total_pl_usd, signed=True)} USD)</div>
             </div>
-            <div class="card" style="border-left: 4px solid var(--purple);">
+            <div class="card" style="border-left: 4px solid {'var(--border-color)' if data['holdings_count'] == 0 else 'var(--purple)'};">
                 <div class="kpi-label">สถานะการเทรดจำลอง (Trade Progress)</div>
-                <div class="kpi-value" style="font-size: 1.55rem; color: #a855f7;">{data['in_profit_count']}/{data['holdings_count']} แดนบวก</div>
+                <div class="kpi-value" style="font-size: 1.55rem; color: {progress_color};">{data['in_profit_count']}/{data['holdings_count']} แดนบวก</div>
                 <div class="kpi-subtext">ชน TP: {data['hit_tp_count']} | ชน SL: {data['hit_sl_count']}</div>
             </div>
         </div>
 
         <!-- SECTION 1: SIMULATION HOLDINGS TABLE -->
+        {f'''
         <div style="margin-bottom: 32px;">
             <div class="section-title">
                 <span>📊</span> 1. ตารางจำลองการถือครองหุ้น Dip รายตัว (ราคาตลาดสดจาก TradingView)
@@ -586,6 +588,13 @@ def generate_html_report(data: Dict[str, Any]) -> str:
                 </table>
             </div>
         </div>
+        ''' if data.get('holdings_count', 0) > 0 else f'''
+        <div class="card" style="text-align: center; padding: 48px 24px; margin-bottom: 32px; border: 1px dashed var(--border-color);">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">🌱</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px;">ยังไม่มีไม้จำลอง</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0;">ใช้ <code>/dip</code> เพื่อสแกนหุ้นย่อ</p>
+        </div>
+        '''}
 
         <!-- SECTION 1.5: CLOSED TRADES / STOP-LOSS & TAKE-PROFIT EXECUTIONS -->
         {f'''
@@ -620,6 +629,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
         ''' if closed_rows_html else ''}
 
         <!-- SECTION 2: TRADE STRATEGY CARDS -->
+        {f'''
         <div style="margin-bottom: 32px;">
             <div class="section-title">
                 <span>🎯</span> 2. รายละเอียดกลยุทธ์และเหตุผลการช้อนซื้อของแต่ละตัว
@@ -628,6 +638,7 @@ def generate_html_report(data: Dict[str, Any]) -> str:
                 {cards_html}
             </div>
         </div>
+        ''' if data.get('holdings_count', 0) > 0 else ''}
 
         <!-- SECTION 3: RULES & PHILOSOPHY -->
         <div class="card" style="background: rgba(13, 21, 39, 0.6); border: 1px dashed var(--border-color); margin-bottom: 32px;">

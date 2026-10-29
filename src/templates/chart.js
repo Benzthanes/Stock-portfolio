@@ -60,7 +60,7 @@
             cat: 'Wave Theory & Market Cycles',
             desc: '<div style="margin-bottom:8px;"><strong>วัฏจักรคลื่นโมเมนตัมแบ่งออกเป็น 2 วงจรหลัก:</strong></div>' +
                   '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px; margin-bottom:10px;">' +
-                  '<div style="font-weight:700; color:#38bdf8; margin-bottom:6px;">🚀 1. คลื่นขับเคลื่อนหลัก (Motive / Impulse Waves: 1 ถึง 5)</div>' +
+                  '<div style="font-weight:700; color:#38bdf8; margin-bottom:6px;">▲ 1. คลื่นขับเคลื่อนหลัก (Motive / Impulse Waves: 1 ถึง 5)</div>' +
                   '<ul style="margin:0; padding-left:18px; line-height:1.7;">' +
                   '<li><span style="color:#34d399; font-weight:700;">🟢 Wave (1) [คลื่นขึ้น]:</span> จุดเริ่มต้นรอบใหม่ สถาบันเริ่มแอบสะสมหุ้นเงียบๆ หลังผ่านจุดต่ำสุด.</li>' +
                   '<li><span style="color:#fb7185; font-weight:700;">🔴 Wave (2) [คลื่นลง/ย่อ]:</span> ย่อพักฐานเพื่อสลัดผู้เล่นใจไม่นิ่ง <em>(กฎ: ห้ามย่อหลุดจุดเริ่ม Wave 0)</em>.</li>' +
@@ -87,15 +87,15 @@
                    '• <strong>🟢 New Cycle Breakout:</strong> เมื่อราคาปรับฐาน A-B-C เสร็จและระเบิดผ่านยอดดอยเดิม ระบบจะยิงสัญญาณเริ่มคลื่นลูกใหม่ทันที.' +
                    '</div>',
             tip: '<div style="line-height:1.7;">' +
-                 '⚠️ <strong>มาตรฐาน LuxAlgo:</strong> ระบบรองรับทั้งคลื่นขาขึ้น (Bullish Motive) และคลื่นขาลง (Bearish Motive) พร้อมตรวจจับสถานะ Invalidation (เส้นประ Dotted) เมื่อราคาละเมิดกฎเหล็ก เพื่อป้องกันการติดดอยและช่วยให้จับจังหวะเทรดได้อย่างแม่นยำ.' +
+                 '⚠️ <strong>มาตรฐาน LuxAlgo:</strong> ระบบรองรับทั้งคลื่นขาขึ้น (Bullish Motive) และคลื่นขาลง (Bearish Motive) พร้อมตรวจจับสถานะ Invalidation (เส้นประ Dotted) เมื่อราคาละเมิดกฎคลื่น.' +
                  '</div>'
         },
         earn: {
             icon: '🗓️',
             title: 'ผลงบการเงินย้อนหลัง (Historical Earnings Reaction)',
             cat: 'Fundamental Catalyst',
-            desc: 'ป้าย Vol ±xx% คือแท่งที่ Volume สูงสุดในแต่ละช่วงประมาณ 1 ไตรมาส (ย้อนหลัง 3 ปี) ใช้ประมาณวันประกาศงบ แต่ไม่ได้ยืนยันกับปฏิทินงบจริง อาจเป็นวัน rebalance ดัชนีหรือข่าวใหญ่อื่น ตัวเลขคือ % เปลี่ยนแปลงเทียบวันก่อนหน้า.',
-            usage: 'ป้ายสีเหลืองทอง Vol +xx% คือวัน Volume พุ่งพร้อมราคาบวกรับงบ ส่วนป้ายสีชมพูมาเจนต้า Vol -xx% คือวัน Volume พุ่งพร้อมแรงขาย เพื่อให้ตัดกับสีแท่งเทียนชัดเจน.',
+            desc: 'ป้าย 🗓️ ±xx% แสดงผลตอบรับของราคาหุ้นต่อวันประกาศผลประกอบการจริงย้อนหลัง 3 ปี ซึ่งอ้างอิงจากปฏิทินงบที่ได้รับการยืนยันแล้ว ตัวเลขคือ % เปลี่ยนแปลงของราคา.',
+            usage: 'ป้ายสีเหลืองทอง +xx% คือวันประกาศงบที่ราคากระโดดบวก ส่วนป้ายสีชมพู -xx% คือวันประกาศงบที่ราคาปรับตัวลง เพื่อให้เห็นปฏิกิริยารับงบชัดเจน.',
             tip: 'ช่วยให้เห็นประวัติและพฤติกรรมความผันผวนของหุ้นตัวนี้ในวันงบออก เพื่อใช้วางแผนบริหารความเสี่ยงก่อนถึงวันประกาศงบรอบถัดไป.'
         },
         fibo: {
@@ -126,7 +126,7 @@
             icon: '🟢',
             title: 'Supertrend (ทิศทางเทรนด์ตามความผันผวน)',
             cat: 'Trend Following',
-            desc: 'ตัวชี้วัดระบุทิศทางแนวโน้มที่คำนวณจากค่าเฉลี่ยความผันผวน ATR (10, Multiplier 3) มีความแม่นยำสูงในการรันเทรนด์.',
+            desc: 'ตัวชี้วัดระบุทิศทางแนวโน้มที่คำนวณจากค่าเฉลี่ยความผันผวน ATR (10, Multiplier 3) ช่วยติดตามทิศทางของเทรนด์.',
             usage: 'เมื่อเส้นสีเขียวอยู่ใต้ราคา บ่งบอกสถานะขาขึ้น (Buy / Hold) เมื่อเส้นเปลี่ยนเป็นสีแดงอยู่เหนือราคา บ่งบอกสถานะขาลง (Sell / Exit).',
             tip: 'ใช้เส้น Supertrend เป็นจุด Trailing Stop ขยับตามราคาเพื่อล็อกกำไรคำโตโดยไม่ขายหมูกลางทาง.'
         },
@@ -160,7 +160,7 @@
             cat: 'Trend Following & Candle Color System',
             desc: 'ระบบสัญลักษณ์สีแท่งเทียนที่ได้รับความนิยมสูงสุดในไทย พัฒนาโดยคุณโฉลก สัมพันธารักษ์ (ลุงโฉลก) อิงเส้นคู่ Fast EMA 12 และ Slow EMA 26 วัน.',
             usage: 'แท่งสีเขียว (Bullish Run) คือสถานะถือรันเทรนด์ / ซื้อตาม, แท่งสีฟ้า (Take Profit / Buy on Dip) คือจุดพักตัวหรือเด้งกลับ, แท่งสีส้ม (Rebound in Downtrend) คือเด้งสั้นในขาลง, และแท่งสีแดง (Strong Bearish / Cash) คือสถานะถือเงินสด ไม่ซื้อ.',
-            tip: 'จุดเข้าซื้อตามระบบที่แม่นยำที่สุดคือวันแรกที่แท่งเทียนเปลี่ยนจากสีแดงเป็น สีเขียว (Golden Cross) และขายเมื่อเปลี่ยนเป็น สีแดง (Death Cross).'
+            tip: 'จุดเข้าซื้อตามระบบคือวันแรกที่แท่งเทียนเปลี่ยนจากสีแดงเป็น สีเขียว (Golden Cross) และขายเมื่อเปลี่ยนเป็น สีแดง (Death Cross).'
         },
         rsi: {
             icon: '⚡',
@@ -168,45 +168,16 @@
             cat: 'Momentum Oscillator',
             desc: 'ดัชนีวัดโมเมนตัมความเร็วและขนาดของการเคลื่อนไหวของราคา บนมาตรวัด 0 ถึง 100 ในกรอบเวลา 14 วัน.',
             usage: 'RSI < 30 บ่งชี้ภาวะขายมากเกินไป (Oversold โซนดักช้อนซื้อ) ส่วน RSI > 70 บ่งชี้ภาวะซื้อมากเกินไป (Overbought โซนระวังแรงขาย).',
-            tip: 'สัญญาณที่แม่นยำที่สุดคือ Bullish Divergence เมื่อราคาหุ้นทำจุดต่ำสุดใหม่ (Lower Low) แต่ RSI ยกจุดต่ำสุดสูงขึ้น (Higher Low) มักเกิดการกลับตัวขึ้นแรง.'
+            tip: 'สัญญาณสำคัญคือ Bullish Divergence เมื่อราคาหุ้นทำจุดต่ำสุดใหม่ (Lower Low) แต่ RSI ยกจุดต่ำสุดสูงขึ้น (Higher Low) มักบ่งชี้โอกาสการกลับตัวขึ้น.'
         },
         sqz: {
             icon: '🎯',
             title: 'Squeeze Momentum Indicator [LazyBear]',
             cat: 'Volatility Compression & Momentum Explosion',
-            desc: 'อินดิเคเตอร์ยอดนิยมอันดับ 1 ตลอดกาลบน TradingView ของ LazyBear พัฒนาจากทฤษฎี John Carter TTM Squeeze วัดการบีบอัดตัวของ Bollinger Bands ภายใน Keltner Channels เพื่อจับจังหวะสะสมพลังก่อนระเบิดเทรนด์.',
-            usage: '🟠 <strong>จุดสีส้ม/ดำ (Squeeze ON):</strong> ความผันผวนบีบตัวต่ำผิดปกติ เป็นจังหวะสะสมพลังของเจ้ามือ.<br>' +
+            desc: 'อินดิเคเตอร์ยอดนิยมบน TradingView ของ LazyBear พัฒนาจากทฤษฎี John Carter TTM Squeeze วัดการบีบอัดตัวของ Bollinger Bands ภายใน Keltner Channels เพื่อจับจังหวะสะสมพลังก่อนระเบิดเทรนด์.',
+            usage: '🟠 <strong>จุดสีส้ม/ดำ (Squeeze ON):</strong> ความผันผวนบีบตัวต่ำผิดปกติ เป็นช่วงสะสมพลังก่อนเลือกทิศทาง.<br>' +
                    '🟢 <strong>จุดสีเขียว/เทา (Squeeze FIRED):</strong> เกิดการระเบิดของกรอบความผันผวน พร้อมแท่งโมเมนตัมพุ่งขึ้น (เขียวสว่าง = ขาขึ้นเร่งตัว, แดงสว่าง = ขาลงเร่งตัว).',
-            tip: 'เมื่อเห็นจุดสีส้มเกิดขึ้นติดต่อกันหลายแท่ง แล้วเปลี่ยนเป็นจุดสีเขียวพร้อมแท่งโมเมนตัมสีเขียวสว่าง มักตามมาด้วยแท่งเทียนพุ่งกระฉูดทันที.'
-        },
-        wae: {
-            icon: '💥',
-            title: 'Waddah Attar Explosion (WAE) [Shayankm]',
-            cat: 'Volume & Momentum Breakout Filter',
-            desc: 'ระบบตรวจจับการระเบิดตัวของราคาและปริมาณการซื้อขายในจังหวะเดียว (Explosion) ผสานความไวของ MACD ทวีคูณเข้ากับกรอบการระเบิด Bollinger Bands และเส้น Dead Zone.',
-            usage: '🟢 <strong>แท่งเขียวเหนือ Explosion Line:</strong> เกิด Bullish Explosion แรงซื้อสถาบันระเบิดดันราคา เป็นจุดเข้าซื้อตามน้ำที่แม่นยำสูง.<br>' +
-                   '🔴 <strong>แท่งแดงเหนือ Explosion Line:</strong> เกิด Bearish Explosion แรงเทขายทะลัก เป็นจุดหนีตายทันที.<br>' +
-                   '⚪ <strong>ต่ำกว่า Dead Zone:</strong> ตลาดซึมตัว ไร้โวลุ่ม ไม่ควรเข้าเทรด.',
-            tip: 'ใช้กรอง False Breakout ได้อย่างสมบูรณ์แบบ หากราคาทำ New High แต่แท่ง WAE ไม่ข้าม Explosion Line มักเป็นเพียงการล่อซื้อหลอก.'
-        },
-        vfi: {
-            icon: '🌊',
-            title: 'Volume Flow Indicator (VFI) [LazyBear]',
-            cat: 'Institutional Volume Accumulation',
-            desc: 'ตัวชี้วัดกระแสเงินไหลเข้า-ออกของสถาบัน (Markos Katsanos VFI) ที่เหนือกว่า OBV ทั่วไป โดยตัดความผันผวนที่เป็นสัญญาณรบกวนออก และถ่วงน้ำหนักเฉพาะแท่งที่มีนัยสำคัญทางสถิติ.',
-            usage: '🟢 <strong>VFI > 0 & เหนือ Signal:</strong> สถาบันสะสมหุ้นสุทธิ (Accumulation) เงินก้อนใหญ่กำลังไหลเข้าหนุนราคา.<br>' +
-                   '🔴 <strong>VFI < 0 & ต่ำกว่า Signal:</strong> สถาบันกระจายของสุทธิ (Distribution) แรงขายทยอยระบายของ.<br>' +
-                   '⚡ <strong>Golden Cross เหนือเส้น 0:</strong> สัญญาณจุดเปลี่ยนวัฏจักรเงินไหลเข้ารอบใหม่.',
-            tip: 'หากราคาหุ้นกำลังสร้างฐานไซด์เวย์ แต่เส้น VFI ชันขึ้นตัด 0 สะท้อนว่าสถาบันกำลังแอบกวาดซื้อหุ้นเก็บไว้เงียบๆ ก่อนดันราคาขึ้นจริง.'
-        },
-        utbot: {
-            icon: '🤖',
-            title: 'UT Bot Alerts [QuantNomad]',
-            cat: 'ATR Trailing Stop & Actionable Alerts',
-            desc: 'หนึ่งในสคริปต์แจ้งเตือนยอดนิยมสูงสุดกว่า 45,000+ Boosts บน TradingView ใช้คำนวณเส้น Trailing Stop ตามค่าความผันผวน ATR เพื่อสร้างสัญญาณเข้าซื้อ (BUY) และขายล็อคกำไร (SELL) ไร้ความล่าช้า.',
-            usage: '🟢 <strong>UT BUY:</strong> แท่งเทียนทะลุผ่านเส้น Trailing Stop ขึ้นมา เป็นจุดเข้าซื้อรันเทรนด์.<br>' +
-                   '🔴 <strong>UT SELL:</strong> แท่งเทียนหลุดเส้น Trailing Stop เป็นจุดขายลดความเสี่ยงหรือล็อคกำไร.',
-            tip: 'ใช้เส้นจุดประสีเขียว/แดงบนกราฟเป็นจุดตั้ง Stop Loss แบบเลื่อนตามราคา (Trailing Stop) ไม่ต้องเดาจุดตัดขาดทุนเอง.'
+            tip: 'เมื่อเห็นจุดสีส้มเกิดขึ้นติดต่อกันหลายแท่ง แล้วเปลี่ยนเป็นจุดสีเขียวพร้อมแท่งโมเมนตัมสีเขียวสว่าง บ่งชี้ว่าเกิดการเบรกเอาต์ความผันผวน.'
         },
         chand: {
             icon: '🪔',
@@ -217,38 +188,9 @@
                    '🔴 <strong>Sell / Flip to Short:</strong> เมื่อราคาปิดหลุดเส้น Long Stop ระบบจะสั่งปิดสถานะทันทีเพื่อล็อคกำไรก้อนใหญ่.',
             tip: 'เหมาะมากสำหรับนักลงทุนที่ต้องการรันเทรนด์ใหญ่ให้สุดทาง โดยปล่อยให้เส้น Chandelier Exit ขยับตามจุดสูงสุดใหม่ของหุ้น.'
         },
-        hull: {
-            icon: '🎨',
-            title: 'Hull Suite [InSilico]',
-            cat: 'Zero-Lag Trend Ribbon',
-            desc: 'การรวมพลังของเส้นค่าเฉลี่ยเคลื่อนที่ตระกูล Hull (HMA) ที่โด่งดังกว่า 30,000+ Boosts ช่วยขจัดความหน่วง (Lag) ของเส้นค่าเฉลี่ยธรรมดาได้เกือบ 100% พร้อมปรับสีตามโมเมนตัมแบบเรียลไทม์.',
-            usage: '🟢 <strong>ริบบอนสีเขียว (Bullish Trend):</strong> ความชันของราคาเป็นบวก เทรนด์แข็งแกร่ง น่าถือรันเทรนด์หรือดักซื้อเมื่อย่อตัว.<br>' +
-                   '🔴 <strong>ริบบอนสีแดง (Bearish Trend):</strong> ความชันหักหัวลง เตือนแรงขายทำกำไร ชะลอการเข้าซื้อ.',
-            tip: 'เมื่อ Hull Suite เปลี่ยนสีจากแดงเป็นเขียว มักส่งสัญญาณเร็วกว่า Golden Cross ของ EMA ทั่วไปถึงหลายวัน.'
-        },
-        wt: {
-            icon: '🌊',
-            title: 'WaveTrend Oscillator [LazyBear]',
-            cat: 'Momentum Waves & Reversal Cycles',
-            desc: 'ออสซิลเลเตอร์ยอดนิยมระดับตำนาน 35,000+ Boosts ของ LazyBear ดัดแปลงจากสูตร Commodity Channel Index (CCI) และคำนวณ EMA สองชั้น เพื่อดักจับจุดกลับตัวต้นรอบที่ไวกว่า MACD.',
-            usage: '🟢 <strong>WT1 ตัดขึ้นเหนือ WT2 ในโซน Oversold (ต่ำกว่า -50):</strong> จุดช้อนซื้อต้นรอบที่มีแต้มต่อสูงสุด (Oversold Buy).<br>' +
-                   '🔴 <strong>WT1 ตัดลงใต้ WT2 ในโซน Overbought (สูงกว่า +50):</strong> จุดขายทำกำไรปลายรอบ (Overbought Sell).<br>' +
-                   '⚪ <strong>เส้น 0:</strong> ระดับแบ่งโซนกระทิง (แดนบวก) และโซนหมี (แดนลบ).',
-            tip: 'สัญญาณ Golden Cross ของ WaveTrend ในโซนต่ำกว่า -50 เป็นหนึ่งในสัญญาณกลับตัวที่แม่นยำที่สุดในหมวด Momentum.'
-        },
-        lorentzian: {
-            icon: '🤖',
-            title: 'Machine Learning: Lorentzian Classification [jdehorty]',
-            cat: 'Algorithmic AI Market Regime Prediction',
-            desc: 'สคริปต์ Machine Learning อันดับ 1 ตลอดกาลบน TradingView (42,000+ Boosts) ของ jdehorty คำนวณระยะห่างทางคณิตศาสตร์แบบ Lorentzian Warped Metric Space ด้วยอัลกอริทึม k-Nearest Neighbors (KNN, k=8) ข้าม 4 มิติทางเทคนิค (RSI 14, ROC 10, Normalized True Range, CCI 20).',
-            usage: '🟢 <strong>STRONG BUY / BUY (สีม่วง/เขียว):</strong> โมเดล AI ทำนายความน่าจะเป็นที่ราคาจะปรับตัวขึ้น พร้อมระบุค่าความเชื่อมั่น (Confidence %).<br>' +
-                   '🔴 <strong>STRONG SELL / SELL (สีแดง):</strong> โมเดล AI ตรวจพบสภาวะตลาดที่มีความเสี่ยงปรับฐานสูง.<br>' +
-                   '⚪ <strong>NEUTRAL:</strong> สภาวะตลาดสมดุล แนะนำรอความชัดเจน.',
-            tip: 'ใช้คะแนนความเชื่อมั่นของ Lorentzian ML ยืนยันร่วมกับสัญญาณเบรกเอาต์ของทรงกราฟหรือ Golden Pocket ของ Fibonacci เพื่อเพิ่ม Win Rate สูงสุด.'
-        },
         aisig: {
-            icon: '🤖',
-            title: 'Rule-based Decision Signals (BUY / DCA / TP)',
+            icon: '📌',
+            title: 'Rule markers (BUY / DCA / TP)',
             cat: 'Algorithmic Signal System',
             desc: 'ระบบป้ายสัญญาณซื้อขายอัจฉริยะ (Rule-based Multi-Factor Engine) วิเคราะห์ร่วมกันระหว่างโมเมนตัม RSI, การตัดกันของเส้น EMA, สภาพคล่อง Order Block และ Fibonacci Golden Pocket.',
             usage: '🟢 <strong>BUY (1-5/5):</strong> สัญญาณจุดเข้าซื้อตามโมเมนตัม ยิ่งคะแนนสูงยิ่งมีความน่าเชื่อถือ.<br>' +
@@ -283,7 +225,7 @@
         document.getElementById('im_usage').innerHTML = g.usage;
         document.getElementById('im_tip').innerHTML = g.tip;
 
-        const isSubpane = ['rsi', 'sqz', 'wae', 'vfi', 'wt'].includes(indKey);
+        const isSubpane = ['rsi', 'sqz'].includes(indKey);
         const isVis = isSubpane ? activeSubpaneOscs.includes(indKey) : indicatorVisibility[indKey];
         const btn = document.getElementById('im_toggle_btn');
         if (btn) {
@@ -305,7 +247,7 @@
 
     function toggleFromModal() {
         if (!currentModalInd) return;
-        const isSubpane = ['rsi', 'sqz', 'wae', 'vfi', 'wt'].includes(currentModalInd);
+        const isSubpane = ['rsi', 'sqz'].includes(currentModalInd);
         if (isSubpane) {
             toggleSubpane(currentModalInd);
         } else {
@@ -401,7 +343,7 @@
                 disclaimerElem.style.background = 'rgba(16, 185, 129, 0.08)';
                 disclaimerElem.style.borderColor = 'rgba(16, 185, 129, 0.35)';
                 disclaimerElem.style.borderStyle = 'solid';
-                disclaimerElem.innerHTML = '🤖 <b>วิเคราะห์และแปลเชิงลึกโดย AI (Antigravity Intelligence)</b> • แปลภาษาและสังเคราะห์สาระสำคัญตามบริบทธุรกิจจริง';
+                disclaimerElem.innerHTML = '📰 <b>สรุปและแปลเชิงลึก</b> • แปลภาษาและสังเคราะห์สาระสำคัญตามบริบทธุรกิจจริง';
             } else {
                 disclaimerElem.style.color = '#fbbf24';
                 disclaimerElem.style.background = 'rgba(245, 158, 11, 0.08)';
@@ -486,10 +428,7 @@
         bb: false,
         pat: false,
         fibo: false,
-        utbot: false,
         chand: false,
-        hull: false,
-        lorentzian: false,
         aisig: false,
         ext: true,
     };
@@ -512,9 +451,7 @@
         smcLines: [],
         ewPriceLines: [],
         fiboLines: [],
-        utbot: [],
         chand: [],
-        hull: [],
         extPriceLine: null
     };
 
@@ -1091,7 +1028,10 @@
         }
 
         // 2. Draw Pattern Geometric Skeleton (Connecting swing key points like W, M, Shoulders, Head)
-        if (pat.key_points && pat.key_points.length >= 2) {
+        // Do NOT draw zigzag skeleton across boundaries for channel, wedge, triangle, flag, or box patterns.
+        const pNameLower = (pat.name || '').toLowerCase();
+        const isBoundingPattern = pNameLower.includes('wedge') || pNameLower.includes('triangle') || pNameLower.includes('channel') || pNameLower.includes('flag') || pNameLower.includes('box');
+        if (!isBoundingPattern && pat.key_points && pat.key_points.length >= 2) {
             const sortedKp = [...pat.key_points].sort((a, b) => new Date(a.time) - new Date(b.time));
             const skelPoints = sortedKp.map(kp => ({ time: kp.time, value: kp.price }));
             const skelData = interpolatePatternPoints(skelPoints, currentCandles);
@@ -1099,9 +1039,12 @@
                 try {
                     const isBear = pat.type && pat.type.toLowerCase().includes('bear');
                     const isFailed = pat.status === 'failed';
-                    const isForming = pat.status === 'forming';
-                    const skelColor = isFailed ? '#ef4444' : (isBear ? '#fb7185' : (isForming ? '#fbbf24' : '#34d399'));
-                    const skelTitle = isFailed ? ('⚠️ ' + pat.name + ' (ล้มเหลว/หลุดรับ)') : ('🏛️ ' + pat.name + (isForming ? ' (กำลังฟอร์มตัว)' : ' (ยืนยันแล้ว)'));
+                    const isBrokeDown = pat.status === 'broke_down';
+                    const isConfirmed = pat.status === 'confirmed';
+                    const isForming = pat.status === 'forming' || (!isConfirmed && !isFailed && !isBrokeDown);
+                    const skelColor = isFailed ? '#ef4444' : (isBrokeDown ? '#fb7185' : (isBear ? '#fb7185' : (isForming ? '#fbbf24' : '#34d399')));
+                    const skelStatusText = isFailed ? ' (ล้มเหลว/หลุดรับ)' : (isBrokeDown ? ' (เบรกลง)' : (isConfirmed ? ' (ยืนยันแล้ว)' : ' (กำลังฟอร์มตัว)'));
+                    const skelTitle = isFailed ? ('⚠️ ' + pat.name + skelStatusText) : (isBrokeDown ? ('🔻 ' + pat.name + skelStatusText) : ('🏛️ ' + pat.name + skelStatusText));
                     const skelSeries = chart.addLineSeries({
                         color: skelColor,
                         lineWidth: 2.5,
@@ -1118,20 +1061,26 @@
         // 3. Draw Price Lines for Neckline and Measured Move Target
         if (pat.neckline && pat.neckline > 0) {
             try {
+                const patNameLower = String(pat.name || '').toLowerCase();
+                const isNecklinePattern = patNameLower.includes('head') || patNameLower.includes('shoulder') || patNameLower.includes('double');
+                const lineLabel = isNecklinePattern ? '🏛️ Neckline $' : '🏛️ แนวเบรก $';
                 priceLines.push(series.createPriceLine({
                     price: Number(pat.neckline),
                     color: '#38bdf8',
                     lineWidth: 1.5,
                     lineStyle: LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
-                    title: '🏛️ Neckline $' + Number(pat.neckline).toFixed(2),
+                    title: lineLabel + Number(pat.neckline).toFixed(2),
                 }));
             } catch(e) {}
         }
 
-        if (pat.target && pat.target > 0 && pat.status !== 'failed') {
+        if (pat.target && pat.target > 0 && pat.status !== 'failed' && pat.status !== 'broke_down') {
             try {
-                const isUp = (pat.upside_pct || 0) >= 0;
+                const uVal = typeof pat.upside_pct === 'number' ? pat.upside_pct : parseFloat(pat.upside_pct || 0);
+                const isUp = uVal >= 0;
+                const uSign = uVal > 0 ? '+' : (uVal < 0 ? '-' : '');
+                const uStr = uSign + Math.abs(uVal).toFixed(1) + '%';
                 const isForming = pat.status === 'forming';
                 priceLines.push(series.createPriceLine({
                     price: Number(pat.target),
@@ -1139,7 +1088,7 @@
                     lineWidth: 2,
                     lineStyle: isForming ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Solid,
                     axisLabelVisible: true,
-                    title: '🎯 Target $' + Number(pat.target).toFixed(2) + (isForming ? ' (รอเบรก)' : (' (' + (isUp ? '+' : '') + (pat.upside_pct || 0) + '%)')),
+                    title: '🎯 Target $' + Number(pat.target).toFixed(2) + (isForming ? ' (รอเบรก)' : ` (${uStr})`),
                 }));
             } catch(e) {}
         }
@@ -1239,6 +1188,11 @@
         }
     }
 
+    function getDaysToEarningsDisplay(dEarn) {
+        if (dEarn === null || dEarn === undefined || isNaN(dEarn)) return null;
+        return Math.round(Number(dEarn));
+    }
+
     function updateUpcomingEarnings(ticker) {
         if (!indicatorVisibility.earn) {
             currentEarningsIso = null;
@@ -1285,7 +1239,8 @@
         ensureEarningsOverlay();
         const vText = document.getElementById('v_earn_text');
         if (vText) {
-            vText.textContent = 'วันประกาศงบ: ' + (mInfo.earnings_date || '') + ' (อีก ' + (Math.round(dEarn * 10) / 10) + ' วัน)';
+            const roundedDays = getDaysToEarningsDisplay(dEarn);
+            vText.textContent = 'วันประกาศงบ: ' + (mInfo.earnings_date || '') + ' (ใน ' + (roundedDays !== null ? roundedDays : 0) + ' วัน)';
         }
 
         try {
@@ -1343,35 +1298,83 @@
             });
         }
 
-        // 2. AI Decision Signals (BUY / DCA / TP) - Only shown when toggled ON
+        // 2. Decision Signals - Evaluated from sig.type
         if (indicatorVisibility.aisig && tData.ai_signals) {
             const aiSignals = tData.ai_signals || [];
             aiSignals.forEach(sig => {
-                const isBuy = sig.action === 'BUY';
-                const isDca = sig.action === 'DCA';
-                const isSell = sig.action === 'SELL';
-                markers.push({
-                    time: sig.time,
-                    position: (isBuy || isDca) ? 'belowBar' : 'aboveBar',
-                    color: sig.marker_color || (isBuy ? '#10b981' : (isDca ? '#38bdf8' : '#f43f5e')),
-                    shape: sig.marker_shape || (isBuy ? 'arrowUp' : (isDca ? 'circle' : 'arrowDown')),
-                    text: (isBuy ? '🤖 BUY ' : (isDca ? '🤖 DCA ' : (isSell ? '🤖 TP ' : '🤖 '))) + sig.score + '/5',
-                    id: 'sig_' + sig.time,
-                });
+                let type = (sig.type || '').toUpperCase();
+                // Map legacy action/type
+                if (!type && sig.action) {
+                    const act = (sig.action || '').toUpperCase();
+                    if (act === 'ENTRY' || act === 'BUY' || act.includes('STRONG')) type = 'RULE_ENTRY';
+                    else if (act === 'DCA') type = 'RULE_DCA';
+                    else if (act === 'SELL' || act === 'TRIM' || act === 'TP') type = 'RULE_TP';
+                    else if (act.includes('พักสัญญาณ') || sig.earnings_guard) type = 'EARNINGS_GUARD';
+                    else if (act.includes('เลี่ยง') || act === 'AVOID') type = 'AVOID';
+                    else if (act.includes('รอ') || act === 'WAIT' || act === 'HOLD') type = 'WAIT';
+                }
+                if ((type.includes('STRONG') && type.includes('BUY')) || type === 'BUY') {
+                    type = 'RULE_ENTRY';
+                } else if (type === 'DCA') {
+                    type = 'RULE_DCA';
+                } else if (type === 'SELL') {
+                    type = 'RULE_TP';
+                }
+
+                // AVOID / HOLD / WAIT: do not render marker
+                if (type === 'AVOID' || type === 'HOLD' || type === 'WAIT') {
+                    return;
+                }
+
+                if (type === 'ENTRY' || type === 'RULE_ENTRY' || type === 'RULE_DCA') {
+                    const isDca = type === 'RULE_DCA';
+                    const scoreText = sig.score ? ` (${sig.score}/5)` : '';
+                    markers.push({
+                        time: sig.time,
+                        position: 'belowBar',
+                        color: sig.marker_color || (isDca ? '#38bdf8' : '#10b981'),
+                        shape: sig.marker_shape || 'arrowUp',
+                        text: (isDca ? 'DCA' : 'Entry') + scoreText,
+                        id: 'sig_' + sig.time,
+                    });
+                } else if (type === 'RULE_TP' || type === 'TRIM') {
+                    const isTrim = type === 'TRIM';
+                    markers.push({
+                        time: sig.time,
+                        position: 'aboveBar',
+                        color: sig.marker_color || (isTrim ? '#f59e0b' : '#f43f5e'),
+                        shape: sig.marker_shape || 'arrowDown',
+                        text: isTrim ? 'Trim' : 'TP',
+                        id: 'sig_' + sig.time,
+                    });
+                } else if (type === 'EARNINGS_GUARD' || sig.earnings_guard) {
+                    const gDays = sig.guard_days != null ? ` (${sig.guard_days}d)` : '';
+                    markers.push({
+                        time: sig.time,
+                        position: sig.position || 'aboveBar',
+                        color: sig.marker_color || '#facc15',
+                        shape: 'circle',
+                        text: 'พักสัญญาณ' + gDays,
+                        id: 'sig_' + sig.time,
+                    });
+                }
             });
         }
 
         // Historical Earnings Reaction Markers (Rocket Tool Style: 'งบ +xx.x%')
         if (indicatorVisibility.earn && tData.earnings_history) {
             tData.earnings_history.forEach(e => {
-                const isPos = (e.reaction_pct >= 0);
+                const rVal = typeof e.reaction_pct === 'number' ? e.reaction_pct : parseFloat(e.reaction_pct || 0);
+                const isPos = rVal >= 0;
+                const rSign = rVal > 0 ? '+' : (rVal < 0 ? '-' : '');
+                const rStr = rSign + Math.abs(rVal).toFixed(1) + '%';
                 markers.push({
                     time: e.time,
                     position: e.position || (isPos ? 'belowBar' : 'aboveBar'),
                     color: isPos ? '#facc15' : '#ec4899',
                     shape: 'circle',
                     size: 2,
-                    text: '🗓️ ' + ((e.reaction_pct || 0) >= 0 ? '+' : '') + Number(e.reaction_pct || 0).toFixed(1) + '%',
+                    text: '🗓️ ' + rStr,
                 });
             });
         }
@@ -1411,15 +1414,36 @@
         const pat = tData.pattern;
         if (indicatorVisibility.pat && pat && pat.key_points && pat.key_points.length > 0) {
             const sortedKp = [...pat.key_points].sort((a, b) => new Date(a.time) - new Date(b.time));
+            let lastMarkerTime = null;
+            let lastMarkerPos = null;
+            let lastMarkerPrice = null;
+
             sortedKp.forEach((kp, idx) => {
                 const isStart = kp.role === 'start' || idx === 0;
                 const isHi = (kp.name && (kp.name.toLowerCase().includes('top') || kp.name.toLowerCase().includes('peak') || kp.name.toLowerCase().includes('head') || kp.name.toLowerCase().includes('shoulder') || kp.name.toLowerCase().includes('high') || kp.name.toLowerCase().includes('resistance') || kp.name.toLowerCase().includes('ceiling')));
                 const isBreakdown = kp.name && kp.name.toLowerCase().includes('breakdown');
                 const isBreakout = kp.name && kp.name.toLowerCase().includes('breakout');
+
+                let pos = isBreakdown ? 'belowBar' : (isBreakout ? 'aboveBar' : (isHi ? 'aboveBar' : 'belowBar'));
+
+                // Anti-collision: if previous marker is within 7 days and close in price, alternate vertical position
+                if (lastMarkerTime && lastMarkerPos) {
+                    const dDiff = Math.abs((new Date(kp.time) - new Date(lastMarkerTime)) / (1000 * 60 * 60 * 24));
+                    const pDiff = lastMarkerPrice ? Math.abs(kp.price - lastMarkerPrice) / lastMarkerPrice : 1;
+                    if (dDiff <= 7 || pDiff <= 0.05) {
+                        if (pos === lastMarkerPos) {
+                            pos = (pos === 'aboveBar') ? 'belowBar' : 'aboveBar';
+                        }
+                    }
+                }
+                lastMarkerTime = kp.time;
+                lastMarkerPos = pos;
+                lastMarkerPrice = kp.price;
+
                 if (isStart) {
                     markers.push({
                         time: kp.time,
-                        position: isHi ? 'aboveBar' : 'belowBar',
+                        position: pos,
                         color: '#facc15',
                         shape: 'circle',
                         text: '🚩 จุดเริ่มแพทเทิร์น: ' + (kp.name || 'Start') + ' $' + Number(kp.price).toFixed(2),
@@ -1428,7 +1452,7 @@
                 } else if (isBreakdown) {
                     markers.push({
                         time: kp.time,
-                        position: 'belowBar',
+                        position: pos,
                         color: '#ef4444',
                         shape: 'arrowDown',
                         text: '⚠️ ' + kp.name + ' $' + Number(kp.price).toFixed(2),
@@ -1437,18 +1461,18 @@
                 } else if (isBreakout) {
                     markers.push({
                         time: kp.time,
-                        position: 'aboveBar',
+                        position: pos,
                         color: '#10b981',
                         shape: 'arrowUp',
-                        text: '🚀 ' + kp.name + ' $' + Number(kp.price).toFixed(2),
+                        text: '↗ ' + kp.name + ' $' + Number(kp.price).toFixed(2),
                         size: 2,
                     });
                 } else {
                     markers.push({
                         time: kp.time,
-                        position: isHi ? 'aboveBar' : 'belowBar',
+                        position: pos,
                         color: pat.type && pat.type.toLowerCase().includes('bear') ? '#fb7185' : '#34d399',
-                        shape: isHi ? 'arrowDown' : 'arrowUp',
+                        shape: pos === 'aboveBar' ? 'arrowDown' : 'arrowUp',
                         text: '🏛️ ' + kp.name + ' $' + Number(kp.price).toFixed(2),
                     });
                 }
@@ -1503,7 +1527,7 @@
             }
         }
 
-        // Squeeze Fired & WAE Explosion Markers on Candles (Only when their sub-pane oscillator is active)
+        // Squeeze Fired Markers on Candles (Only when sub-pane oscillator is active)
         if (activeSubpaneOscs.includes('sqz') && tData.squeeze_momentum && tData.squeeze_momentum.squeeze_fired && currentCandles.length > 0) {
             const lastBar = currentCandles[currentCandles.length - 1];
             const isBull = tData.squeeze_momentum.direction === 'BULLISH';
@@ -1513,34 +1537,7 @@
                 color: isBull ? '#facc15' : '#ec4899',
                 shape: isBull ? 'arrowUp' : 'arrowDown',
                 size: 2,
-                text: '🎯 SQZ FIRED (' + (isBull ? 'Bull 🚀' : 'Bear ⚠️') + ')',
-            });
-        }
-        if (activeSubpaneOscs.includes('wae') && tData.wae && tData.wae.is_explosion && currentCandles.length > 0) {
-            const lastBar = currentCandles[currentCandles.length - 1];
-            const isBullExp = tData.wae.status === 'BULL_EXPLOSION';
-            markers.push({
-                time: lastBar.time,
-                position: isBullExp ? 'belowBar' : 'aboveBar',
-                color: isBullExp ? '#facc15' : '#ec4899',
-                shape: 'circle',
-                size: 2,
-                text: '💥 WAE ' + (isBullExp ? 'Bull Exp 🟡' : 'Bear Exp 🟣'),
-            });
-        }
-
-        // UT Bot Alerts markers
-        if (indicatorVisibility.utbot && tData.ut_bot && tData.ut_bot.alerts) {
-            tData.ut_bot.alerts.forEach(a => {
-                const isBuy = a.action === 'BUY';
-                markers.push({
-                    time: a.time,
-                    position: isBuy ? 'belowBar' : 'aboveBar',
-                    color: isBuy ? '#10b981' : '#f43f5e',
-                    shape: isBuy ? 'arrowUp' : 'arrowDown',
-                    size: 2,
-                    text: '🤖 UT ' + a.action + ' $' + Number(a.price).toFixed(2),
-                });
+                text: '🎯 SQZ FIRED (' + (isBull ? 'Bull ▲' : 'Bear ⚠️') + ')',
             });
         }
 
@@ -1568,48 +1565,6 @@
             }
         }
 
-        // WaveTrend reversal markers
-        if (activeSubpaneOscs.includes('wt') && tData.wavetrend && currentCandles.length > 0) {
-            const wt = tData.wavetrend;
-            if (wt.status === 'OVERSOLD_BUY') {
-                markers.push({
-                    time: currentCandles[currentCandles.length - 1].time,
-                    position: 'belowBar',
-                    color: '#34d399',
-                    shape: 'circle',
-                    size: 2,
-                    text: '🌊 WT OVERSOLD BUY',
-                });
-            } else if (wt.status === 'OVERBOUGHT_SELL') {
-                markers.push({
-                    time: currentCandles[currentCandles.length - 1].time,
-                    position: 'aboveBar',
-                    color: '#fb7185',
-                    shape: 'circle',
-                    size: 2,
-                    text: '🌊 WT OVERBOUGHT SELL',
-                });
-            }
-        }
-
-        // Lorentzian ML Prediction Marker
-        if (indicatorVisibility.lorentzian && tData.lorentzian_ml && currentCandles.length > 0) {
-            const ml = tData.lorentzian_ml;
-            const lastBar = currentCandles[currentCandles.length - 1];
-            const isBull = ml.direction === 'BULLISH';
-            const isBear = ml.direction === 'BEARISH';
-            if (isBull || isBear) {
-                markers.push({
-                    time: lastBar.time,
-                    position: isBull ? 'belowBar' : 'aboveBar',
-                    color: isBull ? '#c084fc' : '#f43f5e',
-                    shape: isBull ? 'arrowUp' : 'arrowDown',
-                    size: 2,
-                    text: '🤖 ML ' + ml.status + ' (' + ml.confidence + '%)',
-                });
-            }
-        }
-
         markers.sort((a, b) => new Date(a.time) - new Date(b.time));
         try {
             series.setMarkers(markers);
@@ -1625,7 +1580,7 @@
             else btn.classList.remove('active');
         }
 
-        if (key === 'lorentzian' || key === 'aisig') {
+        if (key === 'aisig') {
             updateChartMarkers(activeCandleSeries, currentStockTicker);
             return;
         }
@@ -1775,7 +1730,7 @@
             return;
         }
 
-        if (key === 'utbot' || key === 'chand' || key === 'hull') {
+        if (key === 'chand') {
             if (activeCandleSeries) {
                 renderLightweightChart(currentStockTicker);
             }
@@ -1812,7 +1767,7 @@
     }
 
     function updateSubpaneButtons() {
-        ['rsi', 'sqz', 'wae', 'vfi', 'wt'].forEach(k => {
+        ['rsi', 'sqz'].forEach(k => {
             const btn = document.getElementById('tog_osc_' + k);
             if (btn) {
                 if (activeSubpaneOscs.includes(k)) btn.classList.add('active');
@@ -2012,7 +1967,8 @@
         const body = document.getElementById('score_sidebar_body');
         const badge = document.getElementById('score_grade_badge');
         if (!body) return;
-        const sc = (STOCKS_META[ticker] || {}).score;
+        const meta = STOCKS_META[ticker] || {};
+        const sc = meta.score;
         if (!sc) {
             body.innerHTML = '<div style="color:#94a3b8;">ไม่มีข้อมูลคะแนนสำหรับหุ้นนี้</div>';
             if (badge) badge.textContent = '-';
@@ -2035,13 +1991,23 @@
         const reasons = (sc.reasons || []).map(r => `<li>${escapeHtml(r)}</li>`).join('');
         const flags = [];
         if (sc.timing && sc.timing.entry_signal) flags.push('<span style="color:#34d399; font-weight:700;">⤴ Entry Signal (RSI Hook)</span>');
-        if (sc.earnings_guard) flags.push('<span style="color:#fb923c; font-weight:700;">🟠 งบออกใน 14 วัน ระงับการถัว</span>');
+        if (sc.earnings_guard) {
+            const thresh = sc.guard_days_threshold || meta.earnings_guard_days;
+            const roundedDays = getDaysToEarningsDisplay(meta.days_to_earnings);
+            let threshText = 'ใกล้วันประกาศงบ';
+            if (roundedDays !== null && roundedDays >= 0) {
+                threshText = roundedDays === 0 ? 'งบออกวันนี้' : `งบออกใน ${roundedDays} วัน`;
+            } else if (thresh) {
+                threshText = `งบออกภายใน ${thresh} วัน`;
+            }
+            flags.push(`<span style="color:#fb923c; font-weight:700;">🟠 ${threshText} (ระงับการถัว)</span>`);
+        }
         body.innerHTML = `
             ${bar('🏦 พื้นฐาน (60%)', sc.pillars.fundamental, 'รายได้ กำไร ROE PEG D/E FCF')}
             ${bar('📍 โซนราคา vs EMA200 (40%)', sc.pillars.timing, 'วัดจาก backtest: โซน 0-10% เหนือ EMA200 มี drawdown ต่ำสุด')}
             ${flags.length ? `<div style="margin:6px 0;">${flags.join('<br>')}</div>` : ''}
             <ul style="margin:6px 0 0 16px; padding:0;">${reasons}</ul>
-            <div style="margin-top:8px; font-size:0.68rem; color:#94a3b8;">ข้อมูลครบ ${Math.round((sc.coverage || 0) * 100)}% • อินดิเคเตอร์อื่นบนกราฟ (VFI, WAE, Squeeze, UT Bot, Lorentzian) ไม่ผ่าน backtest จึงไม่นับคะแนน</div>
+            <div style="margin-top:8px; font-size:0.68rem; color:#94a3b8;">ข้อมูลครบ ${Math.round((sc.coverage || 0) * 100)}% • อินดิเคเตอร์ประกอบบนกราฟ (Squeeze, Chandelier) ไม่ผ่าน backtest จึงไม่นับคะแนน</div>
         `;
     }
 
@@ -2110,7 +2076,7 @@
                 <div style="margin-top:6px; font-size:0.73rem; color:#cbd5e1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 8px;">
                     <div style="font-weight:700; color:#facc15; margin-bottom:2px;">🎯 สัญญาณ Lux S/R ล่าสุด:</div>
                     <div>${lastBreak.label} ที่ $${Number(lastBreak.level).toFixed(2)} <span style="color:#94a3b8;">(${lastBreak.time})</span></div>
-                    <div style="color:#94a3b8; font-size:0.68rem; margin-top:2px;">${lastBreak.desc}</div>
+                    <div style="color:#94a3b8; font-size:0.68rem; margin-top:2px;">${(lastBreak.desc || '').replace(/\+\s*-\s*/g, '- ')}</div>
                 </div>
             `;
         }
@@ -2139,10 +2105,8 @@
         if (!container) return;
 
         const sqz = tData.squeeze_momentum;
-        const wae = tData.wae;
-        const vfi = tData.vfi;
 
-        if (!sqz && !wae && !vfi) {
+        if (!sqz) {
             container.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8;">ไม่พบข้อมูลโมเมนตัม</div>';
             return;
         }
@@ -2150,80 +2114,19 @@
         let sqzStatusText = '⚪ ปกติ';
         let sqzColor = '#94a3b8';
         let sqzBg = 'rgba(148, 163, 184, 0.12)';
-        if (sqz) {
-            if (sqz.squeeze_on) {
-                sqzStatusText = '🟠 Squeeze ON (สะสมพลัง)';
-                sqzColor = '#f97316';
-                sqzBg = 'rgba(249, 115, 22, 0.15)';
-            } else if (sqz.squeeze_fired) {
-                sqzStatusText = '🟢 Squeeze FIRED (ระเบิดเทรนด์)';
-                sqzColor = '#10b981';
-                sqzBg = 'rgba(16, 185, 129, 0.15)';
-            }
-        }
-
-        let waeStatusText = '⚪ ปกติ';
-        let waeColor = '#94a3b8';
-        let waeBg = 'rgba(148, 163, 184, 0.12)';
-        if (wae) {
-            if (wae.status === 'BULL_EXPLOSION') {
-                waeStatusText = '💥 Bull Explosion (แรงซื้อทะลัก)';
-                waeColor = '#10b981';
-                waeBg = 'rgba(16, 185, 129, 0.15)';
-            } else if (wae.status === 'BEAR_EXPLOSION') {
-                waeStatusText = '💥 Bear Explosion (แรงขายทะลัก)';
-                waeColor = '#f43f5e';
-                waeBg = 'rgba(244, 63, 94, 0.15)';
-            } else if (wae.status === 'DEAD_ZONE') {
-                waeStatusText = '💤 Dead Zone (ตลาดซึม)';
-                waeColor = '#64748b';
-                waeBg = 'rgba(100, 116, 139, 0.12)';
-            }
-        }
-
-        let vfiStatusText = '⚪ ปกติ';
-        let vfiColor = '#94a3b8';
-        let vfiBg = 'rgba(148, 163, 184, 0.12)';
-        if (vfi && vfi.vfi != null) {
-            const vfiVal = Number(vfi.vfi);
-            if (vfi.status === 'ACCUMULATION') {
-                vfiStatusText = `🟢 Accumulation (+${vfiVal.toFixed(1)})`;
-                vfiColor = '#34d399';
-                vfiBg = 'rgba(52, 211, 153, 0.15)';
-            } else if (vfi.status === 'DISTRIBUTION') {
-                vfiStatusText = `🔴 Distribution (${vfiVal.toFixed(1)})`;
-                vfiColor = '#fb7185';
-                vfiBg = 'rgba(251, 113, 133, 0.15)';
-            }
-        }
-
-        const wt = tData.wavetrend;
-        let wtStatusText = '⚪ ปกติ';
-        let wtColor = '#94a3b8';
-        let wtBg = 'rgba(148, 163, 184, 0.12)';
-        if (wt && wt.wt1 != null) {
-            const wtVal = Number(wt.wt1);
-            if (wt.status === 'OVERSOLD_BUY') {
-                wtStatusText = `🟢 Oversold Buy (${wtVal.toFixed(1)})`;
-                wtColor = '#34d399';
-                wtBg = 'rgba(52, 211, 153, 0.15)';
-            } else if (wt.status === 'OVERBOUGHT_SELL') {
-                wtStatusText = `🔴 Overbought Sell (${wtVal.toFixed(1)})`;
-                wtColor = '#fb7185';
-                wtBg = 'rgba(251, 113, 133, 0.15)';
-            } else if (wt.direction === 'BULLISH') {
-                wtStatusText = `🟢 Bullish (${wtVal.toFixed(1)})`;
-                wtColor = '#818cf8';
-                wtBg = 'rgba(129, 140, 248, 0.15)';
-            } else {
-                wtStatusText = `🔴 Bearish (${wtVal.toFixed(1)})`;
-                wtColor = '#f43f5e';
-                wtBg = 'rgba(244, 63, 94, 0.15)';
-            }
+        if (sqz.squeeze_on) {
+            sqzStatusText = '🟠 Squeeze ON (สะสมพลัง)';
+            sqzColor = '#f97316';
+            sqzBg = 'rgba(249, 115, 22, 0.15)';
+        } else if (sqz.squeeze_fired) {
+            sqzStatusText = '🟢 Squeeze FIRED (ระเบิดเทรนด์)';
+            sqzColor = '#10b981';
+            sqzBg = 'rgba(16, 185, 129, 0.15)';
         }
 
         if (badge) {
-            badge.textContent = sqz && sqz.squeeze_fired ? '🔥 High Volatility' : (wae && wae.is_explosion ? '⚡ Explosion Active' : 'Multi-Engine Pro');
+            badge.textContent = 'ไม่ผ่าน backtest ใช้ประกอบเท่านั้น';
+            badge.style.color = '#f59e0b';
         }
 
         container.innerHTML = `
@@ -2233,35 +2136,11 @@
                         <span style="font-weight:700; color:${sqzColor}; font-size:0.75rem;">🎯 LazyBear Squeeze</span>
                         <span style="font-weight:800; color:${sqzColor}; font-size:0.72rem;">${sqzStatusText}</span>
                     </div>
-                    <div style="font-size:0.70rem; color:#cbd5e1;">${sqz ? sqz.summary : ''}</div>
-                </div>
-
-                <div style="background:${waeBg}; border:1px solid ${waeColor}40; border-radius:6px; padding:6px 8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                        <span style="font-weight:700; color:${waeColor}; font-size:0.75rem;">💥 Waddah Attar (WAE)</span>
-                        <span style="font-weight:800; color:${waeColor}; font-size:0.72rem;">${waeStatusText}</span>
-                    </div>
-                    <div style="font-size:0.70rem; color:#cbd5e1;">${wae ? wae.summary : ''}</div>
-                </div>
-
-                <div style="background:${vfiBg}; border:1px solid ${vfiColor}40; border-radius:6px; padding:6px 8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                        <span style="font-weight:700; color:${vfiColor}; font-size:0.75rem;">🌊 LazyBear VFI Flow</span>
-                        <span style="font-weight:800; color:${vfiColor}; font-size:0.72rem;">${vfiStatusText}</span>
-                    </div>
-                    <div style="font-size:0.70rem; color:#cbd5e1;">${vfi ? vfi.summary : ''}</div>
-                </div>
-
-                <div style="background:${wtBg}; border:1px solid ${wtColor}40; border-radius:6px; padding:6px 8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                        <span style="font-weight:700; color:${wtColor}; font-size:0.75rem;">🌊 WaveTrend [LazyBear]</span>
-                        <span style="font-weight:800; color:${wtColor}; font-size:0.72rem;">${wtStatusText}</span>
-                    </div>
-                    <div style="font-size:0.70rem; color:#cbd5e1;">${wt ? wt.summary : ''}</div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${sqz.summary || ''}</div>
                 </div>
             </div>
             <div style="margin-top:8px; font-size:0.68rem; color:#64748b;">
-                💡 สลับดูกราฟย่อยได้ทันทีด้วยปุ่ม SUB-PANE ด้านบน (⚡ RSI | 🎯 Squeeze | 💥 WAE | 🌊 VFI | 🌊 WaveTrend)
+                💡 สลับดูกราฟย่อยได้ทันทีด้วยปุ่ม SUB-PANE ด้านบน (⚡ RSI | 🎯 Squeeze Mom)
             </div>
         `;
     }
@@ -2272,78 +2151,34 @@
         const badge = document.getElementById('ml_sidebar_badge');
         if (!container) return;
 
-        const ml = tData.lorentzian_ml;
-        const ut = tData.ut_bot;
         const ch = tData.chandelier_exit;
-        const hl = tData.hull_suite;
 
-        if (!ml && !ut && !ch && !hl) {
-            container.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8;">ไม่พบข้อมูล Machine Learning & Trend Armor</div>';
+        if (!ch) {
+            container.innerHTML = '<div style="font-size:0.78rem; color:#94a3b8;">ไม่พบข้อมูล Chandelier Exit</div>';
             return;
         }
 
-        let mlColor = '#94a3b8';
-        let mlBg = 'rgba(148, 163, 184, 0.12)';
-        let mlText = '⚪ NEUTRAL';
-        if (ml) {
-            if (ml.direction === 'BULLISH') {
-                mlColor = '#10b981';
-                mlBg = 'rgba(16, 185, 129, 0.15)';
-                mlText = `🟢 ${ml.status} (${ml.confidence}%)`;
-            } else if (ml.direction === 'BEARISH') {
-                mlColor = '#f43f5e';
-                mlBg = 'rgba(244, 63, 94, 0.15)';
-                mlText = `🔴 ${ml.status} (${(100 - ml.confidence).toFixed(1)}%)`;
-            }
-        }
-
-        let utColor = ut && ut.position === 'BUY' ? '#10b981' : '#f43f5e';
-        let utBg = ut && ut.position === 'BUY' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
-        let utText = (ut && ut.trailing_stop != null) ? `${ut.position} (Stop $${Number(ut.trailing_stop).toFixed(2)})` : (ut ? `${ut.position}` : '-');
-
-        let chColor = ch && ch.direction === 'LONG' ? '#10b981' : '#f43f5e';
-        let chBg = ch && ch.direction === 'LONG' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
-        let chText = (ch && ch.trailing_stop != null) ? `${ch.direction} (Stop $${Number(ch.trailing_stop).toFixed(2)})` : (ch ? `${ch.direction}` : '-');
-
-        let hlColor = hl && hl.trend === 'BULLISH' ? '#2dd4bf' : '#f43f5e';
-        let hlBg = hl && hl.trend === 'BULLISH' ? 'rgba(45, 212, 191, 0.12)' : 'rgba(244, 63, 94, 0.12)';
-        let hlText = (hl && hl.value != null) ? `${hl.trend} ($${Number(hl.value).toFixed(2)})` : (hl ? `${hl.trend}` : '-');
+        let chColor = ch.direction === 'LONG' ? '#10b981' : '#f43f5e';
+        let chBg = ch.direction === 'LONG' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
+        let chText = (ch.trailing_stop != null) ? `${ch.direction} (Stop $${Number(ch.trailing_stop).toFixed(2)})` : `${ch.direction}`;
 
         if (badge) {
-            badge.textContent = ml ? `KNN ${ml.bull_votes}/${ml.k} • Score ${ml.score > 0 ? '+' : ''}${ml.score}` : 'Trend Armor';
+            badge.textContent = 'ไม่ผ่าน backtest ใช้ประกอบเท่านั้น';
+            badge.style.color = '#f59e0b';
         }
 
         container.innerHTML = `
             <div style="display:flex; flex-direction:column; gap:6px;">
-                <div style="background:${mlBg}; border:1px solid ${mlColor}40; border-radius:6px; padding:6px 8px;">
+                <div style="background:${chBg}; border:1px solid ${chColor}40; border-radius:6px; padding:6px 8px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                        <span style="font-weight:700; color:${mlColor}; font-size:0.75rem;">🤖 Lorentzian Classification [jdehorty]</span>
-                        <span style="font-weight:800; color:${mlColor}; font-size:0.72rem;">${mlText}</span>
+                        <span style="font-weight:700; color:${chColor}; font-size:0.75rem;">🪔 Chandelier Exit</span>
+                        <span style="font-weight:800; color:${chColor}; font-size:0.72rem;">${chText}</span>
                     </div>
-                    <div style="font-size:0.70rem; color:#cbd5e1;">${ml ? ml.summary : ''}</div>
-                </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                    <div style="background:${utBg}; border:1px solid ${utColor}40; border-radius:6px; padding:6px 8px;">
-                        <div style="font-size:0.68rem; font-weight:700; color:${utColor}; margin-bottom:2px;">🤖 UT Bot Alerts</div>
-                        <div style="font-size:0.72rem; font-weight:800; color:#f8fafc;">${utText}</div>
-                    </div>
-                    <div style="background:${chBg}; border:1px solid ${chColor}40; border-radius:6px; padding:6px 8px;">
-                        <div style="font-size:0.68rem; font-weight:700; color:${chColor}; margin-bottom:2px;">🪔 Chandelier Exit</div>
-                        <div style="font-size:0.72rem; font-weight:800; color:#f8fafc;">${chText}</div>
-                    </div>
-                </div>
-
-                <div style="background:${hlBg}; border:1px solid ${hlColor}40; border-radius:6px; padding:6px 8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                        <span style="font-weight:700; color:${hlColor}; font-size:0.75rem;">🎨 Hull Suite [InSilico]</span>
-                        <span style="font-weight:800; color:${hlColor}; font-size:0.72rem;">${hlText}</span>
-                    </div>
-                    <div style="font-size:0.70rem; color:#cbd5e1;">${hl ? hl.summary : ''}</div>
+                    <div style="font-size:0.70rem; color:#cbd5e1;">${ch.summary || ''}</div>
                 </div>
             </div>
             <div style="margin-top:8px; font-size:0.68rem; color:#64748b;">
-                💡 เปิด/ปิดเส้น UT Bot, Chandelier และ Hull Suite ได้ที่แถบ Toolbar ด้านบนกราฟ
+                💡 เปิด/ปิดเส้น Chandelier Exit ได้ที่แถบ Toolbar ด้านบนกราฟ
             </div>
         `;
     }
@@ -2455,7 +2290,7 @@
                         ${displayTitle}
                     </div>
                     ${item.ai_analyzed
-                        ? `<div class="news-ai-tag" style="display:inline-flex; align-items:center; gap:4px; font-size:0.64rem; font-weight:700; color:#34d399; background:rgba(16, 185, 129, 0.12); border:1px solid rgba(16, 185, 129, 0.3); border-radius:4px; padding:2px 6px; margin:4px 0 6px;">🤖 วิเคราะห์ลึกโดย AI</div>`
+                        ? `<div class="news-ai-tag" style="display:inline-flex; align-items:center; gap:4px; font-size:0.64rem; font-weight:700; color:#34d399; background:rgba(16, 185, 129, 0.12); border:1px solid rgba(16, 185, 129, 0.3); border-radius:4px; padding:2px 6px; margin:4px 0 6px;">📰 สรุปข่าวเชิงลึก</div>`
                         : `<div class="news-heuristic" title="เซนติเมนต์และสรุปสร้างจากคีย์เวิร์ดในพาดหัว ไม่ได้อ่านเนื้อข่าวจริง" style="font-size:0.62rem; color:#94a3b8; margin:4px 0 6px;">🔎 วิเคราะห์จากคีย์เวิร์ด</div>`}
                     <div class="news-actions-row">
                         <button class="news-btn-th" onclick="event.stopPropagation(); openNewsModal('${ticker}', ${idx})">
@@ -2649,6 +2484,29 @@
 
     // Render Single Sub-Pane Chart Component (TradingView Multi-Pane Stacking)
     function renderSingleSubpane(oscKey, container, tData, candles, width, height, isLast) {
+        if (currentAggTimeframe !== 'D' && oscKey !== 'rsi') {
+            const wrap = document.createElement('div');
+            wrap.className = 'rsi-subpane-wrap';
+            wrap.id = 'subpane_wrap_' + oscKey;
+
+            const titleMap = {
+                sqz: '🎯 Squeeze Momentum [LazyBear]',
+            };
+            const oscTitle = titleMap[oscKey] || oscKey.toUpperCase();
+
+            wrap.innerHTML = `
+                <div class="rsi-pane-header">
+                    <span class="rsi-pane-title" style="color:#94a3b8; font-weight:700;">${oscTitle}</span>
+                    <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
+                </div>
+                <div style="padding: 16px; text-align: center; color: #94a3b8; font-size: 0.82rem; background: #080c16; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.08); margin: 6px 10px 10px;">
+                    ⚠️ ใช้ได้เฉพาะกราฟรายวัน
+                </div>
+            `;
+            container.appendChild(wrap);
+            return null;
+        }
+
         const wrap = document.createElement('div');
         wrap.className = 'rsi-subpane-wrap';
         wrap.id = 'subpane_wrap_' + oscKey;
@@ -2773,197 +2631,6 @@
                     valElem.innerHTML = `<span style="color:${col}">M: ${h.value.toFixed(2)}</span>`;
                 }
             };
-        } else if (oscKey === 'wae') {
-            header.innerHTML = `
-                <span class="rsi-pane-title" style="color:#10b981; font-weight:700;">💥 Waddah Attar Explosion (WAE)</span>
-                <span class="rsi-ref-label" style="color:#facc15;">🟡 Explosion</span>
-                <span class="rsi-ref-label" style="color:#94a3b8;">⚪ Dead Zone</span>
-                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
-                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
-            `;
-            const waeSeriesList = (tData.wae && tData.wae.series) || [];
-            const waeByTime = new Map(waeSeriesList.map(w => [w.time, w]));
-
-            const waeHist = subChart.addHistogramSeries({
-                priceLineVisible: false,
-                lastValueVisible: true,
-            });
-            const expLine = subChart.addLineSeries({
-                color: '#facc15',
-                lineWidth: 1.5,
-                title: 'Explosion',
-                priceLineVisible: false,
-            });
-            const deadLine = subChart.addLineSeries({
-                color: '#94a3b8',
-                lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
-                title: 'Dead Zone',
-                priceLineVisible: false,
-            });
-
-            waeHist.setData(candles.map(c => {
-                const w = waeByTime.get(c.time);
-                if (!w) return { time: c.time, value: 0 };
-                const isBull = w.trend_up > 0;
-                return {
-                    time: c.time,
-                    value: isBull ? w.trend_up : w.trend_down,
-                    color: isBull ? (w.bull_explosion ? '#10b981' : '#047857') : (w.bear_explosion ? '#f43f5e' : '#881337')
-                };
-            }));
-            expLine.setData(candles.map(c => {
-                const w = waeByTime.get(c.time);
-                return { time: c.time, value: w ? w.explosion_line : 0 };
-            }));
-            deadLine.setData(candles.map(c => {
-                const w = waeByTime.get(c.time);
-                return { time: c.time, value: w ? w.dead_zone : 0 };
-            }));
-
-            targetSeries = waeHist;
-            getValue = (timeStr) => {
-                const w = waeByTime.get(timeStr);
-                return w ? (w.trend_up > 0 ? w.trend_up : w.trend_down) : 0;
-            };
-
-            const valElem = document.getElementById('sub_hover_' + oscKey);
-            if (tData.wae && valElem) {
-                const w = tData.wae;
-                const col = w.status === 'BULL_EXPLOSION' ? '#10b981' : (w.status === 'BEAR_EXPLOSION' ? '#f43f5e' : '#94a3b8');
-                valElem.innerHTML = `<span style="color:${col}">${w.status}</span>`;
-            }
-
-            updateHover = (timeStr) => {
-                const w = waeByTime.get(timeStr);
-                if (w && valElem) {
-                    const isBull = w.trend_up > 0;
-                    const val = isBull ? w.trend_up : w.trend_down;
-                    const col = isBull ? '#10b981' : '#f43f5e';
-                    valElem.innerHTML = `<span style="color:${col}">${isBull ? 'Bull' : 'Bear'}: ${val.toFixed(2)}</span>`;
-                }
-            };
-        } else if (oscKey === 'vfi') {
-            header.innerHTML = `
-                <span class="rsi-pane-title" style="color:#38bdf8; font-weight:700;">🌊 Volume Flow Indicator (VFI) [LazyBear]</span>
-                <span class="rsi-ref-label" style="color:#10b981;">🟢 Accumulation</span>
-                <span class="rsi-ref-label" style="color:#fb7185;">🔴 Distribution</span>
-                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
-                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
-            `;
-            const vfiSeriesList = (tData.vfi && tData.vfi.series) || [];
-            const vfiByTime = new Map(vfiSeriesList.map(v => [v.time, v]));
-
-            const vfiLine = subChart.addLineSeries({
-                color: '#38bdf8',
-                lineWidth: 2,
-                title: 'VFI',
-                priceLineVisible: false,
-                lastValueVisible: true,
-            });
-            const vfiSigLine = subChart.addLineSeries({
-                color: '#f59e0b',
-                lineWidth: 1.5,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
-                title: 'Signal',
-                priceLineVisible: false,
-            });
-            vfiLine.createPriceLine({
-                price: 0,
-                color: 'rgba(255, 255, 255, 0.35)',
-                lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Solid,
-                title: '0.0',
-            });
-            vfiLine.setData(candles.map(c => {
-                const v = vfiByTime.get(c.time);
-                return { time: c.time, value: v ? v.vfi : 0 };
-            }));
-            vfiSigLine.setData(candles.map(c => {
-                const v = vfiByTime.get(c.time);
-                return { time: c.time, value: v ? v.signal : 0 };
-            }));
-
-            targetSeries = vfiLine;
-            getValue = (timeStr) => {
-                const v = vfiByTime.get(timeStr);
-                return v ? v.vfi : 0;
-            };
-
-            const valElem = document.getElementById('sub_hover_' + oscKey);
-            if (tData.vfi && valElem) {
-                const v = tData.vfi;
-                const col = v.vfi > 0 ? '#10b981' : '#fb7185';
-                valElem.innerHTML = `<span style="color:${col}">VFI ${v.vfi > 0 ? '+' : ''}${v.vfi.toFixed(1)} (${v.status})</span>`;
-            }
-
-            updateHover = (timeStr) => {
-                const v = vfiByTime.get(timeStr);
-                if (v && valElem) {
-                    const col = v.vfi > 0 ? '#10b981' : '#fb7185';
-                    valElem.innerHTML = `<span style="color:${col}">VFI: ${v.vfi.toFixed(1)} / Sig: ${v.signal.toFixed(1)}</span>`;
-                }
-            };
-        } else if (oscKey === 'wt') {
-            header.innerHTML = `
-                <span class="rsi-pane-title" style="color:#818cf8; font-weight:700;">🌊 WaveTrend Oscillator [LazyBear]</span>
-                <span class="rsi-ref-label" style="color:#fb7185;">Overbought: +50 / +60</span>
-                <span class="rsi-ref-label" style="color:#34d399;">Oversold: -50 / -60</span>
-                <span id="sub_hover_${oscKey}" style="margin-left:6px; font-weight:700; color:#94a3b8;">-</span>
-                <button class="subpane-close-btn" onclick="toggleSubpane('${oscKey}')" title="ปิดหน้าต่างนี้ (Close)">✕</button>
-            `;
-            const wtSeriesList = (tData.wavetrend && tData.wavetrend.series) || [];
-            const wtByTime = new Map(wtSeriesList.map(w => [w.time, w]));
-
-            const wt1Line = subChart.addLineSeries({
-                color: '#818cf8',
-                lineWidth: 2,
-                title: 'WT1',
-                priceLineVisible: false,
-                lastValueVisible: true,
-            });
-            const wt2Line = subChart.addLineSeries({
-                color: '#f59e0b',
-                lineWidth: 1.5,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
-                title: 'WT2',
-                priceLineVisible: false,
-            });
-            wt1Line.createPriceLine({ price: 60, color: 'rgba(244, 63, 94, 0.4)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '+60' });
-            wt1Line.createPriceLine({ price: 50, color: 'rgba(244, 63, 94, 0.25)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '+50' });
-            wt1Line.createPriceLine({ price: 0, color: 'rgba(255, 255, 255, 0.2)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Solid, title: '0' });
-            wt1Line.createPriceLine({ price: -50, color: 'rgba(16, 185, 129, 0.25)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '-50' });
-            wt1Line.createPriceLine({ price: -60, color: 'rgba(16, 185, 129, 0.4)', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, title: '-60' });
-
-            wt1Line.setData(candles.map(c => {
-                const w = wtByTime.get(c.time);
-                return { time: c.time, value: w ? w.wt1 : 0 };
-            }));
-            wt2Line.setData(candles.map(c => {
-                const w = wtByTime.get(c.time);
-                return { time: c.time, value: w ? w.wt2 : 0 };
-            }));
-
-            targetSeries = wt1Line;
-            getValue = (timeStr) => {
-                const w = wtByTime.get(timeStr);
-                return w ? w.wt1 : 0;
-            };
-
-            const valElem = document.getElementById('sub_hover_' + oscKey);
-            if (tData.wavetrend && valElem) {
-                const w = tData.wavetrend;
-                const col = w.direction === 'BULLISH' ? '#10b981' : '#fb7185';
-                valElem.innerHTML = `<span style="color:${col}">WT1 ${w.wt1.toFixed(1)} / WT2 ${w.wt2.toFixed(1)} (${w.status})</span>`;
-            }
-
-            updateHover = (timeStr) => {
-                const w = wtByTime.get(timeStr);
-                if (w && valElem) {
-                    const col = w.wt1 >= w.wt2 ? '#10b981' : '#fb7185';
-                    valElem.innerHTML = `<span style="color:${col}">WT1: ${w.wt1.toFixed(1)} / WT2: ${w.wt2.toFixed(1)}</span>`;
-                }
-            };
         } else {
             // Default: 'rsi'
             header.innerHTML = `
@@ -3008,7 +2675,7 @@
             targetSeries = rsiSeries;
             getValue = (timeStr) => {
                 const r = rsiByTime.get(timeStr);
-                return r !== undefined ? r : 50;
+                return r !== undefined ? r : null;
             };
 
             const valElem = document.getElementById('sub_hover_' + oscKey);
@@ -3321,28 +2988,11 @@
             chartSeriesRegistry.ichi.push(kijunSeries);
         }
 
-        // Hull Suite [InSilico]
-        chartSeriesRegistry.hull = [];
-        if (tData.hull_suite && tData.hull_suite.series) {
-            const hlList = tData.hull_suite.series;
-            const hlByTime = new Map(hlList.map(h => [h.time, h]));
-            const isBullHl = tData.hull_suite.trend === 'BULLISH';
-            const hlSeries = chart.addLineSeries({
-                color: isBullHl ? '#2dd4bf' : '#f43f5e',
-                lineWidth: 2.5,
-                title: 'Hull Suite (55)',
-                visible: indicatorVisibility.hull,
-            });
-            hlSeries.setData(currentCandles.map(c => {
-                const h = hlByTime.get(c.time);
-                return { time: c.time, value: h ? h.value : c.close };
-            }));
-            chartSeriesRegistry.hull = [hlSeries];
-        }
+        const isDailyTf = (currentAggTimeframe === 'D');
 
         // Chandelier Exit [everget]
         chartSeriesRegistry.chand = [];
-        if (tData.chandelier_exit && tData.chandelier_exit.series) {
+        if (isDailyTf && tData.chandelier_exit && tData.chandelier_exit.series) {
             const chList = tData.chandelier_exit.series;
             const chByTime = new Map(chList.map(ch => [ch.time, ch]));
             const isLongCh = tData.chandelier_exit.direction === 'LONG';
@@ -3358,26 +3008,6 @@
                 return { time: c.time, value: ch ? ch.stop : c.close };
             }));
             chartSeriesRegistry.chand = [chSeries];
-        }
-
-        // UT Bot Alerts [QuantNomad]
-        chartSeriesRegistry.utbot = [];
-        if (tData.ut_bot && tData.ut_bot.series) {
-            const utList = tData.ut_bot.series;
-            const utByTime = new Map(utList.map(u => [u.time, u]));
-            const isBuyUt = tData.ut_bot.position === 'BUY';
-            const utSeries = chart.addLineSeries({
-                color: isBuyUt ? '#10b981' : '#f43f5e',
-                lineWidth: 1.5,
-                lineStyle: LightweightCharts.LineStyle.Dotted,
-                title: 'UT Bot Stop',
-                visible: indicatorVisibility.utbot,
-            });
-            utSeries.setData(currentCandles.map(c => {
-                const u = utByTime.get(c.time);
-                return { time: c.time, value: u ? u.stop : c.close };
-            }));
-            chartSeriesRegistry.utbot = [utSeries];
         }
 
         // Classical Chart Pattern Lines & Neckline/Target Price Lines (Only drawn when toggled ON!)
@@ -3405,13 +3035,14 @@
         const m = STOCKS_META[ticker] || {};
         const lastP = (currentCandles.length ? currentCandles[currentCandles.length - 1].close : 0);
         if (m.cost && m.cost > 0) {
+            const isHolding = Boolean(m.is_holding && m.shares && m.shares > 0);
             candleSeries.createPriceLine({
                 price: m.cost,
-                color: '#3b82f6',
-                lineWidth: 1.5,
-                lineStyle: LightweightCharts.LineStyle.Dashed,
+                color: isHolding ? '#3b82f6' : '#64748b',
+                lineWidth: isHolding ? 1.5 : 1,
+                lineStyle: isHolding ? LightweightCharts.LineStyle.Dashed : LightweightCharts.LineStyle.Dotted,
                 axisLabelVisible: true,
-                title: '💵 ทุนพอร์ต $' + Number(m.cost).toFixed(2),
+                title: (isHolding ? '💵 ทุนพอร์ต $' : '💵 ทุนเดิม (ขายแล้ว) $') + Number(m.cost).toFixed(2),
             });
         }
 
@@ -3486,6 +3117,9 @@
             });
         });
 
+        const candleByTime = new Map((currentCandles || []).map(c => [c.time, c]));
+        const candleIndexByTime = new Map((currentCandles || []).map((c, i) => [c.time, i]));
+
         const updateHoverBar = (tStr, bar) => {
             const dateEl = document.getElementById('chb_date');
             const ohlcEl = document.getElementById('chb_ohlc');
@@ -3495,13 +3129,27 @@
             if (ohlcEl && bar && bar.open !== undefined) {
                 const isUp = bar.close >= bar.open;
                 const cColor = isUp ? '#10b981' : '#f43f5e';
-                const chg = bar.open > 0 ? (((bar.close - bar.open) / bar.open) * 100).toFixed(2) : '0.00';
-                const sign = Number(chg) >= 0 ? '+' : '';
-                ohlcEl.innerHTML = `O: <b>$${Number(bar.open).toFixed(2)}</b> &nbsp;H: <b>$${Number(bar.high).toFixed(2)}</b> &nbsp;L: <b>$${Number(bar.low).toFixed(2)}</b> &nbsp;C: <b style="color:${cColor};">$${Number(bar.close).toFixed(2)} (${sign}${chg}%)</b>`;
+                const idx = candleIndexByTime.get(tStr);
+                const prevBar = (idx !== undefined && idx > 0) ? currentCandles[idx - 1] : null;
+
+                // Day change vs previous bar close (standard return base)
+                let dayChangeHtml = '';
+                if (prevBar && prevBar.close > 0) {
+                    const dayDiff = ((bar.close - prevBar.close) / prevBar.close) * 100;
+                    const daySign = dayDiff > 0 ? '+' : (dayDiff < 0 ? '-' : '');
+                    const dayColor = dayDiff >= 0 ? '#10b981' : '#f43f5e';
+                    dayChangeHtml = `<span style="color:${dayColor}; font-weight:700;">(${daySign}${Math.abs(dayDiff).toFixed(2)}% vs วันก่อน)</span>`;
+                }
+
+                // Intraday candle change vs bar open
+                const intraDiff = bar.open > 0 ? (((bar.close - bar.open) / bar.open) * 100) : 0;
+                const intraSign = intraDiff > 0 ? '+' : (intraDiff < 0 ? '-' : '');
+                const intraHtml = `<span style="font-size:0.70rem; color:#94a3b8;" title="การเปลี่ยนแปลงภายในแท่ง เทียบราคาเปิด $${Number(bar.open).toFixed(2)}">[แท่ง: ${intraSign}${Math.abs(intraDiff).toFixed(2)}%]</span>`;
+
+                ohlcEl.innerHTML = `O: <b>$${Number(bar.open).toFixed(2)}</b> &nbsp;H: <b>$${Number(bar.high).toFixed(2)}</b> &nbsp;L: <b>$${Number(bar.low).toFixed(2)}</b> &nbsp;C: <b style="color:${cColor};">$${Number(bar.close).toFixed(2)}</b> ${dayChangeHtml} ${intraHtml}`;
             }
         };
 
-        const candleByTime = new Map((currentCandles || []).map(c => [c.time, c]));
         if (currentCandles && currentCandles.length > 0) {
             const lastBar = currentCandles[currentCandles.length - 1];
             updateHoverBar(lastBar.time, lastBar);
@@ -3562,7 +3210,7 @@
                                 if (val !== null && val !== undefined) {
                                     target.chart.setCrosshairPosition(val, param.time, target.series);
                                 } else {
-                                    target.chart.setCrosshairPosition(0, param.time, target.series);
+                                    target.chart.clearCrosshairPosition();
                                 }
                             } catch(e) {}
                         }
@@ -3797,7 +3445,7 @@
                     badgeHtml = `<span class="ai-narrative-tag watch">🟡 ทรงแข็งแรง (เหนือแนวรับ)</span>`;
                     story = `<b>${ticker}</b> วิ่งอยู่เหนือแนวรับ <b>$${s1.toFixed(2)}</b> ราว ${diffS1.toFixed(1)}% และมีระยะวิ่งไปชนแนวต้าน <b>$${r1.toFixed(2)}</b> อีก ${diffR1.toFixed(1)}%. `;
                 } else {
-                    badgeHtml = `<span class="ai-narrative-tag buy">🚀 ทะลุแนวต้าน (Breakout)</span>`;
+                    badgeHtml = `<span class="ai-narrative-tag buy">↗ ทะลุแนวต้าน (Breakout)</span>`;
                     story = `<b>${ticker}</b> เบรกเอาท์ทะลุแนวต้าน <b>$${r1.toFixed(2)}</b> สำเร็จ โมเมนตัมฝั่งซื้อควบคุมตลาด. `;
                 }
             }
@@ -3823,41 +3471,157 @@
     function updateKeyLevelsRadar(ticker) {
         const meta = STOCKS_META[ticker] || {};
         const tData = CHARTS_DATA[ticker] || {};
-        const price = meta.price || (currentCandles.length ? currentCandles[currentCandles.length - 1].close : 0);
+        const lastBar = (currentCandles && currentCandles.length > 0) ? currentCandles[currentCandles.length - 1] : (tData.candles && tData.candles.length ? tData.candles[tData.candles.length - 1] : null);
+        const candleClose = lastBar ? lastBar.close : (meta.price || 0);
+        const livePrice = meta.price || candleClose;
         const fmt = (v) => (v && v > 0) ? '$' + Number(v).toFixed(2) : '-';
 
-        document.getElementById('kl_r2').textContent = fmt(tData.pivots ? tData.pivots.r2 : 0);
-        document.getElementById('kl_r1').textContent = fmt(meta.resistance || (tData.pivots ? tData.pivots.r1 : 0));
-        document.getElementById('kl_current').textContent = fmt(price);
-        document.getElementById('kl_s1').textContent = fmt(meta.support || (tData.pivots ? tData.pivots.s1 : 0));
-        document.getElementById('kl_s2').textContent = fmt(tData.pivots ? tData.pivots.s2 : 0);
-        const slVal = meta.sl || (tData.atr14 ? (price - 1.5 * tData.atr14.value) : 0);
-        document.getElementById('kl_sl').textContent = fmt(slVal);
+        const p = tData.pivots;
+        const hasPivots = p && (p.r1 || p.r2 || p.s1 || p.s2);
+
+        let r2 = 0, r1 = 0, s1 = 0, s2 = 0, sourceLabel = 'Pivot รายเดือน';
+        if (hasPivots) {
+            r2 = p.r2 || 0;
+            r1 = p.r1 || 0;
+            s1 = p.s1 || 0;
+            s2 = p.s2 || 0;
+            sourceLabel = 'Pivot รายเดือน';
+        } else {
+            r1 = meta.resistance || 0;
+            r2 = meta.resistance2 || (r1 > 0 ? r1 * 1.05 : 0);
+            s1 = meta.support || 0;
+            s2 = meta.support2 || (s1 > 0 ? s1 * 0.95 : 0);
+            sourceLabel = 'แนวรับต้านจาก swing';
+        }
+
+        const klBadge = document.getElementById('kl_source_badge');
+        if (klBadge) klBadge.textContent = sourceLabel;
+
+        const latestSig = (tData.ai_signals && tData.ai_signals.length) ? tData.ai_signals[tData.ai_signals.length - 1] : null;
+        const isInformational = Boolean(latestSig && latestSig.levels_informational);
+
+        // R2 row
+        const r2NameElem = document.getElementById('kl_r2_name');
+        const r2ValElem = document.getElementById('kl_r2');
+        if (r2ValElem) {
+            r2ValElem.textContent = fmt(r2);
+            const isBroken = r2 > 0 && candleClose > r2;
+            if (isBroken) {
+                r2ValElem.style.color = '#94a3b8';
+                r2ValElem.style.opacity = '0.7';
+                if (r2NameElem) r2NameElem.innerHTML = `🔴 แนวต้าน 2 (R2) (${sourceLabel}) <span style="font-size:0.68rem; color:#94a3b8; background:rgba(148,163,184,0.18); padding:1px 5px; border-radius:3px; margin-left:4px;">ทะลุแล้ว</span>`;
+            } else {
+                r2ValElem.style.color = '#fb7185';
+                r2ValElem.style.opacity = '1';
+                if (r2NameElem) r2NameElem.textContent = `🔴 แนวต้าน 2 (R2) (${sourceLabel})`;
+            }
+        }
+
+        // R1 row
+        const r1NameElem = document.getElementById('kl_r1_name');
+        const r1ValElem = document.getElementById('kl_r1');
+        if (r1ValElem) {
+            r1ValElem.textContent = fmt(r1);
+            const isBroken = r1 > 0 && candleClose > r1;
+            if (isBroken) {
+                r1ValElem.style.color = '#94a3b8';
+                r1ValElem.style.opacity = '0.7';
+                if (r1NameElem) r1NameElem.innerHTML = `🔴 แนวต้าน 1 (R1) (${sourceLabel}) <span style="font-size:0.68rem; color:#94a3b8; background:rgba(148,163,184,0.18); padding:1px 5px; border-radius:3px; margin-left:4px;">ทะลุแล้ว</span>`;
+            } else {
+                r1ValElem.style.color = '#fb7185';
+                r1ValElem.style.opacity = '1';
+                if (r1NameElem) r1NameElem.textContent = `🔴 แนวต้าน 1 (R1) (${sourceLabel})`;
+            }
+        }
+
+        const klCurrent = document.getElementById('kl_current');
+        if (klCurrent) {
+            if (meta.price && Math.abs(meta.price - candleClose) > 0.001) {
+                klCurrent.innerHTML = fmt(candleClose) + ` <span style="font-size:0.72rem; color:#94a3b8; font-weight:normal;" title="ราคาสด: ${fmt(livePrice)}">(สด ${fmt(livePrice)})</span>`;
+            } else {
+                klCurrent.textContent = fmt(candleClose);
+            }
+        }
+
+        // S1 row
+        const s1NameElem = document.getElementById('kl_s1_name');
+        const s1ValElem = document.getElementById('kl_s1');
+        if (s1ValElem) {
+            s1ValElem.textContent = fmt(s1);
+            const isBroken = s1 > 0 && candleClose < s1;
+            if (isBroken) {
+                s1ValElem.style.color = '#94a3b8';
+                s1ValElem.style.opacity = '0.7';
+                if (s1NameElem) s1NameElem.innerHTML = `🟢 แนวรับ 1 (S1) (${sourceLabel}) <span style="font-size:0.68rem; color:#f43f5e; background:rgba(244,63,94,0.18); padding:1px 5px; border-radius:3px; margin-left:4px;">หลุดแล้ว</span>`;
+            } else {
+                s1ValElem.style.color = '#34d399';
+                s1ValElem.style.opacity = '1';
+                if (s1NameElem) s1NameElem.textContent = `🟢 แนวรับ 1 (S1) (${sourceLabel})`;
+            }
+        }
+
+        // S2 row
+        const s2NameElem = document.getElementById('kl_s2_name');
+        const s2ValElem = document.getElementById('kl_s2');
+        if (s2ValElem) {
+            s2ValElem.textContent = fmt(s2);
+            const isBroken = s2 > 0 && candleClose < s2;
+            if (isBroken) {
+                s2ValElem.style.color = '#94a3b8';
+                s2ValElem.style.opacity = '0.7';
+                if (s2NameElem) s2NameElem.innerHTML = `🛡️ แนวรับ 2 (S2) (${sourceLabel}) <span style="font-size:0.68rem; color:#f43f5e; background:rgba(244,63,94,0.18); padding:1px 5px; border-radius:3px; margin-left:4px;">หลุดแล้ว</span>`;
+            } else {
+                s2ValElem.style.color = '#34d399';
+                s2ValElem.style.opacity = '1';
+                if (s2NameElem) s2NameElem.textContent = `🛡️ แนวรับ 2 (S2) (${sourceLabel})`;
+            }
+        }
+
+        // SL: prioritize ai_signals/Python, fallback to meta.sl or ATR
+        const slVal = (latestSig && latestSig.stop_loss) ? latestSig.stop_loss : (meta.sl || (tData.atr14 ? (candleClose - 1.5 * tData.atr14.value) : 0));
+        const slNameElem = document.getElementById('kl_sl_name');
+        const slValElem = document.getElementById('kl_sl');
+        if (slValElem) {
+            slValElem.textContent = fmt(slVal);
+            if (isInformational) {
+                slValElem.style.color = '#94a3b8';
+                if (slNameElem) slNameElem.innerHTML = `🛑 Stop Loss <span style="font-size:0.68rem; color:#94a3b8; background:rgba(148,163,184,0.18); padding:1px 5px; border-radius:3px; margin-left:4px;">ข้อมูลอ้างอิง</span>`;
+            } else {
+                slValElem.style.color = '#f43f5e';
+                if (slNameElem) slNameElem.textContent = `🛑 Stop Loss (1.5 ATR)`;
+            }
+        }
     }
 
     // Earnings Radar Update
     function updateEarningsRadar(ticker) {
         const meta = STOCKS_META[ticker] || {};
+        const tData = CHARTS_DATA[ticker] || {};
+        const latestSig = (tData.ai_signals && tData.ai_signals.length) ? tData.ai_signals[tData.ai_signals.length - 1] : null;
+        const guardThresh = (latestSig && latestSig.guard_days_threshold) || (meta.score && meta.score.guard_days_threshold) || meta.earnings_guard_days || null;
         const radarBody = document.getElementById('earn_radar_body');
         const radarCard = document.getElementById('earn_radar_card');
         const dEarn = meta.days_to_earnings;
         const dDate = escapeHtml(meta.earnings_date || '-');
+        const roundedDays = getDaysToEarningsDisplay(dEarn);
 
         if (!radarBody) return;
 
-        if (dEarn !== null && dEarn !== undefined && dEarn >= 0) {
-            if (dEarn <= 14) {
+        if (roundedDays !== null && roundedDays >= 0) {
+            const isShockZone = guardThresh != null ? (roundedDays <= guardThresh) : Boolean(meta.earnings_guard_active || (latestSig && latestSig.earnings_guard) || (meta.score && meta.score.earnings_guard));
+            if (isShockZone) {
+                const zoneHint = guardThresh != null ? ` ภายใน ${guardThresh} วัน` : '';
                 radarBody.innerHTML = `
-                    <div style="color: #fb7185; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;">⚠️ งบออกใน ${dEarn} วัน (${dDate})</div>
-                    <div>ความผันผวนสูง (Earnings Shock Zone) แนะนำหลีกเลี่ยงการเปิดสถานะใหม่ขนาดใหญ่ก่อนงบออก</div>
+                    <div style="color: #fb7185; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;">⚠️ งบออกใน ${roundedDays} วัน (${dDate})</div>
+                    <div>ความผันผวนสูง (Earnings Shock Zone${zoneHint}) แนะนำหลีกเลี่ยงการเปิดสถานะใหม่ขนาดใหญ่ก่อนงบออก</div>
                 `;
                 if (radarCard) {
                     radarCard.style.borderColor = 'rgba(244, 63, 94, 0.4)';
                     radarCard.style.background = 'rgba(244, 63, 94, 0.08)';
                 }
-            } else if (dEarn <= 30) {
+            } else if (roundedDays <= 30) {
                 radarBody.innerHTML = `
-                    <div style="color: #facc15; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;">🟡 งบออกใน ${dEarn} วัน (${dDate})</div>
+                    <div style="color: #facc15; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;">🟡 งบออกใน ${roundedDays} วัน (${dDate})</div>
                     <div>เข้าใกล้ฤดูกาลประกาศผลประกอบการ ควรวางกรอบ Stop Loss ให้รัดกุม</div>
                 `;
                 if (radarCard) {
@@ -3866,8 +3630,8 @@
                 }
             } else {
                 radarBody.innerHTML = `
-                    <div style="color: #cbd5e1; font-weight: 700; margin-bottom: 4px;">🗓️ วันประกาศงบ: ${dDate} (อีก ${dEarn} วัน)</div>
-                    <div style="color: #94a3b8;">ยังไม่อยู่ในโซนความผันผวนของงบการเงิน สามารถใช้สัญญาณเทคนิคอลนำการตัดสินใจได้เต็มที่</div>
+                    <div style="color: #cbd5e1; font-weight: 700; margin-bottom: 4px;">🗓️ วันประกาศงบ: ${dDate} (ใน ${roundedDays} วัน)</div>
+                    <div>ยังไม่อยู่ในโซนความผันผวนของงบการเงิน สามารถใช้สัญญาณเทคนิคอลนำการตัดสินใจได้เต็มที่</div>
                 `;
                 if (radarCard) {
                     radarCard.style.borderColor = 'var(--border-color)';
@@ -3925,7 +3689,9 @@
         const extCardReset = document.getElementById('hud_ext_card');
         if (extCardReset) extCardReset.style.display = 'none';
 
-        const lastPrice = m.price || (tData.candles && tData.candles.length ? tData.candles[tData.candles.length - 1].close : 0);
+        const lastBar = (tData.candles && tData.candles.length) ? tData.candles[tData.candles.length - 1] : null;
+        const candleClose = lastBar ? lastBar.close : (m.price || 0);
+        const lastPrice = m.price || candleClose;
         const headPriceElem = document.getElementById('st_head_price');
         if (headPriceElem) headPriceElem.textContent = '$' + Number(lastPrice).toFixed(2);
 
@@ -3936,8 +3702,10 @@
             const prevClose = tData.candles[cLen - 2].close;
             const diffPct = prevClose > 0 ? ((lastPrice - prevClose) / prevClose) * 100 : 0;
             const isUp = diffPct >= 0;
+            const chgSign = diffPct > 0 ? '+' : (diffPct < 0 ? '-' : '');
             headChangeElem.className = 'header-change-chip ' + (isUp ? 'up' : 'down');
-            headChangeElem.textContent = (isUp ? '▲ +' : '▼ ') + diffPct.toFixed(2) + '%';
+            headChangeElem.textContent = (isUp ? '▲ ' : '▼ ') + (chgSign ? chgSign : '') + Math.abs(diffPct).toFixed(2) + '%';
+            headChangeElem.title = `เทียบราคาปิดวันก่อนหน้า $${Number(prevClose).toFixed(2)} (vs Previous Close)`;
         }
 
         const sym = (currentStockExchange && currentStockExchange !== 'US') ? (currentStockExchange + ':' + ticker) : ticker;
@@ -3945,24 +3713,80 @@
 
         // Update HUD Strip with Technical Fallbacks
         const fmt = (v) => (v && v > 0) ? '$' + Number(v).toFixed(2) : '-';
-        document.getElementById('hud_cost').textContent = fmt(m.cost);
-        document.getElementById('hud_price').textContent = fmt(lastPrice);
+        const isHolding = Boolean(m.is_holding && m.shares && m.shares > 0);
+        const hudCostElem = document.getElementById('hud_cost');
+        if (hudCostElem) {
+            if (m.cost && m.cost > 0 && !isHolding) {
+                hudCostElem.innerHTML = fmt(m.cost) + ` <span style="font-size:0.65rem; color:#94a3b8; font-weight:normal;">(ขายแล้ว)</span>`;
+            } else {
+                hudCostElem.textContent = fmt(m.cost);
+            }
+        }
+
+        const hudPriceLabel = document.getElementById('hud_price_label');
+        const hudPrice = document.getElementById('hud_price');
+        if (m.price && Math.abs(m.price - candleClose) > 0.001) {
+            if (hudPriceLabel) hudPriceLabel.textContent = '⚡ ราคาสด';
+            if (hudPrice) hudPrice.innerHTML = fmt(m.price) + ` <div style="font-size:0.68rem; color:#94a3b8; font-weight:normal;" title="ราคาปิดแท่งล่าสุด: ${fmt(candleClose)}">ปิดแท่ง: ${fmt(candleClose)}</div>`;
+        } else {
+            if (hudPriceLabel) hudPriceLabel.textContent = '⚡ ราคาปิดแท่งล่าสุด';
+            if (hudPrice) hudPrice.textContent = fmt(lastPrice);
+        }
 
         // Technical fallback cascade
         const fibo618 = (tData.fibonacci && tData.fibonacci['61.8%']) ? tData.fibonacci['61.8%'].price : 0;
-        const supVal = m.support || (tData.pivots ? tData.pivots.s1 : 0) || fibo618;
+        let supVal = 0, supSource = 'swing';
+        if (m.support) {
+            supVal = m.support;
+            supSource = 'swing';
+        } else if (tData.pivots && tData.pivots.s1) {
+            supVal = tData.pivots.s1;
+            supSource = 'Pivot';
+        } else {
+            supVal = fibo618;
+            supSource = 'Fibo';
+        }
         document.getElementById('hud_support').textContent = fmt(supVal);
+        const hudSupLabel = document.getElementById('hud_support_label');
+        if (hudSupLabel) hudSupLabel.textContent = `🟢 แนวรับสำคัญ (S1) (${supSource})`;
 
         const fibo236 = (tData.fibonacci && tData.fibonacci['23.6%']) ? tData.fibonacci['23.6%'].price : 0;
-        const resVal = m.resistance || (tData.pivots ? tData.pivots.r1 : 0) || fibo236;
+        let resVal = 0, resSource = 'swing';
+        if (m.resistance) {
+            resVal = m.resistance;
+            resSource = 'swing';
+        } else if (tData.pivots && tData.pivots.r1) {
+            resVal = tData.pivots.r1;
+            resSource = 'Pivot';
+        } else {
+            resVal = fibo236;
+            resSource = 'Fibo';
+        }
         document.getElementById('hud_resistance').textContent = fmt(resVal);
+        const hudResLabel = document.getElementById('hud_resistance_label');
+        if (hudResLabel) hudResLabel.textContent = `🔴 แนวต้านสำคัญ (R1) (${resSource})`;
 
-        const hudSlVal = m.sl || (tData.atr14 ? (lastPrice - 1.5 * tData.atr14.value) : (tData.pivots ? tData.pivots.s2 : 0));
-        document.getElementById('hud_sl').textContent = fmt(hudSlVal);
+        const latestSig = (tData.ai_signals && tData.ai_signals.length) ? tData.ai_signals[tData.ai_signals.length - 1] : null;
+        const hudSlVal = (latestSig && latestSig.stop_loss) ? latestSig.stop_loss : (m.sl || (tData.atr14 ? (lastPrice - 1.5 * tData.atr14.value) : (tData.pivots ? tData.pivots.s2 : 0)));
+        const hudSlElem = document.getElementById('hud_sl');
+        hudSlElem.textContent = fmt(hudSlVal);
 
         const ewTarget = (tData.elliott_wave && tData.elliott_wave.target) ? tData.elliott_wave.target : 0;
-        const tpVal = m.tp || (tData.pivots ? tData.pivots.r2 : 0) || ewTarget || (lastPrice > 0 ? (lastPrice * 1.08) : 0);
-        document.getElementById('hud_tp').textContent = fmt(tpVal);
+        const tpVal = (latestSig && latestSig.target) ? latestSig.target : (m.tp || (tData.pivots ? tData.pivots.r2 : 0) || ewTarget || (lastPrice > 0 ? (lastPrice * 1.08) : 0));
+        const hudTpElem = document.getElementById('hud_tp');
+        hudTpElem.textContent = fmt(tpVal);
+
+        if (latestSig && latestSig.levels_informational) {
+            hudSlElem.style.color = '#94a3b8';
+            hudSlElem.title = 'ข้อมูลอ้างอิง';
+            hudTpElem.style.color = '#94a3b8';
+            hudTpElem.title = 'ข้อมูลอ้างอิง';
+        } else {
+            hudSlElem.style.color = '#f43f5e';
+            hudSlElem.title = '';
+            hudTpElem.style.color = '#10b981';
+            hudTpElem.title = '';
+        }
 
         const targetVal = m.target || (tData.pivots ? tData.pivots.r1 : 0) || ewTarget;
         document.getElementById('hud_target').textContent = fmt(targetVal);
@@ -3985,10 +3809,12 @@
         const dEarn = m.days_to_earnings;
         const dDate = m.earnings_date || '-';
         if (earnVal) {
-            if (dEarn !== null && dEarn !== undefined && dEarn >= 0) {
-                const roundedDays = Math.round(dEarn);
+            const roundedDays = getDaysToEarningsDisplay(dEarn);
+            const earnThresh = (latestSig && latestSig.guard_days_threshold) || (m.score && m.score.guard_days_threshold) || m.earnings_guard_days || null;
+            if (roundedDays !== null && roundedDays >= 0) {
                 const shortDate = escapeHtml(String(dDate).replace(/\s+202\d$/, ''));
-                earnVal.innerHTML = `<span style="color:${dEarn <= 14 ? '#fb7185' : '#facc15'};">ใน ${roundedDays} วัน</span> <span style="font-size:0.70rem; color:#94a3b8; font-weight:600;">(${shortDate})</span>`;
+                const isNearGuard = earnThresh != null ? (roundedDays <= earnThresh) : Boolean(latestSig && latestSig.earnings_guard);
+                earnVal.innerHTML = `<span style="color:${isNearGuard ? '#fb7185' : '#facc15'};">ใน ${roundedDays} วัน</span> <span style="font-size:0.70rem; color:#94a3b8; font-weight:600;">(${shortDate})</span>`;
             } else {
                 earnVal.textContent = dDate;
             }
@@ -4030,6 +3856,42 @@
         }
     }
 
+    function getSignalBadgeText(sig, isGuard, guardDays) {
+        if (isGuard) {
+            return `พักสัญญาณ (${guardDays != null ? 'งบออกใน ' + guardDays + ' วัน' : 'ใกล้วันประกาศงบ'})`;
+        }
+        if (!sig) return '-';
+        let type = (sig.type || '').toUpperCase();
+        if (!type && sig.action) {
+            const act = (sig.action || '').toUpperCase();
+            if (act === 'ENTRY' || act === 'BUY' || act.includes('STRONG')) type = 'RULE_ENTRY';
+            else if (act === 'DCA') type = 'RULE_DCA';
+            else if (act === 'SELL' || act === 'TRIM' || act === 'TP') type = 'RULE_TP';
+            else if (act.includes('พักสัญญาณ') || sig.earnings_guard) type = 'EARNINGS_GUARD';
+            else if (act.includes('เลี่ยง') || act === 'AVOID') type = 'AVOID';
+            else if (act.includes('รอ') || act === 'WAIT' || act === 'HOLD') type = 'WAIT';
+        }
+        if ((type.includes('STRONG') && type.includes('BUY')) || type === 'BUY') type = 'RULE_ENTRY';
+        else if (type === 'DCA') type = 'RULE_DCA';
+        else if (type === 'SELL') type = 'RULE_TP';
+
+        if (type === 'ENTRY') return 'เข้าเงื่อนไขจุดเข้า';
+        if (type === 'RULE_ENTRY') return 'จุดเข้าตามกฎ';
+        if (type === 'RULE_DCA') return 'จุดสะสม DCA';
+        if (type === 'RULE_TP') return 'จุดทำกำไร';
+        if (type === 'TRIM') return 'แบ่งทำกำไร / รอ';
+        if (type === 'AVOID') return 'เลี่ยง';
+        if (type === 'HOLD') return 'รอจังหวะ';
+        if (type === 'WAIT') return 'รอ';
+        if (type === 'EARNINGS_GUARD') {
+            return `พักสัญญาณ (${guardDays != null ? 'งบออกใน ' + guardDays + ' วัน' : 'ใกล้วันประกาศงบ'})`;
+        }
+        if (sig.badge && !sig.badge.includes('BUY')) {
+            return String(sig.badge).replace(/🚀\s*/g, '').replace(/[\u{1F916}]\s*/gu, '');
+        }
+        return 'สัญญาณทางเทคนิค';
+    }
+
     // AI Decision Cards
     function renderAiDecisionSection(tData) {
         const chipsContainer = document.getElementById('signal_chips');
@@ -4045,12 +3907,30 @@
             return;
         }
 
+        const meta = STOCKS_META[currentStockTicker] || {};
+        const unified = meta.score;
+        const dEarn = meta.days_to_earnings;
+        const daysToEarn = getDaysToEarningsDisplay(dEarn);
+        const threshold = (signals.length && signals[signals.length - 1].guard_days_threshold) || (unified && unified.guard_days_threshold) || null;
+
         signals.forEach((sig, idx) => {
             const isLast = idx === signals.length - 1;
+            const sigThresh = sig.guard_days_threshold || threshold;
+            const isSigGuard = Boolean(
+                sig.earnings_guard ||
+                sig.guard_active ||
+                sig.type === 'EARNINGS_GUARD' ||
+                sig.action === 'PAUSE' ||
+                (sig.badge && sig.badge.includes('พักสัญญาณ')) ||
+                (isLast && ((unified && unified.earnings_guard) || (daysToEarn !== null && daysToEarn >= 0 && sigThresh && daysToEarn <= sigThresh)))
+            );
+            const guardDays = (daysToEarn !== null && daysToEarn >= 0) ? daysToEarn : (sig.guard_days || null);
+            const chipBadge = getSignalBadgeText(sig, isSigGuard, guardDays);
+
             const btn = document.createElement('button');
             btn.className = 'tv-sig-chip' + (isLast ? ' active' : '');
             btn.id = 'chip_sig_' + sig.time;
-            btn.innerHTML = `<span>${sig.time}</span> <span>${sig.badge}</span>`;
+            btn.innerHTML = `<span>${sig.time}</span> <span>${chipBadge}</span>`;
             btn.onclick = () => showDecisionDetail(sig);
             chipsContainer.appendChild(btn);
         });
@@ -4066,26 +3946,69 @@
         const card = document.getElementById('decision_card');
         if (!card) return;
 
-        const actionClass = sig.action ? sig.action.toLowerCase() : 'hold';
-        const reasonsHtml = (sig.reasons || []).map(r => `<li style="margin-bottom: 5px; color: #cbd5e1;">${r}</li>`).join('');
-        const unified = (STOCKS_META[currentStockTicker] || {}).score;
+        const meta = STOCKS_META[currentStockTicker] || {};
+        const unified = meta.score;
         const sigs = (CHARTS_DATA[currentStockTicker] || {}).ai_signals || [];
         const isLatest = sigs.length && sigs[sigs.length - 1].time === sig.time;
-        const isBuy = /BUY|DCA/i.test(sig.type || sig.badge || '');
-        const guardHtml = (isLatest && isBuy && unified && unified.earnings_guard)
-            ? `<div style="margin-bottom:10px; padding:8px 12px; border-radius:6px; background:rgba(251,146,60,0.12); border:1px solid rgba(251,146,60,0.45); color:#fdba74; font-size:0.80rem; font-weight:700;">🟠 งบจะออกภายใน 14 วัน คะแนนรวมให้ระงับการซื้อเพิ่มจนกว่างบออก สัญญาณนี้จึงยังไม่ควรใช้</div>`
+        const dEarn = meta.days_to_earnings;
+        const daysToEarn = getDaysToEarningsDisplay(dEarn);
+        const sigThresh = sig.guard_days_threshold || (sigs.length && sigs[sigs.length - 1].guard_days_threshold) || (unified && unified.guard_days_threshold) || null;
+        const isGuardActive = Boolean(
+            sig.earnings_guard ||
+            sig.guard_active ||
+            sig.type === 'EARNINGS_GUARD' ||
+            sig.action === 'PAUSE' ||
+            (sig.badge && sig.badge.includes('พักสัญญาณ')) ||
+            (isLatest && ((unified && unified.earnings_guard) || (daysToEarn !== null && daysToEarn >= 0 && sigThresh && daysToEarn <= sigThresh)))
+        );
+        const guardDays = (daysToEarn !== null && daysToEarn >= 0) ? daysToEarn : (sig.guard_days || null);
+
+        let type = (sig.type || '').toUpperCase();
+        if (!type && sig.action) {
+            const act = (sig.action || '').toUpperCase();
+            if (act === 'ENTRY' || act === 'BUY' || act.includes('STRONG')) type = 'RULE_ENTRY';
+            else if (act === 'DCA') type = 'RULE_DCA';
+            else if (act === 'SELL' || act === 'TRIM' || act === 'TP') type = 'RULE_TP';
+            else if (act.includes('พักสัญญาณ') || sig.earnings_guard) type = 'EARNINGS_GUARD';
+            else if (act.includes('เลี่ยง') || act === 'AVOID') type = 'AVOID';
+            else if (act.includes('รอ') || act === 'WAIT' || act === 'HOLD') type = 'WAIT';
+        }
+        if ((type.includes('STRONG') && type.includes('BUY')) || type === 'BUY') type = 'RULE_ENTRY';
+        else if (type === 'DCA') type = 'RULE_DCA';
+        else if (type === 'SELL') type = 'RULE_TP';
+
+        let actionClass = 'hold';
+        if (isGuardActive || type === 'EARNINGS_GUARD') actionClass = 'guard';
+        else if (type === 'ENTRY' || type === 'RULE_ENTRY') actionClass = 'buy';
+        else if (type === 'RULE_DCA') actionClass = 'dca';
+        else if (type === 'RULE_TP' || type === 'TRIM') actionClass = 'sell';
+        else if (type === 'AVOID') actionClass = 'sell';
+        else if (type === 'WAIT' || type === 'HOLD') actionClass = 'hold';
+
+        const badgeText = getSignalBadgeText(sig, isGuardActive, guardDays);
+        const reasonsHtml = (sig.reasons || []).map(r => `<li style="margin-bottom: 5px; color: #cbd5e1;">${r}</li>`).join('');
+
+        const bannerDaysText = sigThresh ? `ภายใน ${sigThresh} วัน` : 'ใกล้วันประกาศงบ';
+        const guardHtml = isGuardActive
+            ? `<div style="margin-bottom:10px; padding:8px 12px; border-radius:6px; background:rgba(251,146,60,0.12); border:1px solid rgba(251,146,60,0.45); color:#fdba74; font-size:0.80rem; font-weight:700;">🟠 งบจะออก${bannerDaysText} คะแนนรวมให้ระงับการซื้อเพิ่มจนกว่างบออก สัญญาณนี้จึงยังไม่ควรใช้</div>`
             : '';
+
+        const isInfo = Boolean(sig.levels_informational || isGuardActive);
+        const slColor = isInfo ? '#94a3b8' : '#fb7185';
+        const tpColor = isInfo ? '#94a3b8' : '#34d399';
+        const rrColor = isInfo ? '#94a3b8' : '#facc15';
+        const infoBadge = isInfo ? ' <span style="font-size:0.68rem; color:#94a3b8; font-weight:normal;">(ข้อมูลอ้างอิง)</span>' : '';
 
         card.innerHTML = `
             ${guardHtml}
             <div class="dc-top">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="dc-badge ${actionClass}">${sig.badge || sig.type}</span>
+                    <span class="dc-badge ${actionClass}">${badgeText}</span>
                     <span style="font-size: 0.88rem; font-weight: 700; color: #f8fafc;">วันที่: ${sig.time}</span>
                     <span style="font-size: 0.80rem; color: #94a3b8;">(ราคาแท่ง: $${sig.price})</span>
                 </div>
                 <div style="font-size: 0.80rem; font-weight: 700; color: #60a5fa;">
-                    ${sig.score_text || (sig.score + '/5 สัญญาณคอนฟลูเอนซ์')}
+                    ${sig.score_text || (sig.score ? sig.score + '/5 สัญญาณคอนฟลูเอนซ์' : '')}
                 </div>
             </div>
             <div style="font-size: 0.84rem; color: #cbd5e1; margin-bottom: 12px; line-height: 1.55;">
@@ -4099,16 +4022,16 @@
             </div>
             <div class="dc-grid">
                 <div class="dc-box">
-                    <div class="dc-box-title">🛑 จุดตัดขาดทุน (STOP LOSS)</div>
-                    <div class="dc-box-val" style="color: #fb7185;">$${sig.stop_loss ? sig.stop_loss.toFixed(2) : '-'}</div>
+                    <div class="dc-box-title">🛑 จุดตัดขาดทุน (STOP LOSS)${infoBadge}</div>
+                    <div class="dc-box-val" style="color: ${slColor};">$${sig.stop_loss ? sig.stop_loss.toFixed(2) : '-'}</div>
                 </div>
                 <div class="dc-box">
-                    <div class="dc-box-title">🎯 เป้าหมายทำกำไร (TARGET)</div>
-                    <div class="dc-box-val" style="color: #34d399;">$${sig.target ? sig.target.toFixed(2) : '-'}</div>
+                    <div class="dc-box-title">🎯 เป้าหมายทำกำไร (TARGET)${infoBadge}</div>
+                    <div class="dc-box-val" style="color: ${tpColor};">$${sig.target ? sig.target.toFixed(2) : '-'}</div>
                 </div>
                 <div class="dc-box">
                     <div class="dc-box-title">⚖️ RISK-TO-REWARD (R:R)</div>
-                    <div class="dc-box-val" style="color: #facc15;">${sig.rr || '1:2.0'}</div>
+                    <div class="dc-box-val" style="color: ${rrColor};">${sig.rr || '1:2.0'}</div>
                 </div>
             </div>
         `;
@@ -4118,7 +4041,13 @@
         const patName = (pat && pat.name) ? pat.name.toLowerCase() : '';
         const neckVal = (pat && pat.neckline) ? ('$' + Number(pat.neckline).toFixed(2)) : 'Neckline';
         const tgtVal = (pat && pat.target) ? ('$' + Number(pat.target).toFixed(2)) : 'Target';
-        const upsideVal = (pat && pat.upside_pct !== undefined) ? ((pat.upside_pct >= 0 ? '+' : '') + pat.upside_pct + '%') : '';
+        let upsideVal = '';
+        if (pat && pat.upside_pct !== undefined && pat.upside_pct !== null) {
+            const u = Number(pat.upside_pct);
+            if (!isNaN(u)) {
+                upsideVal = (u > 0 ? '+' : (u < 0 ? '-' : '')) + Math.abs(u).toFixed(1) + '%';
+            }
+        }
 
         const defs = `
             <defs>
@@ -4209,7 +4138,7 @@
                 <text x="340" y="206" fill="#a7f3d0" font-size="11" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">ฐานสอง (Bottom 2)</text>
 
                 <circle cx="415" cy="85" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
-                <text x="415" y="108" fill="#fef08a" font-size="11" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout 🚀</text>
+                <text x="415" y="108" fill="#fef08a" font-size="11" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout ↗</text>
 
                 <!-- Measured Move Dimension -->
                 <line x1="235" y1="85" x2="235" y2="185" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,2" />
@@ -4269,7 +4198,7 @@
                 <text x="380" y="155" fill="#7dd3fc" font-size="10" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">ไหล่ขวา (ยกฐาน)</text>
 
                 <circle cx="425" cy="85" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
-                <text x="425" y="105" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout 🚀</text>
+                <text x="425" y="105" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout ↗</text>
             `;
         } else if (patName.includes('head & shoulders') || patName.includes('หัวและไหล่')) {
             body = `
@@ -4313,7 +4242,7 @@
                 <text x="110" y="140" fill="#a7f3d0" font-size="11" font-family="'Inter', sans-serif" font-weight="700">เสาธง (Pole)</text>
                 <text x="255" y="125" fill="#7dd3fc" font-size="11" font-family="'Inter', sans-serif" font-weight="700" text-anchor="middle">กรอบธงสะสมพลัง</text>
                 <circle cx="330" cy="95" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
-                <text x="330" y="80" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout 🚀</text>
+                <text x="330" y="80" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout ↗</text>
             `;
         } else if (patName.includes('ascending triangle') || patName.includes('สามเหลี่ยมลู่ขึ้น')) {
             body = `
@@ -4330,7 +4259,7 @@
                 <rect x="365" y="10" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
                 <text x="417" y="23" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <circle cx="420" cy="70" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
-                <text x="420" y="90" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">ทะลุต้าน 🚀</text>
+                <text x="420" y="90" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">ทะลุต้าน ↗</text>
             `;
         } else if (patName.includes('descending triangle') || patName.includes('สามเหลี่ยมกดไฮ')) {
             body = `
@@ -4363,7 +4292,7 @@
                 <text x="210" y="65" fill="#7dd3fc" font-size="10" font-family="'Inter', sans-serif" font-weight="700">แนวต้านลิ่มเฉียงลง</text>
                 <text x="210" y="175" fill="#a7f3d0" font-size="10" font-family="'Inter', sans-serif" font-weight="700">แนวรับลิ่ม</text>
                 <circle cx="365" cy="145" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
-                <text x="365" y="165" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout ลิ่ม 🚀</text>
+                <text x="365" y="165" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout ลิ่ม ↗</text>
             `;
         } else if (patName.includes('channel') || patName.includes('ช่องคู่ขนาน')) {
             body = `
@@ -4411,7 +4340,7 @@
                 <rect x="365" y="10" width="105" height="18" rx="4" fill="rgba(16, 185, 129, 0.2)" stroke="rgba(16, 185, 129, 0.5)" stroke-width="1"/>
                 <text x="417" y="23" fill="#34d399" font-size="10" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">🎯 ${tgtVal} (${upsideVal})</text>
                 <circle cx="415" cy="75" r="5" fill="#facc15" stroke="#ffffff" stroke-width="1.5" />
-                <text x="415" y="95" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout 🚀</text>
+                <text x="415" y="95" fill="#fef08a" font-size="10" font-family="'Inter', sans-serif" font-weight="800" text-anchor="middle">Breakout ↗</text>
             `;
         }
 
@@ -4422,7 +4351,6 @@
     function renderPatternDeepDive(tData) {
         const pat = tData ? tData.pattern : null;
         const badge = document.getElementById('pdd_badge');
-        const winrate = document.getElementById('pdd_winrate');
         const dTitle = document.getElementById('pdd_diagram_title');
         const dType = document.getElementById('pdd_diagram_type');
         const dContainer = document.getElementById('pdd_diagram_container');
@@ -4450,7 +4378,6 @@
                 badge.style.borderColor = 'rgba(148, 163, 184, 0.3)';
                 badge.style.background = 'rgba(148, 163, 184, 0.1)';
             }
-            if (winrate) winrate.textContent = '🎯 สถิติความแม่นยำ: -';
             if (dTitle) dTitle.textContent = 'โครงสร้างการแกว่งตัวทั่วไป (Standard Price Action)';
             if (dType) {
                 dType.textContent = 'Price Action';
@@ -4465,8 +4392,9 @@
             return;
         }
 
-        const isBear = pat.type && pat.type.toLowerCase().includes('bear');
+        const isBear = (pat.type && pat.type.toLowerCase().includes('bear')) || pat.status === 'broke_down';
         const isFailed = pat.status === 'failed';
+        const isBrokeDown = pat.status === 'broke_down';
         const isForming = pat.status === 'forming';
 
         if (badge) {
@@ -4475,6 +4403,10 @@
                 badge.style.color = '#ef4444';
                 badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
                 badge.style.background = 'rgba(239, 68, 68, 0.15)';
+            } else if (isBrokeDown) {
+                badge.style.color = '#fb7185';
+                badge.style.borderColor = 'rgba(251, 113, 133, 0.4)';
+                badge.style.background = 'rgba(251, 113, 133, 0.15)';
             } else if (isForming) {
                 badge.style.color = '#facc15';
                 badge.style.borderColor = 'rgba(250, 204, 21, 0.4)';
@@ -4485,13 +4417,15 @@
                 badge.style.background = isBear ? 'rgba(251, 113, 133, 0.15)' : 'rgba(52, 211, 153, 0.15)';
             }
         }
-        if (winrate) winrate.textContent = '🎯 สถิติความแม่นยำ: ' + (pat.win_rate || 'ไม่มีสถิติยืนยัน (heuristic)');
-        if (dTitle) dTitle.textContent = (isFailed ? '⚠️ ' : 'แผนผัง ') + pat.name + ' (Visual Pattern Blueprint)';
+        if (dTitle) dTitle.textContent = (isFailed ? '⚠️ ' : (isBrokeDown ? '🔻 ' : 'แผนผัง ')) + pat.name + ' (Visual Pattern Blueprint)';
         if (dType) {
             dType.textContent = pat.type || 'Technical Model';
             if (isFailed) {
                 dType.style.color = '#ef4444';
                 dType.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            } else if (isBrokeDown) {
+                dType.style.color = '#fb7185';
+                dType.style.borderColor = 'rgba(251, 113, 133, 0.3)';
             } else if (isForming) {
                 dType.style.color = '#facc15';
                 dType.style.borderColor = 'rgba(250, 204, 21, 0.3)';
@@ -4502,9 +4436,15 @@
         }
         if (dContainer) dContainer.innerHTML = getPatternDiagramSvg(pat);
         if (caption) {
-            const upsideTxt = pat.upside_pct !== undefined && pat.upside_pct !== null ? ((pat.upside_pct >= 0 ? '+' : '') + pat.upside_pct + '%') : '-';
+            let upsideTxt = '-';
+            if (pat.upside_pct !== undefined && pat.upside_pct !== null) {
+                const u = Number(pat.upside_pct);
+                if (!isNaN(u)) {
+                    upsideTxt = (u > 0 ? '+' : (u < 0 ? '-' : '')) + Math.abs(u).toFixed(1) + '%';
+                }
+            }
             const neckTxt = pat.neckline ? ('$' + Number(pat.neckline).toFixed(2)) : '-';
-            const tgtTxt = isFailed ? '<span style="color:#ef4444;font-weight:700;">ยกเลิกเป้าหมาย (แพทเทิร์นล้มเหลว)</span>' : (pat.target ? ('$' + Number(pat.target).toFixed(2) + ' (' + upsideTxt + ')') : '-');
+            const tgtTxt = isFailed ? '<span style="color:#ef4444;font-weight:700;">ยกเลิกเป้าหมาย (แพทเทิร์นล้มเหลว)</span>' : (isBrokeDown ? '<span style="color:#fb7185;font-weight:700;">เบรกลง (หลุดกรอบล่าง)</span>' : (pat.target ? ('$' + Number(pat.target).toFixed(2) + ' (' + upsideTxt + ')') : '-'));
             const startPt = pat.key_points && pat.key_points.length > 0 ? pat.key_points[0] : null;
             const startTxt = startPt ? (' | 🚩 <strong>จุดเริ่มแพทเทิร์น:</strong> ' + startPt.time + ' ที่ $' + Number(startPt.price).toFixed(2) + ' (' + (startPt.name || 'Start') + ')') : '';
             caption.innerHTML = `📐 <strong>สรุปสัญญาณ:</strong> ${pat.summary || pat.name}${startTxt} | <strong>Neckline:</strong> ${neckTxt} | <strong>เป้าหมาย (Measured Target):</strong> ${tgtTxt} | <strong>วิธีคำนวณเป้า:</strong> ${pat.target_calc || '-'}`;
@@ -4578,12 +4518,14 @@
 
     function _renderGrowthBadge(pct, label) {
         if (pct === undefined || pct === null || isNaN(pct)) return '<span class="fin-badge-neutral">-</span>';
-        const isPos = pct >= 0;
-        const sign = isPos ? '+' : '';
-        const arrow = isPos ? '▲' : '▼';
-        const cls = isPos ? 'fin-badge-pos' : 'fin-badge-neg';
+        const num = Number(pct);
+        const isPos = num > 0;
+        const isNeg = num < 0;
+        const sign = isPos ? '+' : (isNeg ? '-' : '');
+        const arrow = isPos ? '▲' : (isNeg ? '▼' : '');
+        const cls = isPos ? 'fin-badge-pos' : (isNeg ? 'fin-badge-neg' : 'fin-badge-neutral');
         const lbl = label ? ` ${label}` : '';
-        return `<span class="${cls}">${sign}${Number(pct).toFixed(1)}% ${arrow}${lbl}</span>`;
+        return `<span class="${cls}">${sign}${Math.abs(num).toFixed(1)}% ${arrow}${lbl}</span>`;
     }
 
     function updateFinancialsSection(ticker) {
@@ -4677,12 +4619,21 @@
         if (fcfElem) fcfElem.textContent = latest.fcf_fmt || '-';
         if (fcfSubElem) fcfSubElem.textContent = `12M รวม (TTM): ${finData.ttm_fcf_fmt || '-'}`;
 
-        // 2. Piotroski F-Score Card
+        // 2. Financial Checklist Card (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)
         const fScore = finData.f_score || {};
+        const fScoreTitleElem = document.getElementById('fin_fscore_title');
+        if (fScoreTitleElem) {
+            fScoreTitleElem.textContent = fScore.title || '🏆 เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)';
+        }
         const fScoreValElem = document.getElementById('fin_fscore_val');
         const fScoreLabelElem = document.getElementById('fin_fscore_label');
+        const isInsufficient = Boolean(fScore.insufficient_data || fScore.label === 'ข้อมูลไม่พอ' || (fScore.evaluated_count !== undefined && fScore.evaluated_count < 5));
+
         if (fScoreValElem) {
-            if (fScore.score != null) {
+            if (isInsufficient) {
+                fScoreValElem.innerHTML = `-<span>/${fScore.max_score || 9}</span>`;
+                fScoreValElem.style.color = '#94a3b8';
+            } else if (fScore.score != null) {
                 fScoreValElem.innerHTML = `${fScore.score}<span>/${fScore.max_score || 9}</span>`;
                 fScoreValElem.style.color = fScore.color || '#34d399';
             } else {
@@ -4691,8 +4642,13 @@
             }
         }
         if (fScoreLabelElem) {
-            fScoreLabelElem.textContent = fScore.label || '-';
-            fScoreLabelElem.style.color = fScore.color || '#cbd5e1';
+            if (isInsufficient) {
+                fScoreLabelElem.textContent = 'ข้อมูลไม่พอ';
+                fScoreLabelElem.style.color = '#94a3b8';
+            } else {
+                fScoreLabelElem.textContent = fScore.label || '-';
+                fScoreLabelElem.style.color = fScore.color || '#cbd5e1';
+            }
         }
 
         const criteriaList = document.getElementById('fin_fscore_criteria');
@@ -4866,7 +4822,7 @@
         // 2. QoQ Revenue Growth
         rowsHtml += buildRow('⚡ เติบโต QoQ (%)', q => _renderGrowthBadge(q.rev_growth_qoq), true);
         // 3. YoY Revenue Growth
-        rowsHtml += buildRow('🚀 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true);
+        rowsHtml += buildRow('📈 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true);
         // 4. Gross Profit
         rowsHtml += buildRow('📈 กำไรขั้นต้น (Gross Profit)', q => q.gross_profit_fmt || '-');
         // 5. Gross Margin
@@ -5157,8 +5113,10 @@
         const ext = getExtQuote(q);
         if (!ext) return;
 
-        const isUp = ext.change >= 0;
-        const sign = isUp ? '+' : '';
+        const extChg = Number(ext.change || 0);
+        const isUp = extChg >= 0;
+        const extSign = extChg > 0 ? '+' : (extChg < 0 ? '-' : '');
+        const extChgStr = (extSign ? extSign : '') + Math.abs(extChg).toFixed(2) + '%';
         try {
             chartSeriesRegistry.extPriceLine = series.createPriceLine({
                 price: ext.price,
@@ -5166,7 +5124,7 @@
                 lineWidth: 1.5,
                 lineStyle: LightweightCharts.LineStyle.Dashed,
                 axisLabelVisible: true,
-                title: `${ext.shortLabel} $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`
+                title: `${ext.shortLabel} $${ext.price.toFixed(2)} (${extChgStr})`
             });
         } catch (e) {
             console.warn('Error creating extPriceLine:', e);
@@ -5331,8 +5289,9 @@
             }
             if (headChangeElem && typeof q.change === 'number') {
                 const isUp = q.change >= 0;
+                const chgSign = q.change > 0 ? '+' : (q.change < 0 ? '-' : '');
                 headChangeElem.className = 'header-change-chip ' + (isUp ? 'up' : 'down');
-                headChangeElem.textContent = (isUp ? '▲ +' : '▼ ') + q.change.toFixed(2) + '%';
+                headChangeElem.textContent = (isUp ? '▲ ' : '▼ ') + (chgSign ? chgSign : '') + Math.abs(q.change).toFixed(2) + '%';
             }
 
             // Extended session quote (Pre-market / After-hours)
@@ -5343,25 +5302,27 @@
             const ext = getExtQuote(q);
 
             if (ext) {
-                const isUp = ext.change >= 0;
-                const sign = isUp ? '+' : '';
+                const extChg = Number(ext.change || 0);
+                const isUp = extChg >= 0;
+                const extSign = extChg > 0 ? '+' : (extChg < 0 ? '-' : '');
+                const extChgStr = (extSign ? extSign : '') + Math.abs(extChg).toFixed(2) + '%';
                 const prevExt = previousExtPriceMap[currentStockTicker];
                 const isExtChanged = prevExt !== undefined && Math.abs(prevExt - ext.price) > 0.0001;
-                const isExtUp = isExtChanged ? ext.price > prevExt : (ext.change >= 0);
+                const isExtUp = isExtChanged ? ext.price > prevExt : isUp;
                 previousExtPriceMap[currentStockTicker] = ext.price;
 
                 if (extChip) {
                     extChip.style.display = 'inline-flex';
                     extChip.className = 'header-ext-chip ' + (isUp ? 'up' : 'down');
-                    extChip.innerHTML = `<span class="ext-tag">${ext.shortLabel}</span> $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`;
-                    extChip.title = `${ext.label}: $${ext.price.toFixed(2)} (${sign}${ext.change.toFixed(2)}%)`;
+                    extChip.innerHTML = `<span class="ext-tag">${ext.shortLabel}</span> $${ext.price.toFixed(2)} (${extChgStr})`;
+                    extChip.title = `${ext.label}: $${ext.price.toFixed(2)} (${extChgStr})`;
                     if (isExtChanged) triggerFlashEffect(extChip, isExtUp);
                 }
                 if (extCard && extVal) {
                     extCard.style.display = 'flex';
                     if (extLabel) extLabel.textContent = ext.label;
                     extVal.style.color = isUp ? '#38bdf8' : '#fb7185';
-                    extVal.innerHTML = `$${ext.price.toFixed(2)} <span style="font-size:0.72rem; font-weight:600;">(${sign}${ext.change.toFixed(2)}%)</span>`;
+                    extVal.innerHTML = `$${ext.price.toFixed(2)} <span style="font-size:0.72rem; font-weight:600;">(${extChgStr})</span>`;
                     if (isExtChanged) triggerFlashEffect(extVal, isExtUp);
                 }
             } else {

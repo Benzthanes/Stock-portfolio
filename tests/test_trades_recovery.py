@@ -44,6 +44,9 @@ class TempDirCase(unittest.TestCase):
         os.chdir(self.tmp)
         self._env = mock.patch.dict(os.environ, {"FILTER_STOCK_DATA_DIR": str(self.tmp / "data")})
         self._env.start()
+        fx_patch = mock.patch("src.fx.fetch_usdthb", return_value=35.0)
+        self.fetch_fx = fx_patch.start()
+        self.addCleanup(fx_patch.stop)
 
     def tearDown(self):
         self._env.stop()
@@ -154,7 +157,7 @@ class MasterOutputTest(TempDirCase):
             "portfolio_name": "P", "total_net_worth_thb": 1.0, "total_net_worth_usd": 1.0, "net_injected_capital_thb": 1.0,
             "all_time_profit_thb": 1.0, "all_time_roi_pct": 1.0, "total_cash_thb": 1.0, "dime_save_cash_thb": 1.0,
             "dime_usd_cash": 1.0, "positions": [], "stock_market_val_usd": 1.0, "stock_market_val_thb": 1.0,
-            "trades_summary": {"total_realized_pl_usd": -12.5, "total_realized_pl_thb": -420.25, "win_rate_pct": 66.7},
+            "trades_summary": {"total_realized_pl_usd": -12.5, "total_realized_pl_thb": -420.25, "win_rate_pct": 66.7, "total_trades": 3, "winning_trades": 2},
             "total_dividends_usd": 3.0, "total_dividends_thb": 100.86, "dividends_list": [{}, {}],
         }
         out = io.StringIO()
@@ -163,7 +166,7 @@ class MasterOutputTest(TempDirCase):
              contextlib.redirect_stdout(out):
             gmr.main()
         text = out.getvalue()
-        self.assertIn("Realized Trades P&L  : -$12.50 (-฿420.25) | Win Rate 66.7%", text)
+        self.assertIn("Realized Trades P&L  : -$12.50 (-฿420.25) | 2/3 ไม้กำไร", text)
         self.assertIn("Total Dividends Recv : +$3.00 (+฿100.86) | 2 payments", text)
 
 

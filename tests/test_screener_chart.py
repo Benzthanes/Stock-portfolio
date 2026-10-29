@@ -85,6 +85,192 @@ class EarningsHistoryTest(unittest.TestCase):
         self.assertEqual(history[0]["position"], "belowBar")
 
 
+class ConfirmedEarningsReactionTest(unittest.TestCase):
+    def test_bmo_reaction_on_same_calendar_day(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2024-04-23", "close": 100.0},
+            {"time": "2024-04-24", "close": 112.5},
+            {"time": "2024-04-25", "close": 115.0},
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2024-04-24"], timing="bmo")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2024-04-24")
+        self.assertEqual(res[0]["reaction_pct"], 12.5)
+        self.assertIn("+12.5%", res[0]["text"])
+        self.assertEqual(res[0]["position"], "belowBar")
+
+    def test_amc_reaction_on_next_trading_session(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2026-08-03", "close": 125.65},  # Announcement date AMC
+            {"time": "2026-08-04", "close": 162.66},  # Reaction trading session
+            {"time": "2026-08-05", "close": 160.00},
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2026-08-03"], timing="amc")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2026-08-04")
+        self.assertEqual(res[0]["reaction_pct"], 29.5)
+        self.assertIn("+29.5%", res[0]["text"])
+
+    def test_amc_negative_reaction_drop(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2026-04-22", "close": 103.07},  # Announcement date AMC
+            {"time": "2026-04-23", "close": 84.78},   # Reaction trading session
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2026-04-22"], timing="amc")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2026-04-23")
+        self.assertEqual(res[0]["reaction_pct"], -17.7)
+        self.assertIn("-17.7%", res[0]["text"])
+        self.assertEqual(res[0]["position"], "aboveBar")
+
+    def test_amc_skips_when_next_candle_not_closed(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2026-10-27", "close": 100.0},
+            {"time": "2026-10-28", "close": 105.0},  # Latest bar today, announced AMC tonight
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2026-10-28"], timing="amc")
+        self.assertEqual(res, [])
+
+    def test_ticker_pltr_default_timing_amc(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2026-08-03", "close": 125.65},  # PLTR announced AMC on 2026-08-03
+            {"time": "2026-08-04", "close": 162.66},  # Next session reaction
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2026-08-03"], ticker="PLTR")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2026-08-04")
+        self.assertEqual(res[0]["reaction_pct"], 29.5)
+        self.assertIn("+29.5%", res[0]["text"])
+
+    def test_explicit_timing_overrides_ticker(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2026-08-02", "close": 123.00},
+            {"time": "2026-08-03", "close": 125.65},  # Same-day reaction if forced BMO
+            {"time": "2026-08-04", "close": 162.66},
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2026-08-03"], timing="bmo", ticker="PLTR")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2026-08-03")
+        self.assertEqual(res[0]["reaction_pct"], 2.2)
+
+    def test_unknown_ticker_timing_reaction_none(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2026-05-10", "close": 50.0},
+            {"time": "2026-05-11", "close": 55.0},
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2026-05-11"], ticker="UNKNOWN_TICKER_XYZ")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2026-05-11")
+        self.assertIsNone(res[0]["reaction_pct"])
+        self.assertEqual(res[0]["text"], "🗓️ งบ")
+
+    def test_vrt_nok_vst_timings_are_bmo(self):
+        from src.earnings_calendar import get_earnings_timing
+        self.assertEqual(get_earnings_timing("VRT"), "bmo")
+        self.assertEqual(get_earnings_timing("NOK"), "bmo")
+        self.assertEqual(get_earnings_timing("VST"), "bmo")
+
+    def test_newly_added_earnings_timings(self):
+        from src.earnings_calendar import get_earnings_timing
+        self.assertEqual(get_earnings_timing("SKHY"), "bmo")
+        self.assertEqual(get_earnings_timing("AAPL"), "amc")
+        self.assertEqual(get_earnings_timing("MSFT"), "amc")
+        self.assertEqual(get_earnings_timing("AMZN"), "amc")
+        self.assertEqual(get_earnings_timing("JPM"), "bmo")
+        self.assertEqual(get_earnings_timing("SPCX"), "amc")
+        self.assertEqual(get_earnings_timing("PLTR"), "amc")
+
+    def test_three_year_tickers_have_twelve_quarters(self):
+        from src.earnings_calendar import get_confirmed_earnings_dates
+        three_year_tickers = [
+            "VRT", "NOK", "LLY", "GOOGL", "BAC", "ABNB", "APP",
+            "MNST", "NOW", "PLTR", "VST", "SKHY", "NVDA", "AAPL",
+            "MSFT", "AMZN", "JPM"
+        ]
+        for ticker in three_year_tickers:
+            dates = get_confirmed_earnings_dates(ticker)
+            self.assertEqual(
+                len(dates), 12,
+                f"Ticker {ticker} should have exactly 12 quarterly earnings dates, got {len(dates)}"
+            )
+
+    def test_spcx_has_post_ipo_earnings_only(self):
+        from src.earnings_calendar import get_confirmed_earnings_dates
+        dates = get_confirmed_earnings_dates("SPCX")
+        self.assertEqual(len(dates), 2)
+        for d in dates:
+            self.assertGreater(d, "2026-06-12", f"SPCX earnings date {d} must be after IPO 2026-06-12")
+
+    def test_added_missing_quarters_present(self):
+        from src.earnings_calendar import get_confirmed_earnings_dates
+        expected_added_dates = {
+            "VRT": "2024-02-21",
+            "LLY": "2024-02-06",
+            "BAC": "2024-01-12",
+            "NOW": "2024-01-24",
+            "APP": "2024-02-14",
+            "SKHY": "2024-01-25",
+            "GOOGL": "2026-02-04",
+            "ABNB": "2026-02-12",
+            "MNST": "2026-02-26",
+            "NVDA": "2026-11-17",
+        }
+        for ticker, expected_date in expected_added_dates.items():
+            dates = get_confirmed_earnings_dates(ticker)
+            self.assertIn(
+                expected_date, dates,
+                f"Ticker {ticker} should contain added confirmed date {expected_date}"
+            )
+
+    def test_reaction_for_newly_timed_tickers(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        # Test BMO reaction on same day (JPM)
+        jpm_candles = [
+            {"time": "2024-01-11", "close": 170.0},
+            {"time": "2024-01-12", "close": 168.0},
+        ]
+        res_jpm = calculate_confirmed_earnings_reaction(jpm_candles, ["2024-01-12"], ticker="JPM")
+        self.assertEqual(len(res_jpm), 1)
+        self.assertEqual(res_jpm[0]["time"], "2024-01-12")
+        self.assertEqual(res_jpm[0]["reaction_pct"], -1.2)
+
+        # Test AMC reaction on next session (AAPL)
+        aapl_candles = [
+            {"time": "2024-10-31", "close": 225.0},
+            {"time": "2024-11-01", "close": 222.0},
+        ]
+        res_aapl = calculate_confirmed_earnings_reaction(aapl_candles, ["2024-10-31"], ticker="AAPL")
+        self.assertEqual(len(res_aapl), 1)
+        self.assertEqual(res_aapl[0]["time"], "2024-11-01")
+        self.assertEqual(res_aapl[0]["reaction_pct"], -1.3)
+
+    def test_vst_dates_contains_2024_05_08_not_09(self):
+        from src.earnings_calendar import get_confirmed_earnings_dates
+        dates = get_confirmed_earnings_dates("VST")
+        self.assertIn("2024-05-08", dates)
+        self.assertNotIn("2024-05-09", dates)
+
+    def test_vst_reaction_uses_bmo_same_session(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction
+        candles = [
+            {"time": "2024-05-07", "close": 80.0},
+            {"time": "2024-05-08", "close": 88.0},  # VST announced BMO on 2024-05-08
+            {"time": "2024-05-09", "close": 90.0},
+        ]
+        res = calculate_confirmed_earnings_reaction(candles, ["2024-05-08"], ticker="VST")
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["time"], "2024-05-08")
+        self.assertEqual(res[0]["reaction_pct"], 10.0)
+        self.assertIn("+10.0%", res[0]["text"])
+
+
 class SuperInvestorsTest(unittest.TestCase):
     def test_lly_has_famous_whales(self):
         from src.chart_data import get_super_investors
@@ -129,13 +315,27 @@ class CDCActionZoneTest(unittest.TestCase):
 
 class ChartPageGenerationTest(unittest.TestCase):
     def setUp(self):
+        import shutil
         import tempfile
         from pathlib import Path
         from unittest import mock
+        from src import chart_data
+
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
+        tmp_path = Path(tmp.name)
+        tmp_cache = tmp_path / "candles_cache.json"
+
+        # Copy existing cache to temp dir if it exists so tests have realistic fixtures without touching disk data/
+        real_cache_path = chart_data.CACHE_PATH
+        if real_cache_path.exists():
+            shutil.copyfile(real_cache_path, tmp_cache)
+        else:
+            tmp_cache.write_text("{}", encoding="utf-8")
+
         for patcher in (
-            mock.patch("src.chart_page.REPORTS_DIR", Path(tmp.name)),
+            mock.patch("src.chart_page.REPORTS_DIR", tmp_path),
+            mock.patch.object(chart_data, "CACHE_PATH", tmp_cache),
             mock.patch("src.news.fetch_batch_news", return_value={}),
         ):
             patcher.start()
@@ -257,28 +457,33 @@ class ConfluenceScoringTest(unittest.TestCase):
         baseline = self._score()
         corrective = self._score(elliott_wave={"detected": True, "type": "Corrective Wave (A-B-C)", "current_wave": "Wave (C)", "target": 90.0})
         self.assertEqual(corrective["score"], baseline["score"])
+        self.assertTrue(any("ไม่ผ่าน backtest ไม่นับคะแนน" in r for r in corrective["reasons"]))
 
-    def test_bullish_impulse_adds_buy_score(self):
+    def test_bullish_impulse_does_not_add_unbacked_score(self):
         baseline = self._score()
         impulse = self._score(elliott_wave={"detected": True, "type": "Bullish Impulse (1-2-3-4-5)", "current_wave": "Wave (5)", "target": 120.0})
-        self.assertEqual(impulse["score"], baseline["score"] + 1)
+        self.assertEqual(impulse["score"], baseline["score"])
+        self.assertTrue(any("ไม่ผ่าน backtest ไม่นับคะแนน" in r for r in impulse["reasons"]))
 
-    def test_new_cycle_breakout_adds_buy_score(self):
+    def test_new_cycle_breakout_does_not_add_unbacked_score(self):
         baseline = self._score()
         new_cycle = self._score(elliott_wave={"detected": True, "type": "New Cycle Wave (1) Breakout", "current_wave": "New Cycle (1)", "target": 150.0})
-        self.assertEqual(new_cycle["score"], baseline["score"] + 1)
+        self.assertEqual(new_cycle["score"], baseline["score"])
+        self.assertTrue(any("ไม่ผ่าน backtest ไม่นับคะแนน" in r for r in new_cycle["reasons"]))
 
     def test_bearish_impulse_does_not_add_buy_score(self):
         baseline = self._score()
         bearish = self._score(elliott_wave={"detected": True, "type": "Bearish Impulse (1-2-3-4-5)", "current_wave": "Bear Wave (5)", "target": 70.0})
         self.assertEqual(bearish["score"], baseline["score"])
+        self.assertTrue(any("ไม่ผ่าน backtest ไม่นับคะแนน" in r for r in bearish["reasons"]))
 
-    def test_pivot_s1_only_counts_when_price_holds_above_support(self):
+    def test_pivot_s1_does_not_add_unbacked_score(self):
         baseline = self._score()
         below = self._score(pivots={"r1": 200.0, "s1": 102.0})
         above = self._score(pivots={"r1": 200.0, "s1": 98.0})
         self.assertEqual(below["score"], baseline["score"])
-        self.assertEqual(above["score"], baseline["score"] + 1)
+        self.assertEqual(above["score"], baseline["score"])
+        self.assertTrue(any("ไม่ผ่าน backtest ไม่นับคะแนน" in r for r in above["reasons"]))
 
     def test_luxalgo_elliott_wave_detection_and_fibo_grid(self):
         from src.chart_data import detect_elliott_wave
@@ -527,152 +732,6 @@ class SqueezeMomentumTest(unittest.TestCase):
         self.assertIn("dot_color", entry)
 
 
-class WaddahAttarExplosionTest(unittest.TestCase):
-    def test_insufficient_candles(self):
-        from src.chart_data import compute_waddah_attar_explosion
-        res = compute_waddah_attar_explosion([])
-        self.assertEqual(res["status"], "DEAD_ZONE")
-        self.assertFalse(res["is_explosion"])
-        self.assertEqual(res["trend_up"], 0.0)
-        self.assertEqual(res["series"], [])
-
-    def test_wae_explosion_detection(self):
-        from src.chart_data import compute_waddah_attar_explosion
-        candles = []
-        # 30 steady candles then a massive upside price explosion
-        for i in range(30):
-            candles.append({
-                "time": f"2026-01-{(i%28)+1:02d}",
-                "open": 100.0,
-                "high": 101.0,
-                "low": 99.0,
-                "close": 100.0,
-                "volume": 1000000
-            })
-        # Massive bullish spike
-        for i in range(5):
-            candles.append({
-                "time": f"2026-02-{i+1:02d}",
-                "open": 100.0 + i * 15.0,
-                "high": 115.0 + i * 15.0,
-                "low": 100.0 + i * 15.0,
-                "close": 114.0 + i * 15.0,
-                "volume": 5000000
-            })
-        res = compute_waddah_attar_explosion(candles)
-        self.assertIn(res["status"], ["BULL_EXPLOSION", "BEAR_EXPLOSION", "DEAD_ZONE", "NORMAL"])
-        self.assertIn("is_explosion", res)
-        self.assertIn("trend_up", res)
-        self.assertIn("trend_down", res)
-        self.assertIn("explosion_line", res)
-        self.assertIn("dead_zone", res)
-        self.assertIn("series", res)
-        self.assertTrue(len(res["series"]) > 0)
-        # Should have triggered bull explosion due to huge upward momentum spike
-        self.assertTrue(res["trend_up"] > 0)
-
-
-class VolumeFlowIndicatorTest(unittest.TestCase):
-    def test_insufficient_candles(self):
-        from src.chart_data import compute_volume_flow_indicator
-        res = compute_volume_flow_indicator([])
-        self.assertEqual(res["status"], "NEUTRAL")
-        self.assertEqual(res["vfi"], 0.0)
-        self.assertEqual(res["series"], [])
-
-    def test_vfi_accumulation_detection(self):
-        from src.chart_data import compute_volume_flow_indicator
-        candles = []
-        # 40 candles with rising prices and heavy volume
-        for i in range(40):
-            candles.append({
-                "time": f"2026-01-{(i%28)+1:02d}",
-                "open": 100.0 + i * 0.5,
-                "high": 101.0 + i * 0.5,
-                "low": 99.5 + i * 0.5,
-                "close": 100.8 + i * 0.5,
-                "volume": 2000000 + i * 50000
-            })
-        res = compute_volume_flow_indicator(candles)
-        self.assertIn(res["status"], ["ACCUMULATION", "WEAKENING_FLOW", "DISTRIBUTION", "REBOUNDING_FLOW", "NEUTRAL"])
-        self.assertIn("vfi", res)
-        self.assertIn("signal", res)
-        self.assertIn("summary", res)
-        self.assertIn("series", res)
-        self.assertTrue(len(res["series"]) > 0)
-        entry = res["series"][-1]
-        self.assertIn("vfi", entry)
-        self.assertIn("signal", entry)
-        self.assertIn("is_bull", entry)
-
-
-class WaveTrendOscillatorTest(unittest.TestCase):
-    def test_insufficient_candles(self):
-        from src.chart_data import compute_wavetrend_oscillator
-        res = compute_wavetrend_oscillator([])
-        self.assertEqual(res["status"], "NEUTRAL")
-        self.assertEqual(res["wt1"], 0.0)
-        self.assertEqual(res["wt2"], 0.0)
-        self.assertEqual(res["series"], [])
-
-    def test_wavetrend_calculation(self):
-        from src.chart_data import compute_wavetrend_oscillator
-        candles = []
-        for i in range(40):
-            candles.append({
-                "time": f"2026-01-{(i%28)+1:02d}",
-                "open": 100.0 + i,
-                "high": 102.0 + i,
-                "low": 99.0 + i,
-                "close": 101.5 + i,
-                "volume": 1000000
-            })
-        res = compute_wavetrend_oscillator(candles)
-        self.assertIn(res["status"], ["OVERSOLD_BUY", "OVERBOUGHT_SELL", "BULLISH_CROSS", "BEARISH_CROSS", "OVERSOLD", "OVERBOUGHT", "BULLISH", "BEARISH"])
-        self.assertIn("wt1", res)
-        self.assertIn("wt2", res)
-        self.assertIn("direction", res)
-        self.assertIn("series", res)
-        self.assertTrue(len(res["series"]) > 0)
-        entry = res["series"][-1]
-        self.assertIn("wt1", entry)
-        self.assertIn("wt2", entry)
-        self.assertIn("bull_cross", entry)
-        self.assertIn("bear_cross", entry)
-
-
-class UTBotAlertsTest(unittest.TestCase):
-    def test_insufficient_candles(self):
-        from src.chart_data import compute_ut_bot_alerts
-        res = compute_ut_bot_alerts([])
-        self.assertEqual(res["status"], "NEUTRAL")
-        self.assertEqual(res["trailing_stop"], 0.0)
-        self.assertEqual(res["alerts"], [])
-
-    def test_ut_bot_signals(self):
-        from src.chart_data import compute_ut_bot_alerts
-        candles = []
-        for i in range(40):
-            candles.append({
-                "time": f"2026-01-{(i%28)+1:02d}",
-                "open": 100.0 + i,
-                "high": 102.0 + i,
-                "low": 99.0 + i,
-                "close": 101.5 + i,
-                "volume": 1000000
-            })
-        res = compute_ut_bot_alerts(candles)
-        self.assertIn(res["status"], ["BUY_ALERT", "SELL_ALERT", "BULLISH_HOLD", "BEARISH_HOLD", "NEUTRAL"])
-        self.assertIn(res["position"], ["BUY", "SELL"])
-        self.assertGreater(res["trailing_stop"], 0.0)
-        self.assertIn("summary", res)
-        self.assertIn("series", res)
-        self.assertTrue(len(res["series"]) > 0)
-        entry = res["series"][-1]
-        self.assertIn("stop", entry)
-        self.assertIn("pos", entry)
-
-
 class ChandelierExitTest(unittest.TestCase):
     def test_insufficient_candles(self):
         from src.chart_data import compute_chandelier_exit
@@ -702,66 +761,6 @@ class ChandelierExitTest(unittest.TestCase):
         self.assertGreater(res["short_stop"], 0.0)
         self.assertIn("series", res)
         self.assertTrue(len(res["series"]) > 0)
-
-
-class HullSuiteTest(unittest.TestCase):
-    def test_insufficient_candles(self):
-        from src.chart_data import compute_hull_suite
-        res = compute_hull_suite([])
-        self.assertEqual(res["status"], "NEUTRAL")
-        self.assertEqual(res["trend"], "NEUTRAL")
-        self.assertEqual(res["value"], 0.0)
-        self.assertEqual(res["series"], [])
-
-    def test_hull_calculation(self):
-        from src.chart_data import compute_hull_suite
-        candles = []
-        for i in range(40):
-            candles.append({
-                "time": f"2026-01-{(i%28)+1:02d}",
-                "open": 100.0 + i,
-                "high": 102.0 + i,
-                "low": 99.0 + i,
-                "close": 101.5 + i,
-                "volume": 1000000
-            })
-        res = compute_hull_suite(candles)
-        self.assertIn(res["status"], ["BULLISH", "BEARISH"])
-        self.assertIn(res["trend"], ["BULLISH", "BEARISH"])
-        self.assertGreater(res["value"], 0.0)
-        self.assertIn("color", res)
-        self.assertIn("series", res)
-        self.assertTrue(len(res["series"]) > 0)
-
-
-class LorentzianClassificationTest(unittest.TestCase):
-    def test_insufficient_candles(self):
-        from src.chart_data import compute_lorentzian_classification
-        res = compute_lorentzian_classification([])
-        self.assertEqual(res["status"], "NEUTRAL")
-        self.assertEqual(res["direction"], "NEUTRAL")
-        self.assertEqual(res["confidence"], 50.0)
-
-    def test_lorentzian_classification_model(self):
-        from src.chart_data import compute_lorentzian_classification
-        candles = []
-        for i in range(60):
-            candles.append({
-                "time": f"2026-01-{(i%28)+1:02d}",
-                "open": 100.0 + i * 0.5,
-                "high": 102.0 + i * 0.5,
-                "low": 99.0 + i * 0.5,
-                "close": 101.5 + i * 0.5,
-                "volume": 1000000
-            })
-        res = compute_lorentzian_classification(candles, k=8)
-        self.assertIn(res["status"], ["STRONG_BUY", "BUY", "NEUTRAL", "SELL", "STRONG_SELL"])
-        self.assertIn(res["direction"], ["BULLISH", "BEARISH", "NEUTRAL"])
-        self.assertGreaterEqual(res["confidence"], 0.0)
-        self.assertLessEqual(res["confidence"], 100.0)
-        self.assertEqual(res["k"], 8)
-        self.assertIn("score", res)
-        self.assertIn("summary", res)
 
 
 if __name__ == "__main__":

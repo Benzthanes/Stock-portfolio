@@ -5,11 +5,14 @@ and net deposited capital from the very first deposit date (2026-02-02) to prese
 """
 
 import json
+import os
 import re
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+from src.fx import FALLBACK_USDTHB
 
 MONTH_MAP = {
     "มค": 1, "กพ": 2, "มีค": 3, "เมย": 4, "พค": 5, "มิย": 6,
@@ -83,7 +86,8 @@ def calculate_daily_wealth_timeline(
     Compute daily wealth time series starting from the first deposit date up to present.
     """
     if candles_cache is None:
-        candles_path = Path(__file__).resolve().parent.parent / "data" / "candles_cache.json"
+        data_dir = Path(os.environ.get("FILTER_STOCK_DATA_DIR") or (Path(__file__).resolve().parent.parent / "data"))
+        candles_path = data_dir / "candles_cache.json"
         if candles_path.exists():
             with open(candles_path, "r", encoding="utf-8") as f:
                 candles_cache = json.load(f)
@@ -94,7 +98,7 @@ def calculate_daily_wealth_timeline(
     trades = summary_data.get("closed_trades", [])
     cash_mov = summary_data.get("cash_movements", [])
     divs = summary_data.get("dividends_list", [])
-    fx_rate = float(summary_data.get("fx_rate", 33.48) or 33.48)
+    fx_rate = float(summary_data.get("fx_rate", FALLBACK_USDTHB) or FALLBACK_USDTHB)
 
     # 1. Price lookup map: prices[ticker][YYYY-MM-DD] = close_price
     prices: Dict[str, Dict[str, float]] = defaultdict(dict)

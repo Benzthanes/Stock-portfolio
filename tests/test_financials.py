@@ -127,7 +127,7 @@ class TestFinancials(unittest.TestCase):
         self.assertIsNone(empty_res["score"])
         self.assertEqual(empty_res["max_score"], 9)
 
-        # High-health quarters
+        # High-health quarters with full 5 quarters for YoY
         q1 = {
             "revenue": 100,
             "net_income": 20,
@@ -146,12 +146,42 @@ class TestFinancials(unittest.TestCase):
             "stockholders_equity": 230,
             "fcf": 35,
         }
-        res = compute_piotroski_f_score([q1, q2])
+        res = compute_piotroski_f_score([q1, q1, q1, q1, q2])
         self.assertIsNotNone(res["score"])
         self.assertGreaterEqual(res["score"], 8)
         self.assertEqual(res["max_score"], 9)
         self.assertEqual(len(res["criteria"]), 9)
         self.assertIn("Elite", res["label"])
+        self.assertEqual(res["title"], "เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)")
+
+        # Short quarters (< 5) should show N/A for YoY without failing
+        res_short = compute_piotroski_f_score([q1, q2])
+        self.assertEqual(res_short["max_score"], 7)
+        self.assertEqual(res_short["score"], 7)
+        self.assertEqual(res_short["evaluable_count"], 7)
+        self.assertIsNone(res_short["criteria"][3]["passed"])
+        self.assertEqual(res_short["criteria"][3]["detail"], "N/A")
+        self.assertIsNone(res_short["criteria"][6]["passed"])
+        self.assertEqual(res_short["criteria"][6]["detail"], "N/A")
+
+        # Insufficient criteria (< 5 evaluable) should label "ข้อมูลไม่พอ"
+        q_sparse = {"revenue": 100}  # Only 1 or 2 evaluable
+        res_sparse = compute_piotroski_f_score([q_sparse])
+        self.assertLess(res_sparse["evaluable_count"], 5)
+        self.assertEqual(res_sparse["label"], "ข้อมูลไม่พอ")
+        self.assertIn("title", res_sparse)
+        self.assertEqual(res_sparse["title"], "เช็กลิสต์งบ 9 ข้อ (เกณฑ์ของระบบนี้ ไม่ใช่ Piotroski)")
+
+    def test_process_quarterly_metrics_stale_timestamp(self):
+        # When raw_data is None (stale), if existing_timestamp is None, timestamp should be 0, not now
+        res_none_ts = process_quarterly_metrics("TEST", None, existing_timestamp=None)
+        self.assertTrue(res_none_ts["stale"])
+        self.assertEqual(res_none_ts["timestamp"], 0)
+
+        # When existing_timestamp is provided, preserve it exactly
+        res_with_ts = process_quarterly_metrics("TEST", None, existing_timestamp=1700000000)
+        self.assertTrue(res_with_ts["stale"])
+        self.assertEqual(res_with_ts["timestamp"], 1700000000)
 
     def test_generate_financial_executive_summary(self):
         quarters = [
@@ -163,13 +193,33 @@ class TestFinancials(unittest.TestCase):
                 "net_income_fmt": "$30.00M",
                 "debt_to_equity": 0.5,
                 "total_debt_fmt": "$50.00M",
+                "fcf": 35,
                 "fcf_fmt": "$35.00M",
             }
         ]
         summary = generate_financial_executive_summary(quarters)
         self.assertIn("เติบโต", summary["growth"])
-        self.assertIn("Net Margin", summary["profitability"])
-        self.assertIn("D/E", summary["debt"])
+        self.assertIn("FCF แข็งแกร่ง", summary["profitability"])
+        self.assertIn("ปลอดภัยสูงมาก", summary["debt"])
+
+        # Test negative FCF and negative equity
+        quarters_neg = [
+            {
+                "revenue": 100,
+                "revenue_fmt": "$100.00M",
+                "rev_growth_yoy": -5.0,
+                "net_margin": 26.0,
+                "net_income_fmt": "$26.00M",
+                "debt_to_equity": -0.5,
+                "total_debt_fmt": "$80.00M",
+                "fcf": -20,
+                "fcf_fmt": "-$20.00M",
+            }
+        ]
+        summary_neg = generate_financial_executive_summary(quarters_neg)
+        self.assertIn("FCF ติดลบ", summary_neg["profitability"])
+        self.assertNotIn("FCF แข็งแกร่ง", summary_neg["profitability"])
+        self.assertIn("Negative Equity", summary_neg["debt"])
 
 
 if __name__ == "__main__":

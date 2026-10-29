@@ -33,6 +33,10 @@ class LedgerCase(unittest.TestCase):
         self.base_gross = float(base_ledger.get("gross_deposits_thb", 0.0))
         base_ledger["cash"] = {"dime_save_thb": 0.0, "dime_usd": 0.0}
         self.ledger.write_text(json.dumps(base_ledger), encoding="utf-8")
+        from unittest import mock
+        fx_patch = mock.patch("src.fx.fetch_usdthb", return_value=None)
+        self.fetch_fx = fx_patch.start()
+        self.addCleanup(fx_patch.stop)
 
     def tearDown(self):
         self._tmp.cleanup()
@@ -70,7 +74,7 @@ class BuyTest(LedgerCase):
         save_ledger(ledger, str(self.ledger))
         res = self.buy("bbb", 2, 10.0, pay="usd", trade_date="2026-10-15", exchange_resolver=lambda t: ("NYSE", "Bbb Corp"))
         self.assertEqual(self.holding("BBB"), {"ticker": "BBB", "exchange": "NYSE", "name": "Bbb Corp", "shares": 2.0,
-                                               "avg_cost_usd": 10.0, "total_cost_usd": 20.0, "cost_thb": 660.0,
+                                               "avg_cost_usd": 10.0, "total_cost_usd": 20.0, "cost_thb": 672.4,
                                                "buy_date": "2026-10-15"})
         self.assertEqual(load_ledger(str(self.ledger))["cash"], {"dime_save_thb": 0.0, "dime_usd": 80.0})
         self.assertEqual(res["warnings"], [])

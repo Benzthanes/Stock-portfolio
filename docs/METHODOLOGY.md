@@ -98,9 +98,9 @@
 1. **Universe.** ใช้ `get_universe("all")` (S&P 100 รวม Nasdaq 100) บวกหุ้นใน `data/portfolio.json` แต่ไม่รวม VOO. รอบล่าสุดได้ 173 ตัว.
 2. **ข้อมูล.** ดึงแท่งเทียนรายวันย้อนหลัง 6 ปีจาก Yahoo ด้วย `range=6y&interval=1d`.
 3. **Walk-forward.** ทุก `STEP = 5` แท่ง ใช้หน้าต่าง `WINDOW = 450` แท่งที่จบ ณ จุดนั้น. คำนวณอินดิเคเตอร์จากข้อมูลถึงจุดนั้นเท่านั้น จึงไม่มี look-ahead. ย้อนหลังสุด `LOOKBACK_BARS = 900` แท่ง.
-4. **สถานะ.** `sample_states()` แปลงผลอินดิเคเตอร์จาก `src/chart_data.py` เป็นสถานะแบบ string เช่น `vfi = "DISTRIBUTION"` หรือ `ema200_dist = "0..5%"`.
+4. **สถานะ.** `sample_states()` แปลงผลอินดิเคเตอร์จาก `src/chart_data.py` เป็นสถานะแบบ string เช่น `chandelier = "LONG"` หรือ `ema200_dist = "0..5%"`.
 5. **ผลลัพธ์ที่วัด.** `fwd20` และ `fwd60` คือผลตอบแทน 20 และ 60 วันข้างหน้า. `mdd60` คือ drawdown ลึกสุดใน 60 วันข้างหน้า วัดจากราคา low.
-6. **บริบท dip.** จุดที่ราคาห่าง EMA200 ระหว่าง -3% ถึง +8% และ RSI ต่ำสุดใน 5 แท่งน้อยกว่า 40. ในบริบทนี้ วัดตัวกรองมีดตก `dip_knife_vfi`, `dip_knife_chandelier` และ `dip_knife_any` เพิ่มด้วย.
+6. **บริบท dip.** จุดที่ราคาห่าง EMA200 ระหว่าง -3% ถึง +8% และ RSI ต่ำสุดใน 5 แท่งน้อยกว่า 40. ในบริบทนี้ วัดตัวกรองมีดตก `dip_knife_chandelier` เพิ่มด้วย. ตัวกรอง `dip_knife_vfi` และ `dip_knife_any` ถูกลบพร้อม VFI แล้ว.
 
 ### 3.3 สถิติที่ใช้ตัดสิน
 
@@ -143,7 +143,8 @@ for m in ['fwd60','fwd20','mdd60']:
 | EMA200 > 10% | mdd60 ลึกกว่า -1.31 (t -3.3) | ได้ 3 คะแนน |
 | RSI hook | fwd20 +0.79 (t 2.1) | เป็น `entry_signal` |
 | VFI DISTRIBUTION | fwd20 +0.65 (t 2.1) | ไม่ใช้บล็อก |
-| VFI, WAE, Squeeze, UT Bot, Chandelier, WaveTrend, Lorentzian, SMC | ไม่มี edge ที่คงที่ | ไม่นับคะแนน |
+| Squeeze, Chandelier, SMC | ไม่มี edge ที่คงที่ | ไม่นับคะแนน |
+| VFI, WAE, UT Bot, WaveTrend, Lorentzian, Hull | ไม่มี edge หรือติดลบ | ลบออกจากโค้ดแล้ว (2026-10-29) |
 | ตัวกรองมีดตกในบริบท dip | ไม่มีนัยสำคัญ | ไม่ใช้บล็อก |
 
 ### 3.7 ข้อจำกัดที่ต้องบอกผู้ใช้ทุกครั้ง

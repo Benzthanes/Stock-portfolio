@@ -74,11 +74,17 @@ def get_forward_outlook(
     net_g_str = pct(net_g_live)
     rev_g_str = pct(rev_g_live)
     has_earnings_date = days_to_earnings is not None and days_to_earnings >= 0
-    earnings_period = f"ระยะประชิด ({days_to_earnings:.1f} วัน)" if has_earnings_date else "รอบประกาศงบถัดไป"
+    days_int = int(round(days_to_earnings)) if has_earnings_date else 0
     if has_earnings_date and days_to_earnings <= EARNINGS_GUARD_DAYS:
-        earnings_note = f"มีวันงบออกในอีก {days_to_earnings:.1f} วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. "
+        earnings_period = f"ระยะประชิด ({days_int} วัน)"
     elif has_earnings_date:
-        earnings_note = f"วันงบถัดไปอยู่ห่างอีก {days_to_earnings:.0f} วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. "
+        earnings_period = f"รอบประกาศงบถัดไป ({days_int} วัน)"
+    else:
+        earnings_period = "รอบประกาศงบถัดไป"
+    if has_earnings_date and days_to_earnings <= EARNINGS_GUARD_DAYS:
+        earnings_note = f"มีวันงบออกในอีก {days_int} วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. "
+    elif has_earnings_date:
+        earnings_note = f"วันงบถัดไปอยู่ห่างอีก {days_int} วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. "
     else:
         earnings_note = ""
 
@@ -89,7 +95,7 @@ def get_forward_outlook(
             "future_growth_drivers": [
                 "สถาปัตยกรรม Blackwell (GB200, B200, B100) มียอดจองเต็มล่วงหน้าข้ามปี สะท้อนดีมานด์ AI Training และ Inference ระดับ Hyperscalers",
                 "ซอฟต์แวร์ CUDA และแพลตฟอร์ม NVIDIA AI Enterprise สร้างคูเมือง (Economic Moat) แข็งแกร่ง ยากที่คู่แข่งจะลอกเลียนแบบ",
-                "อัตรากำไรขั้นต้น (Gross Margin) แข็งแกร่งระดับ 73-75% พร้อมกระแสเงินสดอิสระ (FCF) มหาศาลกว่า $50B ต่อปี",
+                f"อัตรากำไรขั้นต้น (Gross Margin) แข็งแกร่งระดับ 73-75% พร้อมกระแสเงินสดอิสระ (FCF) มหาศาลกว่า $50B ต่อปี (ข้อมูล ณ {CURATED_AS_OF})",
                 "การขยายตัวของ Sovereign AI (ศูนย์ข้อมูลระดับชาติของแต่ละประเทศ) และ Enterprise AI ขับเคลื่อนการเติบโตระลอกใหม่"
             ],
             "drawdown_root_cause": [
@@ -241,7 +247,7 @@ def get_forward_outlook(
                 {"period": "ระยะ 6-12 เดือน", "event": "การเปิดโรงงานขยายกำลังการผลิต Liquid Cooling เฟสใหม่เพื่อรองรับอุปสงค์ที่ล้นมือ"}
             ],
             "wall_street_verdict": f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s} จากราคาปัจจุบัน และเทียบต้นทุนของคุณ {pct(upside_cost)})" if cost_price > 0 else f"{consensus}เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s})",
-            "tailored_roadmap": earnings_note + "ให้ถือสถานะเดิมข้ามงบได้เลย เพราะพื้นฐาน AI Backlog แน่นหนามาก",
+            "tailored_roadmap": earnings_note + "ติดตามสถานะตามแผนยุทธศาสตร์และข้อมูล AI Backlog อย่างใกล้ชิด",
             "invalidation_risk": "หากประกาศงบแล้วพบว่าปัญหา Supply Chain คอขวดรุนแรงจนยกเลิกออเดอร์ หรือราคาปิดหลุดแนวรับ Stop-Loss ให้พิจารณาลดสัดส่วนเพื่อถือเงินสด"
         },
         "BAC": {
@@ -264,7 +270,11 @@ def get_forward_outlook(
                 {"period": "ระยะ 6-12 เดือน", "event": "การกลับมาของกิจกรรมซื้อหุ้นคืน (Share Repurchase Program) หลังเงินกองทุน Tier 1 แข็งแกร่งเกินเกณฑ์"}
             ],
             "wall_street_verdict": f"{consensus}เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ {m(t_low)}{low_vs_cost} เป้าหมายเฉลี่ย {m(t_avg)} (Upside {up_s})",
-            "tailored_roadmap": earnings_note + "เนื่องจากราคาอยู่โซนต่ำสุดของรอบและต่ำกว่าเป้าหมายสถาบันทุกแห่ง จึงเป็น 'จังหวะถือรอเด้งที่ปลอดภัยมาก' หรือตั้งรับ Smart DCA ที่แนวรับสำคัญ",
+            "tailored_roadmap": earnings_note + (
+                "เนื่องจากราคาซื้อขายต่ำกว่าเป้าหมายต่ำสุดของสถาบัน จึงติดตามจังหวะดีดตัวทางเทคนิคหรือพิจารณาตามแผนแนวรับสำคัญ"
+                if (t_low is not None and close_price < t_low)
+                else "ติดตามจังหวะดีดตัวทางเทคนิคหรือพิจารณาตามแผนแนวรับสำคัญ"
+            ),
             "invalidation_risk": "หากราคาปิดหลุดแนวรับ Stop-Loss และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง"
         },
         "NOK": {
@@ -308,6 +318,18 @@ def get_forward_outlook(
     pe_s = f"{pe:.1f}x" if pe is not None else "-"
     peg_s = f"{peg:.2f} เท่า" if peg is not None else "-"
 
+    is_underwater = (cost_price > 0 and close_price < cost_price)
+    if is_underwater:
+        drawdown_reasons = [
+            f"แรงขายทำกำไรและการพักฐานทางเทคนิคตามภาวะความผันผวนของกลุ่ม {sec}",
+            "การปรับสมดุลพอร์ตของนักลงทุนสถาบันก่อนรับรู้ข้อมูลปัจจัยมหภาคและทิศทางอัตราดอกเบี้ย",
+            "แรงทดสอบแนวรับสำคัญเพื่อสร้างฐานราคาใหม่",
+        ]
+    else:
+        drawdown_reasons = []
+
+    days_str = f"ปฏิทินงบ ({int(round(days_to_earnings))} วัน)" if days_to_earnings is not None else "รอบผลประกอบการถัดไป"
+
     return {
         "thesis_title": f"การวิเคราะห์เจาะลึกศักยภาพการเติบโต {t_html} ในกลุ่ม {sec} ({ind})",
         "quality_badge": fundamentals.get("quality_tier", "🟡 Market Leader"),
@@ -317,13 +339,9 @@ def get_forward_outlook(
             f"ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม {ind}",
             "การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ"
         ],
-        "drawdown_root_cause": [
-            f"แรงขายทำกำไรและการพักฐานทางเทคนิคตามภาวะความผันผวนของกลุ่ม {sec}",
-            "การปรับสมดุลพอร์ตของนักลงทุนสถาบันก่อนรับรู้ข้อมูลปัจจัยมหภาคและทิศทางอัตราดอกเบี้ย",
-            "แรงทดสอบแนวรับสำคัญเพื่อสร้างฐานราคาใหม่"
-        ],
+        "drawdown_root_cause": drawdown_reasons,
         "catalyst_timeline": [
-            {"period": f"ปฏิทินงบ ({days_to_earnings} วัน)" if days_to_earnings else "รอบผลประกอบการถัดไป", "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"},
+            {"period": days_str, "event": "การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต"},
             {"period": "ระยะ 1-3 เดือน", "event": "การปรับบทวิเคราะห์และประมาณการกำไรจากนักวิเคราะห์วอลล์สตรีท"},
             {"period": "ระยะ 6-12 เดือน", "event": "การเปิดตัวผลิตภัณฑ์ใหม่และการขยายตลาดสู่กลุ่มเป้าหมายใหม่"}
         ],

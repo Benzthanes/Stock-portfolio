@@ -17,13 +17,52 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.http import http_get
-from src.scoring import ETF_TICKERS
-from src.earnings_calendar import get_confirmed_earnings_dates, calculate_confirmed_earnings_reaction
+from src.scoring import (
+    EARNINGS_GUARD_DAYS,
+    ETF_TICKERS,
+    FundamentalScore,
+    StockScore,
+    TimingScore,
+    score_fundamentals,
+    score_stock,
+    score_timing,
+    grade_for,
+    STARS_BY_GRADE,
+    ETF_STARS,
+)
+from src.earnings_calendar import (
+    get_confirmed_earnings_dates,
+    calculate_confirmed_earnings_reaction,
+    get_earnings_timing,
+    get_earnings_calendar_hash,
+)
 
 CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.json"
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
 PATTERN_WIN_RATE_NOTE = "ไม่มีสถิติยืนยัน (heuristic)"
 ANCHOR_BARS = 504
+INDICATOR_SCHEMA_VERSION = 16
+EARNINGS_CALENDAR_HASH = get_earnings_calendar_hash()
+
+# Heuristic constants for swing signals (heuristic ไม่ผ่าน backtest)
+SWING_FIBO_TOLERANCE = 0.035      # heuristic ไม่ผ่าน backtest: กรอบความคลาดเคลื่อนแนวรับ Fibonacci
+SWING_RSI_OVERSOLD = 38.0         # heuristic ไม่ผ่าน backtest: ระดับ RSI Oversold เริ่มต้น
+SWING_RSI_HOOK_LOW = 42.0         # heuristic ไม่ผ่าน backtest: ระดับดีดยกฐาน RSI
+SWING_VOL_RATIO_BUY = 1.15        # heuristic ไม่ผ่าน backtest: อัตราส่วนวอลุ่มซื้อเทียบเฉลี่ย 20 วัน
+SWING_SL_RATIO_BUY = 0.965        # heuristic ไม่ผ่าน backtest: Stop Loss 3.5% ใต้ swing low
+SWING_TP_RATIO_BUY = 1.12         # heuristic ไม่ผ่าน backtest: Take Profit 12%
+SWING_RSI_OVERBOUGHT = 68.0       # heuristic ไม่ผ่าน backtest: ระดับ Overbought ฝั่งขาย swing
+SWING_VOL_RATIO_SELL = 1.25       # heuristic ไม่ผ่าน backtest: อัตราส่วนวอลุ่มเทขาย
+SWING_SL_RATIO_SELL = 1.025       # heuristic ไม่ผ่าน backtest: Stop Loss 2.5% เหนือ swing peak
+SWING_TP_RATIO_SELL = 0.92        # heuristic ไม่ผ่าน backtest: Take Profit 8% ใต้ราคาขาย
+RSI_OVERBOUGHT_THRESHOLD = 70.0   # heuristic ไม่ผ่าน backtest: ระดับ RSI Overbought สำหรับ TRIM
+
+# Heuristic constants for chart pattern detection (heuristic ไม่ผ่าน backtest)
+MAX_BOX_RANGE_SPAN_PCT = 0.15          # heuristic: เพดานความกว้างกรอบ (high - low) / low สูงสุด 15% สำหรับ Consolidation Box
+DOUBLE_PATTERN_MIN_WIDTH_BARS = 6      # heuristic: ระยะห่างขั้นต่ำระหว่างยอด/ฐานสำหรับ Double Top/Bottom (~6 แท่ง)
+DOUBLE_PATTERN_MIN_SWING_PCT = 0.05    # heuristic: การเด้งหรือย่อตัวขั้นต่ำสำหรับ Double Top/Bottom (~5-6%)
+DOUBLE_PATTERN_PRICE_TOLERANCE_PCT = 0.045  # heuristic: ส่วนต่างราคาสูงสุดระหว่างยอด/ฐานคู่ (4.5%)
+MAX_CHANNEL_SLOPE_DIFF_RATIO = 0.25    # heuristic: ส่วนต่างความชันสัมพัทธ์สูงสุด 25% สำหรับ Ascending Channel ขนาน
 
 
 def _round_price(x: float) -> float:
@@ -64,11 +103,14 @@ def fetch_ticker_candles(ticker: str) -> List[Dict[str, Any]]:
             continue
         v = volumes[i] if (i < len(volumes) and volumes[i] is not None) else 0
         t_str = datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d")
+        # Clamp high and low to enforce OHLC invariant integrity: high >= max(o, c), low <= min(o, c)
+        clamped_h = max(float(h), float(o), float(c))
+        clamped_l = min(float(l), float(o), float(c))
         candles.append({
             "time": t_str,
             "open": _round_price(o),
-            "high": _round_price(h),
-            "low": _round_price(l),
+            "high": _round_price(clamped_h),
+            "low": _round_price(clamped_l),
             "close": _round_price(c),
             "volume": int(v)
         })
@@ -86,8 +128,8 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
         return None
 
     recent = candles[-75:] if len(candles) >= 75 else candles
-    highs = [c["high"] for c in recent]
-    lows = [c["low"] for c in recent]
+    highs = [max(c["high"], c.get("open", c["high"]), c["close"]) for c in recent]
+    lows = [min(c["low"], c.get("open", c["low"]), c["close"]) for c in recent]
     closes = [c["close"] for c in recent]
     times = [c["time"] for c in recent]
     n = len(recent)
@@ -306,7 +348,253 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     ]
                 }
 
-    # 4. Double Bottom (W-Shape)
+    # 4. Triangles, Wedges, Expanding Triangles, Channels (Evaluated before Double Top/Bottom to avoid hiding 4-point patterns)
+    # In a valid geometric 4-point pattern, peaks and troughs must alternate (P1 < T1 < P2 < T2 or T1 < P1 < T2 < P2).
+    # Consecutive troughs followed by consecutive peaks (e.g. T1 < T2 < P1 < P2) is a trend reversal/rally, not a triangle.
+    if not detected and len(peaks) >= 2 and len(troughs) >= 2 and (
+        (peaks[-2]["idx"] < troughs[-2]["idx"] < peaks[-1]["idx"] < troughs[-1]["idx"])
+        or (troughs[-2]["idx"] < peaks[-2]["idx"] < troughs[-1]["idx"] < peaks[-1]["idx"])
+    ):
+        p1, p2 = peaks[-2], peaks[-1]
+        t1, t2 = troughs[-2], troughs[-1]
+
+        # Geometry Guard: troughs must be strictly below their respective peaks
+        if t1["price"] < p1["price"] and t2["price"] < p2["price"]:
+            peak_slope = (p2["price"] - p1["price"]) / max(1, (p2["idx"] - p1["idx"]))
+            trough_slope = (t2["price"] - t1["price"]) / max(1, (t2["idx"] - t1["idx"]))
+
+            p_val = lambda x: p1["price"] + peak_slope * (x - p1["idx"])
+            t_val = lambda x: t1["price"] + trough_slope * (x - t1["idx"])
+
+            start_idx = min(p1["idx"], t1["idx"])
+            end_idx = max(p2["idx"], t2["idx"])
+
+            start_spread = p_val(start_idx) - t_val(start_idx)
+            end_spread = p_val(end_idx) - t_val(end_idx)
+
+            # Lines must not cross inside the pattern body
+            lines_valid = (
+                start_spread > 0
+                and end_spread > 0
+                and p_val(p2["idx"]) > t_val(p2["idx"])
+                and p_val(t2["idx"]) > t_val(t2["idx"])
+            )
+
+            # Ascending Triangle: Flat Resistance (p1 ~= p2), Rising Support (t2 > t1)
+            if lines_valid and abs(p2["price"] - p1["price"]) / p1["price"] <= 0.025 and t2["price"] > t1["price"] * 1.015 and 0 < end_spread < start_spread:
+                flat_res = round((p1["price"] + p2["price"]) / 2, 2)
+                target = round(flat_res + (flat_res - t1["price"]), 2)
+                raw_pts = [
+                    {"name": "Upper Resistance 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                    {"name": "Ascending Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                    {"name": "Upper Resistance 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                    {"name": "Ascending Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                ]
+                raw_pts.sort(key=lambda x: x["idx"])
+                raw_pts[0]["role"] = "start"
+                kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
+                detected = {
+                    "name": "Ascending Triangle (สามเหลี่ยมลู่ขึ้น)",
+                    "type": "Bullish Continuation",
+                    "badge": "🟢 สามเหลี่ยมลู่ขึ้น (Ascending Triangle)",
+                    "summary": f"แนวต้านคงที่ ${flat_res:.2f} ขณะที่แนวรับยกฐานสูงขึ้นเรื่อยๆ รอจังหวะเบรกเอาท์",
+                    "neckline": flat_res,
+                    "breakout": flat_res,
+                    "target": target,
+                    "upside_pct": round((target - current_price) / current_price * 100, 1),
+                    "psychology": "แม้จะมีแรงขายกั้นไว้ที่แนวต้านแนวนอน แต่ผู้ซื้อยินดีซื้อในราคาที่แพงขึ้นเรื่อยๆ ทำให้จุดต่ำสุดยกตัวสูงขึ้นอย่างต่อเนื่อง (Higher Lows) บ่งบอกว่าแรงขายที่แนวต้านกำลังจะถูกดูดซับจนหมดสิ้น",
+                    "structure": f"แนวต้านแนวนอน (${flat_res:.2f}) • แนวรับเฉียงขึ้นยกฐานจาก ${t1['price']:.2f} มาที่ ${t2['price']:.2f}",
+                    "action_plan": f"ดักซื้อสะสมเมื่อราคาลงแตะแนวรับเฉียงขึ้น หรือเคาะซื้อ Follow Buy เมื่อปิดเหนือ ${flat_res:.2f} เป้าหมาย ${target:.2f}",
+                    "invalidation": f"รูปแบบเสียทรงหากราคาหลุดแนวรับเฉียงขึ้น",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
+                    "target_calc": f"วัดความกว้างของสามเหลี่ยมที่ฐานแรก (${flat_res - t1['price']:.2f}) บวกเพิ่มจากจุดต้าน ${flat_res:.2f}",
+                    "key_points": kp,
+                    "lines": [
+                        {"name": "Flat Resistance", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": flat_res}, {"time": times[-1], "value": flat_res}]},
+                        {"name": "Ascending Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
+                    ]
+                }
+            # Descending Triangle: Falling Resistance (p2 < p1), Flat Support (t1 ~= t2)
+            elif lines_valid and abs(t2["price"] - t1["price"]) / t1["price"] <= 0.025 and p2["price"] < p1["price"] * 0.985 and 0 < end_spread < start_spread:
+                flat_sup = round((t1["price"] + t2["price"]) / 2, 2)
+                target = round(flat_sup - (p1["price"] - flat_sup), 2)
+                raw_pts = [
+                    {"name": "Descending High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                    {"name": "Horizontal Floor 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                    {"name": "Descending High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                    {"name": "Horizontal Floor 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                ]
+                raw_pts.sort(key=lambda x: x["idx"])
+                raw_pts[0]["role"] = "start"
+                kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
+                detected = {
+                    "name": "Descending Triangle (สามเหลี่ยมกดไฮ)",
+                    "type": "Bearish Continuation",
+                    "badge": "🔴 สามเหลี่ยมลู่ลง (Descending Triangle)",
+                    "summary": f"แนวรับคงที่ ${flat_sup:.2f} ขณะที่จุดสูงสุดถูกกดต่ำลง บ่งชี้แรงขายสะสมต่อเนื่อง",
+                    "neckline": flat_sup,
+                    "breakout": flat_sup,
+                    "target": target,
+                    "upside_pct": round((target - current_price) / current_price * 100, 1),
+                    "psychology": "ผู้ขายกดราคาลงมาต่อเนื่องจนทำ Lower Highs ขณะที่แนวรับเดิมเริ่มเปราะบาง สะท้อนแรงขายกดดันสะสมจากสถาบัน",
+                    "structure": f"แนวรับแบนราบ (${flat_sup:.2f}) • แนวต้านเฉียงกดต่ำลงต่อเนื่อง",
+                    "action_plan": f"ระมัดระวังแรงเทขาย หากหลุดแนวรับ ${flat_sup:.2f} ให้ขายตัดขาดทุนทันที เป้าหมายขาลง ${target:.2f}",
+                    "invalidation": f"รูปแบบล้มเหลวหากเบรกทะลุเส้นแนวต้านเฉียงกดขึ้นไปได้",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
+                    "target_calc": f"วัดความสูงสามเหลี่ยมแล้วหักลบออกจากแนวรับ ${flat_sup:.2f}",
+                    "key_points": kp,
+                    "lines": [
+                        {"name": "Descending Resistance", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
+                        {"name": "Flat Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": flat_sup}, {"time": times[-1], "value": flat_sup}]}
+                    ]
+                }
+            # Symmetrical Expanding Triangle (Megaphone / Broadening)
+            elif lines_valid and p2["price"] > p1["price"] * 1.02 and t2["price"] < t1["price"] * 0.98 and end_spread > start_spread > 0:
+                height = p2["price"] - t2["price"]
+                target = round(p2["price"] + height * 0.5, 2)
+                raw_pts = [
+                    {"name": "Expanding High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                    {"name": "Expanding Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                    {"name": "Expanding High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                    {"name": "Expanding Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                ]
+                raw_pts.sort(key=lambda x: x["idx"])
+                raw_pts[0]["role"] = "start"
+                kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
+                detected = {
+                    "name": "Expanding Triangle (สามเหลี่ยมปากแตรขยายตัว)",
+                    "type": "High Volatility",
+                    "badge": "📢 ปากแตรขยายตัว (Expanding Triangle)",
+                    "summary": f"ความผันผวนขยายตัวออกทั้งสองฝั่ง Higher High และ Lower Low สวิงรุนแรง",
+                    "neckline": round(p2["price"], 2),
+                    "breakout": round(p2["price"], 2),
+                    "target": target,
+                    "upside_pct": round((target - current_price) / current_price * 100, 1),
+                    "psychology": "สภาวะความผันผวนสูงมาก เกิดศึกชิงขั้วระหว่างฝั่งกระทิงและหมี ทำให้สวิงหลุดทั้งแนวต้านและแนวรับ (High Volatility Squeeze)",
+                    "structure": f"กรอบราคาขยายกว้างออกทั้งสองฝั่ง ระหว่างแนวรับ ${t2['price']:.2f} ถึงแนวต้าน ${p2['price']:.2f}",
+                    "action_plan": "เน้น Swing Trade ตามกรอบ หรือรอให้ราคากลับเข้าสู่การบีบอัดก่อนเข้าสถานะใหญ่",
+                    "invalidation": "ผันผวนรุนแรง ควรวาง Stop Loss กว้าง 2.0 ATR",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
+                    "target_calc": f"เป้าหมายสวิงที่ ${target:.2f}",
+                    "key_points": kp,
+                    "lines": [
+                        {"name": "Diverging Resistance", "color": "#f59e0b", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
+                        {"name": "Diverging Support", "color": "#f43f5e", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
+                    ]
+                }
+            # Symmetrical Triangle
+            elif lines_valid and p2["price"] < p1["price"] * 0.985 and t2["price"] > t1["price"] * 1.015 and 0 < end_spread < start_spread:
+                height = p1["price"] - t1["price"]
+                target = round(current_price + height * 0.75, 2)
+                raw_pts = [
+                    {"name": "Lower High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                    {"name": "Higher Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                    {"name": "Lower High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                    {"name": "Higher Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                ]
+                raw_pts.sort(key=lambda x: x["idx"])
+                raw_pts[0]["role"] = "start"
+                kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
+                detected = {
+                    "name": "Symmetrical Triangle (สามเหลี่ยมบีบอัด)",
+                    "type": "Neutral Breakout",
+                    "badge": "⚖️ สามเหลี่ยมบีบอัด (Symmetrical Triangle)",
+                    "summary": f"ความผันผวนบีบแคบระหว่าง ${t2['price']:.2f} - ${p2['price']:.2f} เตรียมพร้อมระเบิดทิศทาง",
+                    "neckline": round(p2["price"], 2),
+                    "breakout": round(p2["price"], 2),
+                    "target": target,
+                    "upside_pct": round((target - current_price) / current_price * 100, 1),
+                    "psychology": "ทั้งผู้ซื้อและผู้ขายกำลังลังเล ปริมาณการซื้อขายลดฮวบลงเรื่อยๆ บ่งชี้การสะสมพลังครั้งใหญ่ (Volatility Contraction) ก่อนจะเลือกทิศทางระเบิดแรง",
+                    "structure": f"กรอบแนวต้านเฉียงลงและแนวรับเฉียงขึ้น บีบแคบเข้ามาที่โซน ${t2['price']:.2f} - ${p2['price']:.2f}",
+                    "action_plan": f"รอการ Breakout ชัดเจนฝั่งใดฝั่งหนึ่ง หากทะลุขึ้นเป้าหมายแรกอยู่ที่ ${target:.2f}",
+                    "invalidation": "หากราคาสวิงตัดไปมาโดยไร้ Volume ถือเป็น False Breakout",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
+                    "target_calc": f"วัดความกว้างสูงสุดของสามเหลี่ยม ({p1['price'] - t1['price']:.2f}) นำไปทาบจากจุดเบรก",
+                    "key_points": kp,
+                    "lines": [
+                        {"name": "Upper Resistance Line", "color": "#f59e0b", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
+                        {"name": "Lower Support Line", "color": "#38bdf8", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
+                    ]
+                }
+            # Falling Wedge (Bullish Reversal)
+            elif (
+                lines_valid
+                and p2["price"] < p1["price"]
+                and t2["price"] < t1["price"]
+                and peak_slope < 0
+                and trough_slope < 0
+                and trough_slope > peak_slope
+                and 0 < end_spread < start_spread
+            ):
+                target = round(p1["price"], 2)
+                raw_pts = [
+                    {"name": "Wedge High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                    {"name": "Wedge Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                    {"name": "Wedge High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                    {"name": "Wedge Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                ]
+                raw_pts.sort(key=lambda x: x["idx"])
+                raw_pts[0]["role"] = "start"
+                kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
+                detected = {
+                    "name": "Bullish Falling Wedge (ลิ่มเฉียงลงสะสมแรง)",
+                    "type": "Bullish Reversal",
+                    "badge": "🟢 ลิ่มลู่ลง (Falling Wedge)",
+                    "summary": f"กรอบราคาเฉียงลงบีบแคบลงเรื่อยๆ เป็นสัญญาณพร้อมทะยานกลับตัวขึ้นเมื่อทะลุกรอบต้าน",
+                    "neckline": round(p2["price"], 2),
+                    "breakout": round(p2["price"], 2),
+                    "target": target,
+                    "upside_pct": round((target - current_price) / current_price * 100, 1),
+                    "psychology": "ราคาค่อยๆ ซึมลงแต่ช่วงการลงบีบแคบลงเรื่อยๆ สะท้อนว่าแรงขายเริ่มอ่อนแรงลงอย่างมาก ขณะที่สถาบันเริ่มแอบดูดซับของ (Smart Money Absorption) จนเกิดแรงดีดกลับรุนแรง",
+                    "structure": f"แนวต้านและแนวรับเฉียงลงทั้งคู่แต่ลู่เข้าหากัน ปลายลิ่มบีบแคบใกล้ ${current_price:.2f}",
+                    "action_plan": f"เข้าซื้อสะสมในปลายลิ่ม หรือเคาะซื้อเมื่อทะลุกรอบบน ${p2['price']:.2f} เป้าหมายยอดลิ่มเดิมที่ ${target:.2f}",
+                    "invalidation": f"รูปแบบเสียทรงหากราคาหลุดเส้นรับล่างของลิ่ม",
+                    "win_rate": PATTERN_WIN_RATE_NOTE,
+                    "target_calc": f"เป้าหมายเชิงเทคนิคคือจุดเริ่มต้นของลิ่มที่ ${p1['price']:.2f}",
+                    "key_points": kp,
+                    "lines": [
+                        {"name": "Upper Wedge Resistance", "color": "#38bdf8", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
+                        {"name": "Lower Wedge Support", "color": "#10b981", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
+                    ]
+                }
+            # Channel Up / Rising Trend (Heuristic: Must have parallel slopes within MAX_CHANNEL_SLOPE_DIFF_RATIO)
+            elif lines_valid and p2["price"] > p1["price"] and t2["price"] > t1["price"] and peak_slope > 0 and trough_slope > 0:
+                avg_slope = (peak_slope + trough_slope) / 2.0
+                slope_diff_ratio = abs(peak_slope - trough_slope) / max(1e-6, avg_slope)
+                if slope_diff_ratio <= MAX_CHANNEL_SLOPE_DIFF_RATIO:
+                    target = round(p2["price"] * 1.08, 2)
+                    raw_pts = [
+                        {"name": "Channel High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
+                        {"name": "Channel Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
+                        {"name": "Channel High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
+                        {"name": "Channel Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                    ]
+                    raw_pts.sort(key=lambda x: x["idx"])
+                    raw_pts[0]["role"] = "start"
+                    kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
+                    detected = {
+                        "name": "Bullish Ascending Channel (ช่องคู่ขนานขาขึ้น)",
+                        "type": "Bullish Trend",
+                        "badge": "🟢 ช่องราคาขาขึ้น (Ascending Channel)",
+                        "summary": f"ยกทั้งจุดสูงสุดและต่ำสุดขึ้นต่อเนื่อง (Higher Highs & Higher Lows) แข็งแกร่ง",
+                        "neckline": round(p2["price"], 2),
+                        "breakout": round(p2["price"], 2),
+                        "target": target,
+                        "upside_pct": round((target - current_price) / current_price * 100, 1),
+                        "psychology": "แนวโน้มขาขึ้นแข็งแกร่งและมีระเบียบวินัยสูง มีการทำ Higher Highs และ Higher Lows ต่อเนื่อง บ่งชี้ว่ามีเงินทุนสถาบันไหลเข้าสม่ำเสมอ",
+                        "structure": f"กรอบแนวรับแนวต้านขนานกันเฉียงขึ้น ยอดล่าสุดอยู่ที่ ${p2['price']:.2f} ฐานล่าสุดอยู่ที่ ${t2['price']:.2f}",
+                        "action_plan": f"เข้าซื้อทุกครั้งที่ราคาย่อตัวลงมาทดสอบกรอบล่างของ Channel และขายทำกำไรบางส่วนที่กรอบบน เป้าหมาย ${target:.2f}",
+                        "invalidation": f"ระวังหากราคาหลุดกรอบล่าง Channel อาจเข้าสู่ช่วงการพักฐานใหญ่",
+                        "win_rate": PATTERN_WIN_RATE_NOTE,
+                        "target_calc": f"เป้าหมายแนวต้านกรอบบนคำนวณที่ ${target:.2f}",
+                        "key_points": kp,
+                        "lines": [
+                            {"name": "Upper Channel Line", "color": "#10b981", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2['idx']), 2)}]},
+                            {"name": "Lower Channel Support", "color": "#38bdf8", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2['idx']), 2)}]}
+                        ]
+                    }
+
+    # 5. Double Bottom (W-Shape)
     if not detected and len(troughs) >= 2:
         t1, t2 = troughs[-2], troughs[-1]
         mid_peaks = [p for p in peaks if t1["idx"] < p["idx"] < t2["idx"]]
@@ -316,7 +604,11 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             bounce = (neck_p["price"] - min(t1["price"], t2["price"])) / min(t1["price"], t2["price"])
             pattern_h = neck_p["price"] - min(t1["price"], t2["price"])
             width = t2["idx"] - t1["idx"]
-            if price_diff <= 0.045 and bounce >= 0.038 and width >= 3:
+            if (
+                price_diff <= DOUBLE_PATTERN_PRICE_TOLERANCE_PCT
+                and bounce >= DOUBLE_PATTERN_MIN_SWING_PCT
+                and width >= DOUBLE_PATTERN_MIN_WIDTH_BARS
+            ):
                 # Find left rim of W (must be near neck_p in price and within 3-10 bars before t1)
                 win_len = min(10, t1["idx"])
                 left_win = recent[t1["idx"] - win_len: t1["idx"]] if win_len >= 2 else []
@@ -377,7 +669,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     ]
                 }
 
-    # 5. Double Top (M-Shape)
+    # 6. Double Top (M-Shape)
     if not detected and len(peaks) >= 2:
         p1, p2 = peaks[-2], peaks[-1]
         mid_troughs = [t for t in troughs if p1["idx"] < t["idx"] < p2["idx"]]
@@ -387,7 +679,11 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             drop = (max(p1["price"], p2["price"]) - neck_t["price"]) / max(p1["price"], p2["price"])
             pattern_h = max(p1["price"], p2["price"]) - neck_t["price"]
             width = p2["idx"] - p1["idx"]
-            if price_diff <= 0.045 and drop >= 0.038 and width >= 3:
+            if (
+                price_diff <= DOUBLE_PATTERN_PRICE_TOLERANCE_PCT
+                and drop >= DOUBLE_PATTERN_MIN_SWING_PCT
+                and width >= DOUBLE_PATTERN_MIN_WIDTH_BARS
+            ):
                 # Find left base of M (must be near neck_t in price and within 3-10 bars before p1)
                 win_len = min(10, p1["idx"])
                 left_win = recent[p1["idx"] - win_len: p1["idx"]] if win_len >= 2 else []
@@ -448,6 +744,7 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     ]
                 }
 
+
     # 6. Bull Flag / Bear Flag Check
     if not detected and n >= 25:
         sub_lows = lows[-25:-8]
@@ -499,260 +796,64 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                     ]
                 }
 
-    # 7. Triangles, Wedges, Expanding Triangles, Channels
-    if not detected and len(peaks) >= 2 and len(troughs) >= 2:
-        p1, p2 = peaks[-2], peaks[-1]
-        t1, t2 = troughs[-2], troughs[-1]
-        peak_slope = (p2["price"] - p1["price"]) / max(1, (p2["idx"] - p1["idx"]))
-        trough_slope = (t2["price"] - t1["price"]) / max(1, (t2["idx"] - t1["idx"]))
+    # 8. Fallback: Range Consolidation Box (Tight accumulation only, span <= MAX_BOX_RANGE_SPAN_PCT)
+    if not detected and n >= 30:
+        prior_high = max(highs[-30:-1])
+        prior_low = min(lows[-30:-1])
+        if closes[-1] > prior_high:
+            recent_high = prior_high
+            recent_low = prior_low
+            h_sub = highs[-30:-1].index(recent_high)
+            l_sub = lows[-30:-1].index(recent_low)
+        else:
+            recent_high = max(highs[-30:])
+            recent_low = min(lows[-30:])
+            h_sub = highs[-30:].index(recent_high)
+            l_sub = lows[-30:].index(recent_low)
 
-        # Ascending Triangle: Flat Resistance (p1 ~= p2), Rising Support (t2 > t1)
-        if abs(p2["price"] - p1["price"]) / p1["price"] <= 0.025 and t2["price"] > t1["price"] * 1.015:
-            target = round(p2["price"] + (p2["price"] - t1["price"]), 2)
+        span_pct = (recent_high - recent_low) / max(1e-6, recent_low)
+        # Heuristic guard: tight accumulation box must not exceed MAX_BOX_RANGE_SPAN_PCT (15%),
+        # and price must reside inside the box boundary or just break out (within 3%).
+        if span_pct <= MAX_BOX_RANGE_SPAN_PCT and (recent_low <= current_price <= recent_high * 1.03):
+            h_idx = -30 + h_sub
+            l_idx = -30 + l_sub
+            start_idx = -30
             raw_pts = [
-                {"name": "Upper Resistance 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
-                {"name": "Ascending Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
-                {"name": "Upper Resistance 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
-                {"name": "Ascending Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
+                {"name": "Box Start (จุดเริ่มกรอบ)", "time": times[start_idx], "price": closes[start_idx], "idx": n + start_idx},
+                {"name": "Box Resistance", "time": times[h_idx], "price": recent_high, "idx": n + h_idx},
+                {"name": "Box Support", "time": times[l_idx], "price": recent_low, "idx": n + l_idx},
             ]
             raw_pts.sort(key=lambda x: x["idx"])
             raw_pts[0]["role"] = "start"
             kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
             detected = {
-                "name": "Ascending Triangle (สามเหลี่ยมลู่ขึ้น)",
-                "type": "Bullish Continuation",
-                "badge": "🟢 สามเหลี่ยมลู่ขึ้น (Ascending Triangle)",
-                "summary": f"แนวต้านคงที่ ${p2['price']:.2f} ขณะที่แนวรับยกฐานสูงขึ้นเรื่อยๆ รอจังหวะเบรกเอาท์",
-                "neckline": round(p2["price"], 2),
-                "breakout": round(p2["price"], 2),
-                "target": target,
-                "upside_pct": round((target - current_price) / current_price * 100, 1),
-                "psychology": "แม้จะมีแรงขายกั้นไว้ที่แนวต้านแนวนอน แต่ผู้ซื้อยินดีซื้อในราคาที่แพงขึ้นเรื่อยๆ ทำให้จุดต่ำสุดยกตัวสูงขึ้นอย่างต่อเนื่อง (Higher Lows) บ่งบอกว่าแรงขายที่แนวต้านกำลังจะถูกดูดซับจนหมดสิ้น",
-                "structure": f"แนวต้านแนวนอน (${p2['price']:.2f}) • แนวรับเฉียงขึ้นยกฐานจาก ${t1['price']:.2f} มาที่ ${t2['price']:.2f}",
-                "action_plan": f"ดักซื้อสะสมเมื่อราคาลงแตะแนวรับเฉียงขึ้น หรือเคาะซื้อ Follow Buy เมื่อปิดเหนือ ${p2['price']:.2f} เป้าหมาย ${target:.2f}",
-                "invalidation": f"รูปแบบเสียทรงหากราคาหลุดแนวรับเฉียงขึ้น",
+                "name": "Consolidation Box (กรอบสะสมพลัง)",
+                "type": "Neutral Consolidation",
+                "badge": "📦 กรอบพักตัว (Box Range)",
+                "summary": f"ราคาเคลื่อนไหวไซด์เวย์ในกรอบสะสม ${recent_low:.2f} - ${recent_high:.2f}",
+                "neckline": round(recent_high, 2),
+                "breakout": round(recent_high, 2),
+                "target": None,
+                "upside_pct": None,
+                "psychology": "ราคาพักตัวรอปัจจัยหนุนใหม่ มีการสะสมหุ้นในกรอบระหว่างผู้ซื้อที่ตั้งรับด้านล่างและผู้ขายที่ขายทำกำไรด้านบน",
+                "structure": f"กรอบแนวรับ ${recent_low:.2f} และแนวต้าน ${recent_high:.2f}",
+                "action_plan": f"ตั้งรับใกล้แนวรับ ${recent_low:.2f} หรือ Follow Buy เมื่อเบรกทะลุกรอบบน ${recent_high:.2f}",
+                "invalidation": f"Stop Loss หากราคาปิดหลุดแนวรับ ${recent_low:.2f}",
                 "win_rate": PATTERN_WIN_RATE_NOTE,
-                "target_calc": f"วัดความกว้างของสามเหลี่ยมที่ฐานแรก (${p2['price'] - t1['price']:.2f}) บวกเพิ่มจากจุดต้าน ${p2['price']:.2f}",
+                "target_calc": "วัดจากความสูงของกรอบสะสมพลัง 50% (คำนวณเป้าหมายเมื่อยืนยันเบรกเอาท์)",
                 "key_points": kp,
                 "lines": [
-                    {"name": "Flat Resistance", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": p2["price"]}]},
-                    {"name": "Ascending Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
+                    {"name": "Box Resistance", "color": "#f43f5e", "style": 2, "points": [{"time": times[-30], "value": recent_high}, {"time": times[-1], "value": recent_high}]},
+                    {"name": "Box Support", "color": "#10b981", "style": 2, "points": [{"time": times[-30], "value": recent_low}, {"time": times[-1], "value": recent_low}]}
                 ]
             }
-        # Descending Triangle: Falling Resistance (p2 < p1), Flat Support (t1 ~= t2)
-        elif abs(t2["price"] - t1["price"]) / t1["price"] <= 0.025 and p2["price"] < p1["price"] * 0.985:
-            target = round(t2["price"] - (p1["price"] - t2["price"]), 2)
-            raw_pts = [
-                {"name": "Descending High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
-                {"name": "Horizontal Floor 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
-                {"name": "Descending High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
-                {"name": "Horizontal Floor 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
-            ]
-            raw_pts.sort(key=lambda x: x["idx"])
-            raw_pts[0]["role"] = "start"
-            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
-            detected = {
-                "name": "Descending Triangle (สามเหลี่ยมกดไฮ)",
-                "type": "Bearish Continuation",
-                "badge": "🔴 สามเหลี่ยมลู่ลง (Descending Triangle)",
-                "summary": f"แนวรับคงที่ ${t2['price']:.2f} ขณะที่จุดสูงสุดถูกกดต่ำลง บ่งชี้แรงขายสะสมต่อเนื่อง",
-                "neckline": round(t2["price"], 2),
-                "breakout": round(t2["price"], 2),
-                "target": target,
-                "upside_pct": round((target - current_price) / current_price * 100, 1),
-                "psychology": "ผู้ขายกดราคาลงมาต่อเนื่องจนทำ Lower Highs ขณะที่แนวรับเดิมเริ่มเปราะบาง สะท้อนแรงขายกดดันสะสมจากสถาบัน",
-                "structure": f"แนวรับแบนราบ (${t2['price']:.2f}) • แนวต้านเฉียงกดต่ำลงต่อเนื่อง",
-                "action_plan": f"ระมัดระวังแรงเทขาย หากหลุดแนวรับ ${t2['price']:.2f} ให้ขายตัดขาดทุนทันที เป้าหมายขาลง ${target:.2f}",
-                "invalidation": f"รูปแบบล้มเหลวหากเบรกทะลุเส้นแนวต้านเฉียงกดขึ้นไปได้",
-                "win_rate": PATTERN_WIN_RATE_NOTE,
-                "target_calc": f"วัดความสูงสามเหลี่ยมแล้วหักลบออกจากแนวรับ ${t2['price']:.2f}",
-                "key_points": kp,
-                "lines": [
-                    {"name": "Descending Resistance", "color": "#f43f5e", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
-                    {"name": "Flat Support", "color": "#10b981", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": t2["price"]}]}
-                ]
-            }
-        # Symmetrical Expanding Triangle (Megaphone / Broadening)
-        elif p2["price"] > p1["price"] * 1.02 and t2["price"] < t1["price"] * 0.98:
-            height = p2["price"] - t2["price"]
-            target = round(p2["price"] + height * 0.5, 2)
-            raw_pts = [
-                {"name": "Expanding High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
-                {"name": "Expanding Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
-                {"name": "Expanding High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
-                {"name": "Expanding Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
-            ]
-            raw_pts.sort(key=lambda x: x["idx"])
-            raw_pts[0]["role"] = "start"
-            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
-            detected = {
-                "name": "Expanding Triangle (สามเหลี่ยมปากแตรขยายตัว)",
-                "type": "High Volatility",
-                "badge": "📢 ปากแตรขยายตัว (Expanding Triangle)",
-                "summary": f"ความผันผวนขยายตัวออกทั้งสองฝั่ง Higher High และ Lower Low สวิงรุนแรง",
-                "neckline": round(p2["price"], 2),
-                "breakout": round(p2["price"], 2),
-                "target": target,
-                "upside_pct": round((target - current_price) / current_price * 100, 1),
-                "psychology": "สภาวะความผันผวนสูงมาก เกิดศึกชิงขั้วระหว่างฝั่งกระทิงและหมี ทำให้สวิงหลุดทั้งแนวต้านและแนวรับ (High Volatility Squeeze)",
-                "structure": f"กรอบราคาขยายกว้างออกทั้งสองฝั่ง ระหว่างแนวรับ ${t2['price']:.2f} ถึงแนวต้าน ${p2['price']:.2f}",
-                "action_plan": "เน้น Swing Trade ตามกรอบ หรือรอให้ราคากลับเข้าสู่การบีบอัดก่อนเข้าสถานะใหญ่",
-                "invalidation": "ผันผวนรุนแรง ควรวาง Stop Loss กว้าง 2.0 ATR",
-                "win_rate": PATTERN_WIN_RATE_NOTE,
-                "target_calc": f"เป้าหมายสวิงที่ ${target:.2f}",
-                "key_points": kp,
-                "lines": [
-                    {"name": "Diverging Resistance", "color": "#f59e0b", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
-                    {"name": "Diverging Support", "color": "#f43f5e", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
-                ]
-            }
-        # Symmetrical Triangle
-        elif p2["price"] < p1["price"] * 0.985 and t2["price"] > t1["price"] * 1.015:
-            height = p1["price"] - t1["price"]
-            target = round(current_price + height * 0.75, 2)
-            raw_pts = [
-                {"name": "Lower High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
-                {"name": "Higher Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
-                {"name": "Lower High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
-                {"name": "Higher Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
-            ]
-            raw_pts.sort(key=lambda x: x["idx"])
-            raw_pts[0]["role"] = "start"
-            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
-            detected = {
-                "name": "Symmetrical Triangle (สามเหลี่ยมบีบอัด)",
-                "type": "Neutral Breakout",
-                "badge": "⚖️ สามเหลี่ยมบีบอัด (Symmetrical Triangle)",
-                "summary": f"ความผันผวนบีบแคบระหว่าง ${t2['price']:.2f} - ${p2['price']:.2f} เตรียมพร้อมระเบิดทิศทาง",
-                "neckline": round(p2["price"], 2),
-                "breakout": round(p2["price"], 2),
-                "target": target,
-                "upside_pct": round((target - current_price) / current_price * 100, 1),
-                "psychology": "ทั้งผู้ซื้อและผู้ขายกำลังลังเล ปริมาณการซื้อขายลดฮวบลงเรื่อยๆ บ่งชี้การสะสมพลังครั้งใหญ่ (Volatility Contraction) ก่อนจะเลือกทิศทางระเบิดแรง",
-                "structure": f"กรอบแนวต้านเฉียงลงและแนวรับเฉียงขึ้น บีบแคบเข้ามาที่โซน ${t2['price']:.2f} - ${p2['price']:.2f}",
-                "action_plan": f"รอการ Breakout ชัดเจนฝั่งใดฝั่งหนึ่ง หากทะลุขึ้นเป้าหมายแรกอยู่ที่ ${target:.2f}",
-                "invalidation": "หากราคาสวิงตัดไปมาโดยไร้ Volume ถือเป็น False Breakout",
-                "win_rate": PATTERN_WIN_RATE_NOTE,
-                "target_calc": f"วัดความกว้างสูงสุดของสามเหลี่ยม ({p1['price'] - t1['price']:.2f}) นำไปทาบจากจุดเบรก",
-                "key_points": kp,
-                "lines": [
-                    {"name": "Upper Resistance Line", "color": "#f59e0b", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
-                    {"name": "Lower Support Line", "color": "#38bdf8", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
-                ]
-            }
-        # Falling Wedge (Bullish Reversal)
-        elif p2["price"] < p1["price"] and t2["price"] < t1["price"]:
-            target = round(p1["price"], 2)
-            raw_pts = [
-                {"name": "Wedge High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
-                {"name": "Wedge Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
-                {"name": "Wedge High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
-                {"name": "Wedge Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
-            ]
-            raw_pts.sort(key=lambda x: x["idx"])
-            raw_pts[0]["role"] = "start"
-            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
-            detected = {
-                "name": "Bullish Falling Wedge (ลิ่มเฉียงลงสะสมแรง)",
-                "type": "Bullish Reversal",
-                "badge": "🟢 ลิ่มลู่ลง (Falling Wedge)",
-                "summary": f"กรอบราคาเฉียงลงบีบแคบลงเรื่อยๆ เป็นสัญญาณพร้อมทะยานกลับตัวขึ้นเมื่อทะลุกรอบต้าน",
-                "neckline": round(p2["price"], 2),
-                "breakout": round(p2["price"], 2),
-                "target": target,
-                "upside_pct": round((target - current_price) / current_price * 100, 1),
-                "psychology": "ราคาค่อยๆ ซึมลงแต่ช่วงการลงบีบแคบลงเรื่อยๆ สะท้อนว่าแรงขายเริ่มอ่อนแรงลงอย่างมาก ขณะที่สถาบันเริ่มแอบดูดซับของ (Smart Money Absorption) จนเกิดแรงดีดกลับรุนแรง",
-                "structure": f"แนวต้านและแนวรับเฉียงลงทั้งคู่แต่ลู่เข้าหากัน ปลายลิ่มบีบแคบใกล้ ${current_price:.2f}",
-                "action_plan": f"เข้าซื้อสะสมในปลายลิ่ม หรือเคาะซื้อเมื่อทะลุกรอบบน ${p2['price']:.2f} เป้าหมายยอดลิ่มเดิมที่ ${target:.2f}",
-                "invalidation": f"รูปแบบเสียทรงหากราคาหลุดเส้นรับล่างของลิ่ม",
-                "win_rate": PATTERN_WIN_RATE_NOTE,
-                "target_calc": f"เป้าหมายเชิงเทคนิคคือจุดเริ่มต้นของลิ่มที่ ${p1['price']:.2f}",
-                "key_points": kp,
-                "lines": [
-                    {"name": "Upper Wedge Resistance", "color": "#38bdf8", "style": 2, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2["idx"]), 2)}]},
-                    {"name": "Lower Wedge Support", "color": "#10b981", "style": 2, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2["idx"]), 2)}]}
-                ]
-            }
-        # Channel Up / Rising Trend
-        elif p2["price"] > p1["price"] and t2["price"] > t1["price"]:
-            target = round(p2["price"] * 1.08, 2)
-            raw_pts = [
-                {"name": "Channel High 1", "time": p1["time"], "price": p1["price"], "idx": p1["idx"]},
-                {"name": "Channel Low 1", "time": t1["time"], "price": t1["price"], "idx": t1["idx"]},
-                {"name": "Channel High 2", "time": p2["time"], "price": p2["price"], "idx": p2["idx"]},
-                {"name": "Channel Low 2", "time": t2["time"], "price": t2["price"], "idx": t2["idx"]},
-            ]
-            raw_pts.sort(key=lambda x: x["idx"])
-            raw_pts[0]["role"] = "start"
-            kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
-            detected = {
-                "name": "Bullish Ascending Channel (ช่องคู่ขนานขาขึ้น)",
-                "type": "Bullish Trend",
-                "badge": "🟢 ช่องราคาขาขึ้น (Ascending Channel)",
-                "summary": f"ยกทั้งจุดสูงสุดและต่ำสุดขึ้นต่อเนื่อง (Higher Highs & Higher Lows) แข็งแกร่ง",
-                "neckline": round(p2["price"], 2),
-                "breakout": round(p2["price"], 2),
-                "target": target,
-                "upside_pct": round((target - current_price) / current_price * 100, 1),
-                "psychology": "แนวโน้มขาขึ้นแข็งแกร่งและมีระเบียบวินัยสูง มีการทำ Higher Highs และ Higher Lows ต่อเนื่อง บ่งชี้ว่ามีเงินทุนสถาบันไหลเข้าสม่ำเสมอ",
-                "structure": f"กรอบแนวรับแนวต้านขนานกันเฉียงขึ้น ยอดล่าสุดอยู่ที่ ${p2['price']:.2f} ฐานล่าสุดอยู่ที่ ${t2['price']:.2f}",
-                "action_plan": f"เข้าซื้อทุกครั้งที่ราคาย่อตัวลงมาทดสอบกรอบล่างของ Channel และขายทำกำไรบางส่วนที่กรอบบน เป้าหมาย ${target:.2f}",
-                "invalidation": f"ระวังหากราคาหลุดกรอบล่าง Channel อาจเข้าสู่ช่วงการพักฐานใหญ่",
-                "win_rate": PATTERN_WIN_RATE_NOTE,
-                "target_calc": f"เป้าหมายแนวต้านกรอบบนคำนวณที่ ${target:.2f}",
-                "key_points": kp,
-                "lines": [
-                    {"name": "Upper Channel Line", "color": "#10b981", "style": 0, "points": [{"time": p1["time"], "value": p1["price"]}, {"time": times[-1], "value": round(p2["price"] + peak_slope * (n - 1 - p2['idx']), 2)}]},
-                    {"name": "Lower Channel Support", "color": "#38bdf8", "style": 0, "points": [{"time": t1["time"], "value": t1["price"]}, {"time": times[-1], "value": round(t2["price"] + trough_slope * (n - 1 - t2['idx']), 2)}]}
-                ]
-            }
-
-    # Fallback: Range Consolidation Box
-    if not detected:
-        recent_high = max(highs[-30:])
-        recent_low = min(lows[-30:])
-        target = round(recent_high + (recent_high - recent_low) * 0.5, 2)
-        h_sub = highs[-30:].index(recent_high)
-        l_sub = lows[-30:].index(recent_low)
-        h_idx = -30 + h_sub
-        l_idx = -30 + l_sub
-        start_idx = -30
-        raw_pts = [
-            {"name": "Box Start (จุดเริ่มกรอบ)", "time": times[start_idx], "price": closes[start_idx], "idx": n + start_idx},
-            {"name": "Box Resistance", "time": times[h_idx], "price": recent_high, "idx": n + h_idx},
-            {"name": "Box Support", "time": times[l_idx], "price": recent_low, "idx": n + l_idx},
-        ]
-        raw_pts.sort(key=lambda x: x["idx"])
-        raw_pts[0]["role"] = "start"
-        kp = [{"name": x["name"], "time": x["time"], "price": x["price"], "role": x.get("role", "")} for x in raw_pts]
-        detected = {
-            "name": "Consolidation Box (กรอบสะสมพลัง)",
-            "type": "Neutral Consolidation",
-            "badge": "📦 กรอบพักตัว (Box Range)",
-            "summary": f"ราคาเคลื่อนไหวไซด์เวย์ในกรอบสะสม ${recent_low:.2f} - ${recent_high:.2f}",
-            "neckline": round(recent_high, 2),
-            "breakout": round(recent_high, 2),
-            "target": target,
-            "upside_pct": round((target - current_price) / current_price * 100, 1),
-            "psychology": "ราคาพักตัวรอปัจจัยหนุนใหม่ มีการสะสมหุ้นในกรอบระหว่างผู้ซื้อที่ตั้งรับด้านล่างและผู้ขายที่ขายทำกำไรด้านบน",
-            "structure": f"กรอบแนวรับ ${recent_low:.2f} และแนวต้าน ${recent_high:.2f}",
-            "action_plan": f"ตั้งรับใกล้แนวรับ ${recent_low:.2f} หรือ Follow Buy เมื่อเบรกทะลุกรอบบน ${recent_high:.2f} เป้าหมาย ${target:.2f}",
-            "invalidation": f"Stop Loss หากราคาปิดหลุดแนวรับ ${recent_low:.2f}",
-            "win_rate": PATTERN_WIN_RATE_NOTE,
-            "target_calc": f"ความสูงของกรอบบวกเพิ่มจากแนวต้านเป้าหมาย ${target:.2f}",
-            "key_points": kp,
-            "lines": [
-                {"name": "Box Resistance", "color": "#f43f5e", "style": 2, "points": [{"time": times[-30], "value": recent_high}, {"time": times[-1], "value": recent_high}]},
-                {"name": "Box Support", "color": "#10b981", "style": 2, "points": [{"time": times[-30], "value": recent_low}, {"time": times[-1], "value": recent_low}]}
-            ]
-        }
 
     # Universal Pattern Lifecycle & Invalidation Guard
     if detected:
         pat_name = detected.get("name", "")
         pat_type = detected.get("type", "")
-        is_bullish = "bullish" in pat_type.lower() or "inv" in pat_name.lower() or "flag" in pat_name.lower() or "ascending" in pat_name.lower()
-        is_bearish = "bearish" in pat_type.lower() or "descending" in pat_name.lower()
+        is_bullish = ("bullish" in pat_type.lower() or "inv" in pat_name.lower() or "flag" in pat_name.lower() or "ascending" in pat_name.lower()) and "descending triangle" not in pat_name.lower()
+        is_bearish = "bearish" in pat_type.lower() or "descending triangle" in pat_name.lower()
 
         support_level = None
         resistance_level = None
@@ -778,47 +879,120 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
             r_shoulder = [kp for kp in detected.get("key_points", []) if "right shoulder" in kp["name"].lower()]
             if r_shoulder:
                 support_level = r_shoulder[0]["price"]
+        elif "Descending Triangle" in pat_name:
+            # Floor is horizontal flat support
+            support_level = detected.get("neckline")
+            res_lines = [l for l in detected.get("lines", []) if "resistance" in l["name"].lower()]
+            if res_lines:
+                resistance_level = res_lines[0]["points"][0]["value"]
         elif any(k in pat_name for k in ["Triangle", "Wedge", "Flag", "Channel"]):
             resistance_level = detected.get("breakout") or detected.get("neckline")
             sup_lines = [l for l in detected.get("lines", []) if "support" in l["name"].lower()]
             if sup_lines:
                 support_level = min(p["value"] for p in sup_lines[0]["points"])
 
-        # 2. Find post-pattern candle slice (from the last key point time)
+        # Extract slope and points for support and resistance lines if available
+        sup_lines_all = [l for l in detected.get("lines", []) if "support" in l["name"].lower() or "floor" in l["name"].lower() or "lower" in l["name"].lower()]
+        res_lines_all = [l for l in detected.get("lines", []) if "resistance" in l["name"].lower() or "ceiling" in l["name"].lower() or "upper" in l["name"].lower() or "neckline" in l["name"].lower()]
+
+        s_slope = 0.0
+        s_p1_val = support_level
+        s_bar_idx = 0
+        has_dynamic_support = False
+        if sup_lines_all:
+            s_pts = sup_lines_all[0]["points"]
+            s_p1_time = s_pts[0]["time"]
+            s_p1_val = s_pts[0]["value"]
+            s_end_val = s_pts[-1]["value"]
+            s_idx = [i for i, tm in enumerate(times) if tm == s_p1_time]
+            s_bar_idx = s_idx[0] if s_idx else 0
+            s_end_time = s_pts[-1]["time"]
+            s_end_idx = [i for i, tm in enumerate(times) if tm == s_end_time]
+            s_end_bar = s_end_idx[0] if s_end_idx else (n - 1)
+            s_span = max(1, s_end_bar - s_bar_idx)
+            s_slope = (s_end_val - s_p1_val) / s_span
+            if abs(s_slope) > 1e-6:
+                has_dynamic_support = True
+            if support_level is None:
+                support_level = s_p1_val
+
+        r_slope = 0.0
+        r_p1_val = resistance_level
+        r_bar_idx = 0
+        has_dynamic_resistance = False
+        if res_lines_all:
+            r_pts = res_lines_all[0]["points"]
+            r_p1_time = r_pts[0]["time"]
+            r_p1_val = r_pts[0]["value"]
+            r_end_val = r_pts[-1]["value"]
+            r_idx = [i for i, tm in enumerate(times) if tm == r_p1_time]
+            r_bar_idx = r_idx[0] if r_idx else 0
+            r_end_time = r_pts[-1]["time"]
+            r_end_idx = [i for i, tm in enumerate(times) if tm == r_end_time]
+            r_end_bar = r_end_idx[0] if r_end_idx else (n - 1)
+            r_span = max(1, r_end_bar - r_bar_idx)
+            r_slope = (r_end_val - r_p1_val) / r_span
+            if abs(r_slope) > 1e-6:
+                has_dynamic_resistance = True
+            if resistance_level is None:
+                resistance_level = r_p1_val
+
+        # 2. Find post-pattern candle slice (from the last key point time or t2/p2 for double patterns)
         kp_indices = []
-        for kp in detected.get("key_points", []):
-            if "idx" in kp:
-                kp_indices.append(kp["idx"])
-            elif "time" in kp:
-                matching = [i for i, tm in enumerate(times) if tm == kp["time"]]
+        if "Double Bottom" in pat_name:
+            t2_pts = [kp for kp in detected.get("key_points", []) if "bottom 2" in kp["name"].lower() or "ฐานที่สอง" in kp["name"]]
+            if t2_pts and "time" in t2_pts[0]:
+                matching = [i for i, tm in enumerate(times) if tm == t2_pts[0]["time"]]
                 if matching:
-                    kp_indices.append(matching[-1])
+                    kp_indices = [matching[-1]]
+        elif "Double Top" in pat_name:
+            p2_pts = [kp for kp in detected.get("key_points", []) if "peak 2" in kp["name"].lower() or "ยอดที่สอง" in kp["name"]]
+            if p2_pts and "time" in p2_pts[0]:
+                matching = [i for i, tm in enumerate(times) if tm == p2_pts[0]["time"]]
+                if matching:
+                    kp_indices = [matching[-1]]
+
+        if not kp_indices:
+            for kp in detected.get("key_points", []):
+                if "idx" in kp:
+                    kp_indices.append(kp["idx"])
+                elif "time" in kp:
+                    matching = [i for i, tm in enumerate(times) if tm == kp["time"]]
+                    if matching:
+                        kp_indices.append(matching[-1])
         latest_kp_idx = max(kp_indices) if kp_indices else max(0, n - 6)
 
         post_candles = recent[latest_kp_idx:]
         post_closes = [c["close"] for c in post_candles]
 
         # 3. Evaluate Bullish Patterns
-        if is_bullish and support_level is not None:
-            breakdown_indices = [i for i, c in enumerate(post_candles) if c["close"] < support_level * 0.995 or c["low"] < support_level * 0.985]
+        if is_bullish:
+            breakdown_indices = []
+            for i, c in enumerate(post_candles):
+                bar_idx = latest_kp_idx + i
+                cur_floor = (s_p1_val + s_slope * (bar_idx - s_bar_idx)) if has_dynamic_support else (support_level or 0.0)
+                if cur_floor > 0 and (c["close"] < cur_floor * 0.995 or c["low"] < cur_floor * 0.985):
+                    breakdown_indices.append(i)
+
             if breakdown_indices:
                 first_break_idx = latest_kp_idx + breakdown_indices[0]
                 bars_since_break = n - 1 - first_break_idx
                 if bars_since_break > 12:
                     detected = None
                 else:
+                    break_floor = (s_p1_val + s_slope * (first_break_idx - s_bar_idx)) if has_dynamic_support else (support_level or 0.0)
                     detected["status"] = "failed"
-                    detected["badge"] = f"🔴 รูปแบบล้มเหลว (Pattern Failed - หลุด ${support_level:.2f})"
+                    detected["badge"] = f"🔴 รูปแบบล้มเหลว (Pattern Failed - หลุด ${break_floor:.2f})"
                     detected["type"] = "Failed Pattern (เสียทรง)"
-                    detected["summary"] = f"รูปแบบ {detected['name']} ล้มเหลวเนื่องจากราคาปิดหลุดแนวรับ ${support_level:.2f} (ราคาปิดล่าสุด ${current_price:.2f})"
-                    detected["action_plan"] = f"⚠️ รูปแบบเสียทรง ห้ามเข้าซื้อหรือให้ Stop Loss ทันที ราคาปิดหลุดแนวรับสำคัญ ${support_level:.2f} กลายเป็นขาลงต่อเนื่อง"
+                    detected["summary"] = f"รูปแบบ {detected['name']} ล้มเหลวเนื่องจากราคาปิดหลุดแนวรับ ${break_floor:.2f} (ราคาปิดล่าสุด ${current_price:.2f})"
+                    detected["action_plan"] = f"⚠️ รูปแบบเสียทรง ห้ามเข้าซื้อหรือให้ Stop Loss ทันที ราคาปิดหลุดแนวรับสำคัญ ${break_floor:.2f} กลายเป็นขาลงต่อเนื่อง"
                     detected["target"] = None
                     detected["upside_pct"] = None
                     detected["lines"].append({
-                        "name": f"Breakdown Floor (${support_level:.2f})",
+                        "name": f"Breakdown Floor (${break_floor:.2f})",
                         "color": "#ef4444",
                         "style": 2,
-                        "points": [{"time": times[first_break_idx], "value": support_level}, {"time": times[-1], "value": support_level}]
+                        "points": [{"time": times[first_break_idx], "value": round(break_floor, 2)}, {"time": times[-1], "value": round(break_floor, 2)}]
                     })
                     # Append Breakdown leg to key_points so the skeleton connects through the broken floor
                     valid_break_indices = [i for i in breakdown_indices if i > 0]
@@ -835,47 +1009,142 @@ def detect_chart_patterns(candles: List[Dict[str, Any]]) -> Optional[Dict[str, A
                             if "structure" in detected and "หลุดแนวรับ" not in detected["structure"]:
                                 detected["structure"] += f" ➔ ⚠️ หลุดแนวรับ Breakdown (${break_c['low']:.2f})"
             else:
-                if resistance_level and any(c >= resistance_level * 1.002 for c in post_closes):
+                is_breakout = False
+                for i, c in enumerate(post_candles):
+                    bar_idx = latest_kp_idx + i
+                    cur_roof = (r_p1_val + r_slope * (bar_idx - r_bar_idx)) if has_dynamic_resistance else (resistance_level or 0.0)
+                    if cur_roof > 0 and c["close"] >= cur_roof * 1.002:
+                        is_breakout = True
+                        break
+
+                if is_breakout:
                     detected["status"] = "confirmed"
-                    detected["badge"] = detected.get("badge", "").replace("🟢", "🚀").replace("รูปแบบกระทิง", "ยืนยันเบรกเอาท์ (Confirmed)")
+                    detected["badge"] = detected.get("badge", "").replace("🟢", "✅").replace("รูปแบบกระทิง", "ยืนยันเบรกเอาท์ (Confirmed)")
                 else:
                     detected["status"] = "forming"
                     detected["badge"] = detected.get("badge", "").replace("🟢", "🟡").replace("รูปแบบกระทิง", "กำลังก่อตัว (Forming - รอเบรก)")
-                    detected["action_plan"] = f"ราคากำลังทดสอบแนวต้าน Neckline ${resistance_level:.2f} ห้ามชิงซื้อจนกว่าแท่งเทียนจะปิดทะลุแนวต้านยืนยัน"
+                    cur_res_str = f"${resistance_level:.2f}" if resistance_level else "ต้าน"
+                    detected["action_plan"] = f"ราคากำลังทดสอบแนวต้าน Neckline {cur_res_str} ห้ามชิงซื้อจนกว่าแท่งเทียนจะปิดทะลุแนวต้านยืนยัน"
 
         # 4. Evaluate Bearish Patterns
-        elif is_bearish and resistance_level is not None:
-            breakout_indices = [i for i, c in enumerate(post_candles) if c["close"] > resistance_level * 1.008]
-            if breakout_indices:
-                first_break_idx = latest_kp_idx + breakout_indices[0]
-                bars_since_break = n - 1 - first_break_idx
-                if bars_since_break > 12:
-                    detected = None
-                else:
-                    detected["status"] = "failed"
-                    detected["badge"] = f"🟢 รูปแบบหมีล้มเหลว (Bear Failed - ทะลุ ${resistance_level:.2f})"
-                    detected["type"] = "Failed Pattern (เบรกทะลุต้าน)"
-                    detected["target"] = None
-                    detected["upside_pct"] = None
-                    # Append Breakout leg to key_points so the skeleton connects through the broken ceiling
-                    valid_break_indices = [i for i in breakout_indices if i > 0]
-                    target_break_idx = valid_break_indices[0] if valid_break_indices else breakout_indices[0]
-                    break_slice = post_candles[target_break_idx:]
-                    if break_slice:
-                        break_c = max(break_slice, key=lambda c: c["high"])
-                        if not detected.get("key_points") or break_c["time"] != detected["key_points"][-1]["time"]:
-                            detected.setdefault("key_points", []).append({
-                                "name": "Breakout (ทะลุต้าน)",
-                                "time": break_c["time"],
-                                "price": round(break_c["high"], 2)
-                            })
-                            if "structure" in detected and "ทะลุต้าน" not in detected["structure"]:
-                                detected["structure"] += f" ➔ 🚀 ทะลุต้าน Breakout (${break_c['high']:.2f})"
-            else:
-                if support_level and any(c <= support_level * 0.998 for c in post_closes):
+        elif is_bearish and support_level is not None:
+            if "Descending Triangle" in pat_name:
+                flat_floor = support_level
+                failed_indices = [
+                    i for i, c in enumerate(post_candles)
+                    if c["close"] > ((r_p1_val + r_slope * (latest_kp_idx + i - r_bar_idx)) if has_dynamic_resistance else (resistance_level or flat_floor)) * 1.008
+                ]
+                if failed_indices:
+                    first_break_idx = latest_kp_idx + failed_indices[0]
+                    bars_since_break = n - 1 - first_break_idx
+                    if bars_since_break > 12:
+                        detected = None
+                    else:
+                        break_roof = (r_p1_val + r_slope * (first_break_idx - r_bar_idx)) if has_dynamic_resistance else (resistance_level or flat_floor)
+                        detected["status"] = "failed"
+                        detected["badge"] = f"🟢 รูปแบบหมีล้มเหลว (Bear Failed - ทะลุแนวต้านเฉียง ${break_roof:.2f})"
+                        detected["type"] = "Failed Pattern (เบรกทะลุต้าน)"
+                        detected["target"] = None
+                        detected["upside_pct"] = None
+                elif any(c["close"] <= flat_floor * 0.998 for c in post_candles):
                     detected["status"] = "confirmed"
                 else:
                     detected["status"] = "forming"
+            elif resistance_level is not None:
+                breakout_indices = [i for i, c in enumerate(post_candles) if c["close"] > resistance_level * 1.008]
+                if breakout_indices:
+                    first_break_idx = latest_kp_idx + breakout_indices[0]
+                    bars_since_break = n - 1 - first_break_idx
+                    if bars_since_break > 12:
+                        detected = None
+                    else:
+                        detected["status"] = "failed"
+                        detected["badge"] = f"🟢 รูปแบบหมีล้มเหลว (Bear Failed - ทะลุ ${resistance_level:.2f})"
+                        detected["type"] = "Failed Pattern (เบรกทะลุต้าน)"
+                        detected["target"] = None
+                        detected["upside_pct"] = None
+                        valid_break_indices = [i for i in breakout_indices if i > 0]
+                        target_break_idx = valid_break_indices[0] if valid_break_indices else breakout_indices[0]
+                        break_slice = post_candles[target_break_idx:]
+                        if break_slice:
+                            break_c = max(break_slice, key=lambda c: c["high"])
+                            if not detected.get("key_points") or break_c["time"] != detected["key_points"][-1]["time"]:
+                                detected.setdefault("key_points", []).append({
+                                    "name": "Breakout (ทะลุต้าน)",
+                                    "time": break_c["time"],
+                                    "price": round(break_c["high"], 2)
+                                })
+                                if "structure" in detected and "ทะลุต้าน" not in detected["structure"]:
+                                    detected["structure"] += f" ➔ ✅ ทะลุต้าน Breakout (${break_c['high']:.2f})"
+                else:
+                    if support_level and any(c <= support_level * 0.998 for c in post_closes):
+                        detected["status"] = "confirmed"
+                    else:
+                        detected["status"] = "forming"
+
+        # 5. Evaluate Neutral / Volatility Patterns (Expanding Triangle, Symmetrical Triangle, Box Range)
+        else:
+            detected.setdefault("status", "forming")
+            if "Triangle" in pat_name:
+                is_breakout = False
+                is_breakdown = False
+                break_roof_val = r_p1_val
+                break_floor_val = s_p1_val
+                for i, c in enumerate(post_candles):
+                    bar_idx = latest_kp_idx + i
+                    roof = (r_p1_val + r_slope * (bar_idx - r_bar_idx)) if has_dynamic_resistance else (resistance_level or c["close"])
+                    floor = (s_p1_val + s_slope * (bar_idx - s_bar_idx)) if has_dynamic_support else (support_level or c["close"])
+                    if c["close"] >= roof * 1.002:
+                        is_breakout = True
+                        break_roof_val = roof
+                        break
+                    elif c["close"] <= floor * 0.995:
+                        is_breakdown = True
+                        break_floor_val = floor
+                        break
+
+                if is_breakout:
+                    detected["status"] = "confirmed"
+                    detected["badge"] = "✅ ยืนยันเบรกเอาท์ (Confirmed Breakout)"
+                elif is_breakdown:
+                    detected["status"] = "broke_down"
+                    detected["badge"] = f"🔻 หลุดกรอบล่าง (Breakdown - หลุด ${break_floor_val:.2f})"
+                    detected["type"] = "Bearish Breakdown (เบรกลง)"
+                    detected["summary"] = f"รูปแบบ {detected['name']} หลุดแนวรับกรอบล่าง (${break_floor_val:.2f})"
+                    detected["action_plan"] = f"⚠️ ราคาหลุดแนวรับกรอบล่าง ชะลอการลงทุนหรือตัดขาดทุนตามแผน"
+                    detected["target"] = None
+                    detected["upside_pct"] = None
+                else:
+                    detected["status"] = "forming"
+            elif "Consolidation Box" in pat_name:
+                box_res = detected.get("neckline")
+                box_sup_lines = [l for l in detected.get("lines", []) if "support" in l["name"].lower()]
+                box_sup = box_sup_lines[0]["points"][0]["value"] if box_sup_lines else None
+                if box_res and any(c >= box_res * 1.002 for c in post_closes):
+                    detected["status"] = "confirmed"
+                    box_h = box_res - (box_sup if box_sup is not None else box_res * 0.95)
+                    detected["target"] = round(box_res + box_h * 0.5, 2)
+                    detected["upside_pct"] = round((detected["target"] - current_price) / current_price * 100, 1)
+                    detected["target_calc"] = f"ความสูงของกรอบบวกเพิ่มจากแนวต้าน 50% เป้าหมาย ${detected['target']:.2f}"
+                elif box_sup and any(c <= box_sup * 0.995 for c in post_closes):
+                    detected["status"] = "failed"
+                    detected["target"] = None
+                    detected["upside_pct"] = None
+                    detected["target_calc"] = "-"
+                else:
+                    detected["status"] = "forming"
+                    detected["target"] = None
+                    detected["upside_pct"] = None
+                    detected["target_calc"] = "วัดจากความสูงของกรอบสะสมพลัง 50% (คำนวณเป้าหมายเมื่อยืนยันเบรกเอาท์)"
+            else:
+                if resistance_level and any(c >= resistance_level * 1.002 for c in post_closes):
+                    detected["status"] = "confirmed"
+                elif support_level and any(c <= support_level * 0.995 for c in post_closes):
+                    detected["status"] = "failed"
+
+
+    if detected:
+        detected.setdefault("status", "forming")
 
     return detected
 
@@ -1347,7 +1616,7 @@ def detect_earnings_history(
             return []
         confirmed_dates = get_confirmed_earnings_dates(ticker)
         if confirmed_dates:
-            return calculate_confirmed_earnings_reaction(candles, confirmed_dates)
+            return calculate_confirmed_earnings_reaction(candles, confirmed_dates, ticker=ticker)
         return []
 
     # Fallback to volume spike heuristic only when ticker is not provided (e.g. synthetic test candles)
@@ -1939,7 +2208,7 @@ def compute_squeeze_momentum(
         summary = "เกิดสภาวะ Squeeze ON ความผันผวนบีบอัดแคบ กำลังสะสมพลังรอระเบิดทิศทาง"
     elif is_sqz_fired:
         status = "SQUEEZE_FIRED"
-        summary = f"เกิดสัญญาณ Squeeze Fired ระเบิดกรอบความผันผวน ({'ขาขึ้นรุนแรง 🚀' if latest['value'] > 0 else 'ขาลงรุนแรง ⚠️'})"
+        summary = f"เกิดสัญญาณ Squeeze Fired ระเบิดกรอบความผันผวน ({'ขาขึ้นรุนแรง 🟢' if latest['value'] > 0 else 'ขาลงรุนแรง ⚠️'})"
     else:
         status = "NORMAL"
         summary = f"สภาวะปกติ โมเมนตัมเอียงไปทาง {'ฝั่งซื้อ' if latest['value'] > 0 else 'ฝั่งขาย'}"
@@ -1955,459 +2224,8 @@ def compute_squeeze_momentum(
     }
 
 
-def compute_waddah_attar_explosion(
-    candles: List[Dict[str, Any]],
-    fast_len: int = 20,
-    slow_len: int = 40,
-    bb_len: int = 20,
-    bb_mult: float = 2.0,
-    sensitivity: float = 150.0
-) -> Dict[str, Any]:
-    """
-    Computes Waddah Attar Explosion (WAE) [Shayankm]:
-    1. MACD difference: (EMA(close, fast_len) - EMA(close, slow_len)) * sensitivity.
-    2. Explosion Line: 2.0 * BB StdDev(close, bb_len) * 2.0.
-    3. Dead Zone: ATR(100) * 3.7 (filters out flat/low-volatility noise).
-    Signals:
-    - Bullish Explosion: TrendUp > ExplosionLine and TrendUp > DeadZone.
-    - Bearish Explosion: TrendDown > ExplosionLine and TrendDown > DeadZone.
-    """
-    if not candles or len(candles) < 20:
-        return {
-            "status": "DEAD_ZONE",
-            "is_explosion": False,
-            "trend_up": 0.0,
-            "trend_down": 0.0,
-            "explosion_line": 0.0,
-            "dead_zone": 0.0,
-            "summary": "ข้อมูลไม่เพียงพอ",
-            "series": []
-        }
-
-    n = len(candles)
-    closes = [float(c["close"]) for c in candles]
-    highs = [float(c["high"]) for c in candles]
-    lows = [float(c["low"]) for c in candles]
-
-    ema_fast = _calc_ema_series(closes, fast_len)
-    ema_slow = _calc_ema_series(closes, slow_len)
-    macd_diff = [ema_fast[i] - ema_slow[i] for i in range(n)]
-
-    t1 = [0.0] * n
-    for i in range(1, n):
-        t1[i] = (macd_diff[i] - macd_diff[i - 1]) * sensitivity
-
-    e1 = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - bb_len + 1)
-        window = closes[start_idx : i + 1]
-        m = sum(window) / len(window)
-        var = sum((x - m) ** 2 for x in window) / len(window)
-        stdev = math.sqrt(max(0.0, var))
-        e1[i] = 2.0 * (stdev * bb_mult)
-
-    tr = [highs[0] - lows[0]]
-    for i in range(1, n):
-        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
-
-    atr_period = min(100, n)
-    dead_zone = [v * 3.7 for v in _rma(tr, atr_period)]
-
-    series_data = []
-    for i in range(n):
-        val = t1[i]
-        t_up = val if val > 0 else 0.0
-        t_dn = -val if val < 0 else 0.0
-        exp = e1[i]
-        dz = dead_zone[i]
-
-        is_bull_exp = t_up > exp and t_up > dz
-        is_bear_exp = t_dn > exp and t_dn > dz
-
-        series_data.append({
-            "time": candles[i]["time"],
-            "trend_up": round(t_up, 2),
-            "trend_down": round(t_dn, 2),
-            "explosion_line": round(exp, 2),
-            "dead_zone": round(dz, 2),
-            "bull_explosion": is_bull_exp,
-            "bear_explosion": is_bear_exp
-        })
-
-    latest = series_data[-1]
-    if latest["bull_explosion"]:
-        status = "BULL_EXPLOSION"
-        summary = f"💥 Bullish Explosion! แรงซื้อระเบิดทะลุเส้น Explosion Line (${latest['trend_up']:.1f} > ${latest['explosion_line']:.1f})"
-    elif latest["bear_explosion"]:
-        status = "BEAR_EXPLOSION"
-        summary = f"💥 Bearish Explosion! แรงขายระเบิดทะลุเส้น Explosion Line (${latest['trend_down']:.1f} > ${latest['explosion_line']:.1f})"
-    elif latest["trend_up"] < latest["dead_zone"] and latest["trend_down"] < latest["dead_zone"]:
-        status = "DEAD_ZONE"
-        summary = "อยู่ในโซน Dead Zone ความผันผวนและโวลุ่มยังไม่เพียงพอ ไม่แนะนำให้ไล่ราคา"
-    else:
-        status = "NORMAL"
-        summary = "โมเมนตัมกำลังไต่ระดับ ยังไม่แตะจุดระเบิด Explosion"
-
-    return {
-        "status": status,
-        "is_explosion": latest["bull_explosion"] or latest["bear_explosion"],
-        "trend_up": latest["trend_up"],
-        "trend_down": latest["trend_down"],
-        "explosion_line": latest["explosion_line"],
-        "dead_zone": latest["dead_zone"],
-        "summary": summary,
-        "series": series_data[-120:]
-    }
-
-
-def compute_volume_flow_indicator(
-    candles: List[Dict[str, Any]],
-    length: int = 130,
-    coef: float = 0.2,
-    vcoef: float = 2.5,
-    signal_len: int = 5
-) -> Dict[str, Any]:
-    """
-    Computes Volume Flow Indicator (VFI) [LazyBear / Markos Katsanos]:
-    1. Typical price = (H + L + C) / 3.
-    2. Inter-bar return log(tp / tp_prev) and StdDev.
-    3. Volume cutoff = coef * stdev * close.
-    4. Directional Volume based on price move exceeding noise cutoff.
-    5. Smoothed VFI sum over length.
-    Signals:
-    - VFI > 0 and VFI > Signal: Institutional Accumulation.
-    - VFI < 0 and VFI < Signal: Institutional Distribution.
-    """
-    if not candles or len(candles) < 20:
-        return {
-            "status": "NEUTRAL",
-            "vfi": 0.0,
-            "signal": 0.0,
-            "summary": "ข้อมูลไม่เพียงพอ",
-            "series": []
-        }
-
-    n = len(candles)
-    highs = [float(c["high"]) for c in candles]
-    lows = [float(c["low"]) for c in candles]
-    closes = [float(c["close"]) for c in candles]
-    volumes = [float(c["volume"]) for c in candles]
-
-    tp = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
-
-    inter = [0.0] * n
-    for i in range(1, n):
-        if tp[i - 1] > 0 and tp[i] > 0:
-            inter[i] = math.log(tp[i] / tp[i - 1])
-
-    vinter = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - 30 + 1)
-        w = inter[start_idx : i + 1]
-        m = sum(w) / len(w)
-        var = sum((x - m) ** 2 for x in w) / len(w)
-        vinter[i] = math.sqrt(max(0.0, var))
-
-    eff_len = min(length, max(20, n // 2))
-
-    vave = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - eff_len + 1)
-        w = volumes[start_idx : i + 1]
-        vave[i] = sum(w) / len(w)
-
-    vdir = [0.0] * n
-    for i in range(1, n):
-        cutoff = coef * vinter[i] * closes[i]
-        vmax = vcoef * vave[i - 1] if i > 0 else vcoef * volumes[i]
-        vc = min(volumes[i], vmax)
-        mf = tp[i] - tp[i - 1]
-        if mf > cutoff:
-            vdir[i] = vc
-        elif mf < -cutoff:
-            vdir[i] = -vc
-        else:
-            vdir[i] = 0.0
-
-    raw_vfi = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - eff_len + 1)
-        s_vdir = sum(vdir[start_idx : i + 1])
-        avg_vol = max(1.0, vave[i])
-        raw_vfi[i] = s_vdir / avg_vol
-
-    vfi = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - 2)
-        w = raw_vfi[start_idx : i + 1]
-        vfi[i] = round(sum(w) / len(w), 2)
-
-    signal = _calc_ema_series(vfi, signal_len)
-    signal = [round(x, 2) for x in signal]
-
-    series_data = []
-    for i in range(n):
-        series_data.append({
-            "time": candles[i]["time"],
-            "vfi": vfi[i],
-            "signal": signal[i],
-            "is_bull": vfi[i] > 0 and vfi[i] >= signal[i]
-        })
-
-    last_vfi = vfi[-1]
-    last_sig = signal[-1]
-
-    if last_vfi > 0 and last_vfi >= last_sig:
-        status = "ACCUMULATION"
-        summary = f"กระแสเงินสะสมสถาบัน (VFI = +{last_vfi:.1f}) อยู่เหนือเส้น Signal สะท้อนแรงเก็บของเงียบ"
-    elif last_vfi > 0 and last_vfi < last_sig:
-        status = "WEAKENING_FLOW"
-        summary = f"กระแสเงินยังเป็นบวก แต่เริ่มชะลอตัวลงต่ำกว่าเส้น Signal (VFI = +{last_vfi:.1f})"
-    elif last_vfi < 0 and last_vfi <= last_sig:
-        status = "DISTRIBUTION"
-        summary = f"กระแสเงินไหลออกสุทธิ (VFI = {last_vfi:.1f}) สถาบันกระจายของ"
-    else:
-        status = "REBOUNDING_FLOW"
-        summary = f"กระแสเงินติดลบแต่เริ่มฟื้นตัวขึ้นเหนือเส้น Signal (VFI = {last_vfi:.1f})"
-
-    return {
-        "status": status,
-        "vfi": last_vfi,
-        "signal": last_sig,
-        "summary": summary,
-        "series": series_data[-120:]
-    }
-
-
-def compute_wavetrend_oscillator(
-    candles: List[Dict[str, Any]],
-    n1: int = 10,
-    n2: int = 21
-) -> Dict[str, Any]:
-    """
-    Computes WaveTrend Oscillator [LazyBear]:
-    1. Typical price = (H + L + C) / 3.
-    2. ESA = EMA(Typical Price, n1).
-    3. D = EMA(abs(Typical Price - ESA), n1).
-    4. CI = (Typical Price - ESA) / (0.015 * D).
-    5. WT1 = EMA(CI, n2).
-    6. WT2 = SMA(WT1, 4).
-    Levels: Overbought +50/+60, Oversold -50/-60.
-    """
-    if not candles or len(candles) < 25:
-        return {
-            "status": "NEUTRAL",
-            "wt1": 0.0,
-            "wt2": 0.0,
-            "direction": "NEUTRAL",
-            "oversold": False,
-            "overbought": False,
-            "bullish_cross": False,
-            "bearish_cross": False,
-            "summary": "ข้อมูลไม่เพียงพอ",
-            "series": []
-        }
-
-    n = len(candles)
-    highs = [float(c["high"]) for c in candles]
-    lows = [float(c["low"]) for c in candles]
-    closes = [float(c["close"]) for c in candles]
-
-    ap = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
-
-    esa = _calc_ema_series(ap, n1)
-    diff = [abs(ap[i] - esa[i]) for i in range(n)]
-    d = _calc_ema_series(diff, n1)
-
-    ci = [0.0] * n
-    for i in range(n):
-        denom = 0.015 * d[i]
-        ci[i] = (ap[i] - esa[i]) / denom if denom > 1e-8 else 0.0
-
-    wt1 = _calc_ema_series(ci, n2)
-    wt1 = [round(x, 2) for x in wt1]
-
-    wt2 = [0.0] * n
-    for i in range(n):
-        start_idx = max(0, i - 3)
-        w = wt1[start_idx : i + 1]
-        wt2[i] = round(sum(w) / len(w), 2)
-
-    series_data = []
-    for i in range(n):
-        bull_cross = (i > 0 and wt1[i - 1] <= wt2[i - 1] and wt1[i] > wt2[i])
-        bear_cross = (i > 0 and wt1[i - 1] >= wt2[i - 1] and wt1[i] < wt2[i])
-        series_data.append({
-            "time": candles[i]["time"],
-            "wt1": wt1[i],
-            "wt2": wt2[i],
-            "bull_cross": bull_cross,
-            "bear_cross": bear_cross
-        })
-
-    last_wt1 = wt1[-1]
-    last_wt2 = wt2[-1]
-    prev_wt1 = wt1[-2] if n >= 2 else last_wt1
-    prev_wt2 = wt2[-2] if n >= 2 else last_wt2
-
-    is_bull_cross = (prev_wt1 <= prev_wt2 and last_wt1 > last_wt2)
-    is_bear_cross = (prev_wt1 >= prev_wt2 and last_wt1 < last_wt2)
-    is_oversold = last_wt1 <= -50.0
-    is_overbought = last_wt1 >= 50.0
-
-    if is_bull_cross and (last_wt1 <= -45.0 or prev_wt1 <= -45.0):
-        status = "OVERSOLD_BUY"
-        summary = f"เกิดสัญญาณ Oversold Bullish Cross (WT1 = {last_wt1:.1f}) ตัดขึ้นในโซนขายมากเกินไป โอกาสดีดตัวสูงมาก"
-    elif is_bear_cross and (last_wt1 >= 45.0 or prev_wt1 >= 45.0):
-        status = "OVERBOUGHT_SELL"
-        summary = f"เกิดสัญญาณ Overbought Bearish Cross (WT1 = {last_wt1:.1f}) ตัดลงในโซนซื้อมากเกินไป ควรระวังการพักตัว"
-    elif is_bull_cross:
-        status = "BULLISH_CROSS"
-        summary = f"เกิดสัญญาณ WaveTrend Bullish Cross (WT1 = {last_wt1:.1f} ตัดเหนือ WT2)"
-    elif is_bear_cross:
-        status = "BEARISH_CROSS"
-        summary = f"เกิดสัญญาณ WaveTrend Bearish Cross (WT1 = {last_wt1:.1f} ตัดใต้ WT2)"
-    elif is_oversold:
-        status = "OVERSOLD"
-        summary = f"โมเมนตัม WaveTrend เข้าโซน Oversold ({last_wt1:.1f}) กำลังสะสมแรง"
-    elif is_overbought:
-        status = "OVERBOUGHT"
-        summary = f"โมเมนตัม WaveTrend เข้าโซน Overbought ({last_wt1:.1f}) ระวังแรงขายทำกำไร"
-    else:
-        status = "BULLISH" if last_wt1 >= last_wt2 else "BEARISH"
-        summary = f"โมเมนตัม WaveTrend อยู่ในฝั่ง {'กระทิง (WT1 > WT2)' if last_wt1 >= last_wt2 else 'หมี (WT1 < WT2)'}"
-
-    return {
-        "status": status,
-        "wt1": last_wt1,
-        "wt2": last_wt2,
-        "direction": "BULLISH" if last_wt1 >= last_wt2 else "BEARISH",
-        "oversold": is_oversold,
-        "overbought": is_overbought,
-        "bullish_cross": is_bull_cross,
-        "bearish_cross": is_bear_cross,
-        "summary": summary,
-        "series": series_data[-120:]
-    }
-
-
-def compute_ut_bot_alerts(
-    candles: List[Dict[str, Any]],
-    key_value: float = 2.0,
-    atr_period: int = 10
-) -> Dict[str, Any]:
-    """
-    Computes UT Bot Alerts [QuantNomad]:
-    ATR-based dynamic trailing stop & trailing reversal alert system.
-    """
-    if not candles or len(candles) < 15:
-        return {
-            "status": "NEUTRAL",
-            "position": "NEUTRAL",
-            "trailing_stop": 0.0,
-            "buy_signal": False,
-            "sell_signal": False,
-            "summary": "ข้อมูลไม่เพียงพอ",
-            "alerts": [],
-            "series": []
-        }
-
-    n = len(candles)
-    highs = [float(c["high"]) for c in candles]
-    lows = [float(c["low"]) for c in candles]
-    closes = [float(c["close"]) for c in candles]
-
-    tr = [highs[0] - lows[0]]
-    for i in range(1, n):
-        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
-
-    atr = _rma(tr, atr_period)
-
-    n_loss = [key_value * atr[i] for i in range(n)]
-
-    trailing_stop = [0.0] * n
-    pos = [0] * n
-    alerts = []
-    series_data = []
-
-    for i in range(n):
-        c = closes[i]
-        loss = n_loss[i]
-        if i == 0:
-            trailing_stop[i] = c - loss
-            pos[i] = 1
-        else:
-            prev_stop = trailing_stop[i - 1]
-            prev_c = closes[i - 1]
-
-            if c > prev_stop:
-                iff_1 = c - loss
-            else:
-                iff_1 = c + loss
-
-            if c < prev_stop and prev_c < prev_stop:
-                iff_2 = min(prev_stop, c + loss)
-            else:
-                iff_2 = iff_1
-
-            if c > prev_stop and prev_c > prev_stop:
-                trailing_stop[i] = max(prev_stop, c - loss)
-            else:
-                trailing_stop[i] = iff_2
-
-            if prev_c < prev_stop and c > prev_stop:
-                pos[i] = 1
-            elif prev_c > prev_stop and c < prev_stop:
-                pos[i] = -1
-            else:
-                pos[i] = pos[i - 1]
-
-        trailing_stop[i] = round(trailing_stop[i], 2)
-
-        buy_alert = (i > 0 and pos[i] == 1 and pos[i - 1] == -1)
-        sell_alert = (i > 0 and pos[i] == -1 and pos[i - 1] == 1)
-
-        if buy_alert:
-            alerts.append({"time": candles[i]["time"], "price": c, "action": "BUY"})
-        elif sell_alert:
-            alerts.append({"time": candles[i]["time"], "price": c, "action": "SELL"})
-
-        series_data.append({
-            "time": candles[i]["time"],
-            "stop": trailing_stop[i],
-            "pos": pos[i],
-            "buy": buy_alert,
-            "sell": sell_alert
-        })
-
-    last_pos = pos[-1]
-    last_stop = trailing_stop[-1]
-    last_buy = series_data[-1]["buy"]
-    last_sell = series_data[-1]["sell"]
-
-    if last_buy:
-        status = "BUY_ALERT"
-        summary = f"เกิดสัญญาณแจ้งเตือน UT Bot BUY! จุด Stop Loss ล่าสุดที่ ${last_stop:.2f}"
-    elif last_sell:
-        status = "SELL_ALERT"
-        summary = f"เกิดสัญญาณแจ้งเตือน UT Bot SELL! หลุดเส้น Trailing Stop ที่ ${last_stop:.2f}"
-    elif last_pos == 1:
-        status = "BULLISH_HOLD"
-        summary = f"สถานะ UT Bot ถือฝั่งซื้อ (BULLISH) ราคายืนเหนือ Trailing Stop (${last_stop:.2f})"
-    else:
-        status = "BEARISH_HOLD"
-        summary = f"สถานะ UT Bot พักตัว (BEARISH) ราคาอยู่ใต้ Trailing Stop (${last_stop:.2f})"
-
-    return {
-        "status": status,
-        "position": "BUY" if last_pos == 1 else "SELL",
-        "trailing_stop": last_stop,
-        "buy_signal": last_buy,
-        "sell_signal": last_sell,
-        "summary": summary,
-        "alerts": alerts[-10:],
-        "series": series_data[-120:]
-    }
+# Note: WAE, VFI, WaveTrend, and UT Bot were removed because they showed
+# no predictive edge in backtesting (see data/backtest_scoring.json).
 
 
 def compute_chandelier_exit(
@@ -2531,230 +2349,8 @@ def compute_chandelier_exit(
     }
 
 
-def compute_hull_suite(
-    candles: List[Dict[str, Any]],
-    length: int = 55
-) -> Dict[str, Any]:
-    """
-    Computes Hull Suite [InSilico]:
-    Zero-lag Hull Moving Average ribbon:
-    WMA(2 * WMA(close, length/2) - WMA(close, length), round(sqrt(length)))
-    """
-    if not candles or len(candles) < 25:
-        return {
-            "status": "NEUTRAL",
-            "trend": "NEUTRAL",
-            "value": 0.0,
-            "color": "#94a3b8",
-            "summary": "ข้อมูลไม่เพียงพอ",
-            "series": []
-        }
-
-    n = len(candles)
-    closes = [float(c["close"]) for c in candles]
-
-    def _calc_wma(vals: List[float], L: int) -> List[float]:
-        out = [vals[0]] * len(vals)
-        for i in range(len(vals)):
-            start_idx = max(0, i - L + 1)
-            w = vals[start_idx : i + 1]
-            k = len(w)
-            if k < 2:
-                out[i] = vals[i]
-            else:
-                d = k * (k + 1) / 2.0
-                out[i] = sum((j + 1) * w[j] for j in range(k)) / d
-        return out
-
-    eff_len = min(length, max(10, n // 2))
-    half_wma = _calc_wma(closes, max(2, eff_len // 2))
-    full_wma = _calc_wma(closes, eff_len)
-
-    diff = [2.0 * half_wma[i] - full_wma[i] for i in range(n)]
-    sqrt_len = max(2, int(round(math.sqrt(eff_len))))
-    hma = _calc_wma(diff, sqrt_len)
-    hma = [round(x, 2) for x in hma]
-
-    series_data = []
-    for i in range(n):
-        c_val = hma[i]
-        p_val = hma[i - 1] if i > 0 else c_val
-        is_bull = c_val >= p_val
-        color = "#10b981" if is_bull else "#f43f5e"
-        series_data.append({
-            "time": candles[i]["time"],
-            "value": c_val,
-            "color": color,
-            "is_bull": is_bull
-        })
-
-    last_val = hma[-1]
-    prev_val = hma[-2] if n >= 2 else last_val
-    is_bullish = last_val >= prev_val
-    status = "BULLISH" if is_bullish else "BEARISH"
-    color = "#10b981" if is_bullish else "#f43f5e"
-
-    summary = f"Hull Suite ริบบอนเขียว (${last_val:.2f}) เทรนด์ขาขึ้น ไร้ความหน่วง" if is_bullish else f"Hull Suite ริบบอนแดง (${last_val:.2f}) เทรนด์ปรับฐานชะลอตัว"
-
-    return {
-        "status": status,
-        "trend": "BULLISH" if is_bullish else "BEARISH",
-        "value": last_val,
-        "color": color,
-        "summary": summary,
-        "series": series_data[-120:]
-    }
-
-
-def compute_lorentzian_classification(
-    candles: List[Dict[str, Any]],
-    k: int = 8,
-    lookback: int = 120
-) -> Dict[str, Any]:
-    """
-    Computes Machine Learning: Lorentzian Classification [jdehorty]:
-    Uses k-Nearest Neighbors (KNN) in Lorentzian warped metric space across
-    multiple technical features (RSI, WaveTrend, Momentum, Volatility)
-    to classify current market regime and forecast directional probability.
-    """
-    if not candles or len(candles) < 30:
-        return {
-            "status": "NEUTRAL",
-            "direction": "NEUTRAL",
-            "confidence": 50.0,
-            "score": 0,
-            "bull_votes": 0,
-            "bear_votes": 0,
-            "k": k,
-            "summary": "ข้อมูลไม่เพียงพอสำหรับโมเดล Machine Learning",
-            "historical_regimes": []
-        }
-
-    n = len(candles)
-    closes = [float(c["close"]) for c in candles]
-    highs = [float(c["high"]) for c in candles]
-    lows = [float(c["low"]) for c in candles]
-
-    gains, losses = [], []
-    for i in range(1, n):
-        diff = closes[i] - closes[i - 1]
-        gains.append(max(0.0, diff))
-        losses.append(max(0.0, -diff))
-
-    rsi = [50.0] * n
-    if len(gains) >= 14:
-        avg_g = sum(gains[:14]) / 14.0
-        avg_l = sum(losses[:14]) / 14.0
-        rsi[14] = _rsi_value(avg_g, avg_l)
-        for i in range(15, n):
-            avg_g = (avg_g * 13.0 + gains[i - 1]) / 14.0
-            avg_l = (avg_l * 13.0 + losses[i - 1]) / 14.0
-            rsi[i] = _rsi_value(avg_g, avg_l)
-
-    roc = [0.0] * n
-    for i in range(10, n):
-        if closes[i - 10] > 0:
-            roc[i] = ((closes[i] - closes[i - 10]) / closes[i - 10]) * 100.0
-
-    tr = [highs[0] - lows[0]]
-    for i in range(1, n):
-        tr.append(max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1])))
-
-    norm_tr = [0.0] * n
-    for i in range(n):
-        norm_tr[i] = (tr[i] / closes[i]) * 100.0 if closes[i] > 0 else 0.0
-
-    tp = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
-    cci = [0.0] * n
-    for i in range(19, n):
-        w = tp[i - 19 : i + 1]
-        m = sum(w) / 20.0
-        md = sum(abs(x - m) for x in w) / 20.0
-        cci[i] = (tp[i] - m) / (0.015 * md) if md > 1e-6 else 0.0
-
-    horizon = 4
-    train_start = max(20, n - lookback)
-    vectors = []
-    labels = []
-
-    for i in range(train_start, n - horizon):
-        feat = [
-            rsi[i] / 100.0,
-            (roc[i] + 20.0) / 40.0,
-            (norm_tr[i]) / 5.0,
-            (cci[i] + 200.0) / 400.0
-        ]
-        ret = closes[i + horizon] - closes[i]
-        label = 1 if ret > 0 else (-1 if ret < 0 else 0)
-        vectors.append(feat)
-        labels.append(label)
-
-    curr_vec = [
-        rsi[-1] / 100.0,
-        (roc[-1] + 20.0) / 40.0,
-        (norm_tr[-1]) / 5.0,
-        (cci[-1] + 200.0) / 400.0
-    ]
-
-    if not vectors or len(vectors) < k:
-        return {
-            "status": "NEUTRAL",
-            "direction": "NEUTRAL",
-            "confidence": 50.0,
-            "score": 0,
-            "bull_votes": 0,
-            "bear_votes": 0,
-            "k": k,
-            "summary": "ข้อมูลตัวอย่างไม่เพียงพอสำหรับ KNN",
-            "historical_regimes": []
-        }
-
-    distances = []
-    for idx, vec in enumerate(vectors):
-        dist = 0.0
-        for f in range(len(curr_vec)):
-            dist += math.log(1.0 + abs(curr_vec[f] - vec[f]))
-        distances.append((dist, labels[idx]))
-
-    distances.sort(key=lambda x: x[0])
-    k_nearest = distances[:k]
-
-    bull_votes = sum(1 for _, lbl in k_nearest if lbl == 1)
-    bear_votes = sum(1 for _, lbl in k_nearest if lbl == -1)
-    net_score = bull_votes - bear_votes
-    confidence = round((bull_votes / max(1, bull_votes + bear_votes)) * 100.0, 1) if (bull_votes + bear_votes) > 0 else 50.0
-
-    if bull_votes >= 6:
-        status = "STRONG_BUY"
-        direction = "BULLISH"
-        summary = f"โมเดล AI Lorentzian ML แนะนำ STRONG BUY! โอกาสปรับตัวขึ้นสูง ({confidence}% จากผลลัพธ์ {bull_votes}/{k} เพื่อนบ้าน KNN)"
-    elif bull_votes >= 5:
-        status = "BUY"
-        direction = "BULLISH"
-        summary = f"โมเดล AI Lorentzian ML แนะนำ BUY มีแนวโน้มปรับตัวขึ้น (ความเชื่อมั่น {confidence}%)"
-    elif bear_votes >= 6:
-        status = "STRONG_SELL"
-        direction = "BEARISH"
-        summary = f"โมเดล AI Lorentzian ML แนะนำ STRONG SELL! ตลาดมีความเสี่ยงปรับฐานสูง ({100.0 - confidence}% ฝั่งลง)"
-    elif bear_votes >= 5:
-        status = "SELL"
-        direction = "BEARISH"
-        summary = f"โมเดล AI Lorentzian ML แนะนำ SELL ทิศทางเอียงไปฝั่งชะลอตัว (ความเชื่อมั่นฝั่งลง {100.0 - confidence}%)"
-    else:
-        status = "NEUTRAL"
-        direction = "NEUTRAL"
-        summary = f"โมเดล AI Lorentzian ML ประเมินสภาวะสมดุล (Bull {bull_votes} vs Bear {bear_votes}) แนะนำรอความชัดเจน"
-
-    return {
-        "status": status,
-        "direction": direction,
-        "confidence": confidence,
-        "score": net_score,
-        "bull_votes": bull_votes,
-        "bear_votes": bear_votes,
-        "k": k,
-        "summary": summary
-    }
+# Note: Hull Suite and Lorentzian Classification were removed because
+# they showed no predictive edge or were redundant with EMA in backtesting.
 
 
 SUPER_INVESTORS_DATA: Dict[str, List[Dict[str, Any]]] = {
@@ -3287,6 +2883,58 @@ def _curated_super_investors(ticker: str) -> List[Dict[str, Any]]:
     ]
 
 
+def _lookup_cached_stock_score(ticker: str) -> Optional[Dict[str, Any]]:
+    if not ticker:
+        return None
+    ticker_clean = ticker.strip().upper()
+    try:
+        data_dir = Path(os.environ.get("FILTER_STOCK_DATA_DIR") or (Path(__file__).resolve().parent.parent / "data"))
+        p = data_dir / "account_summary.json"
+        if p.exists():
+            data = json.loads(p.read_text(encoding="utf-8"))
+            for pos in data.get("positions", []):
+                if pos.get("ticker") == ticker_clean:
+                    sc = pos.get("stock_score")
+                    if isinstance(sc, dict) and "grade" in sc:
+                        return sc
+                    if pos.get("grade"):
+                        return {
+                            "grade": pos["grade"],
+                            "stars": STARS_BY_GRADE.get(pos["grade"], 1),
+                            "total": None,
+                            "reasons": [],
+                            "timing": {"entry_signal": False},
+                            "earnings_guard": False,
+                        }
+    except Exception:
+        pass
+    return None
+
+
+def _lookup_cached_fundamental(ticker: str) -> Optional[FundamentalScore]:
+    if not ticker:
+        return None
+    ticker_clean = ticker.strip().upper()
+    try:
+        data_dir = Path(os.environ.get("FILTER_STOCK_DATA_DIR") or (Path(__file__).resolve().parent.parent / "data"))
+        p = data_dir / "financials_cache.json"
+        if p.exists():
+            data = json.loads(p.read_text(encoding="utf-8"))
+            entry = data.get(ticker_clean, {})
+            quarters = entry.get("quarters", [])
+            if quarters:
+                latest = quarters[-1]
+                rev_g = latest.get("rev_growth_yoy")
+                net_g = latest.get("net_income_growth_yoy")
+                roe = latest.get("roe")
+                de = latest.get("debt_to_equity")
+                fcf_v = latest.get("fcf")
+                return score_fundamentals(ticker_clean, None, rev_g, net_g, roe, None, de, fcf_v)
+    except Exception:
+        pass
+    return None
+
+
 def compute_ai_confluence_signals(
     candles: List[Dict[str, Any]],
     fibo_levels: Dict[str, float],
@@ -3302,18 +2950,18 @@ def compute_ai_confluence_signals(
     luxalgo_sr: Optional[Dict[str, Any]] = None,
     smc: Optional[Dict[str, Any]] = None,
     squeeze_mom: Optional[Dict[str, Any]] = None,
-    wae: Optional[Dict[str, Any]] = None,
-    vfi: Optional[Dict[str, Any]] = None,
-    wavetrend: Optional[Dict[str, Any]] = None,
-    ut_bot: Optional[Dict[str, Any]] = None,
     chandelier_exit: Optional[Dict[str, Any]] = None,
-    hull_suite: Optional[Dict[str, Any]] = None,
-    lorentzian_ml: Optional[Dict[str, Any]] = None
+    ticker: Optional[str] = None,
+    days_to_earnings: Optional[float] = None,
+    is_etf: bool = False,
+    stock_score: Optional[Dict[str, Any]] = None,
+    fundamental: Optional[FundamentalScore] = None,
 ) -> List[Dict[str, Any]]:
     """
-    AI Multi-Technical Confluence Decision Engine.
-    Evaluates 5 dimensions: Trend, Momentum, Value/Fibo, Volume Flow, and Pattern Geometry.
-    Pins actionable BUY, SELL, DCA points directly on the chart with full multi-indicator reasoning.
+    Multi-Technical Confluence Decision Engine.
+    Evaluates Trend, Momentum, Value/Fibo, and Technical Confluence.
+    Action and score derive strictly from the unified scoring system (EMA200 zone + fundamentals),
+    with RSI Hook serving as entry trigger, while unbacked indicators are informational.
     """
     if not candles or len(candles) < 20:
         return []
@@ -3357,6 +3005,43 @@ def compute_ai_confluence_signals(
             avg_l = (avg_l * 13.0 + losses[i - 1]) / 14.0
             rsi_vals[i] = _rsi_value(avg_g, avg_l)
 
+    curr_close = closes[-1]
+    curr_low = lows[-1]
+    curr_high = highs[-1]
+    if current_rsi is None:
+        current_rsi = rsi_vals[-1]
+
+    # Calculate unified scoring metrics
+    dist_ema200 = round(((curr_close - ema200_vals[-1]) / ema200_vals[-1]) * 100.0, 2) if ema200_vals[-1] > 0 else None
+    rsi_prev_val = rsi_vals[-2] if len(rsi_vals) > 1 else None
+    timing_score = score_timing(dist_ema200, current_rsi, rsi_prev_val)
+
+    resolved_stock_score = stock_score
+    if not resolved_stock_score:
+        if fundamental is not None:
+            resolved_stock_score = score_stock(fundamental, timing_score, days_to_earnings)
+        elif is_etf or (ticker and ticker in ETF_TICKERS):
+            etf_fund = score_fundamentals(ticker or "ETF", None, None, None, None, None, None, None)
+            resolved_stock_score = score_stock(etf_fund, timing_score, days_to_earnings)
+        elif ticker:
+            cached_sc = _lookup_cached_stock_score(ticker)
+            if cached_sc:
+                resolved_stock_score = cached_sc
+            else:
+                cached_fund = _lookup_cached_fundamental(ticker)
+                if cached_fund:
+                    resolved_stock_score = score_stock(cached_fund, timing_score, days_to_earnings)
+                else:
+                    empty_fund = score_fundamentals(ticker, None, None, None, None, None, None, None)
+                    resolved_stock_score = score_stock(empty_fund, timing_score, days_to_earnings)
+        else:
+            empty_fund = FundamentalScore(applicable=True, points=0.0, max_points=0, pct=None, coverage=0.0, grade="N/A", metrics={}, reasons=[])
+            resolved_stock_score = score_stock(empty_fund, timing_score, days_to_earnings)
+
+    grade = resolved_stock_score.get("grade", "N/A")
+    curr_score = max(1, min(5, resolved_stock_score.get("stars", 1)))
+    is_guard = bool(resolved_stock_score.get("earnings_guard")) or (days_to_earnings is not None and 0 <= days_to_earnings <= EARNINGS_GUARD_DAYS)
+
     signals = []
     scan_start = max(15, n - 220)  # scan past ~10-11 months
 
@@ -3368,125 +3053,129 @@ def compute_ai_confluence_signals(
         rng = max(1e-6, hi_v - lo_v)
         return {"0.0": hi_v, "50.0": hi_v - 0.5 * rng, "61.8": hi_v - 0.618 * rng, "78.6": hi_v - 0.786 * rng}
 
-    # 1. Detect Swing Troughs (BUY / DCA Signals)
+    # 1. Detect Swing Troughs (RULE_ENTRY / RULE_DCA Signals)
+    # A swing trough at bar i is confirmed at bar i + k_window (causal confirmation).
+    # Heuristic markers: Only emitted if current grade is A+, A, or ETF.
     k_window = 3
-    for i in range(scan_start, n - k_window):
-        if all(lows[i] <= lows[i + j] for j in range(-k_window, k_window + 1) if j != 0):
-            c_low = lows[i]
-            c_close = closes[i]
-            c_vol = volumes[i]
-            c_rsi = rsi_vals[i]
-            c_ema50 = ema50_vals[i]
-            c_ema200 = ema200_vals[i]
-            v_avg = max(1.0, vol20_avg[i])
+    if grade in ("A+", "A", "ETF"):
+        for i in range(scan_start, n - k_window):
+            if all(lows[i] <= lows[i + j] for j in range(-k_window, k_window + 1) if j != 0):
+                c_low = lows[i]
+                confirm_idx = i + k_window
+                c_close = closes[confirm_idx]
+                v_avg = max(1.0, vol20_avg[confirm_idx])
 
-            reasons = []
-            score = 0
-            fib_i = causal_fibo(i)
+                reasons = []
+                score = 0
+                fib_i = causal_fibo(confirm_idx)
 
-            # Factor 1: Value / Fibonacci Golden Pocket (POC is a full-history value, so it is not used here)
-            f618 = fib_i["61.8"]
-            f500 = fib_i["50.0"]
-            f786 = fib_i["78.6"]
-            if f618 > 0 and abs(c_low - f618) / f618 <= 0.035:
-                score += 1
-                reasons.append(f"โซนราคาคุณค่า: ทดสอบแนวรับ Fibonacci 61.8% Golden Pocket (${f618:.2f}) รับอยู่หมัด")
-            elif f500 > 0 and abs(c_low - f500) / f500 <= 0.035:
-                score += 1
-                reasons.append(f"โซนราคาคุณค่า: เด้งทดสอบแนวรับ Fibonacci 50.0% (${f500:.2f})")
+                # Factor 1: Value / Fibonacci Golden Pocket
+                f618 = fib_i["61.8"]
+                f500 = fib_i["50.0"]
+                if f618 > 0 and abs(c_low - f618) / f618 <= SWING_FIBO_TOLERANCE:
+                    score += 1
+                    reasons.append(f"โซนราคาคุณค่า: ทดสอบแนวรับ Fibonacci 61.8% Golden Pocket (${f618:.2f})")
+                elif f500 > 0 and abs(c_low - f500) / f500 <= SWING_FIBO_TOLERANCE:
+                    score += 1
+                    reasons.append(f"โซนราคาคุณค่า: เด้งทดสอบแนวรับ Fibonacci 50.0% (${f500:.2f})")
 
-            # Factor 2: Momentum / RSI Hook
-            if c_rsi <= 38:
-                score += 1
-                reasons.append(f"โมเมนตัมกลับตัว: RSI เข้าสู่โซน Oversold ({c_rsi:.1f}) พร้อมส่งสัญญาณ Bullish Hook")
-            elif i > 1 and rsi_vals[i] > rsi_vals[i - 1] and rsi_vals[i - 1] <= 42:
-                score += 1
-                reasons.append(f"โมเมนตัมกลับตัว: RSI ดีดยกฐานกลับตัวจากโซนต่ำ ({c_rsi:.1f})")
+                # Factor 2: Momentum / RSI Hook
+                c_rsi = rsi_vals[confirm_idx]
+                if c_rsi <= SWING_RSI_OVERSOLD:
+                    score += 1
+                    reasons.append(f"โมเมนตัมกลับตัว: RSI เข้าสู่โซน Oversold ({c_rsi:.1f}) พร้อมส่งสัญญาณ Bullish Hook")
+                elif confirm_idx > 1 and rsi_vals[confirm_idx] > rsi_vals[confirm_idx - 1] and rsi_vals[confirm_idx - 1] <= SWING_RSI_HOOK_LOW:
+                    score += 1
+                    reasons.append(f"โมเมนตัมกลับตัว: RSI ดีดยกฐานกลับตัวจากโซนต่ำ ({c_rsi:.1f})")
 
-            # Factor 3: Volume Confirmation
-            vol_ratio = c_vol / v_avg
-            if vol_ratio >= 1.15:
-                score += 1
-                reasons.append(f"สภาพคล่องสถาบัน: ปริมาณการซื้อขายพุ่งสูง {vol_ratio:.1f}x ของค่าเฉลี่ย 20 วัน ยืนยันแรงซื้อดูดซับ")
+                # Factor 3: Volume Confirmation
+                vol_ratio = volumes[confirm_idx] / v_avg
+                if vol_ratio >= SWING_VOL_RATIO_BUY:
+                    score += 1
+                    reasons.append(f"สภาพคล่องสถาบัน: ปริมาณการซื้อขายพุ่งสูง {vol_ratio:.1f}x ของค่าเฉลี่ย 20 วัน ยืนยันแรงซื้อดูดซับ")
 
-            # Factor 4: Trend Alignment
-            if c_close >= c_ema200:
-                score += 1
-                reasons.append(f"แนวโน้มระยะยาว: ราคายืนเหนือ EMA 200 (${c_ema200:.2f}) โครงสร้างหลักเป็นขาขึ้น")
-            elif c_close >= c_ema50:
-                score += 1
-                reasons.append(f"แนวโน้มระยะกลาง: ราคายืนเหนือ EMA 50 (${c_ema50:.2f})")
+                # Factor 4: Trend Alignment
+                c_ema200 = ema200_vals[confirm_idx]
+                c_ema50 = ema50_vals[confirm_idx]
+                if c_close >= c_ema200:
+                    score += 1
+                    reasons.append(f"แนวโน้มระยะยาว: ราคายืนเหนือ EMA 200 (${c_ema200:.2f}) โครงสร้างหลักเป็นขาขึ้น")
+                elif c_close >= c_ema50:
+                    score += 1
+                    reasons.append(f"แนวโน้มระยะกลาง: ราคายืนเหนือ EMA 50 (${c_ema50:.2f})")
 
+                if score >= 3:
+                    is_entry = score >= 4
+                    sl = round(c_low * SWING_SL_RATIO_BUY, 2)
+                    tp = round(c_close * SWING_TP_RATIO_BUY, 2)
+                    rr = round((tp - c_close) / max(0.01, c_close - sl), 1)
+                    sig_type = "RULE_ENTRY" if is_entry else "RULE_DCA"
+                    act_txt = "จุดเข้าตามกฎ" if is_entry else "จุดสะสมตามกฎ"
+                    badge_txt = f"💎 จุดเข้าตามกฎ ({score}/5) (ไม่ผ่าน backtest)" if is_entry else f"🔹 จุดสะสมตามกฎ ({score}/5) (ไม่ผ่าน backtest)"
+                    signals.append({
+                        "time": times[confirm_idx],
+                        "price": round(c_close, 2),
+                        "action": act_txt,
+                        "type": sig_type,
+                        "score": score,
+                        "score_text": f"{score}/5 สัญญาณคอนฟลูเอนซ์ (ไม่ผ่าน backtest)",
+                        "badge": badge_txt,
+                        "summary": f"{act_txt}ยืนยันที่ราคา ${c_close:.2f} (ยืนยัน Swing Low ${c_low:.2f} ของวันที่ {times[i]}) สัญญาณคอนฟลูเอนซ์ระดับ {score}/5 (ไม่ผ่าน backtest)",
+                        "reasons": reasons,
+                        "stop_loss": sl,
+                        "target": tp,
+                        "rr": f"1:{rr}",
+                        "marker_shape": "arrowUp" if is_entry else "circle",
+                        "marker_color": "#10b981" if is_entry else "#38bdf8",
+                    })
 
-            if score >= 3:
-                is_strong = score >= 4
-                sl = round(c_low * 0.965, 2)
-                tp = round(c_close * 1.12, 2)
-                rr = round((tp - c_close) / max(0.01, c_close - sl), 1)
-                signals.append({
-                    "time": times[i],
-                    "price": round(c_close, 2),
-                    "action": "BUY" if is_strong else "DCA",
-                    "type": "STRONG BUY" if is_strong else "SMART DCA",
-                    "score": score,
-                    "score_text": f"{score}/5 สัญญาณคอนฟลูเอนซ์",
-                    "badge": f"🚀 STRONG BUY ({score}/5)" if is_strong else f"💎 SMART DCA ({score}/5)",
-                    "summary": f"จุดเข้าซื้อคอนฟลูเอนซ์ระดับ {score}/5 ที่ราคา ${c_close:.2f} มีการประสานกันของสัญญาณทางเทคนิคถึง {score} ประการ",
-                    "reasons": reasons,
-                    "stop_loss": sl,
-                    "target": tp,
-                    "rr": f"1:{rr}",
-                    "marker_shape": "arrowUp" if is_strong else "circle",
-                    "marker_color": "#10b981" if is_strong else "#38bdf8"
-                })
-
-    # 2. Detect Swing Peaks (SELL / TAKE PROFIT Signals)
+    # 2. Detect Swing Peaks (RULE_TP Signals)
+    # A swing peak at bar i is confirmed at bar i + k_window (causal confirmation).
     for i in range(scan_start, n - k_window):
         if all(highs[i] >= highs[i + j] for j in range(-k_window, k_window + 1) if j != 0):
             c_high = highs[i]
-            c_close = closes[i]
-            c_vol = volumes[i]
-            c_rsi = rsi_vals[i]
-            v_avg = max(1.0, vol20_avg[i])
+            confirm_idx = i + k_window
+            c_close = closes[confirm_idx]
+            c_rsi = rsi_vals[confirm_idx]
+            v_avg = max(1.0, vol20_avg[confirm_idx])
 
             reasons = []
             score = 0
 
             # Resistance: ATH / Fibo 0.0% / 23.6%
-            ath_p = causal_fibo(i)["0.0"]
+            ath_p = causal_fibo(confirm_idx)["0.0"]
             if ath_p > 0 and abs(c_high - ath_p) / ath_p <= 0.03:
                 score += 1
-                reasons.append(f"แนวต้านสำคัญ: ทดสอบจุดสูงสุดรอบ 52 สัปดาห์ (${ath_p:.2f})")
+                reasons.append(f"แนวต้านสำคัญ: ยืนยันจุดสูงสุดรอบ 52 สัปดาห์ (${ath_p:.2f})")
 
             # Momentum: Overbought
-            if c_rsi >= 68:
+            if c_rsi >= SWING_RSI_OVERBOUGHT:
                 score += 1
                 reasons.append(f"โมเมนตัมตึงตัว: RSI แตะระดับ Overbought ร้อนแรง ({c_rsi:.1f}) เสี่ยงพักฐาน")
 
             # Volume Churn / Spike at top
-            if c_vol / v_avg >= 1.25:
+            if volumes[confirm_idx] / v_avg >= SWING_VOL_RATIO_SELL:
                 score += 1
-                reasons.append("สภาพคล่องเทขาย: วอลุ่มพุ่งสูงที่ยอดบน สะท้อนการขายทำกำไรของรายใหญ่ (Distribution)")
-
+                reasons.append("สภาพคล่องเทขาย: วอลุ่มพุ่งสูง สะท้อนการขายทำกำไรของรายใหญ่ (Distribution)")
 
             if score >= 3:
-                sl = round(c_high * 1.025, 2)
-                tp = round(c_close * 0.92, 2)
+                sl = round(c_high * SWING_SL_RATIO_SELL, 2)
+                tp = round(c_close * SWING_TP_RATIO_SELL, 2)
                 signals.append({
-                    "time": times[i],
+                    "time": times[confirm_idx],
                     "price": round(c_close, 2),
-                    "action": "SELL",
-                    "type": "TAKE PROFIT",
+                    "action": "จุดขายทำกำไรตามกฎ",
+                    "type": "RULE_TP",
                     "score": score,
-                    "score_text": f"{score}/5 สัญญาณคอนฟลูเอนซ์",
-                    "badge": f"🎯 TAKE PROFIT ({score}/5)",
-                    "summary": f"จุดขายทำกำไร / ลดพอร์ต ที่ราคา ${c_close:.2f} สัญญาณ Overbought ประสานแนวต้านสำคัญ",
+                    "score_text": f"{score}/5 สัญญาณคอนฟลูเอนซ์ (ไม่ผ่าน backtest)",
+                    "badge": f"🎯 จุดขายทำกำไรตามกฎ ({score}/5) (ไม่ผ่าน backtest)",
+                    "summary": f"จุดขายทำกำไรยืนยันที่ราคา ${c_close:.2f} (ยืนยัน Swing Peak ${c_high:.2f} ของวันที่ {times[i]}) สัญญาณ Overbought ประสานแนวต้านสำคัญ (ไม่ผ่าน backtest)",
                     "reasons": reasons,
                     "stop_loss": sl,
                     "target": tp,
                     "rr": "1:2.0",
                     "marker_shape": "arrowDown",
-                    "marker_color": "#f43f5e"
+                    "marker_color": "#f43f5e",
                 })
 
     # Sort signals chronologically and deduplicate (keep minimum 12 days between same action)
@@ -3507,173 +3196,149 @@ def compute_ai_confluence_signals(
     historical_signals = pruned[-4:] if len(pruned) > 4 else pruned
 
     # 3. Always Add Current / Latest Status Analysis (Today's Candle)
-    curr_close = closes[-1]
-    curr_low = lows[-1]
-    curr_high = highs[-1]
     curr_reasons = []
-    curr_score = 0
 
-    # Evaluate current conditions
+    # Fundamental & Timing reasons from unified scoring
+    curr_reasons.extend(resolved_stock_score.get("reasons", []))
+
+    # Contextual reasons for unbacked indicators (do NOT add points to score)
+    UNBACKED_TAG = "(ไม่ผ่าน backtest ไม่นับคะแนน)"
+
     if current_st_trend == "BULLISH":
-        curr_score += 1
-        curr_reasons.append("แนวโน้ม SuperTrend: ฝั่งกระทิง (BULLISH) คุมทิศทางราคา")
+        curr_reasons.append(f"แนวโน้ม SuperTrend: ฝั่งกระทิง (BULLISH) {UNBACKED_TAG}")
     else:
-        curr_reasons.append("แนวโน้ม SuperTrend: สภาวะปรับฐาน (BEARISH)")
-
-    if current_rsi < 35:
-        curr_score += 2
-        curr_reasons.append(f"โมเมนตัม RSI: โซน Oversold มีแต้มต่อสูง ({current_rsi:.1f})")
-    elif current_rsi < 48:
-        curr_score += 1
-        curr_reasons.append(f"โมเมนตัม RSI: ปลอดโปร่ง ไม่ร้อนแรง ({current_rsi:.1f})")
-    elif current_rsi > 70:
-        curr_reasons.append(f"โมเมนตัม RSI: เข้าเขต Overbought ({current_rsi:.1f}) ควรระวังการพักตัว")
+        curr_reasons.append(f"แนวโน้ม SuperTrend: สภาวะปรับฐาน (BEARISH) {UNBACKED_TAG}")
 
     if current_macd_hist >= 0:
-        curr_score += 1
-        curr_reasons.append(f"โมเมนตัม MACD: Histogram เป็นบวก (+{current_macd_hist:.2f}) มีโมเมนตัมหนุน")
+        curr_reasons.append(f"โมเมนตัม MACD: Histogram เป็นบวก (+{current_macd_hist:.2f}) {UNBACKED_TAG}")
 
     f618 = fibo_levels.get("61.8", 0.0)
     if f618 > 0 and abs(curr_close - f618) / f618 <= 0.045:
-        curr_score += 1
-        curr_reasons.append(f"โซน Fibonacci: ราคาอยู่ใกล้ Golden Pocket 61.8% (${f618:.2f})")
+        curr_reasons.append(f"โซน Fibonacci: ราคาอยู่ใกล้ Golden Pocket 61.8% (${f618:.2f}) {UNBACKED_TAG}")
 
     if pattern and pattern.get("target") and pattern.get("upside_pct", 0) > 5:
-        curr_score += 1
-        curr_reasons.append(f"เป้าหมาย Pattern: โครงสร้าง {pattern['name']} เปิด Upside +{pattern.get('upside_pct', 0)}%")
+        curr_reasons.append(f"เป้าหมาย Pattern: โครงสร้าง {pattern['name']} เปิด Upside +{pattern.get('upside_pct', 0)}% {UNBACKED_TAG}")
 
     if cdc_zone == "green":
-        curr_score += 1
-        curr_reasons.append("สัญญาณ CDC ActionZone: อยู่ใน โซนเขียว (Bullish Trend / ถือรันเทรนด์ ห้ามขายหมู)")
+        curr_reasons.append(f"สัญญาณ CDC ActionZone: อยู่ใน โซนเขียว (Bullish Trend) {UNBACKED_TAG}")
     elif cdc_zone == "blue":
-        curr_score += 1
-        curr_reasons.append("สัญญาณ CDC ActionZone: โซนฟ้า (Bullish Pullback ย่อตัวทดสอบแนวรับเพื่อไปต่อ)")
+        curr_reasons.append(f"สัญญาณ CDC ActionZone: โซนฟ้า (Bullish Pullback) {UNBACKED_TAG}")
     elif cdc_zone == "orange":
-        curr_reasons.append("สัญญาณ CDC ActionZone: โซนส้ม (Bearish Rebound ระวังเด้งเพื่อลงต่อ)")
+        curr_reasons.append(f"สัญญาณ CDC ActionZone: โซนส้ม (Bearish Rebound) {UNBACKED_TAG}")
     elif cdc_zone == "red":
-        curr_reasons.append("สัญญาณ CDC ActionZone: โซนแดง (Bearish Trend แนะนำถือเงินสด)")
+        curr_reasons.append(f"สัญญาณ CDC ActionZone: โซนแดง (Bearish Trend) {UNBACKED_TAG}")
 
     if elliott_wave and elliott_wave.get("detected"):
         ew_type = elliott_wave.get("type", "")
         ew_target = elliott_wave.get("target") or 0.0
         if ew_type in BULLISH_DEVELOPING_WAVE_TYPES:
-            curr_score += 1
-            curr_reasons.append(f"โครงสร้าง Elliott Wave: กำลังเคลื่อนที่ใน {elliott_wave.get('current_wave', 'Impulse Wave')} สู่เป้าหมาย ${ew_target:.2f}")
+            curr_reasons.append(f"โครงสร้าง Elliott Wave: เคลื่อนที่ใน {elliott_wave.get('current_wave', 'Impulse Wave')} สู่เป้าหมาย ${ew_target:.2f} {UNBACKED_TAG}")
         else:
-            curr_reasons.append(f"คำเตือน Elliott Wave: {elliott_wave.get('current_wave', ew_type)} (ไม่นับเป็นสัญญาณซื้อ)")
+            curr_reasons.append(f"คำเตือน Elliott Wave: {elliott_wave.get('current_wave', ew_type)} {UNBACKED_TAG}")
 
     if pivots:
         p_r1 = pivots.get("r1", 0.0)
         p_s1 = pivots.get("s1", 0.0)
         if p_r1 > 0 and curr_close >= p_r1:
-            curr_score += 1
-            curr_reasons.append(f"ระดับราคา Pivot: ยืนเหนือแนวต้าน R1 (${p_r1:.2f}) เปลี่ยนเป็นแนวรับใหม่")
+            curr_reasons.append(f"ระดับราคา Pivot: ยืนเหนือแนวต้าน R1 (${p_r1:.2f}) {UNBACKED_TAG}")
         elif p_s1 > 0 and p_s1 <= curr_close <= p_s1 * 1.035:
-            curr_score += 1
-            curr_reasons.append(f"ระดับราคา Pivot: ดีดตัวทดสอบแนวรับสำคัญ S1 (${p_s1:.2f})")
+            curr_reasons.append(f"ระดับราคา Pivot: ดีดตัวทดสอบแนวรับสำคัญ S1 (${p_s1:.2f}) {UNBACKED_TAG}")
 
     if luxalgo_sr:
         last_sig = luxalgo_sr.get("current_signal")
         if last_sig and last_sig.get("time") == times[-1]:
             stype = last_sig.get("type")
             if stype == "BREAKOUT_VOL":
-                curr_score += 1
-                curr_reasons.append(f"LuxAlgo S/R: {last_sig.get('desc')}")
+                curr_reasons.append(f"LuxAlgo S/R: {last_sig.get('desc')} {UNBACKED_TAG}")
             elif stype == "BULL_WICK":
-                curr_reasons.append(f"คำเตือน LuxAlgo S/R: {last_sig.get('desc')}")
+                curr_reasons.append(f"คำเตือน LuxAlgo S/R: {last_sig.get('desc')} {UNBACKED_TAG}")
 
     if smc:
         fvgs = smc.get("unmitigated_fvgs", [])
         for f in fvgs:
             if f.get("type") == "BULLISH_FVG" and f["bottom"] <= curr_close <= f["top"] * 1.02:
-                curr_score += 1
-                curr_reasons.append(f"Smart Money (SMC): ราคาลงมาทดสอบ Demand Fair Value Gap (${f['bottom']:.2f} - ${f['top']:.2f})")
+                curr_reasons.append(f"Smart Money (SMC): ราคาลงมาทดสอบ Demand FVG (${f['bottom']:.2f} - ${f['top']:.2f}) {UNBACKED_TAG}")
                 break
 
     if squeeze_mom:
         if squeeze_mom.get("squeeze_fired") and squeeze_mom.get("direction") == "BULLISH":
-            curr_score += 1
-            curr_reasons.append(f"LazyBear Squeeze: เกิดสัญญาณ Squeeze Fired ระเบิดกรอบความผันผวนพร้อมโมเมนตัมพุ่งขึ้น ({squeeze_mom.get('momentum'):.2f})")
+            curr_reasons.append(f"LazyBear Squeeze: สัญญาณ Squeeze Fired ({squeeze_mom.get('momentum'):.2f}) {UNBACKED_TAG}")
         elif squeeze_mom.get("squeeze_on"):
-            curr_reasons.append("คำเตือน Squeeze: สภาวะ Squeeze ON ความผันผวนกำลังบีบอัดแคบ สะสมพลังรอระเบิดทิศทาง")
-
-    if wae:
-        if wae.get("status") == "BULL_EXPLOSION":
-            curr_score += 1
-            curr_reasons.append("Waddah Attar (WAE): เกิด Bullish Explosion แรงซื้อระเบิดทะลุเส้น Explosion Line หนุนโมเมนตัมขาขึ้น")
-        elif wae.get("status") == "DEAD_ZONE":
-            curr_reasons.append("สถานะ WAE: อยู่ใน Dead Zone ตลาดซึมตัว ยังไม่มีแรงซื้อระเบิด")
-
-    if vfi:
-        if vfi.get("status") == "ACCUMULATION":
-            curr_score += 1
-            curr_reasons.append(f"LazyBear VFI: กระแสเงินสะสมสถาบันสุทธิ (Institutional Accumulation VFI = +{vfi.get('vfi'):.1f})")
-        elif vfi.get("status") == "DISTRIBUTION":
-            curr_reasons.append(f"คำเตือน VFI: กระแสเงินไหลออกสุทธิ (Distribution VFI = {vfi.get('vfi'):.1f}) สถาบันกระจายของ")
-
-    if lorentzian_ml:
-        if lorentzian_ml.get("direction") == "BULLISH":
-            curr_score += 1
-            curr_reasons.append(f"โมเดล AI Lorentzian ML: ทำนายฝั่งกระทิง ความเชื่อมั่น {lorentzian_ml.get('confidence')}% ({lorentzian_ml.get('status')})")
-        elif lorentzian_ml.get("direction") == "BEARISH":
-            curr_reasons.append(f"คำเตือน AI Lorentzian ML: ทำนายฝั่งพักตัว ความเชื่อมั่น {lorentzian_ml.get('confidence')}%")
-
-    if ut_bot:
-        if ut_bot.get("position") == "BUY":
-            curr_score += 1
-            curr_reasons.append(f"สัญญาณ UT Bot: ถือรันเทรนด์ฝั่งซื้อ ยืนเหนือ Trailing Stop (${ut_bot.get('trailing_stop'):.2f})")
-        else:
-            curr_reasons.append(f"สถานะ UT Bot: อยู่ใต้ Trailing Stop (${ut_bot.get('trailing_stop'):.2f})")
+            curr_reasons.append(f"คำเตือน Squeeze: สภาวะ Squeeze ON ความผันผวนบีบอัดแคบ {UNBACKED_TAG}")
 
     if chandelier_exit:
         if chandelier_exit.get("direction") == "LONG":
-            curr_score += 1
-            curr_reasons.append(f"Chandelier Exit: เทรนด์หลักฝั่ง Long ยืนเหนือ Trailing Stop (${chandelier_exit.get('long_stop'):.2f})")
+            curr_reasons.append(f"Chandelier Exit: เทรนด์หลักฝั่ง Long เหนือ Trailing Stop (${chandelier_exit.get('long_stop'):.2f}) {UNBACKED_TAG}")
         else:
-            curr_reasons.append(f"สถานะ Chandelier Exit: พักตัวใต้แนวต้าน Stop (${chandelier_exit.get('short_stop'):.2f})")
+            curr_reasons.append(f"สถานะ Chandelier Exit: ใต้แนวต้าน Stop (${chandelier_exit.get('short_stop'):.2f}) {UNBACKED_TAG}")
 
-    if wavetrend:
-        if wavetrend.get("status") in ["OVERSOLD_BUY", "BULLISH_CROSS"]:
-            curr_score += 1
-            curr_reasons.append(f"WaveTrend [LazyBear]: {wavetrend.get('summary')}")
-        elif wavetrend.get("status") in ["OVERBOUGHT_SELL", "BEARISH_CROSS"]:
-            curr_reasons.append(f"คำเตือน WaveTrend: {wavetrend.get('summary')}")
+    # Determine Action, Type, Badge, and Markers from unified score
+    score_total = resolved_stock_score.get("total")
+    score_label = f"{score_total:.0f}/100" if score_total is not None else f"{curr_score}/5"
+    has_entry_signal = bool(timing_score.get("entry_signal")) or (
+        isinstance(resolved_stock_score.get("timing"), dict) and bool(resolved_stock_score["timing"].get("entry_signal"))
+    )
 
-    if hull_suite:
-        if hull_suite.get("trend") == "BULLISH":
-            curr_score += 1
-            curr_reasons.append(f"Hull Suite [InSilico]: ริบบอนเขียว (${hull_suite.get('value'):.2f}) โมเมนตัมนำตลาด ไร้ความหน่วง")
-
-    curr_score = min(5, max(1, curr_score))
-
-    if curr_score >= 4:
-        act = "BUY"
-        b_type = "STRONG BUY"
-        badge = f"🚀 STRONG BUY ({curr_score}/5)"
-        m_shape = "arrowUp"
-        m_col = "#10b981"
-        summary_txt = f"สถานะปัจจุบันราคา ${curr_close:.2f} อยู่ในจุดได้เปรียบสูง สัญญาณคอนฟลูเอนซ์ระดับ {curr_score}/5 พร้อมลุ้นฟื้นตัว"
-    elif curr_score == 3:
-        act = "DCA"
-        b_type = "SMART DCA"
-        badge = f"💎 SMART DCA ({curr_score}/5)"
+    if is_guard and days_to_earnings is not None:
+        d_val = int(round(days_to_earnings))
+        act = f"พักสัญญาณ (งบออกใน {d_val} วัน)"
+        b_type = "EARNINGS_GUARD"
+        badge = f"🟠 พักสัญญาณ (งบออกใน {d_val} วัน)"
         m_shape = "circle"
-        m_col = "#38bdf8"
-        summary_txt = f"สถานะปัจจุบันราคา ${curr_close:.2f} เหมาะแก่การทยอยสะสม (DCA) คอนฟลูเอนซ์ระดับ 3/5 ปลอดภัย"
-    elif current_rsi > 70:
-        act = "SELL"
-        b_type = "TRIM"
-        badge = f"🎯 TRIM / TAKE PROFIT ({curr_score}/5)"
+        m_col = "#fb923c"
+        summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในช่วงงบออกใน {d_val} วัน (Earnings Guard) พักสัญญาณซื้อเพื่อควบคุมความเสี่ยง"
+    elif grade == "F":
+        act = "เลี่ยง"
+        b_type = "AVOID"
+        badge = "⚠️ เลี่ยง (เกรด F)"
         m_shape = "arrowDown"
         m_col = "#f43f5e"
-        summary_txt = f"สถานะปัจจุบันราคา ${curr_close:.2f} วิ่งขึ้นมาในโซนตึงตัว แนะนำแบ่งทำกำไรหรือเลื่อน Trailing Stop"
-    else:
-        act = "HOLD"
-        b_type = "HOLD & MONITOR"
-        badge = f"⚖️ HOLD & MONITOR ({curr_score}/5)"
+        extra_rsi = f" (RSI {current_rsi:.1f} อยู่ในโซนสูง)" if current_rsi > RSI_OVERBOUGHT_THRESHOLD else ""
+        summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในเกรด F พื้นฐานหรือเทรนด์มีความเสี่ยงสูง ควรเลี่ยงหรือวางแผนบริหารความเสี่ยง{extra_rsi}"
+    elif grade == "C":
+        act = "รอ"
+        b_type = "WAIT"
+        badge = "⏳ รอ (เกรด C)"
         m_shape = "circle"
         m_col = "#94a3b8"
-        summary_txt = f"สถานะปัจจุบันราคา ${curr_close:.2f} อยู่ในเกณฑ์ถือครอง (HOLD) ติดตามแนวรับแนวต้านสำคัญ"
+        extra_rsi = f" (RSI {current_rsi:.1f} อยู่ในโซนสูง)" if current_rsi > RSI_OVERBOUGHT_THRESHOLD else ""
+        summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในเกรด C สภาวะเฝ้าระวัง ควรรอสัญญาณกลับตัวและงบไตรมาสถัดไป{extra_rsi}"
+    elif current_rsi > RSI_OVERBOUGHT_THRESHOLD:
+        act = "แบ่งทำกำไร / รอ"
+        b_type = "TRIM"
+        badge = f"🎯 แบ่งทำกำไร / รอ ({curr_score}/5)"
+        m_shape = "arrowDown"
+        m_col = "#f43f5e"
+        summary_txt = f"สถานะราคา ${curr_close:.2f} เข้าเขต Overbought (RSI {current_rsi:.1f}) แนะนำแบ่งทำกำไรหรือเลื่อน Trailing Stop"
+    elif grade == "B":
+        act = "รอ"
+        b_type = "HOLD"
+        badge = "⚖️ รอจังหวะ (เกรด B)"
+        m_shape = "circle"
+        m_col = "#94a3b8"
+        summary_txt = f"สถานะราคา ${curr_close:.2f} อยู่ในเกรด B คุณภาพปานกลาง ถือครองเดิมและรอจังหวะสะสมใหม่"
+    elif grade in ("A+", "A", "ETF"):
+        if has_entry_signal:
+            act = "เข้าเงื่อนไขจุดเข้า"
+            b_type = "ENTRY"
+            badge = f"💎 เข้าเงื่อนไขจุดเข้า ({grade})"
+            m_shape = "arrowUp"
+            m_col = "#10b981"
+            summary_txt = f"สถานะราคา ${curr_close:.2f} เข้าเงื่อนไขจุดเข้า สัญญาณ RSI Hook หนุนรอบฟื้นตัวในหุ้นคุณภาพเกรด {grade}"
+        else:
+            act = "รอ"
+            b_type = "HOLD"
+            badge = f"⚖️ ถือ / รอจุดเข้า ({grade})"
+            m_shape = "circle"
+            m_col = "#38bdf8"
+            summary_txt = f"สถานะราคา ${curr_close:.2f} หุ้นคุณภาพเกรด {grade} อยู่ในเกณฑ์ถือครอง ติดตามจังหวะย่อเพื่อหาจุดเข้า"
+    else:
+        act = "รอ"
+        b_type = "WAIT"
+        badge = f"⚖️ รอ ({grade})"
+        m_shape = "circle"
+        m_col = "#94a3b8"
+        summary_txt = f"สถานะราคา ${curr_close:.2f} ข้อมูลไม่เพียงพอสำหรับประเมินเกรด ควรรอข้อมูลเพิ่มเติม"
 
     current_signal = {
         "time": times[-1],
@@ -3681,16 +3346,22 @@ def compute_ai_confluence_signals(
         "action": act,
         "type": b_type,
         "score": curr_score,
-        "score_text": f"{curr_score}/5 สัญญาณคอนฟลูเอนซ์",
+        "score_text": f"{curr_score}/5 ดาว (เกรด {grade} · {score_label})",
         "badge": badge,
         "summary": summary_txt,
         "reasons": curr_reasons,
-        "stop_loss": round(curr_close - 1.5 * atr_val, 2) if act != "SELL" else round(curr_close + 1.5 * atr_val, 2),
-        "target": round(curr_close + 2.5 * atr_val, 2) if act != "SELL" else round(curr_close - 2.0 * atr_val, 2),
-        "rr": "1:2.5" if act != "SELL" else "1:2.0",
+        "stop_loss": round(curr_close - 1.5 * atr_val, 2) if b_type != "TRIM" and b_type != "AVOID" else round(curr_close + 1.5 * atr_val, 2),
+        "target": round(curr_close + 2.5 * atr_val, 2) if b_type != "TRIM" and b_type != "AVOID" else round(curr_close - 2.0 * atr_val, 2),
+        "rr": "1:2.5" if b_type != "TRIM" and b_type != "AVOID" else "1:2.0",
         "marker_shape": m_shape,
         "marker_color": m_col,
-        "is_latest": True
+        "is_latest": True,
+        "earnings_guard": is_guard,
+        "guard_days": int(round(days_to_earnings)) if is_guard and days_to_earnings is not None else None,
+        "guard_days_threshold": int(round(EARNINGS_GUARD_DAYS)),
+        "levels_informational": (b_type in ("AVOID", "EARNINGS_GUARD")),
+        "grade": grade,
+        "stock_score": resolved_stock_score,
     }
 
     # If the latest bar already has a signal, update it or append
@@ -3722,6 +3393,8 @@ def compute_fibo_and_indicators(
     days_to_earnings: Optional[float] = None,
     is_etf: bool = False,
     ticker: Optional[str] = None,
+    stock_score: Optional[Dict[str, Any]] = None,
+    fundamental: Optional[FundamentalScore] = None,
 ) -> Dict[str, Any]:
     """
     Compute Inception High/Low (ATH/ATL), Fibonacci retracements (52W cycle and 2Y macro),
@@ -3741,6 +3414,15 @@ def compute_fibo_and_indicators(
             "volume_profile": {"poc": 0.0},
             "pattern": None
         }
+
+    # Sanitize input candles to enforce OHLC invariant: high >= max(open, close), low <= min(open, close)
+    for c in candles:
+        o = c.get("open", c["high"])
+        cl = c["close"]
+        if c["high"] < max(o, cl):
+            c["high"] = max(c["high"], o, cl)
+        if c["low"] > min(o, cl):
+            c["low"] = min(c["low"], o, cl)
 
     highs = [c["high"] for c in candles]
     lows = [c["low"] for c in candles]
@@ -3982,28 +3664,10 @@ def compute_fibo_and_indicators(
     # 20. Squeeze Momentum Indicator [LazyBear]
     squeeze_mom = compute_squeeze_momentum(candles)
 
-    # 21. Waddah Attar Explosion (WAE) [Shayankm]
-    wae = compute_waddah_attar_explosion(candles)
-
-    # 22. Volume Flow Indicator (VFI) [LazyBear]
-    vfi = compute_volume_flow_indicator(candles)
-
-    # 23. WaveTrend Oscillator [LazyBear]
-    wavetrend = compute_wavetrend_oscillator(candles)
-
-    # 24. UT Bot Alerts [QuantNomad]
-    ut_bot = compute_ut_bot_alerts(candles)
-
-    # 25. Chandelier Exit [everget]
+    # 21. Chandelier Exit [everget]
     chandelier_exit = compute_chandelier_exit(candles)
 
-    # 26. Hull Suite [InSilico]
-    hull_suite = compute_hull_suite(candles)
-
-    # 27. Machine Learning: Lorentzian Classification [jdehorty]
-    lorentzian_ml = compute_lorentzian_classification(candles)
-
-    # 28. AI Multi-Technical Confluence Decision Engine
+    # 22. Multi-Technical Confluence Decision Engine
     ai_signals = compute_ai_confluence_signals(
         candles=candles,
         fibo_levels=fibo_levels,
@@ -4019,13 +3683,12 @@ def compute_fibo_and_indicators(
         luxalgo_sr=luxalgo_sr,
         smc=smc,
         squeeze_mom=squeeze_mom,
-        wae=wae,
-        vfi=vfi,
-        wavetrend=wavetrend,
-        ut_bot=ut_bot,
         chandelier_exit=chandelier_exit,
-        hull_suite=hull_suite,
-        lorentzian_ml=lorentzian_ml
+        ticker=ticker,
+        days_to_earnings=days_to_earnings,
+        is_etf=is_etf,
+        stock_score=stock_score,
+        fundamental=fundamental,
     )
 
     return {
@@ -4097,13 +3760,9 @@ def compute_fibo_and_indicators(
         "luxalgo_sr": luxalgo_sr,
         "smc": smc,
         "squeeze_momentum": squeeze_mom,
-        "wae": wae,
-        "vfi": vfi,
-        "wavetrend": wavetrend,
-        "ut_bot": ut_bot,
         "chandelier_exit": chandelier_exit,
-        "hull_suite": hull_suite,
-        "lorentzian_ml": lorentzian_ml
+        "earnings_hash": EARNINGS_CALENDAR_HASH,
+        "schema_version": INDICATOR_SCHEMA_VERSION
     }
 
 
@@ -4137,10 +3796,6 @@ def save_candles_cache(cache: Dict[str, Any]):
         raise
 
 
-# Bump whenever compute_fibo_and_indicators output changes so cached entries are recomputed from cached candles.
-INDICATOR_SCHEMA_VERSION = 13
-
-
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
     """
     Load or fetch chart payloads for all given tickers.
@@ -4159,6 +3814,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
             or not entry.get("candles")
             or not entry.get("full_history")
             or entry.get("schema_version") != INDICATOR_SCHEMA_VERSION
+            or entry.get("earnings_hash") != EARNINGS_CALENDAR_HASH
         ):
             tickers_to_fetch.append(t)
 
@@ -4184,6 +3840,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
                 chart_data["timestamp"] = fetched_ts
                 chart_data["full_history"] = True
                 chart_data["schema_version"] = INDICATOR_SCHEMA_VERSION
+                chart_data["earnings_hash"] = EARNINGS_CALENDAR_HASH
                 return t, chart_data
             except Exception as e:
                 print(f"[chart_data] {t}: refresh failed, keeping cached data: {type(e).__name__}: {e}", file=sys.stderr)

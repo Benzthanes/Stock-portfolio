@@ -10,12 +10,21 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.tradingview import fetch_screener_data
-from src.screener import evaluate_stock
+from src.screener import evaluate_stock, trade_levels
 from src.news import fetch_batch_news, fetch_batch_catalysts
 from src.profiles import get_business_summary
 from src.outlook import get_forward_outlook
-from src.fx import resolve_usdthb
-from src.scoring import FundamentalScore, format_score, score_fundamentals, score_stock, score_timing
+from src.fmt import money, pct
+from src.fx import resolve_usdthb, resolve_usdthb_with_source
+from src.scoring import (
+    FundamentalScore,
+    compute_rebalance_score,
+    evaluate_portfolio_health,
+    format_score,
+    score_fundamentals,
+    score_stock,
+    score_timing,
+)
 
 
 from src.trades import data_path
@@ -58,6 +67,8 @@ RATING_TEXT_BY_GRADE = {
     "ETF": ("กองทุนดัชนี (ETF)", "ถือเป็นแกนหลักของพอร์ต ทยอยสะสมตามแผน DCA."),
     "N/A": ("ข้อมูลไม่พอประเมิน", "ตรวจสอบข้อมูลราคาและงบการเงินก่อนตัดสินใจ."),
 }
+
+CONCENTRATION_WARN_PCT = 40.0
 
 
 def top_pick_reason(pick: Dict[str, Any], fmt_money) -> str:
@@ -112,7 +123,13 @@ def compute_stock_rating(pos: Dict[str, Any]) -> Dict[str, Any]:
     grade, action = RATING_TEXT_BY_GRADE.get(stock_score["grade"], RATING_TEXT_BY_GRADE["N/A"])
 
     # Dynamic narrative summary
-    trend_desc = f"ยืนเหนือเส้น 200 วัน {dist_200:+.1f}%" if dist_200 is not None else "ไม่มีข้อมูลเส้น 200 วัน"
+    if dist_200 is not None:
+        if dist_200 >= 0:
+            trend_desc = f"ยืนเหนือเส้น 200 วัน {dist_200:+.1f}%"
+        else:
+            trend_desc = f"ต่ำกว่าเส้น 200 วัน {abs(dist_200):.1f}%"
+    else:
+        trend_desc = "ไม่มีข้อมูลเส้น 200 วัน"
     pl_desc = f"กำไร {pl_pct:+.1f}%" if pl_pct >= 0 else f"ขาดทุน {pl_pct:.1f}%"
     summary_desc = f"สถานะ {pl_desc}, กราฟ {trend_desc}."
 
@@ -209,14 +226,28 @@ def compute_financial_health(pos: Dict[str, Any]) -> Dict[str, Any]:
     """
     fund = _fundamental(pos)
     if not fund["applicable"]:
+        ticker_up = str(pos.get("ticker", "")).strip().upper()
+        if ticker_up in ("VOO", "SPY"):
+            peg_verdict = "N/A (กระจาย 500 บ.)"
+            summary_txt = "กองทุนดัชนีรวมกระจายความเสี่ยงข้าม 500 บริษัทชั้นนำสหรัฐฯ ไร้ความเสี่ยงงบการเงินรายตัว."
+        elif ticker_up == "QQQ":
+            peg_verdict = "N/A (กระจาย 100 บ.)"
+            summary_txt = "กองทุนดัชนี Nasdaq 100 กระจายความเสี่ยงข้าม 100 บริษัทนวัตกรรมชั้นนำ ไร้ความเสี่ยงงบการเงินรายตัว."
+        elif ticker_up == "QQQI":
+            peg_verdict = "N/A (Covered Call)"
+            summary_txt = "กองทุน Nasdaq 100 Covered Call สร้างกระแสเงินสดปันผลสูง พร้อมกระจายความเสี่ยงในหุ้นนวัตกรรมชั้นนำ."
+        else:
+            peg_verdict = "N/A (กองทุน ETF)"
+            summary_txt = "กองทุนดัชนีรวมกระจายความเสี่ยง ไร้ความเสี่ยงงบการเงินรายตัว."
+
         return {
             "health_grade": "🏛️ ETF ดัชนี (ความเสี่ยงต่ำ)",
             "health_badge": "🏛️ กองทุนดัชนี",
-            "peg_verdict": "N/A (กระจาย 500 บ.)",
+            "peg_verdict": peg_verdict,
             "fcf_str": "-",
             "roe_str": "-",
             "de_str": "-",
-            "summary": "กองทุนดัชนีรวมกระจายความเสี่ยงข้าม 500 บริษัทชั้นนำสหรัฐฯ ไร้ความเสี่ยงงบการเงินรายตัว.",
+            "summary": summary_txt,
             "score": 5,
             "pct": None,
             "coverage": fund["coverage"],
@@ -260,7 +291,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
     Fetch live TradingView market data, fundamentals, and news to compute portfolio metrics.
     """
     holdings = portfolio_data.get("holdings", [])
-    fx_rate = resolve_usdthb(portfolio_data.get("fx_rate_usd_thb"))
+    fx_rate, fx_source = resolve_usdthb_with_source(portfolio_data.get("fx_rate_usd_thb"))
     portfolio_name = portfolio_data.get("portfolio_name", "My Portfolio")
     broker = portfolio_data.get("broker", "InnovestX")
     base_currency = str(portfolio_data.get("base_currency", "USD")).upper()
@@ -365,53 +396,17 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
 
         biz_summary = get_business_summary(ticker, live_row.get("sector", ""), live_row.get("industry", ""))
 
-        # Key Support & Resistance calculation
+        # Key Support & Resistance calculation via unified trade_levels
         key_support = key_resistance = sl_calc = tp_calc = None
         support_desc = resistance_desc = "-"
         if not price_missing:
-            sma20 = live_row.get("SMA20") or 0.0
-            sma50 = live_row.get("SMA50") or 0.0
-            sma200 = live_row.get("SMA200") or 0.0
-            bb_lower = live_row.get("BB.lower") or 0.0
-            bb_upper = live_row.get("BB.upper") or 0.0
-            atr = live_row.get("ATR") or (close_price * 0.03)
-            sl_calc = eval_result.get("stop_loss") or round(close_price - (1.5 * atr), 2)
-            tp_calc = eval_result.get("take_profit") or round(close_price * 1.08, 2)
-
-            if eval_result.get("key_support") and eval_result["key_support"] < close_price:
-                key_support = eval_result["key_support"]
-                support_desc = eval_result.get("support_desc", "แนวรับทางเทคนิค")
-            elif sma200 > 0 and sma200 < close_price and (close_price - sma200) / close_price <= 0.08:
-                key_support = round(sma200, 2)
-                support_desc = "เส้น 200 วัน (SMA 200)"
-            elif bb_lower > 0 and bb_lower < close_price:
-                key_support = round(bb_lower, 2)
-                support_desc = "ขอบล่าง Bollinger Band"
-            else:
-                key_support = round(sl_calc, 2)
-                support_desc = "แนวรับความผันผวน 1.5 ATR"
-
-            if eval_result.get("key_resistance") and eval_result["key_resistance"] > close_price:
-                key_resistance = eval_result["key_resistance"]
-                resistance_desc = eval_result.get("resistance_desc", "แนวต้านทางเทคนิค")
-            elif sma200 > 0 and sma200 > close_price:
-                key_resistance = round(sma200, 2)
-                resistance_desc = "เส้น 200 วัน (SMA 200)"
-            elif sma50 > 0 and sma50 > close_price:
-                key_resistance = round(sma50, 2)
-                resistance_desc = "เส้น 50 วัน (SMA 50)"
-            elif sma20 > 0 and sma20 > close_price:
-                key_resistance = round(sma20, 2)
-                resistance_desc = "เส้น 20 วัน (SMA 20)"
-            elif bb_upper > 0 and bb_upper > close_price:
-                key_resistance = round(bb_upper, 2)
-                resistance_desc = "ขอบบน Bollinger Band"
-            elif target_avg and target_avg > close_price:
-                key_resistance = round(target_avg, 2)
-                resistance_desc = "ราคาเป้าหมายเฉลี่ยสถาบัน"
-            else:
-                key_resistance = round(tp_calc, 2)
-                resistance_desc = "เป้าหมายรีบาวด์ Take-Profit"
+            levels = trade_levels(live_row)
+            key_support = levels["key_support"]
+            support_desc = levels["support_desc"]
+            key_resistance = levels["key_resistance"]
+            resistance_desc = levels["resistance_desc"]
+            sl_calc = levels["stop_loss"]
+            tp_calc = levels["take_profit"]
 
         positions.append({
             "ticker": ticker,
@@ -554,10 +549,16 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         weighted_rev_growth = weighted_rev_growth / weight_covered
         weighted_net_growth = weighted_net_growth / weight_covered
 
-    # Opportunities: stocks with low RSI or in Value Zone
+    # Opportunities: stocks with dip actionable signal, low RSI, or in Value Zone with good grade
     dip_opportunities = [
         p for p in positions
-        if not p["price_missing"] and ((p["rsi"] is not None and p["rsi"] <= 35) or p["in_value_zone"] or (p["score"] >= 3.0))
+        if not p["price_missing"] and (
+            p.get("is_actionable")
+            or "Actionable" in p.get("tier", "")
+            or (p.get("stock_score", {}).get("grade") in ("A+", "A", "B", "ETF") and (
+                (p.get("rsi") is not None and p["rsi"] <= 35) or p.get("in_value_zone")
+            ))
+        )
     ]
 
     best_pos = max(priced, key=lambda x: x["unrealized_pl_pct"]) if priced else None
@@ -617,30 +618,10 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
 
     health_score = max(10.0, min(99.0, health_score))
 
-    if health_score >= 88.0:
-        health_grade = "A+"
-        health_status = "🟢 ยอดเยี่ยม แข็งแกร่งมาก"
-        health_grade_desc = "พอร์ตมีความแข็งแกร่งสูงมาก หุ้นส่วนใหญ่มีพื้นฐานดี มีกำไร และไม่มีความเสี่ยงรุนแรง."
-    elif health_score >= 80.0:
-        health_grade = "A"
-        health_status = "🟢 ปลอดภัย แข็งแกร่ง"
-        health_grade_desc = "สุขภาพพอร์ตแข็งแรงดี สามารถถือลงทุนระยะยาวได้อย่างสบายใจ."
-    elif health_score >= 70.0:
-        health_grade = "B+"
-        health_status = "🟡 สุขภาพดี มีจุดที่ต้องเฝ้าระวัง"
-        health_grade_desc = "พอร์ตทำกำไรได้ดี แต่มีการกระจุกตัวของเงินในหุ้นตัวใดตัวหนึ่งมากเกินไป หรือมีหุ้นบางตัวติดลบ."
-    elif health_score >= 60.0:
-        health_grade = "B"
-        health_status = "🟡 ปานกลาง ควรปรับสมดุล"
-        health_grade_desc = "พอร์ตอยู่ในระดับประคองตัว ควรหาจังหวะลดการกระจุกตัวและควบคุมหุ้นที่ขาดทุน."
-    elif health_score >= 50.0:
-        health_grade = "C"
-        health_status = "🟠 เปราะบาง มีความเสี่ยงขาดทุน"
-        health_grade_desc = "พอร์ตเริ่มมีความเสี่ยง มีหุ้นติดลบหลายตัว ต้องวางแผนแก้ดอย."
-    else:
-        health_grade = "D"
-        health_status = "🔴 เสี่ยงสูง ต้องรีบปรับพอร์ต"
-        health_grade_desc = "พอร์ตขาดทุนหนักหรือมีความเสี่ยงรุนแรง ต้องใช้แผนกู้พอร์ตทันที."
+    health_band = evaluate_portfolio_health(health_score)
+    health_grade = health_band.grade
+    health_status = health_band.status
+    health_grade_desc = health_band.desc
 
     # Rank holdings for fresh capital rebalancing (ถ้ามีเงินใหม่ ควรซื้อตัวไหนเพิ่ม)
     buy_candidates = []
@@ -689,20 +670,20 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
             })
             continue
 
-        # Score eligible holding for fresh cash
-        score = float(stars) * 2.5
-        if in_val:
-            score += 3.5
-        if dist_200 is not None and dist_200 >= 0:
-            score += 2.0
-        if not fund["applicable"]:
-            score += 4.0  # Index ETF rebalancing priority to counter extreme single-stock concentration
-        if w < 5.0:
-            score += 2.0  # Room to increase allocation
-        if upside > 15.0:
-            score += 1.5
-        if fund["pct"] is not None:
-            score += fund["pct"] / 100.0 * 6.0
+        # Score eligible holding for fresh cash using EMA200 and unified scoring weights
+        dist_ema200 = p.get("dist_ema200_pct")
+        if dist_ema200 is None:
+            dist_ema200 = dist_200
+
+        score = compute_rebalance_score(
+            stars=stars,
+            in_value_zone=in_val,
+            dist_ema200_pct=dist_ema200,
+            is_etf=not fund["applicable"],
+            weight_pct=w,
+            target_upside_pct=upside,
+            fundamental_pct=fund["pct"],
+        )
 
         p_copy = dict(p)
         p_copy["rebalance_score"] = score
@@ -714,6 +695,7 @@ def analyze_portfolio(portfolio_data: Dict[str, Any]) -> Dict[str, Any]:
         "portfolio_name": portfolio_name,
         "broker": broker,
         "fx_rate_usd_thb": fx_rate,
+        "fx_source": fx_source,
         "base_currency": base_currency,
         "cash_balance_thb": float(portfolio_data.get("cash_balance_thb", 0.0)),
         "line_available_thb": float(portfolio_data.get("line_available_thb", 0.0)),
@@ -915,7 +897,7 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
     }
     for sec_name, sec_pct in summary.get("sector_sorted", []):
         sec_label = SECTOR_TRANSLATION.get(sec_name, sec_name)
-        if sec_pct >= 40.0:
+        if sec_pct >= CONCENTRATION_WARN_PCT:
             eval_txt = f"⚠️ สัดส่วนสูงมาก ({sec_pct:.1f}%) ระวังความผันผวนเฉพาะกลุ่ม"
         elif sec_pct >= 20.0:
             eval_txt = "🟢 สัดส่วนเหมาะสม เป็นแกนหลักของพอร์ต"
@@ -946,8 +928,9 @@ def generate_portfolio_markdown(summary: Dict[str, Any]) -> str:
             price = f"${p['close_price']:,.2f}"
             supp_res = f"รับ ${p['key_support']:.2f}<br>ต้าน ${p['key_resistance']:.2f}"
             val_str = f"${p['current_val_usd']:,.2f}<br>฿{p['current_val_thb']:,.0f}"
-            pl_color = "+" if p['unrealized_pl_usd'] >= 0 else ""
-            pl_str = f"**{pl_color}{p['unrealized_pl_pct']:.2f}%**<br>({pl_color}${p['unrealized_pl_usd']:,.2f})"
+            pl_pct_str = pct(p['unrealized_pl_pct'], signed=True, digits=2)
+            pl_money_str = money(p['unrealized_pl_usd'], "USD", signed=True)
+            pl_str = f"**{pl_pct_str}**<br>({pl_money_str})"
 
         day_c = "+" if p['change_pct'] >= 0 else ""
         day_str = f"{day_c}{p['change_pct']:.2f}%"

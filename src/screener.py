@@ -11,17 +11,104 @@ from typing import Any, Dict, List, Optional
 
 from src.news import fetch_batch_news, fetch_batch_catalysts
 from src.profiles import get_business_summary
-from src.scoring import EARNINGS_GUARD_DAYS, format_score, score_fundamentals, score_stock, score_timing
+from src.scoring import EARNINGS_GUARD_DAYS, TIMING_RULES, format_score, score_fundamentals, score_stock, score_timing
 
 FALLBACK_SL_RATIO = 0.95
 MIN_SL_RATIO = 0.5
 
 
 def atr_stop_loss(close: float, atr: Optional[float]) -> float:
-    """1.5 ATR stop, floored at half the price so a huge ATR cannot push the stop to zero or below."""
+    """1.5 ATR stop, floored at half the price so a huge ATR cannot push the stop to zero or below, and never negative."""
+    if close <= 0:
+        return 0.0
     if atr and atr > 0:
-        return round(max(close - 1.5 * atr, close * MIN_SL_RATIO), 2)
-    return round(close * FALLBACK_SL_RATIO, 2)
+        return round(max(close - 1.5 * atr, close * MIN_SL_RATIO, 0.0), 2)
+    return round(max(close * FALLBACK_SL_RATIO, 0.0), 2)
+
+
+def trade_levels(row: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Computes unified support, resistance, stop loss, take profit and R:R ratio from market metrics.
+    Single source of truth across screener, portfolio and recovery.
+    """
+    close = float(row.get("close") or row.get("close_price") or 0.0)
+    if close <= 0:
+        return {
+            "atr": None,
+            "stop_loss": None,
+            "take_profit": None,
+            "risk": None,
+            "reward": None,
+            "rr_ratio": None,
+            "key_support": None,
+            "support_desc": "-",
+            "key_resistance": None,
+            "resistance_desc": "-",
+        }
+
+    raw_atr = row.get("ATR")
+    atr = float(raw_atr) if (raw_atr is not None and float(raw_atr) > 0) else None
+
+    stop_loss = max(0.0, atr_stop_loss(close, atr))
+
+    sma20 = float(row.get("SMA20") or 0.0)
+    sma50 = float(row.get("SMA50") or 0.0)
+    ema50 = float(row.get("EMA50") or 0.0)
+    sma200 = float(row.get("SMA200") or 0.0)
+    bb_lower = float(row.get("BB.lower") or 0.0)
+    bb_upper = float(row.get("BB.upper") or 0.0)
+    price_target_avg = float(row.get("price_target_average") or 0.0)
+
+    target_ma = sma50 or ema50
+    if target_ma and target_ma > close:
+        take_profit = round(target_ma, 2)
+    else:
+        take_profit = round(close * 1.08, 2)
+
+    risk = max(round(close - stop_loss, 2), 0.01)
+    reward = max(round(take_profit - close, 2), 0.0)
+    rr_ratio = round(reward / risk, 1)
+
+    # Key Support
+    if sma200 > 0 and sma200 < close and (close - sma200) / close <= 0.08:
+        key_support = round(sma200, 2)
+        support_desc = "เส้น 200 วัน (SMA 200)"
+    elif bb_lower > 0 and bb_lower < close:
+        key_support = round(bb_lower, 2)
+        support_desc = "ขอบล่าง Bollinger Band"
+    else:
+        key_support = round(stop_loss, 2)
+        support_desc = "แนวรับความผันผวน 1.5 ATR"
+
+    # Key Resistance
+    if target_ma and target_ma > close:
+        key_resistance = round(target_ma, 2)
+        resistance_desc = "เส้น 50 วัน (Mean Reversion)"
+    elif sma200 > 0 and sma200 > close:
+        key_resistance = round(sma200, 2)
+        resistance_desc = "เส้น 200 วัน (SMA 200)"
+    elif bb_upper > 0 and bb_upper > close:
+        key_resistance = round(bb_upper, 2)
+        resistance_desc = "ขอบบน Bollinger Band"
+    elif price_target_avg > close:
+        key_resistance = round(price_target_avg, 2)
+        resistance_desc = "ราคาเป้าหมายเฉลี่ยสถาบัน"
+    else:
+        key_resistance = round(take_profit, 2)
+        resistance_desc = "เป้าหมายทำกำไร +8%"
+
+    return {
+        "atr": round(atr, 2) if atr is not None else None,
+        "stop_loss": stop_loss,
+        "take_profit": take_profit,
+        "risk": risk,
+        "reward": reward,
+        "rr_ratio": rr_ratio,
+        "key_support": key_support,
+        "support_desc": support_desc,
+        "key_resistance": key_resistance,
+        "resistance_desc": resistance_desc,
+    }
 
 
 def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -105,57 +192,23 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     mfi_oversold = (mfi <= 30.0) if mfi is not None else False
     mfi_extreme = (mfi <= 20.0) if mfi is not None else False
 
-    # Actionable Confirmation: Needs green candle or RSI hook up, and not in active plunge
-    has_reversal_confirmation = is_green_candle or rsi_hook_up
-    is_actionable = has_reversal_confirmation and not is_plunge_day
-
     # Falling Knife Filter (ADX > 35 indicates strong trending plunge)
     adx_falling_knife = (adx > 35.0) if adx is not None else False
     vol_ratio = (vol / avg_vol_30) if avg_vol_30 > 0 else 1.0
 
     touch_bb_lower = ((low <= bb_lower * 1.005) or (close <= bb_lower * 1.01)) if bb_lower else False
     weekly_bullish = (rsi_weekly >= 45.0) if rsi_weekly is not None else False
-    
-    # Trade Setup: ATR Stop Loss & Target calculation
-    stop_loss = atr_stop_loss(close, atr)
 
-    target_ma = sma50 or ema50
-    if target_ma and target_ma > close:
-        take_profit = round(target_ma, 2)
-    else:
-        take_profit = round(close * 1.08, 2)
-        
-    risk = max(round(close - stop_loss, 2), 0.01)
-    reward = max(round(take_profit - close, 2), 0.0)
-    rr_ratio = round(reward / risk, 1)
-
-    # Key Support & Resistance Levels
-    if sma200 and sma200 > 0 and sma200 < close and (close - sma200) / close <= 0.08:
-        key_support = round(sma200, 2)
-        support_desc = "เส้น 200 วัน (SMA 200)"
-    elif bb_lower and bb_lower > 0 and bb_lower < close:
-        key_support = round(bb_lower, 2)
-        support_desc = "ขอบล่าง Bollinger Band"
-    else:
-        key_support = round(stop_loss, 2)
-        support_desc = "แนวรับความผันผวน 1.5 ATR"
-
-    bb_upper = data.get("BB.upper") or 0.0
-    if target_ma and target_ma > close:
-        key_resistance = round(target_ma, 2)
-        resistance_desc = "เส้น 50 วัน (Mean Reversion)"
-    elif sma200 and sma200 > close:
-        key_resistance = round(sma200, 2)
-        resistance_desc = "เส้น 200 วัน (SMA 200)"
-    elif bb_upper and bb_upper > close:
-        key_resistance = round(bb_upper, 2)
-        resistance_desc = "ขอบบน Bollinger Band"
-    elif data.get("price_target_average") and data.get("price_target_average") > close:
-        key_resistance = round(data.get("price_target_average"), 2)
-        resistance_desc = "ราคาเป้าหมายเฉลี่ยสถาบัน"
-    else:
-        key_resistance = round(take_profit, 2)
-        resistance_desc = "เป้าหมายทำกำไร +8%"
+    # Trade Setup: ATR Stop Loss & Target calculation via unified trade_levels
+    levels = trade_levels(data)
+    atr = levels["atr"]
+    stop_loss = levels["stop_loss"]
+    take_profit = levels["take_profit"]
+    rr_ratio = levels["rr_ratio"] or 0.0
+    key_support = levels["key_support"]
+    support_desc = levels["support_desc"]
+    key_resistance = levels["key_resistance"]
+    resistance_desc = levels["resistance_desc"]
 
     # Earnings Proximity Calculation
     now_ts = int(time.time())
@@ -175,13 +228,13 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     if selected_earnings_ts:
         diff_days = (selected_earnings_ts - now_ts) / 86400.0
         days_to_earnings = round(diff_days, 1)
-        is_earnings_near = (days_to_earnings <= EARNINGS_GUARD_DAYS)
+        is_earnings_near = (0.0 <= days_to_earnings <= EARNINGS_GUARD_DAYS)
         try:
             earnings_date_str = datetime.fromtimestamp(selected_earnings_ts, tz=timezone.utc).strftime("%d %b %Y")
         except Exception:
             earnings_date_str = str(selected_earnings_ts)
 
-    # Score calculation (0 - 8+ points)
+    # Score calculation & informational signal tags (technicals kept as tags without arbitrary score points)
     score_points = 0.0
     signal_tags = []
     
@@ -194,7 +247,6 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
             signal_tags.append("Value Zone (0-10% เหนือ EMA200) 💎")
             
     if weekly_bullish:
-        score_points += 1.0
         signal_tags.append("Weekly Bullish (RSI≥45)")
     if rsi is not None and rsi <= 30:
         score_points += 1.0
@@ -207,41 +259,31 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         signal_tags.append("RSI Hook Up ⤴")
         
     if fresh_stoch_cross:
-        score_points += 1.0
         signal_tags.append("Fresh Stoch Cross ✂")
     elif stoch_bullish:
-        score_points += 0.5
         signal_tags.append("Stoch Bullish (%K>%D)")
         
     if macd_tick_up:
-        score_points += 0.5
         signal_tags.append("MACD Hist Tick 📈")
         
     if mfi_extreme:
-        score_points += 0.5
         signal_tags.append("MFI Capitulation (<20) 🌊")
     elif mfi_oversold:
-        score_points += 0.25
         signal_tags.append("MFI Oversold (≤30)")
         
     if touch_bb_lower:
-        score_points += 0.5
         signal_tags.append("Touch BB Lower Band")
         
     if rr_ratio >= 2.0:
-        score_points += 0.5
         signal_tags.append(f"High R:R ({rr_ratio}x) 🎯")
         
     if vol_ratio >= 1.3:
-        score_points += 0.5
         signal_tags.append(f"High Vol ({vol_ratio:.1f}x)")
 
     # Candle price action signals
     if is_green_candle:
-        score_points += 0.5
         signal_tags.append("Green Reversal Candle 🕯️🟢")
     elif is_plunge_day:
-        score_points -= 1.0
         signal_tags.append("⚠️ Plunge Day (มีดยังหล่น)")
 
     ticker = data.get("ticker", data.get("name", ""))
@@ -249,32 +291,44 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
     if fundamental["pct"] is not None:
         score_points += (fundamental["pct"] - 40.0) / 60.0 * 4.5
     signal_tags.extend(fundamental["reasons"])
-    stock_score = score_stock(fundamental, score_timing(dist_ema200_pct, rsi, rsi_prev), days_to_earnings)
+
+    dist_for_timing = dist_ema200_pct if dist_ema200_pct is not None else dist_sma200_pct
+    stock_score = score_stock(fundamental, score_timing(dist_for_timing, rsi, rsi_prev), days_to_earnings)
 
     if rec_mark is not None and rec_mark <= 1.5:
-        score_points += 0.5
         signal_tags.append("Wall St Strong Buy 🌟")
 
     if adx_falling_knife:
-        score_points -= 1.5
         signal_tags.append("⚠️ High ADX Falling Knife")
 
-    # Rating Tier with Reversal Confirmation Guard
-    if score_points >= 4.5:
-        if is_actionable:
+    # Unified Dip Tier strictly derived from stock_score grade, entry_signal, plunge guard, and earnings guard
+    grade = stock_score.get("grade", "N/A")
+    entry_signal = bool(stock_score.get("timing", {}).get("entry_signal", False))
+    earnings_guard_active = is_earnings_near or stock_score.get("earnings_guard", False)
+
+    if is_plunge_day:
+        tier = "👀 รอสร้างฐาน (Forming Base - วันทิ้งตัว)"
+        is_actionable = False
+    elif earnings_guard_active:
+        tier = "⚠️ รอพ้นวันงบ (Earnings Guard)"
+        is_actionable = False
+    elif grade in ("A+", "A", "ETF"):
+        if entry_signal:
             tier = "⭐⭐⭐ Actionable Dip Buy 🎯"
-        else:
-            tier = "👀 รอสร้างฐาน (Forming Base - วันทิ้งตัว)"
-    elif score_points >= 3.0:
-        if is_actionable:
-            tier = "⭐⭐ Good Setup (Actionable) 🎯"
+            is_actionable = True
         else:
             tier = "⭐ Watchlist (รอแท่งกลับตัว)"
-    else:
-        if is_plunge_day:
-            tier = "👀 รอสร้างฐาน (Forming Base - วันทิ้งตัว)"
+            is_actionable = False
+    elif grade == "B":
+        if entry_signal:
+            tier = "⭐⭐ Good Setup (Actionable) 🎯"
+            is_actionable = True
         else:
-            tier = "⭐ Watchlist"
+            tier = "⭐ Watchlist (รอแท่งกลับตัว)"
+            is_actionable = False
+    else:
+        tier = "⭐ Watchlist"
+        is_actionable = False
         
     exchange = data.get("exchange", "NASDAQ")
     tv_url = f"https://www.tradingview.com/chart/?symbol={exchange}:{ticker}"
@@ -332,7 +386,6 @@ def evaluate_stock(data: Dict[str, Any]) -> Dict[str, Any]:
         "is_green_candle": is_green_candle,
         "is_red_candle": is_red_candle,
         "is_plunge_day": is_plunge_day,
-        "has_reversal_confirmation": has_reversal_confirmation,
         "is_actionable": is_actionable,
         "days_to_earnings": days_to_earnings,
         "earnings_date_str": earnings_date_str,
@@ -444,7 +497,7 @@ def filter_stocks(
         if require_stoch_cross and not stock["fresh_stoch_cross"]:
             continue
 
-        if exclude_falling_knife and stock.get("adx_falling_knife"):
+        if exclude_falling_knife and stock.get("is_plunge_day"):
             continue
 
         if require_reversal and not stock.get("is_actionable"):
@@ -781,9 +834,13 @@ def generate_markdown_report(
     lines.append("2. **งบการเงินไม่ติดลบและสถาบันไม่เทขาย:** รายได้ YoY ต้องไม่ติดลบรุนแรง และมตินักวิเคราะห์สถาบันต้องแนะนำซื้อมากกว่าขาย.")
     lines.append("3. **ระวังตลาดรวม (SPY/QQQ):** หากดัชนีหลักหลุดเส้น 50 วันพร้อมกัน ให้ชะลอการเข้าซื้อหรือลดขนาดไม้ลงครึ่งหนึ่งเสมอ.")
 
+    val_band = next((b for b in TIMING_RULES.get("ema200_dist", (0, []))[1] if "Value Zone" in b.label), None)
+    val_lo = int(val_band.lo) if (val_band and val_band.lo is not None) else 0
+    val_hi = int(val_band.hi) if (val_band and val_band.hi is not None) else 10
+
     lines.append("\n---")
     lines.append("### 🪜 สูตรแบ่ง 3 ไม้ช้อนซื้อ สำหรับมือใหม่ (3-Step Dip Money Management)")
-    lines.append("- **ไม้ที่ 1 (30%):** เข้าซื้อเมื่อราคาแตะโซนรับ Value Zone (ใกล้เส้น 200 วัน ในระยะ 0% ถึง +5%).")
+    lines.append(f"- **ไม้ที่ 1 (30%):** เข้าซื้อเมื่อราคาแตะโซนรับ Value Zone (ใกล้เส้น 200 วัน ในระยะ {val_lo}% ถึง +{val_hi}%).")
     lines.append("- **ไม้ที่ 2 (40%):** เข้าซื้อเมื่อเกิดสัญญาณกลับตัวยืนยัน เช่น RSI Hook Up (⤴) หรือ Stoch RSI Golden Cross (✂🟢).")
     lines.append("- **ไม้ที่ 3 (30%):** เก็บเป็นเงินสดสำรอง หรือซื้อเพิ่มเมื่อราคาวิ่งทะลุแนวต้านแรกเพื่อยืนยันรอบขาขึ้น.")
 

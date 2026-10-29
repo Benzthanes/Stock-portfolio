@@ -4,16 +4,29 @@ Generates a modern, luxury dark-mode, responsive financial dashboard HTML report
 """
 
 import json
+import re
 from html import escape
 from typing import Any, Dict, List, Optional
 
 from src.fmt import money, pct
-from src.fx import resolve_usdthb
+from src.fx import FALLBACK_USDTHB, resolve_usdthb, resolve_usdthb_with_source
 from src.nav import nav_bar_html
-from src.scoring import format_roe_html, format_score
+from src.portfolio import CONCENTRATION_WARN_PCT
+from src.scoring import FUNDAMENTAL_RULES, find_band, format_roe_html, format_score
 
 NA = "n/a"
 HEALTH_BADGE_CLASS = {"A+": "badge-emerald", "A": "badge-emerald", "B": "badge-amber", "C": "badge-amber", "F": "badge-rose"}
+
+
+def _format_fx_badge(fx_source: Optional[str]) -> str:
+    """Badge for FX rate indicating fallback or stored rates when live rate is unavailable."""
+    if fx_source == "fallback":
+        return f' <span class="badge badge-amber" style="margin-left: 6px; font-size: 0.78rem;">FX สำรอง {FALLBACK_USDTHB:.2f}</span>'
+    if fx_source == "stored":
+        return ' <span class="badge badge-amber" style="margin-left: 6px; font-size: 0.78rem;">FX ที่บันทึกไว้</span>'
+    if fx_source and fx_source != "live":
+        return ' <span class="badge badge-amber" style="margin-left: 6px; font-size: 0.78rem;">FX ไม่ใช่เรทสด</span>'
+    return ""
 
 
 def score_badge_html(score: Optional[Dict[str, Any]]) -> str:
@@ -56,13 +69,18 @@ def _news_items_html(items: List[Dict[str, Any]], empty_msg: str) -> str:
             title = f"<a href='{escape(link, quote=True)}' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>{title} ↗</a>"
         published = f" <span class='text-muted small'>({escape(b['published'], quote=True)})</span>" if b.get("published") else ""
         
+        is_ai = bool(b.get("ai_analyzed"))
+        badge = (
+            " <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span>"
+            if is_ai
+            else " <span class='badge badge-neutral' style='font-size:0.7rem; color:#94a3b8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.25); vertical-align:middle;'>heuristic</span>"
+        )
         title_th = b.get("title_th")
         if title_th:
             title_th_escaped = escape(title_th, quote=True)
-            ai_badge = " <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>🤖 AI Verified</span>" if b.get("ai_analyzed") else ""
             rows.append(
                 f"<li style='margin-bottom: 8px;'><strong class='source-tag'>[{escape(b.get('source', ''), quote=True)}]</strong> "
-                f"<span style='font-weight: 600; color: #f1f5f9;'>{title_th_escaped}</span>{ai_badge}"
+                f"<span style='font-weight: 600; color: #f1f5f9;'>{title_th_escaped}</span>{badge}"
                 f"<div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ {title}{published}</div></li>"
             )
         else:
@@ -104,7 +122,16 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     """
     port_name = escape(str(summary.get("portfolio_name", "Portfolio")))
     broker = escape(str(summary.get("broker", "Broker")))
-    fx = summary.get("fx_rate_usd_thb") or resolve_usdthb(None)
+    fx = summary.get("fx_rate_usd_thb")
+    fx_source = summary.get("fx_source")
+    if fx is None:
+        fx, fx_source = resolve_usdthb_with_source(None)
+    elif fx_source is None:
+        if abs(fx - FALLBACK_USDTHB) < 1e-4:
+            fx_source = "fallback"
+        else:
+            _, fx_source = resolve_usdthb_with_source(fx)
+    fx_badge = _format_fx_badge(fx_source)
     val_usd = summary.get("total_market_val_usd", 0.0)
     val_thb = summary.get("total_market_val_thb", 0.0)
     cost_usd = summary.get("total_cost_usd", 0.0)
@@ -115,19 +142,42 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     day_usd = summary.get("total_daily_change_usd", 0.0)
     day_thb = summary.get("total_daily_change_thb", 0.0)
     day_pct = summary.get("total_daily_change_pct", 0.0)
+    positions = summary.get("positions", [])
     conc_lvl = summary.get("concentration_level", "Moderate")
     hhi = summary.get("hhi", 0.0)
+    conc_th_map = {
+        "Extremely High": "กระจุกตัวสูงมาก",
+        "High": "กระจุกตัวสูง",
+        "Moderate": "กระจุกตัวปานกลาง",
+        "Well Diversified": "กระจายความเสี่ยงดี",
+    }
+    conc_title_th = conc_th_map.get(conc_lvl, conc_lvl)
+    top_pos_item = max(positions, key=lambda x: x.get('weight_pct', 0.0)) if positions else None
+    if top_pos_item:
+        top_ticker = top_pos_item.get('ticker', '')
+        top_weight = top_pos_item.get('weight_pct', 0.0)
+        conc_sub_th = f"หุ้นใหญ่สุด ({top_ticker}) {top_weight:.1f}% ของพอร์ต (HHI {hhi:.0f})"
+    else:
+        top_ticker = ""
+        top_weight = 0.0
+        conc_sub_th = f"HHI {hhi:.0f}"
     grade = summary.get("health_grade", "B")
     score = summary.get("health_score", 70.0)
     status_txt = summary.get("health_status", "")
     grade_desc = summary.get("health_grade_desc", "")
+
+    if top_weight >= CONCENTRATION_WARN_PCT:
+        status_txt = f"⚠️ ระวังการกระจุกตัวสูง ({top_ticker} {top_weight:.1f}%)"
+        grade_desc = (
+            f"พอร์ตมีหุ้น {top_ticker} กระจุกตัวสูงถึง {top_weight:.1f}% ของพอร์ต "
+            f"จึงมีความเสี่ยงสูงจากความผันผวนเฉพาะตัวของหุ้น แม้คะแนนพื้นฐานโดยรวมจะดี ควรหาจังหวะกระจายการลงทุนเพื่อลดความเสี่ยง."
+        )
     best_pos = summary.get("best_pos")
     worst_pos = summary.get("worst_pos")
     top_picks = summary.get("top_buy_candidates", [])
     forbidden = summary.get("forbidden_buys", [])
     dip_setups = summary.get("dip_opportunities", [])
     sector_sorted = summary.get("sector_sorted", [])
-    positions = summary.get("positions", [])
 
     is_thb = summary.get("base_currency") == "THB"
     ccy = "THB" if is_thb else "USD"
@@ -143,13 +193,10 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     day_color = "var(--emerald)" if (day_thb >= 0 if is_thb else day_usd >= 0) else "var(--rose)"
 
     # Grade color
-    if grade in ("A+", "A"):
+    if grade in ("A+", "A", "ดีมาก", "ดี"):
         grade_badge_color = "var(--emerald-glow)"
         grade_border = "var(--emerald)"
-    elif grade == "B+":
-        grade_badge_color = "var(--amber-glow)"
-        grade_border = "var(--amber)"
-    elif grade == "B":
+    elif grade in ("B+", "B", "พอใช้"):
         grade_badge_color = "var(--amber-glow)"
         grade_border = "var(--amber)"
     else:
@@ -160,8 +207,8 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
     sector_rows_html = ""
     for sec_name, sec_pct in sector_sorted:
         bar_width = min(100.0, max(2.0, sec_pct))
-        bar_color = "var(--rose)" if sec_pct >= 40.0 else ("var(--emerald)" if sec_pct >= 20.0 else "var(--blue)")
-        warn_badge = '<span class="badge badge-warn">⚠️ สัดส่วนสูงมาก</span>' if sec_pct >= 40.0 else (
+        bar_color = "var(--rose)" if sec_pct >= CONCENTRATION_WARN_PCT else ("var(--emerald)" if sec_pct >= 20.0 else "var(--blue)")
+        warn_badge = '<span class="badge badge-warn">⚠️ สัดส่วนสูงมาก</span>' if sec_pct >= CONCENTRATION_WARN_PCT else (
             '<span class="badge badge-success">🟢 สัดส่วนหลัก</span>' if sec_pct >= 20.0 else
             '<span class="badge badge-neutral">⚪ กระจายตัวดี</span>'
         )
@@ -186,16 +233,16 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         biz = escape(p.get("business_summary") or "")
         r = p.get("rating", {})
         stars = r.get("stars_str", "⭐")
-        weight = p["weight_pct"]
-        avg_cost = p["avg_cost_usd"]
-        price = p["close_price"]
-        p_val_usd = p["current_val_usd"]
-        p_val_thb = p["current_val_thb"]
-        un_pl_usd = p["unrealized_pl_usd"]
-        un_pl_pct = p["unrealized_pl_pct"]
-        p_chg = p["change_pct"]
-        rsi = p["rsi"]
-        dist_sma = p["dist_sma200_pct"]
+        weight = p.get("weight_pct", 0.0)
+        avg_cost = p.get("avg_cost_usd", 0.0)
+        price = p.get("close_price", 0.0)
+        p_val_usd = p.get("current_val_usd", 0.0)
+        p_val_thb = p.get("current_val_thb", 0.0)
+        un_pl_usd = p.get("unrealized_pl_usd", 0.0)
+        un_pl_pct = p.get("unrealized_pl_pct", 0.0)
+        p_chg = p.get("change_pct", 0.0)
+        rsi = p.get("rsi")
+        dist_sma = p.get("dist_sma200_pct")
         in_val = p.get("in_value_zone")
         alerts = p.get("alerts", [])
 
@@ -218,9 +265,17 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
 
         badges_html = ""
         for a in alerts:
+            m_earn = re.search(r"Earnings in ([\d\.]+)\s*d", a, re.IGNORECASE)
+            if m_earn:
+                d_val = float(m_earn.group(1))
+                d_rounded = int(round(d_val))
+                if d_rounded <= 0:
+                    a = "⚠️ งบออกวันนี้"
+                else:
+                    a = f"⚠️ งบออกใน {d_rounded} วัน"
             if "Extreme" in a or "Drawdown" in a:
                 badges_html += f'<span class="badge badge-rose">{a}</span> '
-            elif "Heavy" in a or "Earnings" in a:
+            elif "Heavy" in a or "Earnings" in a or "งบออก" in a:
                 badges_html += f'<span class="badge badge-amber">{a}</span> '
             else:
                 badges_html += f'<span class="badge badge-neutral">{a}</span> '
@@ -245,32 +300,34 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
 
         holdings_rows_html += f"""
         <tr>
-            <td>
+            <td style="white-space: nowrap;">
                 <span class="ticker-pill clickable-ticker" onclick="{onclick_js}" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span>
             </td>
             <td>
                 <div class="fw-bold">{name}</div>
-                <div class="text-muted small">{biz}</div>
+                <div class="text-muted small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 180px; line-height: 1.3;">{biz}</div>
             </td>
             <td style="white-space: nowrap;">{stars}<br>{score_badge_html(p.get("stock_score"))}</td>
-            <td style="text-align: right; font-weight: 700;">{weight:.1f}%</td>
-            <td style="text-align: right;">{avg_cost_disp}</td>
-            <td style="text-align: right; font-weight: 600;">{price_disp}</td>
-            <td style="text-align: right;">
+            <td style="text-align: right; font-weight: 700; white-space: nowrap;">{weight:.1f}%</td>
+            <td style="text-align: right; white-space: nowrap;">{avg_cost_disp}</td>
+            <td style="text-align: right; font-weight: 600; white-space: nowrap;">{price_disp}</td>
+            <td style="text-align: right; white-space: nowrap;">
                 <div class="text-emerald small fw-bold">{supp_disp}</div>
                 <div class="text-amber small">{res_disp}</div>
             </td>
-            <td style="text-align: right;">
+            <td style="text-align: right; white-space: nowrap;">
                 <div>{val_main}</div>
                 <div class="text-muted small">{val_sub}</div>
             </td>
-            <td style="text-align: right;" class="{pl_cls}">
+            <td style="text-align: right; white-space: nowrap;" class="{pl_cls}">
                 <div class="fw-bold">{pct(un_pl_pct, digits=2, na=NA)}</div>
                 <div class="small">{pl_sub_disp}</div>
             </td>
-            <td style="text-align: right;" class="{day_cls}">{pct(p_chg, digits=2)}</td>
-            <td style="text-align: center;">{rsi_html}</td>
-            <td style="text-align: center;">{dist_html}</td>
+            <td style="text-align: right; white-space: nowrap;">
+                <div class="{day_cls}" style="font-weight: 600;">{pct(p_chg, digits=2)}</div>
+                <div class="small text-muted">{dist_html}</div>
+            </td>
+            <td style="text-align: center; white-space: nowrap;">{rsi_html}</td>
             <td>{badges_html}</td>
         </tr>
         """
@@ -299,12 +356,21 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
 
         de_val = p.get('debt_to_equity')
         if de_val is not None:
-            if de_val <= 0.8:
+            try:
+                band = find_band(FUNDAMENTAL_RULES["debt_to_equity"][1], de_val)
+                pts = band.points
+            except Exception:
+                pts = 0
+            if de_val < 0.0:
+                de_html = f"<span class='text-rose fw-bold'>{de_val:.2f} ⚠️</span>"
+            elif pts == 3:
                 de_html = f"<span class='text-emerald fw-bold'>{de_val:.2f} 🛡️</span>"
-            elif de_val <= 1.5:
+            elif pts == 2:
                 de_html = f"<span>{de_val:.2f}</span>"
+            elif pts == 1:
+                de_html = f"<span class='text-amber'>{de_val:.2f}</span>"
             else:
-                de_html = f"<span class='text-amber fw-bold'>{de_val:.2f} ⚠️</span>"
+                de_html = f"<span class='text-rose fw-bold'>{de_val:.2f} ⚠️</span>"
         else:
             de_html = "-"
 
@@ -322,15 +388,22 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         else:
             votes_html = "-"
 
-        earn_str = f"{p['earnings_date']} ({p['days_to_earnings']}d)" if p.get('days_to_earnings') is not None else "-"
+        days_e = p.get('days_to_earnings')
+        if days_e is not None:
+            d_rounded = int(round(days_e))
+            days_e_str = "งบออกวันนี้" if d_rounded <= 0 else f"งบออกใน {d_rounded} วัน"
+            earn_str = f"{p['earnings_date']} ({days_e_str})"
+        else:
+            earn_str = "-"
         if p.get("is_earnings_near"):
             earn_html = f"<span class='badge badge-rose'>⚠️ {earn_str}</span>"
         else:
             earn_html = f"<span class='text-muted'>{earn_str}</span>"
 
+        tv_url = p.get('tv_url') or f"https://www.tradingview.com/chart/?symbol={p.get('exchange', 'NASDAQ')}:{t}"
         fund_rows_html += f"""
         <tr>
-            <td><a href="{p['tv_url']}" target="_blank" class="ticker-pill">{t}</a></td>
+            <td><a href="{tv_url}" target="_blank" class="ticker-pill">{t}</a></td>
             <td><div class="fw-bold">{name}</div></td>
             <td>{badge_html}</td>
             <td style="text-align: right; font-weight: 600;">{rev_g}</td>
@@ -489,14 +562,17 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             </div>
 
             <!-- Thesis Banner -->
-            <div class="thesis-banner">
-                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
-                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">{thesis_title}</div>
+            <div class="thesis-banner" style="background: rgba(255, 255, 255, 0.025); border: 1px solid var(--border-color); color: var(--text-secondary);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px;">
+                    <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                    {f"<span class='text-muted small' style='font-size:0.72rem; font-weight:normal;'>บันทึกเขียนเอง อัปเดต {fo['curated_as_of']}</span>" if fo.get('curated_as_of') else ""}
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.4;">{thesis_title}</div>
             </div>
 
             <!-- 4 Future Growth Drivers -->
             <div class="drivers-box">
-                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">🚀 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">📈 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
                 <ul class="drivers-list">
                     {drivers_li}
                 </ul>
@@ -669,21 +745,21 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         /* Grid utilities */
         .grid-4-cols {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
             gap: 18px;
             margin-bottom: 24px;
         }}
 
         .grid-3-cols {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
             gap: 20px;
             margin-bottom: 24px;
         }}
 
         .grid-2-cols {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
             gap: 20px;
             margin-bottom: 24px;
         }}
@@ -825,7 +901,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         th {{
             background: rgba(15, 23, 42, 0.95);
             color: var(--text-secondary);
-            padding: 14px 16px;
+            padding: 10px 10px;
             font-weight: 600;
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
@@ -835,7 +911,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         }}
 
         td {{
-            padding: 14px 16px;
+            padding: 10px 10px;
             border-bottom: 1px solid var(--border-subtle);
         }}
 
@@ -1030,7 +1106,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         }}
         .timeline-strip {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
             gap: 12px;
         }}
         .timeline-step {{
@@ -1064,7 +1140,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
         }}
         .ws-targets-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
             gap: 12px;
             margin: 12px 0;
             text-align: center;
@@ -1131,7 +1207,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             </div>
             <div class="header-meta">
                 <span class="meta-pill">🏦 <strong>Broker:</strong> {broker}</span>
-                <span class="meta-pill">💱 <strong>FX Rate:</strong> {fx:.2f} THB/USD</span>
+                <span class="meta-pill">💱 <strong>FX Rate:</strong> {fx:.2f} THB/USD{fx_badge}</span>
             </div>
         </header>
 
@@ -1164,7 +1240,13 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             <div class="card kpi-card">
                 <div class="kpi-label">⚡ กำไร/ขาดทุนวันนี้ (1D Change)</div>
                 <div class="kpi-value" style="color: {day_color};">{money(day_thb, 'THB', signed=True) if is_thb else money(day_usd, 'USD', signed=True)} ({pct(day_pct, digits=2)})</div>
-                <div class="kpi-subtext">HHI: {hhi:.0f} ({conc_lvl})</div>
+                <div class="kpi-subtext">{'≈ ' + money(day_usd, 'USD', signed=True) + ' USD' if is_thb else '≈ ' + money(day_thb, 'THB', signed=True) + ' THB'}</div>
+            </div>
+
+            <div class="card kpi-card">
+                <div class="kpi-label">🎯 การกระจายความเสี่ยง</div>
+                <div class="kpi-value" style="font-size: 1.35rem;">{conc_title_th}</div>
+                <div class="kpi-subtext">{conc_sub_th}</div>
             </div>
         </div>
 
@@ -1174,7 +1256,7 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
             <p style="color: var(--text-secondary); margin-bottom: 12px;">{grade_desc}</p>
             <div class="grid-2-cols" style="margin-bottom: 12px; gap: 12px;">
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
-                    🚀 <strong>ฮีโร่แบกพอร์ต:</strong> {f"[{best_pos['ticker']}] {escape(best_pos['name'])} ({pct(best_pos['unrealized_pl_pct'])})" if best_pos else "-"}
+                    ⭐ <strong>หุ้นกำไรสูงสุดในพอร์ต:</strong> {f"[{best_pos['ticker']}] {escape(best_pos['name'])} ({pct(best_pos['unrealized_pl_pct'])})" if best_pos else "-"}
                 </div>
                 <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius-sm);">
                     🔻 <strong>ตัวฉุดดอยหนัก:</strong> {f"[{worst_pos['ticker']}] {escape(worst_pos['name'])} ({pct(worst_pos['unrealized_pl_pct'])})" if worst_pos else "-"}
@@ -1217,12 +1299,11 @@ def generate_portfolio_html(summary: Dict[str, Any]) -> str:
                         <th style="text-align: right;">สัดส่วน</th>
                         <th style="text-align: right;">ทุนเฉลี่ย</th>
                         <th style="text-align: right;">ราคาตลาด</th>
-                        <th style="text-align: right;">แนวรับ / แนวต้าน</th>
+                        <th style="text-align: right;">แนวรับ / ต้าน</th>
                         <th style="text-align: right;">มูลค่ารวม ($ / ฿)</th>
                         <th style="text-align: right;">กำไร/ขาดทุน</th>
-                        <th style="text-align: right;">1D Chg</th>
+                        <th style="text-align: right;">1D / 200D Trend</th>
                         <th style="text-align: center;">Daily RSI</th>
-                        <th style="text-align: center;">200D Trend</th>
                         <th>สถานะ & สัญญาณ</th>
                     </tr>
                 </thead>
@@ -1310,7 +1391,16 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
     Render portfolio recovery analysis into a standalone, luxury dark-themed HTML report.
     """
     port_name = escape(str(summary.get("portfolio_name", "Portfolio")))
-    fx = summary.get("fx_rate") or resolve_usdthb(None)
+    fx = summary.get("fx_rate")
+    fx_source = summary.get("fx_source")
+    if fx is None:
+        fx, fx_source = resolve_usdthb_with_source(None)
+    elif fx_source is None:
+        if abs(fx - FALLBACK_USDTHB) < 1e-4:
+            fx_source = "fallback"
+        else:
+            _, fx_source = resolve_usdthb_with_source(fx)
+    fx_badge = _format_fx_badge(fx_source)
     count = summary.get("total_underwater_count", 0)
     loss_usd = summary.get("total_underwater_loss_usd", 0.0)
     loss_thb = summary.get("total_underwater_loss_thb", 0.0)
@@ -1343,11 +1433,16 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         net_g = pct(f.get('net_inc_growth_yoy'))
         fund_str = f"Rev {rev_g} | Net {net_g}"
 
-        earn_str = f"{p['days_to_earnings']}d" if p.get('days_to_earnings') is not None else "-"
+        days_e = p.get('days_to_earnings')
+        if days_e is not None:
+            d_rounded = int(round(days_e))
+            earn_str = "งบออกวันนี้" if d_rounded <= 0 else f"งบออกใน {d_rounded} วัน"
+        else:
+            earn_str = "-"
         earn_badge = f"<span class='badge badge-rose'>⚠️ {earn_str}</span>" if p.get("is_earnings_imminent") else f"<span class='badge badge-neutral'>{earn_str}</span>"
 
-        target_str = f"<strong>{money(t_avg, ccy, digits=1)}</strong> <span class='text-emerald small'>({pct(t_up, digits=0)})</span>" if (t_avg and t_up is not None) else (f"<strong>{money(t_avg, ccy, digits=1)}</strong>" if t_avg else "-")
-        loss_disp = f"({money(-abs(p.get('loss_thb', abs(loss_u))), 'THB', digits=0)})" if is_thb else f"({money(-abs(loss_u), 'USD', digits=1)})"
+        target_str = f"<strong>{money(t_avg, ccy, digits=2)}</strong> <span class='text-emerald small'>({pct(t_up, digits=0)})</span>" if (t_avg and t_up is not None) else (f"<strong>{money(t_avg, ccy, digits=2)}</strong>" if t_avg else "-")
+        loss_disp = f"({money(-abs(p.get('loss_thb', abs(loss_u))), 'THB', digits=0)})" if is_thb else f"({money(-abs(loss_u), 'USD', digits=2)})"
 
         onclick_js = _make_chart_onclick(p, is_thb=is_thb)
 
@@ -1355,7 +1450,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         <tr>
             <td><span class="ticker-pill clickable-ticker" onclick="{onclick_js}" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">{t} 📈</span></td>
             <td><div class="fw-bold">{name}</div><div class="text-muted small">{biz}</div></td>
-            <td style="text-align: right;">{money(avg, ccy)}<br><span class="text-muted small">{money(c, ccy)}</span></td>
+            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> {money(avg, ccy)}<br><span class="text-muted small">ตลาด:</span> {money(c, ccy)}</td>
             <td style="text-align: right;" class="text-rose fw-bold">{loss_pct:.1f}%<br><span class="small">{loss_disp}</span></td>
             <td style="text-align: right;">
                 <div class="text-emerald fw-bold">รับ {money(p.get('key_support', 0), ccy)}</div>
@@ -1429,9 +1524,12 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             </div>
 
             <!-- Thesis Banner -->
-            <div class="thesis-banner">
-                <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #93c5fd; margin-bottom: 4px;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
-                <div style="color: #ffffff; font-size: 1.05rem; line-height: 1.4;">{thesis_title}</div>
+            <div class="thesis-banner" style="background: rgba(255, 255, 255, 0.025); border: 1px solid var(--border-color); color: var(--text-secondary);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px;">
+                    <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;">🔭 วิสัยทัศน์และธีมการเติบโตหลักในอนาคต (Growth Thesis):</div>
+                    {f"<span class='text-muted small' style='font-size:0.72rem; font-weight:normal;'>บันทึกเขียนเอง อัปเดต {fo['curated_as_of']}</span>" if fo.get('curated_as_of') else ""}
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.4;">{thesis_title}</div>
             </div>
 
             <!-- Key Metrics Strip -->
@@ -1472,17 +1570,18 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             <div class="outlook-grid-2">
                 <div class="outlook-subcard" style="border-top: 3px solid var(--emerald);">
                     <div class="subcard-title text-emerald">
-                        <span>🚀 4 ปัจจัยขับเคลื่อนการเติบโตในอนาคต (1-12 เดือนข้างหน้า)</span>
+                        <span>📈 4 ปัจจัยขับเคลื่อนการเติบโตในอนาคต (1-12 เดือนข้างหน้า)</span>
                     </div>
                     <ul class="outlook-list drivers">
                         {drivers_li}
                     </ul>
                 </div>
                 <div class="outlook-subcard" style="border-top: 3px solid var(--rose);">
-                    <div class="subcard-title text-rose">
+                    <div class="subcard-title text-rose" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
                         <span>🔍 สาเหตุที่แท้จริงที่ทำให้ราคาพักตัว / ติดลบ (Drawdown Root Cause)</span>
+                        {f"<span class='text-muted small' style='font-size:0.72rem; font-weight:normal; color:#94a3b8;'>บันทึกเขียนเอง อัปเดต {fo['curated_as_of']}</span>" if fo.get('curated_as_of') else ""}
                     </div>
-                    <ul class="outlook-list drawdown">
+                    <ul class="outlook-list drawdown" style="color: var(--text-secondary);">
                         {drawdown_li}
                     </ul>
                 </div>
@@ -1546,7 +1645,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             <!-- Tailored Strategic Roadmap & Invalidation Risk -->
             <div class="roadmap-callout">
                 <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
-                    🧭 แผนยุทธศาสตร์ฟันธงสำหรับ {t} โดยเฉพาะ (Tailored Gameplan):
+                    🧭 แผนยุทธศาสตร์สำหรับ {t} (แนะนำตามกฎ ไม่ใช่คำสั่ง):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
                     {tailored_roadmap}
@@ -1643,8 +1742,8 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             border: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-secondary);
         }}
 
-        .grid-3-cols {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 24px; }}
-        .grid-2-cols {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 18px; margin-bottom: 24px; }}
+        .grid-3-cols {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px; margin-bottom: 24px; }}
+        .grid-2-cols {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 18px; margin-bottom: 24px; }}
 
         .card {{
             background: var(--bg-card); border: 1px solid var(--border-color);
@@ -1668,8 +1767,8 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
 
         .table-responsive {{ overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 24px; }}
         table {{ width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; background: var(--bg-card); }}
-        th {{ background: rgba(15, 23, 42, 0.95); color: var(--text-secondary); padding: 14px 16px; font-weight: 600; border-bottom: 1px solid var(--border-color); font-size: 0.75rem; text-transform: uppercase; }}
-        td {{ padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); }}
+        th {{ background: rgba(15, 23, 42, 0.95); color: var(--text-secondary); padding: 10px 10px; font-weight: 600; border-bottom: 1px solid var(--border-color); font-size: 0.75rem; text-transform: uppercase; }}
+        td {{ padding: 10px 10px; border-bottom: 1px solid var(--border-subtle); }}
 
         .text-emerald {{ color: var(--emerald); }}
         .text-rose {{ color: var(--rose); }}
@@ -1721,7 +1820,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         }}
         .kpi-strip {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
             gap: 12px;
             margin-bottom: 18px;
         }}
@@ -1733,7 +1832,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         }}
         .outlook-grid-2 {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
             gap: 16px;
             margin-bottom: 18px;
         }}
@@ -1779,7 +1878,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         }}
         .timeline-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
             gap: 12px;
         }}
         .timeline-step {{
@@ -1813,7 +1912,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
         }}
         .ws-targets-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
             gap: 12px;
             margin: 12px 0;
             text-align: center;
@@ -1847,7 +1946,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                 <div class="text-muted">พอร์ต: <strong>{port_name}</strong></div>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <span class="meta-pill">💱 <strong>FX Rate:</strong> {fx:.2f} THB/USD</span>
+                <span class="meta-pill">💱 <strong>FX Rate:</strong> {fx:.2f} THB/USD{fx_badge}</span>
             </div>
         </header>
 
@@ -1876,14 +1975,14 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
                     <tr>
                         <th>Ticker</th>
                         <th>บริษัทและลักษณะธุรกิจ</th>
-                        <th style="text-align: right;">ทุน / ตลาด</th>
+                        <th style="text-align: right;">ทุน (Cost)<br><span style="font-weight: normal; font-size: 0.75rem; opacity: 0.8;">ตลาด (Market)</span></th>
                         <th style="text-align: right;">ขาดทุน (%)</th>
                         <th style="text-align: right;">แนวรับ / แนวต้าน</th>
                         <th style="text-align: right;">ดีดคืนทุน</th>
                         <th style="text-align: right;">เป้าหมายสถาบัน (Upside)</th>
                         <th style="text-align: center;">งบการเงิน (YoY)</th>
                         <th style="text-align: center;">ปฏิทินงบ</th>
-                        <th>แผนแนะนำที่ปฏิบัติได้จริง</th>
+                        <th>แผนแนะนำที่ปฏิบัติได้จริง <span class="badge badge-neutral" style="font-size:0.7rem; font-weight:normal;">แนะนำตามกฎ ไม่ใช่คำสั่ง</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1892,7 +1991,7 @@ def generate_recovery_html(summary: Dict[str, Any]) -> str:
             </table>
         </div>
 
-        <h3 style="margin: 32px 0 16px 0;">🛠️ 2. แผนปฏิบัติการแก้ขาดทุนเจาะลึกรายตัว (Actionable Playbooks)</h3>
+        <h3 style="margin: 32px 0 16px 0;">🛠️ 2. แผนปฏิบัติการแก้ขาดทุนเจาะลึกรายตัว (Actionable Playbooks) <span class="badge badge-neutral" style="font-size:0.75rem; font-weight:normal; vertical-align:middle;">แนะนำตามกฎ ไม่ใช่คำสั่ง</span></h3>
         {deep_dive_cards}
 
         <div class="card" style="margin-top: 24px;">

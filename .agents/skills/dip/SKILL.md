@@ -59,7 +59,8 @@ description: Scans US Top 100 stocks (S&P 100 + Nasdaq 100) for pullback-in-uptr
 * **RSI Hook.** RSI ยกหัวจากต่ำกว่า 40 ให้ผลตอบแทน 20 วันดีขึ้นเล็กน้อย.
 
 ส่วนที่เป็นตัวกรองตามกลยุทธ์ แต่ยังไม่ผ่าน backtest:
-* RSI รายวัน ≤ 35, RSI รายสัปดาห์ ≥ 45, Stoch RSI cross, MACD tick up, MFI และ ADX Falling Knife Guard.
+* RSI รายวัน ≤ 35, RSI รายสัปดาห์ ≥ 45, Stoch RSI cross, MACD tick up, MFI และ ADX (เก็บเป็น tag ข้อมูลประกอบ ไม่คิดคะแนนและไม่ตัดสิทธิ์หุ้น).
+* Plunge Guard ป้องกันมีดหล่น (ตัดหุ้นวันทิ้งตัว change ≤ -3.0% หรือแท่งแดง change ≤ -1.5%) และ Earnings Guard 14 วัน.
 * ถ้าผู้ใช้ถามว่าตัวไหนแม่น ให้ตอบตามผล backtest. ห้ามอ้างว่าตัวกรองเหล่านี้พิสูจน์แล้ว.
 
 คะแนนพื้นฐานมาจาก `score_fundamentals()` ใน `src/scoring.py` ตัวเดียวกับทุกหน้า.

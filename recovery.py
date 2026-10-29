@@ -13,11 +13,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from src.fmt import money, pct
 from src.portfolio import load_portfolio, cost_basis
-from src.fx import resolve_usdthb
+from src.fx import FALLBACK_USDTHB, resolve_usdthb, resolve_usdthb_with_source
 from src.tradingview import fetch_screener_data
 from src.news import get_catalyst_breakdown, fetch_batch_catalysts
 from src.profiles import get_business_summary
+from src.screener import trade_levels
 from src.html_report import generate_recovery_html
 from src.scoring import EARNINGS_GUARD_DAYS, format_score, score_fundamentals, score_stock, score_timing
 
@@ -85,7 +87,14 @@ from src.outlook import get_forward_outlook
 
 
 
-def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_cost: Optional[float] = None, portfolio_path: Optional[str] = None) -> Dict[str, Any]:
+def analyze_recovery(
+    ticker: str,
+    custom_shares: Optional[float] = None,
+    custom_cost: Optional[float] = None,
+    portfolio_path: Optional[str] = None,
+    market_row: Optional[Dict[str, Any]] = None,
+    catalysts: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
     """
     Compute quantitative recovery plans, fundamentals, earnings proximity, news, and business summary.
     """
@@ -112,22 +121,25 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
     name = pos.get("name", ticker.upper()) if pos else ticker.upper()
 
     symbol_tv = f"{exchange}:{ticker.upper()}"
-    market_data_list = fetch_screener_data([symbol_tv])
-    if not market_data_list and exchange == "NASDAQ":
-        # Try NYSE fallback
-        alt_data = fetch_screener_data([f"NYSE:{ticker.upper()}"])
-        if alt_data:
-            market_data_list = alt_data
-            exchange = "NYSE"
-            symbol_tv = f"NYSE:{ticker.upper()}"
-    if not market_data_list:
-        raise ValueError(f"Unable to fetch market data for {symbol_tv} from TradingView.")
-
-    data = market_data_list[0]
+    if market_row is not None:
+        data = market_row
+    else:
+        market_data_list = fetch_screener_data([symbol_tv])
+        if not market_data_list and exchange == "NASDAQ":
+            # Try NYSE fallback
+            alt_data = fetch_screener_data([f"NYSE:{ticker.upper()}"])
+            if alt_data:
+                market_data_list = alt_data
+                exchange = "NYSE"
+                symbol_tv = f"NYSE:{ticker.upper()}"
+        if not market_data_list:
+            raise ValueError(f"Unable to fetch market data for {symbol_tv} from TradingView.")
+        data = market_data_list[0]
     close = data.get("close") or 0.0
     if close <= 0:
         raise ValueError(f"No valid close price for {symbol_tv} from TradingView.")
-    atr = data.get("ATR") or (close * 0.03)
+    raw_atr = data.get("ATR")
+    atr = raw_atr if raw_atr else (close * 0.03)
     sma20 = data.get("SMA20") or 0.0
     sma50 = data.get("SMA50") or 0.0
     sma200 = data.get("SMA200") or 0.0
@@ -171,43 +183,20 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
     biz_summary = get_business_summary(ticker, sector=sector, industry=industry)
 
     # Catalysts & News (Bullish vs Bearish)
-    catalysts = get_catalyst_breakdown(ticker, max_items=4)
-
-    # Technical ATR Bands, Stop-Loss & Key Support Levels
-    target_rebound_1atr = close + (1.0 * atr)
-    target_rebound_2atr = close + (2.0 * atr)
-    hard_stop_loss = round(close - (1.5 * atr), 2)
-
-    if sma200 > 0 and sma200 < close and (close - sma200) / close <= 0.08:
-        key_support = round(sma200, 2)
-        support_desc = "เส้น 200 วัน (SMA 200)"
-    elif bb_lower > 0 and bb_lower < close:
-        key_support = round(bb_lower, 2)
-        support_desc = "ขอบล่าง Bollinger Band"
+    if catalysts is not None:
+        cat_breakdown = catalysts
     else:
-        key_support = round(hard_stop_loss, 2)
-        support_desc = "แนวรับความผันผวน 1.5 ATR"
+        cat_breakdown = get_catalyst_breakdown(ticker, max_items=4)
 
-    # Key Resistance Levels
-    bb_upper = data.get("BB.upper") or 0.0
-    if sma200 > 0 and sma200 > close:
-        key_resistance = round(sma200, 2)
-        resistance_desc = "เส้น 200 วัน (SMA 200)"
-    elif sma20 > 0 and sma20 > close:
-        key_resistance = round(sma20, 2)
-        resistance_desc = "เส้น 20 วัน (SMA 20)"
-    elif sma50 > 0 and sma50 > close:
-        key_resistance = round(sma50, 2)
-        resistance_desc = "เส้น 50 วัน (SMA 50)"
-    elif bb_upper > 0 and bb_upper > close:
-        key_resistance = round(bb_upper, 2)
-        resistance_desc = "ขอบบน Bollinger Band"
-    elif data.get("price_target_average") and data.get("price_target_average") > close:
-        key_resistance = round(data.get("price_target_average"), 2)
-        resistance_desc = "ราคาเป้าหมายเฉลี่ยสถาบัน"
-    else:
-        key_resistance = round(target_rebound_2atr, 2)
-        resistance_desc = "เป้าหมายรีบาวด์ 2.0 ATR"
+    # Technical Levels (Support, Resistance, Stop-Loss via unified trade_levels)
+    levels = trade_levels(data)
+    hard_stop_loss = levels["stop_loss"]
+    key_support = levels["key_support"]
+    support_desc = levels["support_desc"]
+    key_resistance = levels["key_resistance"]
+    resistance_desc = levels["resistance_desc"]
+    target_rebound_1atr = round(close + (1.0 * raw_atr), 2) if raw_atr else None
+    target_rebound_2atr = round(close + (2.0 * raw_atr), 2) if raw_atr else None
 
     # DCA Scenarios
     shares_add_a = shares * 0.5
@@ -234,17 +223,20 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         action_verdict = "🟢 Smart DCA เมื่อคอนเฟิร์มฐาน (พื้นฐานโตแกร่ง ทยอยดึงทุนต่ำได้)"
         dca_permitted = True
         primary_playbook = "Smart DCA"
-        layman_action = f"หุ้นตัวนี้ธุรกิจโตแรงมาก การตกใจของราคาเป็นโอกาสสะสม รอให้แท่งเทียนรายวันปิดเขียวที่แนวรับ ${key_support:.2f} ({support_desc}) ก่อนแล้วค่อยแบ่งเงินซื้อเพิ่มเพื่อดึงต้นทุนลง."
+        layman_action = f"หุ้นตัวนี้ธุรกิจโตแรงมาก การตกใจของราคาเป็นโอกาสสะสม รอให้แท่งเทียนรายวันปิดเขียวที่แนวรับ {curr_sym}{key_support:.2f} ({support_desc}) ก่อนแล้วค่อยแบ่งเงินซื้อเพิ่มเพื่อดึงต้นทุนลง."
     elif avg_cost <= sma20 and sma20 > 0:
         action_verdict = "🎯 Rebound Exit (ทุนต่ำกว่า SMA20 รอเด้งออกเท่าทุน ไม่เติมเงิน)"
         dca_permitted = False
         primary_playbook = "Rebound Exit"
         layman_action = "ต้นทุนอยู่ใกล้แนวต้านมาก ไม่ต้องควักเงินเติมเพิ่ม แค่รอราคาเด้งทดสอบทุนแล้วตั้งขายคืนเงินต้นกลับมา."
     elif fundamentals["quality_score"] == 1:
-        action_verdict = "🔄 Capital Rotation (กำไรหดตัว โยกเงินไปหุ้นผู้นำขาขึ้น)"
+        fund_score = fundamentals.get("fundamental")
+        metrics_dict = fund_score.get("metrics", {}) if isinstance(fund_score, dict) else (getattr(fund_score, "metrics", {}) or {})
+        weak = ", ".join(m["label"] for m in metrics_dict.values() if m.get("points") == 0) or "พื้นฐานอ่อนแอ"
+        action_verdict = f"🔄 Capital Rotation ({weak} โยกเงินไปหุ้นผู้นำขาขึ้น)"
         dca_permitted = False
         primary_playbook = "Capital Rotation"
-        layman_action = "กำไรของบริษัทเริ่มชะลอตัวลงอย่างชัดเจน ไม่ควรจมเงินไว้ แนะนำตัดขาดทุนแล้วโยกเงินไปเข้าหุ้นผู้นำขาขึ้นที่แข็งแรงกว่า."
+        layman_action = f"พื้นฐานของบริษัทมีจุดอ่อน ({weak}) ไม่ควรจมเงินไว้ แนะนำตัดขาดทุนแล้วโยกเงินไปเข้าหุ้นผู้นำขาขึ้นที่แข็งแรงกว่า."
     else:
         action_verdict = f"🛡️ ถือติดตามแนวรับ {curr_sym}{key_support:.2f} (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)"
         dca_permitted = False
@@ -281,7 +273,7 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         "unrealized_pl_pct": unrealized_pl_pct,
         "pct_to_breakeven": pct_to_breakeven,
         "rsi": round(rsi, 2) if rsi is not None else None,
-        "atr": round(atr, 2),
+        "atr": round(raw_atr, 2) if raw_atr else None,
         "key_support": key_support,
         "support_desc": support_desc,
         "key_resistance": key_resistance,
@@ -292,15 +284,15 @@ def analyze_recovery(ticker: str, custom_shares: Optional[float] = None, custom_
         "ema50": round(ema50, 2),
         "sma200": round(sma200, 2),
         "bb_lower": round(bb_lower, 2),
-        "target_rebound_1atr": round(target_rebound_1atr, 2),
-        "target_rebound_2atr": round(target_rebound_2atr, 2),
+        "target_rebound_1atr": round(target_rebound_1atr, 2) if target_rebound_1atr is not None else None,
+        "target_rebound_2atr": round(target_rebound_2atr, 2) if target_rebound_2atr is not None else None,
         "days_to_earnings": days_to_earnings,
         "earnings_date_str": earnings_date_str,
         "is_earnings_imminent": is_earnings_imminent,
         "fundamentals": fundamentals,
         "stock_score": stock_score,
         "dist_ema200_pct": round(dist_ema200_pct, 2) if dist_ema200_pct is not None else None,
-        "catalysts": catalysts,
+        "catalysts": cat_breakdown,
         "forward_outlook": forward_outlook,
         "price_target_average": round(target_avg, 2) if target_avg else None,
         "price_target_high": round(target_high, 2) if target_high else None,
@@ -337,7 +329,7 @@ def analyze_all_underwater(portfolio_path: Optional[str] = None) -> Dict[str, An
     portfolio = load_portfolio(portfolio_path)
     holdings = portfolio.get("holdings", [])
     base_currency = str(portfolio.get("base_currency", "USD")).upper()
-    fx_rate = resolve_usdthb(portfolio.get("fx_rate_usd_thb"))
+    fx_rate, fx_source = resolve_usdthb_with_source(portfolio.get("fx_rate_usd_thb"))
     curr_sym = "฿" if base_currency == "THB" else "$"
 
     symbols = [f"{h.get('exchange', 'NASDAQ')}:{h['ticker']}" for h in holdings]
@@ -366,17 +358,26 @@ def analyze_all_underwater(portfolio_path: Optional[str] = None) -> Dict[str, An
         unrealized_pl_pct = (unrealized_pl / total_cost * 100.0) if total_cost > 0 else 0.0
 
         if unrealized_pl < 0:
-            rec = analyze_recovery(t, custom_shares=shares, custom_cost=avg_cost, portfolio_path=portfolio_path)
+            rec = analyze_recovery(
+                t,
+                custom_shares=shares,
+                custom_cost=avg_cost,
+                portfolio_path=portfolio_path,
+                market_row=d,
+                catalysts=all_catalysts.get(t),
+            )
             if base_currency == "THB":
-                rec["loss_thb"] = abs(unrealized_pl)
-                rec["loss_usd"] = abs(unrealized_pl) / fx_rate
-                total_underwater_loss_thb += abs(unrealized_pl)
-                total_underwater_loss_usd += abs(unrealized_pl) / fx_rate
+                loss_thb = abs(unrealized_pl)
+                loss_usd = abs(unrealized_pl) / fx_rate if fx_rate > 0 else 0.0
             else:
-                rec["loss_usd"] = abs(unrealized_pl)
-                rec["loss_thb"] = abs(unrealized_pl) * fx_rate
-                total_underwater_loss_usd += abs(unrealized_pl)
-                total_underwater_loss_thb += abs(unrealized_pl) * fx_rate
+                cost_thb = float(h.get("cost_thb") or (total_cost * fx_rate))
+                loss_thb = cost_thb - (shares * close * fx_rate)
+                loss_usd = abs(unrealized_pl)
+
+            rec["loss_usd"] = loss_usd
+            rec["loss_thb"] = loss_thb
+            total_underwater_loss_usd += loss_usd
+            total_underwater_loss_thb += loss_thb
 
             if t in all_catalysts:
                 rec["catalysts"] = all_catalysts[t]
@@ -389,6 +390,7 @@ def analyze_all_underwater(portfolio_path: Optional[str] = None) -> Dict[str, An
         "base_currency": base_currency,
         "curr_sym": curr_sym,
         "fx_rate": fx_rate,
+        "fx_source": fx_source,
         "total_underwater_count": len(underwater_list),
         "total_underwater_loss_usd": total_underwater_loss_usd,
         "total_underwater_loss_thb": total_underwater_loss_thb,
@@ -548,10 +550,12 @@ def generate_portfolio_recovery_report(summary: Dict[str, Any]) -> str:
     """
     curr_sym = summary.get("curr_sym", "฿" if summary.get("base_currency") == "THB" else "$")
     curr_code = summary.get("base_currency", "USD")
+    thb_loss_str = money(-abs(summary.get('total_underwater_loss_thb', 0.0)), 'THB', signed=True)
+    usd_loss_str = money(-abs(summary.get('total_underwater_loss_usd', 0.0)), 'USD', signed=True)
     if curr_code == "THB":
-        loss_header = f"**ยอดขาดทุนรวมที่ยังไม่รับรู้:** -฿{summary['total_underwater_loss_thb']:,.2f} THB"
+        loss_header = f"**ยอดขาดทุนรวมที่ยังไม่รับรู้:** {thb_loss_str} THB"
     else:
-        loss_header = f"**ยอดขาดทุนรวมที่ยังไม่รับรู้:** -${summary['total_underwater_loss_usd']:,.2f} USD (-฿{summary['total_underwater_loss_thb']:,.2f} THB)"
+        loss_header = f"**ยอดขาดทุนรวมที่ยังไม่รับรู้:** {usd_loss_str} USD ({thb_loss_str} THB)"
 
     lines = [
         "# 🚑 แดชบอร์ดวิเคราะห์แก้ติดลบในพอร์ตโฟลิโอ 360 องศา (Portfolio Recovery Dashboard)",

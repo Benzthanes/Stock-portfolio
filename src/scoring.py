@@ -144,8 +144,8 @@ def score_fundamentals(
 # (173 tickers, 2023-2026, see data/backtest_scoring.json). EMA200 distance moved the 60-day
 # drawdown (0..10% above: about 1.6 points shallower, more than 10% below: 2.7 points deeper).
 # An RSI hook from below 40 added about 0.8% to the 20-day return, so it is reported as an
-# entry signal rather than folded into holding health. VFI, WAE, Squeeze, UT Bot, Chandelier,
-# WaveTrend and Lorentzian showed no stable edge, so they earn no points.
+# entry signal rather than folded into holding health. Squeeze and Chandelier showed no stable
+# edge, so they earn no points. VFI, WAE, UT Bot, WaveTrend, Lorentzian and Hull were removed.
 TIMING_RULES: Dict[str, tuple] = {
     "ema200_dist": (6, [
         Band(None, -10.0, 0, "⚠️ หลุด EMA200 เกิน 10% ({v:+.1f}%) เสี่ยง Drawdown ลึก"),
@@ -279,3 +279,92 @@ def score_stock(
         total=total, grade=grade, stars=STARS_BY_GRADE[grade], pillars=pillars, coverage=coverage,
         earnings_guard=earnings_guard, reasons=reasons, fundamental=fundamental, timing=timing,
     )
+
+
+class PortfolioHealthBand(NamedTuple):
+    min_score: float
+    grade: str
+    status: str
+    desc: str
+
+
+PORTFOLIO_HEALTH_BANDS: tuple = (
+    PortfolioHealthBand(
+        85.0,
+        "ดีมาก",
+        "🟢 ยอดเยี่ยม แข็งแกร่งมาก",
+        "พอร์ตมีความแข็งแกร่งสูงมาก หุ้นส่วนใหญ่มีพื้นฐานดี มีกำไร และไม่มีความเสี่ยงรุนแรง.",
+    ),
+    PortfolioHealthBand(
+        70.0,
+        "ดี",
+        "🟢 ปลอดภัย แข็งแกร่ง",
+        "สุขภาพพอร์ตแข็งแรงดี สามารถถือลงทุนระยะยาวได้อย่างสบายใจ.",
+    ),
+    PortfolioHealthBand(
+        55.0,
+        "พอใช้",
+        "🟡 ปานกลาง ควรปรับสมดุล",
+        "พอร์ตอยู่ในระดับประคองตัว ควรหาจังหวะลดการกระจุกตัวและควบคุมหุ้นที่ขาดทุน.",
+    ),
+    PortfolioHealthBand(
+        40.0,
+        "ต้องระวัง",
+        "🟠 เปราะบาง มีความเสี่ยงขาดทุน",
+        "พอร์ตเริ่มมีความเสี่ยง มีหุ้นติดลบหลายตัว ต้องวางแผนแก้ดอย.",
+    ),
+    PortfolioHealthBand(
+        0.0,
+        "เสี่ยง",
+        "🔴 เสี่ยงสูง ต้องรีบปรับพอร์ต",
+        "พอร์ตขาดทุนหนักหรือมีความเสี่ยงรุนแรง ต้องใช้แผนกู้พอร์ตทันที.",
+    ),
+)
+
+
+def evaluate_portfolio_health(score: float) -> PortfolioHealthBand:
+    """Evaluates portfolio-level health score against PORTFOLIO_HEALTH_BANDS."""
+    for band in PORTFOLIO_HEALTH_BANDS:
+        if score >= band.min_score:
+            return band
+    return PORTFOLIO_HEALTH_BANDS[-1]
+
+
+REBALANCE_WEIGHTS: Dict[str, float] = {
+    "stars_multiplier": 2.5,
+    "value_zone": 3.5,
+    "above_ema200": 2.0,
+    "etf_priority": 4.0,
+    "under_allocated": 2.0,
+    "under_allocated_max_weight_pct": 5.0,
+    "upside_bonus": 1.5,
+    "upside_bonus_min_pct": 15.0,
+    "fundamental_multiplier": 6.0,
+}
+
+
+def compute_rebalance_score(
+    stars: int,
+    in_value_zone: bool,
+    dist_ema200_pct: Optional[float],
+    is_etf: bool,
+    weight_pct: float,
+    target_upside_pct: Optional[float],
+    fundamental_pct: Optional[float],
+) -> float:
+    """Computes rebalance score for eligible holding to receive fresh cash allocation."""
+    score = float(stars) * REBALANCE_WEIGHTS["stars_multiplier"]
+    if in_value_zone:
+        score += REBALANCE_WEIGHTS["value_zone"]
+    if dist_ema200_pct is not None and dist_ema200_pct >= 0:
+        score += REBALANCE_WEIGHTS["above_ema200"]
+    if is_etf:
+        score += REBALANCE_WEIGHTS["etf_priority"]
+    if weight_pct < REBALANCE_WEIGHTS["under_allocated_max_weight_pct"]:
+        score += REBALANCE_WEIGHTS["under_allocated"]
+    if target_upside_pct is not None and target_upside_pct > REBALANCE_WEIGHTS["upside_bonus_min_pct"]:
+        score += REBALANCE_WEIGHTS["upside_bonus"]
+    if fundamental_pct is not None:
+        score += (fundamental_pct / 100.0) * REBALANCE_WEIGHTS["fundamental_multiplier"]
+    return round(score, 2)
+
