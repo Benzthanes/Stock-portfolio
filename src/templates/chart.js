@@ -4510,6 +4510,14 @@
             if (btnTable) btnTable.classList.add('active');
             if (chartPanel) chartPanel.style.display = 'none';
             if (tablePanel) tablePanel.style.display = 'block';
+            if (window.innerWidth <= 640) {
+                if (typeof finMobileView === 'function') finMobileView('table');
+                const scrollEl = document.querySelector('.fin-table-scroll');
+                if (scrollEl) {
+                    scrollEl.scrollLeft = scrollEl.scrollWidth;
+                    setTimeout(() => { if (scrollEl) scrollEl.scrollLeft = scrollEl.scrollWidth; }, 50);
+                }
+            }
         } else {
             if (btnAll) btnAll.classList.add('active');
             if (btnTable) btnTable.classList.remove('active');
@@ -4835,97 +4843,324 @@
         wrap.innerHTML = svgContent;
     }
 
-    function renderFinancialStatementTable(quarters) {
-        const container = document.getElementById('fin_table_container');
-        if (!container || !quarters || quarters.length === 0) return;
-
-        // Header Columns
-        let thCols = '<th class="th-metric">รายการตัวชี้วัด (Financial Metrics)</th>';
-        quarters.forEach((q, idx) => {
-            const isLatest = idx === quarters.length - 1;
-            const latestBadge = isLatest ? ' <span style="font-size:0.65rem; background:#3b82f6; color:#fff; padding:1px 5px; border-radius:3px;">ล่าสุด</span>' : '';
-            thCols += `<th class="th-quarter ${isLatest ? 'th-latest' : ''}"><div>${q.quarter_label}${latestBadge}</div><div style="font-size:0.65rem; color:#64748b; font-weight:normal; margin-top:2px;">${q.date}</div></th>`;
-        });
-
-        // One metric list feeds both the desktop table and the phone view.
-        const metrics = [
-            ['💰 รายได้รวม (Total Revenue)', q => `<strong>${q.revenue_fmt || '-'}</strong>`],
-            ['⚡ เติบโต QoQ (%)', q => _renderGrowthBadge(q.rev_growth_qoq), true],
-            ['📈 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true],
-            ['📈 กำไรขั้นต้น (Gross Profit)', q => q.gross_profit_fmt || '-'],
-            ['⚙️ อัตรากำไรขั้นต้น (Gross Margin)', q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-', true],
-            ['🏢 กำไรจากการดำเนินงาน (Operating Income)', q => q.operating_income_fmt || '-'],
-            ['🎯 กำไรสุทธิ (Net Income)', q => {
+    const FINANCIAL_METRICS_SCHEMA = [
+        {
+            key: 'revenue',
+            label_th: '💰 รายได้รวม (Total Revenue)',
+            trend_title: '💰 รายได้รวม',
+            short_en: 'Revenue',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'ยอดขายหรือรายได้รวมทั้งหมดของบริษัทในไตรมาสนั้น. ยิ่งเติบโตต่อเนื่องยิ่งแสดงถึงธุรกิจที่มีการขยายตัว.',
+            getter: q => `<strong>${q.revenue_fmt || '-'}</strong>`,
+            trend_fmt: q => q.revenue_fmt || '-',
+        },
+        {
+            key: 'rev_growth_qoq',
+            label_th: '⚡ เติบโต QoQ (%)',
+            trend_title: '⚡ เติบโต QoQ (%)',
+            short_en: 'Rev QoQ',
+            is_sub: true,
+            has_trend: false,
+            help_th: 'อัตราการเติบโตของรายได้เทียบกับไตรมาสก่อนหน้า. ใช้ดูโมเมนตัมและการเร่งตัวของธุรกิจระยะสั้น.',
+            getter: q => _renderGrowthBadge(q.rev_growth_qoq),
+            trend_fmt: null,
+        },
+        {
+            key: 'rev_growth_yoy',
+            label_th: '📈 เติบโต YoY (%)',
+            trend_title: '📈 เติบโต YoY (%)',
+            short_en: 'Rev YoY',
+            is_sub: true,
+            has_trend: false,
+            help_th: 'อัตราการเติบโตของรายได้เทียบกับไตรมาสเดียวกันของปีก่อนหน้า. ช่วยตัดผลกระทบจากฤดูกาลของธุรกิจ.',
+            getter: q => _renderGrowthBadge(q.rev_growth_yoy),
+            trend_fmt: null,
+        },
+        {
+            key: 'gross_profit',
+            label_th: '📈 กำไรขั้นต้น (Gross Profit)',
+            trend_title: '📈 กำไรขั้นต้น',
+            short_en: 'GP',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'รายได้รวมหักด้วยต้นทุนขายตรง. บอกความสามารถในการสร้างกำไรเบื้องต้นจากตัวสินค้าหรือบริการ.',
+            getter: q => q.gross_profit_fmt || '-',
+            trend_fmt: q => q.gross_profit_fmt || '-',
+        },
+        {
+            key: 'gross_margin',
+            label_th: '⚙️ อัตรากำไรขั้นต้น (Gross Margin)',
+            trend_title: '⚙️ อัตรากำไรขั้นต้น',
+            short_en: 'GM %',
+            is_sub: true,
+            has_trend: true,
+            help_th: 'กำไรขั้นต้นหารรายได้รวม. ยิ่งสูงยิ่งมีอำนาจตั้งราคาและคุมต้นทุนการผลิตได้ดี.',
+            getter: q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-',
+            trend_fmt: q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-',
+        },
+        {
+            key: 'operating_income',
+            label_th: '🏢 กำไรจากการดำเนินงาน (Operating Income)',
+            trend_title: '🏢 กำไรจากการดำเนินงาน',
+            short_en: 'Op Income',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'กำไรหลังหักต้นทุนขายและค่าใช้จ่ายดำเนินงานทั้งหมด. สะท้อนประสิทธิภาพของธุรกิจหลักอย่างแท้จริง.',
+            getter: q => q.operating_income_fmt || '-',
+            trend_fmt: q => q.operating_income_fmt || '-',
+        },
+        {
+            key: 'net_income',
+            label_th: '🎯 กำไรสุทธิ (Net Income)',
+            trend_title: '🎯 กำไรสุทธิ',
+            short_en: 'NI',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'กำไรบรรทัดสุดท้ายหลังหักดอกเบี้ยและภาษี. เป็นกำไรจริงส่วนที่เป็นของผู้ถือหุ้นบริษัท.',
+            getter: q => {
                 const ni = q.net_income;
                 const col = (ni != null && ni >= 0) ? '#34d399' : '#fb7185';
                 return `<strong style="color:${col}">${q.net_income_fmt || '-'}</strong>`;
-            }],
-            ['📊 อัตรากำไรสุทธิ (Net Margin)', q => {
+            },
+            trend_fmt: q => q.net_income_fmt || '-',
+        },
+        {
+            key: 'net_margin',
+            label_th: '📊 อัตรากำไรสุทธิ (Net Margin)',
+            trend_title: '📊 อัตรากำไรสุทธิ',
+            short_en: 'NM %',
+            is_sub: true,
+            has_trend: true,
+            help_th: 'กำไรสุทธิหารด้วยรายได้รวม. เกิน 15% ถือว่าแข็งแกร่งมากในการแปลงยอดขายเป็นกำไรเข้ากระเป๋า.',
+            getter: q => {
                 const m = q.net_margin;
                 if (m == null) return '-';
                 const col = m >= 15 ? '#34d399' : (m >= 0 ? '#38bdf8' : '#fb7185');
                 return `<span style="color:${col}; font-weight:700;">${m.toFixed(1)}%</span>`;
-            }, true],
-            ['💵 กำไรต่อหุ้น (Diluted EPS)', q => {
+            },
+            trend_fmt: q => q.net_margin != null ? `${q.net_margin.toFixed(1)}%` : '-',
+        },
+        {
+            key: 'eps',
+            label_th: '💵 กำไรต่อหุ้น (Diluted EPS)',
+            trend_title: '💵 กำไรต่อหุ้น (EPS)',
+            short_en: 'EPS',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'กำไรสุทธิต่อหนึ่งหุ้นแบบปรับลด. เป็นตัวเลขสำคัญในการวัดมูลค่าหุ้นและจ่ายเงินปันผล.',
+            getter: q => {
                 const eps = q.eps;
                 if (eps == null) return '-';
                 const epsBadge = q.eps_growth_yoy != null ? ` ${_renderGrowthBadge(q.eps_growth_yoy)}` : '';
                 return `$${eps.toFixed(2)}${epsBadge}`;
-            }],
-            ['🌊 กระแสเงินสดอิสระ (FCF)', q => `<span style="color:#c084fc;">${q.fcf_fmt || '-'}</span>`],
-            ['💳 หนี้สินรวม (Total Debt)', q => q.total_debt_fmt || '-'],
-            ['🏛️ ส่วนของผู้ถือหุ้น (Stockholders Equity)', q => q.stockholders_equity_fmt || '-'],
-            ['⚖️ หนี้สินต่อทุน (D/E Ratio)', q => {
+            },
+            trend_fmt: q => q.eps != null ? `$${q.eps.toFixed(2)}` : '-',
+        },
+        {
+            key: 'fcf',
+            label_th: '🌊 กระแสเงินสดอิสระ (FCF)',
+            trend_title: '🌊 กระแสเงินสดอิสระ (FCF)',
+            short_en: 'FCF',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'เงินสดจากการดำเนินงานหักงบลงทุนสินทรัพย์. บ่งบอกสภาพคล่องเงินสดแท้จริงพร้อมจ่ายปันผลหรือซื้อหุ้นคืน.',
+            getter: q => `<span style="color:#c084fc;">${q.fcf_fmt || '-'}</span>`,
+            trend_fmt: q => q.fcf_fmt || '-',
+        },
+        {
+            key: 'total_debt',
+            label_th: '💳 หนี้สินรวม (Total Debt)',
+            trend_title: '💳 หนี้สินรวม',
+            short_en: 'Debt',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'หนี้สินรวมที่มีภาระดอกเบี้ยของบริษัท. ควรติดตามไม่ให้เพิ่มสูงเกินความสามารถในการชำระ.',
+            getter: q => q.total_debt_fmt || '-',
+            trend_fmt: q => q.total_debt_fmt || '-',
+        },
+        {
+            key: 'stockholders_equity',
+            label_th: '🏛️ ส่วนของผู้ถือหุ้น (Stockholders Equity)',
+            trend_title: '🏛️ ส่วนของผู้ถือหุ้น',
+            short_en: 'Equity',
+            is_sub: false,
+            has_trend: true,
+            help_th: 'มูลค่าสินทรัพย์สุทธิที่เป็นของเจ้าของ. บริษัทที่ดีจะมีส่วนของผู้ถือหุ้นเติบโตขึ้นเรื่อยๆ.',
+            getter: q => q.stockholders_equity_fmt || '-',
+            trend_fmt: q => q.stockholders_equity_fmt || '-',
+        },
+        {
+            key: 'debt_to_equity',
+            label_th: '⚖️ หนี้สินต่อทุน (D/E Ratio)',
+            trend_title: '⚖️ หนี้สินต่อทุน (D/E)',
+            short_en: 'D/E',
+            is_sub: true,
+            has_trend: true,
+            help_th: 'หนี้สินรวมต่อส่วนผู้ถือหุ้น. ต่ำกว่า 1 ถือว่าหนี้น้อย หากเกิน 2.5 ควรระวังความเสี่ยงด้านภาระหนี้.',
+            getter: q => {
                 const de = q.debt_to_equity;
                 if (de == null) return '-';
                 const col = de > 2.5 ? '#fb7185' : (de <= 1.0 ? '#34d399' : '#f8fafc');
                 return `<span style="color:${col}; font-weight:700;">${de.toFixed(2)}x</span>`;
-            }, true],
-            ['🏷️ P/E อ้างอิงไตรมาส', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-', true],
-        ];
+            },
+            trend_fmt: q => q.debt_to_equity != null ? `${q.debt_to_equity.toFixed(2)}x` : '-',
+        },
+        {
+            key: 'pe_quarterly',
+            label_th: '🏷️ P/E อ้างอิงไตรมาส',
+            trend_title: '🏷️ P/E อ้างอิงไตรมาส',
+            short_en: 'P/E',
+            is_sub: true,
+            has_trend: true,
+            help_th: 'ราคาหารด้วย EPS ไตรมาสนั้นคูณ 4. บอกความถูกแพงของหุ้นเทียบกับผลกำไรในไตรมาสนั้น.',
+            getter: q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-',
+            trend_fmt: q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-',
+        },
+    ];
 
+    let currentActiveHelpKey = null;
+
+    function _getOffsetRelativeTo(el, parent) {
+        let top = 0;
+        let left = 0;
+        let curr = el;
+        while (curr && curr !== parent && curr !== document.body) {
+            top += curr.offsetTop || 0;
+            left += curr.offsetLeft || 0;
+            curr = curr.offsetParent;
+        }
+        return { top, left };
+    }
+
+    function toggleFinHelp(event, key) {
+        if (event) {
+            event.stopPropagation();
+            if (event.preventDefault) event.preventDefault();
+        }
+        const panel = document.getElementById('fin_table_panel') || document.body;
+        let popover = document.getElementById('fin_help_popover');
+        if (!popover) {
+            popover = document.createElement('div');
+            popover.id = 'fin_help_popover';
+            popover.className = 'fin-help-popover';
+            popover.style.display = 'none';
+            panel.appendChild(popover);
+        } else if (popover.parentElement !== panel) {
+            panel.appendChild(popover);
+        }
+
+        if (currentActiveHelpKey === key && popover.style.display !== 'none') {
+            closeFinHelp();
+            return;
+        }
+
+        const metric = FINANCIAL_METRICS_SCHEMA.find(m => m.key === key);
+        if (!metric) return;
+
+        currentActiveHelpKey = key;
+        const btn = (event && event.currentTarget) ? event.currentTarget : document.querySelector(`.fin-help-btn[data-key="${key}"]`);
+
+        document.querySelectorAll('.fin-help-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.key === key);
+        });
+
+        popover.innerHTML = `
+            <div class="fin-popover-header">
+                <span class="fin-popover-title">${escapeHtml(metric.label_th)}</span>
+                <button type="button" class="fin-popover-close" onclick="closeFinHelp(event)">&times;</button>
+            </div>
+            <div class="fin-popover-body">${escapeHtml(metric.help_th)}</div>
+        `;
+        popover.style.display = 'block';
+
+        if (btn) {
+            const offsets = _getOffsetRelativeTo(btn, panel);
+            const panelW = panel.clientWidth || 320;
+            const popW = Math.min(270, panelW - 16);
+            popover.style.width = `${popW}px`;
+
+            let left = offsets.left;
+            if (left + popW > panelW - 8) {
+                left = panelW - popW - 8;
+            }
+            if (left < 8) {
+                left = 8;
+            }
+
+            const popH = popover.offsetHeight || 80;
+            let top = offsets.top + (btn.offsetHeight || 14) + 6;
+            // If near bottom of panel (like D/E or P/E), place above the button
+            if (offsets.top > 320 && offsets.top - popH - 6 > 60) {
+                top = offsets.top - popH - 6;
+            }
+
+            popover.style.left = `${Math.round(left)}px`;
+            popover.style.top = `${Math.round(top)}px`;
+        }
+    }
+
+    function closeFinHelp(event) {
+        if (event && event.stopPropagation) {
+            event.stopPropagation();
+        }
+        const popover = document.getElementById('fin_help_popover');
+        if (popover) {
+            popover.style.display = 'none';
+        }
+        currentActiveHelpKey = null;
+        document.querySelectorAll('.fin-help-btn').forEach(b => b.classList.remove('active'));
+    }
+
+    // Dismiss popover on click outside or resize
+    document.addEventListener('click', e => {
+        const pop = document.getElementById('fin_help_popover');
+        if (pop && pop.style.display !== 'none') {
+            if (!e.target.closest('#fin_help_popover') && !e.target.closest('.fin-help-btn')) {
+                closeFinHelp();
+            }
+        }
+    });
+    window.addEventListener('resize', () => {
+        closeFinHelp();
+    });
+
+    function renderFinancialStatementTable(quarters) {
+        const container = document.getElementById('fin_table_container');
+        if (!container || !quarters || quarters.length === 0) return;
+
+        // Ensure popover element exists on document.body
+        let popover = document.getElementById('fin_help_popover');
+        if (!popover) {
+            popover = document.createElement('div');
+            popover.id = 'fin_help_popover';
+            popover.className = 'fin-help-popover';
+            popover.style.display = 'none';
+            document.body.appendChild(popover);
+        }
+
+        // Header Columns
+        let thCols = '<th class="th-metric"><span class="fin-name-desktop">รายการตัวชี้วัด (Financial Metrics)</span><span class="fin-name-mobile">Metric</span></th>';
+        quarters.forEach((q, idx) => {
+            const isLatest = idx === quarters.length - 1;
+            const latestBadge = isLatest ? ' <span class="fin-latest-badge">ล่าสุด</span>' : '';
+            thCols += `<th class="th-quarter ${isLatest ? 'th-latest' : ''}"><div>${q.quarter_label}${latestBadge}</div><div class="fin-th-date">${q.date}</div></th>`;
+        });
+
+        // 14 Rows using the single source of truth schema
         let rowsHtml = '';
-        metrics.forEach(([title, getter, isSub]) => {
-            rowsHtml += `<tr class="${isSub ? 'fin-row-sub' : ''}"><td class="fin-row-header">${title}</td>`;
+        FINANCIAL_METRICS_SCHEMA.forEach(m => {
+            const rowClass = m.is_sub ? 'fin-row-sub' : '';
+            rowsHtml += `<tr class="${rowClass}"><td class="fin-row-header"><span class="fin-metric-cell"><span class="fin-name-desktop">${escapeHtml(m.label_th)}</span><span class="fin-name-mobile">${escapeHtml(m.short_en)}</span><button type="button" class="fin-help-btn" data-key="${m.key}" onclick="toggleFinHelp(event, '${m.key}')" aria-label="คำอธิบาย ${m.short_en}">?</button></span></td>`;
             quarters.forEach((q, idx) => {
                 const isLatest = idx === quarters.length - 1;
-                rowsHtml += `<td class="fin-cell ${isLatest ? 'td-latest' : ''}">${getter(q, idx)}</td>`;
+                rowsHtml += `<td class="fin-cell ${isLatest ? 'td-latest' : ''}">${m.getter(q, idx)}</td>`;
             });
             rowsHtml += `</tr>`;
         });
 
-        // Phone view: pick a quarter, then read its metrics top to bottom.
+        // Phone trend view: one card per metric with an 8-quarter bar strip
         const last = quarters.length - 1;
-        let chips = '';
-        let lists = '';
-        quarters.forEach((q, idx) => {
-            const on = idx === last ? ' active' : '';
-            // Newest quarter first so the selected chip is visible without scrolling.
-            chips = `<button type="button" class="finm-chip${on}" data-q="${idx}" onclick="finMobileSelectQuarter(${idx})">${q.quarter_label}</button>` + chips;
-            let items = '';
-            metrics.forEach(([title, getter, isSub]) => {
-                items += `<div class="finm-row${isSub ? ' finm-sub' : ''}"><span class="finm-label">${title}</span><span class="finm-val">${getter(q, idx)}</span></div>`;
-            });
-            lists += `<div class="finm-list" data-q="${idx}"${idx === last ? '' : ' hidden'}><div class="finm-date">งวด ${q.quarter_label} · ${q.date}</div>${items}</div>`;
-        });
-        // Phone trend view: one card per metric with an 8-quarter bar strip.
-        const money = k => q => q[k + '_fmt'] || '-';
-        const pct = k => q => q[k] != null ? `${q[k].toFixed(1)}%` : '-';
-        const trendDefs = [
-            ['💰 รายได้รวม', 'revenue', money('revenue')],
-            ['📈 กำไรขั้นต้น', 'gross_profit', money('gross_profit')],
-            ['⚙️ อัตรากำไรขั้นต้น', 'gross_margin', pct('gross_margin')],
-            ['🏢 กำไรจากการดำเนินงาน', 'operating_income', money('operating_income')],
-            ['🎯 กำไรสุทธิ', 'net_income', money('net_income')],
-            ['📊 อัตรากำไรสุทธิ', 'net_margin', pct('net_margin')],
-            ['💵 กำไรต่อหุ้น (EPS)', 'eps', q => q.eps != null ? `$${q.eps.toFixed(2)}` : '-'],
-            ['🌊 กระแสเงินสดอิสระ (FCF)', 'fcf', money('fcf')],
-            ['💳 หนี้สินรวม', 'total_debt', money('total_debt')],
-            ['🏛️ ส่วนของผู้ถือหุ้น', 'stockholders_equity', money('stockholders_equity')],
-            ['⚖️ หนี้สินต่อทุน (D/E)', 'debt_to_equity', q => q.debt_to_equity != null ? `${q.debt_to_equity.toFixed(2)}x` : '-'],
-            ['🏷️ P/E อ้างอิงไตรมาส', 'pe_quarterly', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-'],
-        ];
-        // Short label above each bar so the trend reads without tapping.
         const short = (key, v) => {
             if (v == null) return '–';
             if (['gross_margin', 'net_margin', 'pe_quarterly'].includes(key)) return v.toFixed(1);
@@ -4935,8 +5170,6 @@
             if (a >= 1e6) return sign + (a / 1e6).toFixed(0) + 'M';
             return sign + (a / 1e3).toFixed(0) + 'K';
         };
-        // Margins change in percentage points: 36.4% -> 30.9% is "-5.5 จุด",
-        // not "-15.1%", which reads as if profit itself fell or went negative.
         const PP_KEYS = ['gross_margin', 'net_margin'];
         const yoy = (key, idx) => {
             if (idx < 4) return null;
@@ -4947,8 +5180,13 @@
         };
         const LOWER_IS_BETTER = ['total_debt', 'debt_to_equity'];
         const yoyBadge = (key, val) => val == null ? '' : _renderYoYBadge(val, PP_KEYS.includes(key), LOWER_IS_BETTER.includes(key), key === 'pe_quarterly');
+
         let trendCards = '';
-        trendDefs.forEach(([title, key, fmt]) => {
+        const trendMetrics = FINANCIAL_METRICS_SCHEMA.filter(m => m.has_trend);
+        trendMetrics.forEach(m => {
+            const key = m.key;
+            const fmt = m.trend_fmt;
+            const title = m.trend_title || m.label_th;
             const vals = quarters.map(q => q[key]);
             if (vals.every(v => v == null)) return;
             const maxAbs = Math.max(...vals.map(v => Math.abs(v || 0))) || 1;
@@ -4973,42 +5211,57 @@
         const mobileHtml = `
             <div class="finm-wrap">
                 <div class="finm-seg" role="tablist">
-                    <button type="button" class="finm-seg-btn active" data-view="trend" onclick="finMobileView('trend')">📈 แนวโน้ม ${quarters.length} ไตรมาส</button>
-                    <button type="button" class="finm-seg-btn" data-view="quarter" onclick="finMobileView('quarter')">📋 ทีละไตรมาส</button>
+                    <button type="button" class="finm-seg-btn active" data-view="table" onclick="finMobileView('table')">📋 ตาราง</button>
+                    <button type="button" class="finm-seg-btn" data-view="trend" onclick="finMobileView('trend')">📈 แนวโน้ม</button>
                 </div>
-                <div class="finm-view" data-view="trend">
+                <div class="finm-view finm-trend-view" data-view="trend" style="display:none;">
                     <div class="finc-hint">แตะแท่งกราฟเพื่อดูตัวเลขของไตรมาสนั้น</div>
                     ${trendCards}
-                </div>
-                <div class="finm-view" data-view="quarter" hidden>
-                    <div class="finm-chips">${chips}</div>
-                    ${lists}
                 </div>
             </div>`;
 
         container.innerHTML = `
             ${mobileHtml}
-            <div class="fin-table-scroll">
+            <div class="fin-table-scroll" id="fin_table_scroll">
                 <table class="fin-table">
                     <thead><tr>${thCols}</tr></thead>
                     <tbody>${rowsHtml}</tbody>
                 </table>
             </div>
         `;
-    }
 
-    function finMobileSelectQuarter(idx) {
-        const container = document.getElementById('fin_table_container');
-        if (!container) return;
-        container.querySelectorAll('.finm-chip').forEach(b => b.classList.toggle('active', +b.dataset.q === idx));
-        container.querySelectorAll('.finm-list').forEach(l => { l.hidden = +l.dataset.q !== idx; });
+        const scrollEl = container.querySelector('.fin-table-scroll');
+        if (scrollEl) {
+            scrollEl.addEventListener('scroll', () => {
+                closeFinHelp();
+            }, { passive: true });
+
+            if (window.innerWidth <= 640) {
+                scrollEl.scrollLeft = scrollEl.scrollWidth;
+                setTimeout(() => {
+                    if (scrollEl) scrollEl.scrollLeft = scrollEl.scrollWidth;
+                }, 50);
+            }
+        }
     }
 
     function finMobileView(view) {
         const container = document.getElementById('fin_table_container');
         if (!container) return;
         container.querySelectorAll('.finm-seg-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-        container.querySelectorAll('.finm-view').forEach(v => { v.hidden = v.dataset.view !== view; });
+        const tableScroll = container.querySelector('.fin-table-scroll');
+        const trendView = container.querySelector('.finm-trend-view');
+        if (view === 'table') {
+            if (tableScroll) {
+                tableScroll.style.display = 'block';
+                tableScroll.scrollLeft = tableScroll.scrollWidth;
+            }
+            if (trendView) trendView.style.display = 'none';
+        } else {
+            if (tableScroll) tableScroll.style.display = 'none';
+            if (trendView) trendView.style.display = 'block';
+        }
+        closeFinHelp();
     }
 
     function finTrendPick(bar) {
@@ -5020,6 +5273,11 @@
         const y = bar.dataset.y;
         card.querySelector('.finc-yoy').innerHTML = y === '' ? '' : _renderYoYBadge(Number(y), bar.dataset.pp === '1', bar.dataset.inv === '1', bar.dataset.neu === '1');
     }
+
+    window.toggleFinHelp = toggleFinHelp;
+    window.closeFinHelp = closeFinHelp;
+    window.finMobileView = finMobileView;
+    window.FINANCIAL_METRICS_SCHEMA = FINANCIAL_METRICS_SCHEMA;
 
 
     // Switch Tabs (Lightweight Chart vs TradingView Full Embed)

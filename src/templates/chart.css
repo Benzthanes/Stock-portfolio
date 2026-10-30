@@ -1959,6 +1959,7 @@
             padding: 8px 0;
         }
         .fin-table-panel {
+            position: relative;
             background: rgba(15, 23, 42, 0.45);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
@@ -2131,26 +2132,207 @@
 
 
 
-        /* Sub-rows (QoQ, YoY, margins) set a see-through cell background that
-           also hit the frozen metric column, so numbers scrolled underneath it. */
         .fin-table td.fin-row-header,
-        .fin-table .fin-row-sub td.fin-row-header { background: #0c1427; }
+        .fin-table .fin-row-sub td.fin-row-header,
+        .fin-table th.th-metric { background: #0c1427 !important; }
 
-        /* Quarterly statements on phones: no sideways table. A trend view (one
-           card per metric with an 8-quarter bar strip) and a per-quarter list. */
-        .finm-wrap { display: none; }
+        .fin-metric-cell {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .fin-name-mobile { display: none !important; }
+        .fin-name-desktop { display: inline !important; }
+
+        .fin-help-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
+            font-size: 0.60rem;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 3px;
+            vertical-align: middle;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        .fin-help-btn:hover, .fin-help-btn.active {
+            background: #3b82f6;
+            border-color: #60a5fa;
+            color: #ffffff;
+        }
+
+        .fin-help-popover {
+            position: absolute;
+            z-index: 9999;
+            max-width: 280px;
+            width: calc(100vw - 24px);
+            background: #0f172a;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 0 12px rgba(59, 130, 246, 0.25);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #e2e8f0;
+            font-size: 0.74rem;
+            line-height: 1.45;
+            pointer-events: auto;
+        }
+        .fin-popover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .fin-popover-title {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        .fin-popover-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+        .fin-popover-close:hover {
+            color: #ffffff;
+        }
+        .fin-popover-body {
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            line-height: 1.4;
+        }
+
+        .fin-latest-badge {
+            font-size: 0.65rem;
+            background: #3b82f6;
+            color: #fff;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 700;
+            margin-left: 4px;
+            display: inline-block;
+        }
+        .fin-th-date {
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: normal;
+            margin-top: 2px;
+        }
+
+        /* Desktop view: table is always visible, mobile tabs are hidden */
+        @media (min-width: 641px) {
+            .finm-wrap { display: none !important; }
+            .fin-table-scroll { display: block !important; }
+        }
+
         .fin-table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         @media (max-width: 640px) {
-            .fin-table-panel { padding: 14px 12px; overflow-x: visible; }
+            .financials-main-card { padding: 14px 8px; }
+            .fin-table-panel { padding: 12px 6px; overflow-x: visible; }
             .fin-table-title { font-size: 0.84rem; }
             .fin-table-responsive { border: none; background: transparent; overflow: visible; }
-            .finm-wrap { display: block; }
-            .fin-table-scroll { display: none; }
-            .finm-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 12px;
-                border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.08); }
-            .finm-seg-btn { white-space: nowrap; padding: 9px 6px; border-radius: 9px; border: none; background: transparent; color: #94a3b8;
-                font-size: 0.80rem; font-weight: 700; font-family: inherit; cursor: pointer; }
-            .finm-seg-btn.active { background: rgba(59, 130, 246, 0.25); color: #bfdbfe; }
+            .finm-wrap { display: block; margin-bottom: 12px; }
+            .fin-name-desktop { display: none !important; }
+            .fin-name-mobile { display: inline !important; font-size: 0.68rem; font-weight: 700; }
+            .fin-table-scroll {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                background: #090e1a;
+            }
+            .finm-seg {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+                padding: 4px;
+                margin-bottom: 10px;
+                border-radius: 10px;
+                background: rgba(15, 23, 42, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .finm-seg-btn {
+                white-space: nowrap;
+                padding: 8px 6px;
+                border-radius: 8px;
+                border: none;
+                background: transparent;
+                color: #94a3b8;
+                font-size: 0.78rem;
+                font-weight: 700;
+                font-family: inherit;
+                cursor: pointer;
+            }
+            .finm-seg-btn.active {
+                background: rgba(59, 130, 246, 0.25);
+                color: #bfdbfe;
+            }
+
+            /* Mobile table layout */
+            .fin-table {
+                min-width: 0 !important;
+                width: max-content;
+            }
+            .fin-table th, .fin-table td {
+                padding: 7px 4px;
+            }
+            .fin-table th.th-metric,
+            .fin-table td.fin-row-header {
+                min-width: 76px !important;
+                max-width: 84px !important;
+                width: 80px !important;
+                padding: 7px 4px !important;
+                box-sizing: border-box;
+                font-size: 0.68rem;
+                background: #0c1427 !important;
+            }
+            .fin-table th.th-quarter,
+            .fin-table td.fin-cell {
+                min-width: 78px !important;
+                max-width: 88px !important;
+                width: 82px !important;
+                padding: 7px 4px !important;
+                box-sizing: border-box;
+                font-size: 0.70rem;
+            }
+            .fin-table th.th-quarter div {
+                font-size: 0.68rem;
+            }
+            .fin-table .fin-badge-pos,
+            .fin-table .fin-badge-neg,
+            .fin-table .fin-badge-neutral {
+                padding: 1px 4px;
+                font-size: 0.62rem;
+                letter-spacing: -0.3px;
+            }
+            .fin-latest-badge {
+                font-size: 0.58rem !important;
+                padding: 0 3px !important;
+            }
+            .fin-help-btn {
+                width: 13px;
+                height: 13px;
+                font-size: 0.55rem;
+                margin-left: 2px;
+            }
+
             .finc-hint { font-size: 0.70rem; color: #64748b; margin: 0 2px 8px; }
             .finc-card { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; background: #090e1a;
                 padding: 12px 12px 8px; margin-bottom: 10px; }
@@ -2172,19 +2354,6 @@
             .finc-bar.sel span { outline: 2px solid #f8fafc; outline-offset: 1px; }
             .finc-bar em { font-style: normal; font-size: 0.56rem; color: #64748b; white-space: nowrap; line-height: 1; }
             .finc-bar.sel em { color: #e2e8f0; font-weight: 700; }
-            .finm-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-            .finm-chips::-webkit-scrollbar { display: none; }
-            .finm-chip { flex: 0 0 auto; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12);
-                background: rgba(255, 255, 255, 0.04); color: #94a3b8; font-size: 0.78rem; font-weight: 700; font-family: inherit; cursor: pointer; }
-            .finm-chip.active { background: rgba(59, 130, 246, 0.22); border-color: #3b82f6; color: #93c5fd; }
-            .finm-list { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; background: #090e1a; overflow: hidden; }
-            .finm-date { padding: 8px 12px; font-size: 0.72rem; color: #60a5fa; font-weight: 700; background: #0f172a; }
-            .finm-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 12px;
-                border-top: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.80rem; }
-            .finm-label { color: #cbd5e1; font-weight: 700; min-width: 0; }
-            .finm-val { font-family: 'JetBrains Mono', monospace; color: #f1f5f9; text-align: right; white-space: nowrap; }
-            .finm-sub { background: rgba(255, 255, 255, 0.015); padding-left: 22px; }
-            .finm-sub .finm-label { color: #94a3b8; font-weight: 500; font-size: 0.74rem; }
         }
 
         /* Phones: the stock-menu button shrinks to a round thumb-reach button on
@@ -2211,4 +2380,14 @@
             }
             .floating-sidebar-toggle:hover { transform: none; }
             body { padding-bottom: 84px; }
+        }
+
+        /* Phones: a value with a growth badge (EPS) stacks the badge underneath
+           so the latest-quarter column does not run past the table edge. */
+        @media (max-width: 640px) {
+            .fin-table td.fin-cell > [class^="fin-badge-"] {
+                display: block;
+                width: fit-content;
+                margin: 3px 0 0 auto;
+            }
         }
