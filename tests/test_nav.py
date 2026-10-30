@@ -22,6 +22,7 @@ class NavBarTest(unittest.TestCase):
                 "trades_ledger.html",
                 "stock_chart.html",
                 "watchlist.html",
+                "advisor.html",
             ],
         )
 
@@ -41,7 +42,7 @@ class NavBarTest(unittest.TestCase):
         html = nav_bar_html("review", FIXED)
         self.assertEqual(
             re.findall(r'class="rnav-link[^"]*"[^>]*>([^<]+)</a>', html),
-            ["ภาพรวม", "สุขภาพพอร์ต", "แก้ดอย", "Dip จำลอง", "รายการซื้อขายทั้งหมด", "กราฟ", "หุ้นที่สนใจ"],
+            ["ภาพรวม", "สุขภาพพอร์ต", "แก้ดอย", "Dip จำลอง", "รายการซื้อขายทั้งหมด", "กราฟ", "หุ้นที่สนใจ", "คำแนะนำ"],
         )
         self.assertNotIn("หุ้นไทย", html)
 

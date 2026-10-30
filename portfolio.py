@@ -87,6 +87,11 @@ def _watchlist_report(reports_dir):
     generate_watchlist_page(reports_dir)
 
 
+def _advisor_report(reports_dir):
+    from src.advisor import generate_advisor_page
+    generate_advisor_page(reports_dir)
+
+
 def run_all_reports():
     """Generate every report. A failed step is logged and skipped. Returns the list of failed steps."""
     reports_dir = Path("reports")
@@ -102,24 +107,25 @@ def run_all_reports():
             _report_failure(failures, name, e)
             return None
 
-    step("📊 [0/7] กำลังอัปเดตข้อมูลแท่งเทียนย้อนหลังและคำนวณ Fibonacci อัจฉริยะ...", "chart data refresh", _refresh_charts)
-    master_data = step("🚀 [1/7] กำลังอัปเดต Master Wealth Dashboard (KKP + Dime!)...", "master dashboard", _master_report, reports_dir)
-    step("🏥 [2/7] กำลังอัปเดต Portfolio Health Review (พอร์ตจริง)...", "health review", _review_report, reports_dir)
-    step("🛟 [3/7] กำลังอัปเดต Drawdown Recovery Strategy (แผนแก้ดอย 360 องศา)...", "recovery strategy", _recovery_report, reports_dir)
-    step("🎯 [4/7] กำลังอัปเดต Simulated Dip Portfolio (พอร์ตจำลองช้อนซื้อ)...", "dip simulation", _dip_report, reports_dir)
+    step("📊 [0/8] กำลังอัปเดตข้อมูลแท่งเทียนย้อนหลังและคำนวณ Fibonacci อัจฉริยะ...", "chart data refresh", _refresh_charts)
+    master_data = step("🚀 [1/8] กำลังอัปเดต Master Wealth Dashboard (KKP + Dime!)...", "master dashboard", _master_report, reports_dir)
+    step("🏥 [2/8] กำลังอัปเดต Portfolio Health Review (พอร์ตจริง)...", "health review", _review_report, reports_dir)
+    step("🛟 [3/8] กำลังอัปเดต Drawdown Recovery Strategy (แผนแก้ดอย 360 องศา)...", "recovery strategy", _recovery_report, reports_dir)
+    step("🎯 [4/8] กำลังอัปเดต Simulated Dip Portfolio (พอร์ตจำลองช้อนซื้อ)...", "dip simulation", _dip_report, reports_dir)
     if master_data is not None:
-        step("📈 [5/7] กำลังอัปเดต Complete Trading Ledger (รายการซื้อขายทั้งหมด)...", "trades ledger",
+        step("📈 [5/8] กำลังอัปเดต Complete Trading Ledger (รายการซื้อขายทั้งหมด)...", "trades ledger",
              _ledger_report, reports_dir, master_data)
     else:
         _report_failure(failures, "trades ledger", RuntimeError("skipped because master dashboard failed"))
-    step("🚀 [6/7] กำลังสร้าง Dedicated Stock Chart Page (หน้าวิเคราะห์กราฟ & AI เต็มจอ)...", "stock chart page", _chart_page, reports_dir)
-    step("📋 [7/7] กำลังสร้าง Watchlist Page (แนวรับ Fibo & หุ้นที่สนใจ)...", "watchlist page", _watchlist_report, reports_dir)
+    step("🚀 [6/8] กำลังสร้าง Dedicated Stock Chart Page (หน้าวิเคราะห์กราฟ & AI เต็มจอ)...", "stock chart page", _chart_page, reports_dir)
+    step("📋 [7/8] กำลังสร้าง Watchlist Page (แนวรับ Fibo & หุ้นที่สนใจ)...", "watchlist page", _watchlist_report, reports_dir)
+    step("🧭 [8/8] กำลังสร้าง Advisor Page (คำแนะนำพอร์ตและจุดซื้อขาย)...", "advisor page", _advisor_report, reports_dir)
 
     print("\n" + "=" * 74)
     if failures:
         print(f" ⚠️ อัปเดตไม่สำเร็จ {len(failures)} ขั้นตอน: {', '.join(failures)}")
     else:
-        print(" 🎉 อัปเดตรายงานทั้งหมด 7 รายการเรียบร้อยสมบูรณ์!")
+        print(" 🎉 อัปเดตรายงานทั้งหมด 8 รายการเรียบร้อยสมบูรณ์!")
     print("=" * 74)
     if master_data is not None:
         nav_thb = money(master_data['total_net_worth_thb'], 'THB')
@@ -138,6 +144,7 @@ def run_all_reports():
     print("5. รายการซื้อขายทั้งหมด   : reports/trades_ledger.html")
     print("6. หน้ากราฟ & AI เต็มจอ  : reports/stock_chart.html")
     print("7. หุ้นที่สนใจ (Watchlist) : reports/watchlist.html")
+    print("8. คำแนะนำพอร์ต (Advisor) : reports/advisor.html")
     print("=" * 74)
     return failures
 
@@ -166,7 +173,7 @@ def main():
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Generate and update all 7 HTML reports in one shot"
+        help="Generate and update all 8 HTML reports in one shot"
     )
     parser.add_argument(
         "--save-report",

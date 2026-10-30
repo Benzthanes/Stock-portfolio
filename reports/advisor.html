@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คำแนะนำพอร์ต - Filter Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#080d1a; --card:#0f172a; --line:rgba(255,255,255,0.08); --text:#f8fafc; --sub:#94a3b8; --muted:#64748b;
+  --go:#10b981; --wait:#f59e0b; --stop:#f43f5e; --blue:#3b82f6; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font-family:'Prompt','Inter',-apple-system,sans-serif; line-height:1.6; }
+.wrap { max-width:1080px; margin:0 auto; padding:16px; }
+h1 { font-size:1.6rem; margin:4px 0 2px; }
+h2 { font-size:1.15rem; margin:30px 0 12px; display:flex; align-items:center; gap:8px; }
+.muted { color:var(--muted); } .small { font-size:0.8rem; }
+.sub { color:var(--sub); margin:0 0 18px; font-size:0.92rem; }
+.alert { background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.3); border-radius:12px; padding:12px 16px; margin-bottom:16px; }
+.hero { background:linear-gradient(135deg,rgba(59,130,246,0.18),rgba(167,139,250,0.12)); border:1px solid rgba(96,165,250,0.3);
+  border-radius:18px; padding:20px; }
+.hero-date { display:inline-block; font-size:0.78rem; color:#93c5fd; background:rgba(59,130,246,0.18); border-radius:999px; padding:2px 10px; }
+.hls { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+.hl { display:flex; gap:12px; background:rgba(8,13,26,0.55); border:1px solid var(--line); border-radius:14px; padding:14px; }
+.hl-ico { font-size:1.6rem; line-height:1; }
+.hl-t { font-weight:600; } .hl-s { color:var(--sub); font-size:0.85rem; }
+.prog { margin-top:16px; }
+.prog-head { display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; font-size:0.88rem; margin-bottom:6px; }
+.prog-bar { position:relative; height:12px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:visible; }
+.prog-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#a78bfa,#f43f5e); }
+.prog-mark { position:absolute; top:-4px; width:2px; height:20px; background:#f8fafc; }
+.prog-mark2 { background:#10b981; }
+.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.card { background:var(--card); border:1px solid var(--line); border-left:4px solid var(--muted); border-radius:14px; padding:14px 16px; }
+.tone-go { border-left-color:var(--go); } .tone-wait { border-left-color:var(--wait); } .tone-stop { border-left-color:var(--stop); }
+.card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.card-t { font-weight:600; }
+.card ul { margin:8px 0 0; padding-left:18px; color:#cbd5e1; font-size:0.9rem; }
+.card li { margin:3px 0; }
+.pill { flex:0 0 auto; font-size:0.76rem; font-weight:600; border-radius:999px; padding:3px 10px; white-space:nowrap; }
+.pill-go { color:#6ee7b7; background:rgba(16,185,129,0.15); }
+.pill-wait { color:#fcd34d; background:rgba(245,158,11,0.15); }
+.pill-stop { color:#fda4af; background:rgba(244,63,94,0.15); }
+.tk { font-family:'Inter',sans-serif; font-weight:700; font-size:1.25rem; }
+.live-line { margin-top:8px; font-size:0.88rem; color:var(--sub); }
+.live-line b { color:var(--text); font-family:'Inter',sans-serif; }
+.mix { display:flex; height:22px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+.mix-seg { height:100%; }
+.mix-legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; font-size:0.85rem; color:var(--sub); }
+.mix-key i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; }
+.tbl-wrap { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+th { text-align:left; color:var(--sub); font-weight:500; font-size:0.8rem; padding:10px 12px; border-bottom:1px solid var(--line); }
+td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; font-family:'Inter','Prompt',sans-serif; }
+tr:last-child td { border-bottom:none; }
+.tk-cell { font-weight:700; }
+.tot { font-weight:700; color:#6ee7b7; min-width:110px; }
+.bar { height:4px; background:rgba(255,255,255,0.06); border-radius:4px; margin-top:4px; }
+.bar div { height:100%; background:var(--go); border-radius:4px; }
+.neg { color:#fda4af; }
+.st { font-size:0.8rem; font-weight:600; border-radius:999px; padding:3px 9px; white-space:nowrap; }
+.st-hit { color:#6ee7b7; background:rgba(16,185,129,0.15); }
+.st-wait { color:#cbd5e1; background:rgba(255,255,255,0.06); }
+.st-na { color:var(--muted); }
+.note { color:var(--sub); font-size:0.82rem; margin-top:8px; }
+.box { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 18px; }
+.box ol, .box ul { margin:0; padding-left:20px; color:#cbd5e1; font-size:0.9rem; }
+.box li { margin:4px 0; }
+@media (max-width:720px) {
+  .wrap { padding:10px; }
+  h1 { font-size:1.3rem; }
+  .hls, .grid { grid-template-columns:1fr; }
+  .hero { padding:16px; }
+  td, th { padding:8px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<style>
+.rnav { display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; width: 100%; max-width: 100%;
+  padding: 10px 14px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
+.rnav-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; width: 100%; flex-wrap: wrap; }
+.rnav-links { display: flex; gap: 6px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rnav-links::-webkit-scrollbar { display: none; }
+.rnav-link { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8;
+  border: 1px solid transparent; transition: color 0.15s, background 0.15s; }
+.rnav-link:hover { color: #f8fafc; background: rgba(255,255,255,0.06); }
+.rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
+.rnav-time { white-space: nowrap; color: #64748b; font-size: 0.78rem; }
+
+/* GLOBAL LIVE CONTROLS BAR */
+.rnav-live-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.82rem; }
+.rnav-live-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rnav-live-right { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+.rnav-refresh-btn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(37, 99, 235, 0.32) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.45); color: #93c5fd; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+.rnav-refresh-btn:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.45) 100%); border-color: #60a5fa; color: #ffffff; }
+.rnav-live-badge { font-size: 0.66rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; font-weight: 700; }
+.rnav-int-group { display: inline-flex; align-items: center; gap: 3px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 2px 4px; }
+.rnav-int-label { font-size: 0.76rem; color: #94a3b8; font-weight: 600; padding-left: 4px; }
+.rnav-int-btn { padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: #94a3b8; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; font-family: inherit; }
+.rnav-int-btn:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.08); }
+.rnav-int-btn.active { background: rgba(59, 130, 246, 0.3); border-color: #3b82f6; color: #60a5fa; font-weight: 700; }
+.rnav-status { font-size: 0.78rem; color: #94a3b8; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .rnav { padding: 8px 10px; gap: 8px; }
+  .rnav-top-row { gap: 6px; }
+  .rnav-live-bar { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 6px; }
+  .rnav-live-left { justify-content: space-between; width: 100%; }
+  .rnav-live-right { width: 100%; justify-content: space-between; margin-left: 0; }
+  .rnav-time { font-size: 0.72rem; }
+  .rnav-status { font-size: 0.74rem; }
+  /* Every tab visible at once: wrap instead of scrolling sideways. */
+  .rnav-links { flex-wrap: wrap; overflow: visible; gap: 4px; }
+  .rnav-link { padding: 6px 9px; font-size: 0.80rem; }
+  /* Live bar: refresh and interval on one row, status underneath. */
+  .rnav-live-left { flex-wrap: nowrap; gap: 6px; }
+  .rnav-refresh-btn { padding: 5px 9px; }
+  .rnav-live-badge { display: none; }
+  .rnav-int-word { display: none; }
+  .rnav-int-btn { padding: 3px 6px; }
+}
+</style>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a><a href="advisor.html" class="rnav-link active" aria-current="page">คำแนะนำ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️<span class="rnav-int-word"> อัปเดตสด:</span></span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 22:56</span></div></div></nav>
+<script>
+(function() {
+  var activeLink = document.querySelector(".rnav-link.active");
+  if (activeLink && activeLink.parentNode) {
+    activeLink.parentNode.scrollLeft = activeLink.offsetLeft - activeLink.parentNode.offsetLeft - 16;
+  }
+
+  var globalIntervalSec = 0;
+  var globalCountdownSec = 0;
+  var globalCountdownTimer = null;
+  var globalLastSyncTime = '';
+
+  window.triggerGlobalRefresh = async function() {
+    var btn = document.getElementById('rnav-btn-refresh');
+    var icon = document.getElementById('rnav-refresh-icon');
+    var text = document.getElementById('rnav-refresh-text');
+    var statusEl = document.getElementById('rnav-live-status');
+
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+    if (icon) icon.style.transform = 'rotate(360deg)';
+    if (text) text.textContent = 'กำลังดึง...';
+
+    try {
+      if (typeof window.refreshLiveQuotes === 'function') {
+        await window.refreshLiveQuotes();
+      } else if (typeof window.fetchChartLiveQuotes === 'function') {
+        await window.fetchChartLiveQuotes();
+      } else {
+        await fetchGenericLiveQuotes();
+      }
+      var now = new Date();
+      globalLastSyncTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      updateGlobalStatusUI();
+    } catch (e) {
+      console.warn('Global refresh error:', e);
+      if (statusEl) statusEl.textContent = '⚠️ รีเฟรชไม่สำเร็จ';
+    } finally {
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+      if (icon) icon.style.transform = 'none';
+      if (text) text.textContent = 'รีเฟรชราคา';
+    }
+  };
+
+  window.setGlobalLiveInterval = function(sec) {
+    globalIntervalSec = parseInt(sec, 10) || 0;
+    try {
+      localStorage.setItem('portfolio_live_interval', globalIntervalSec);
+    } catch (e) {}
+
+    [0, 5, 15, 30, 60].forEach(function(s) {
+      var b = document.getElementById('rnav-live-' + s);
+      if (b) b.classList.toggle('active', s === globalIntervalSec);
+    });
+
+    if (globalCountdownTimer) {
+      clearInterval(globalCountdownTimer);
+      globalCountdownTimer = null;
+    }
+
+    if (typeof window.setLiveInterval === 'function') {
+      window.setLiveInterval(globalIntervalSec);
+    }
+    if (typeof window.setChartLiveInterval === 'function') {
+      window.setChartLiveInterval(globalIntervalSec);
+    }
+
+    if (globalIntervalSec <= 0) {
+      updateGlobalStatusUI();
+      return;
+    }
+
+    globalCountdownSec = globalIntervalSec;
+    updateGlobalStatusUI();
+
+    if (typeof window.setLiveInterval !== 'function' && typeof window.setChartLiveInterval !== 'function') {
+      window.triggerGlobalRefresh();
+      globalCountdownTimer = setInterval(function() {
+        if (document.hidden) return;
+        globalCountdownSec--;
+        if (globalCountdownSec <= 0) {
+          globalCountdownSec = globalIntervalSec;
+          window.triggerGlobalRefresh();
+        }
+        updateGlobalStatusUI();
+      }, 1000);
+    }
+  };
+
+  function updateGlobalStatusUI() {
+    var statusEl = document.getElementById('rnav-live-status');
+    if (!statusEl) return;
+    if (globalIntervalSec <= 0) {
+      statusEl.innerHTML = globalLastSyncTime 
+        ? '🟢 ซิงค์ล่าสุด: <strong style="color:#60a5fa;">' + globalLastSyncTime + ' น.</strong>'
+        : '⚪ อัปเดตด้วยตนเอง';
+    } else {
+      var dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;margin-right:4px;"></span>';
+      statusEl.innerHTML = dot + 'Live (' + globalIntervalSec + 's): <strong style="color:#10b981;">' + globalCountdownSec + 's</strong>' +
+        (globalLastSyncTime ? ' | <strong style="color:#60a5fa;">' + globalLastSyncTime + ' น.</strong>' : '');
+    }
+  }
+
+  async function fetchGenericLiveQuotes() {
+    var res = await fetch('https://scanner.tradingview.com/america/scan', {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        symbols: { tickers: ["NASDAQ:NVDA","NASDAQ:AAPL","NASDAQ:MSFT","NASDAQ:GOOGL","NASDAQ:AMZN","NYSE:LLY","NASDAQ:TSLA","NASDAQ:AVGO","AMEX:VOO","NASDAQ:QQQI"] },
+        columns: ['close', 'change', 'premarket_close', 'premarket_change', 'postmarket_close', 'postmarket_change']
+      })
+    });
+    if (!res.ok) return;
+    var data = await res.json();
+    var quotes = {};
+    (data.data || []).forEach(function(item) {
+      var parts = (item.s || '').split(':');
+      var tk = parts.length > 1 ? parts[1] : parts[0];
+      quotes[tk] = {
+        close: item.d[0],
+        change: item.d[1],
+        premarket_close: item.d[2],
+        premarket_change: item.d[3],
+        postmarket_close: item.d[4],
+        postmarket_change: item.d[5]
+      };
+    });
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    var payload = { quotes: quotes, timeStr: timeStr, timestamp: Date.now() };
+    try { localStorage.setItem('portfolio_live_bus', JSON.stringify(payload)); } catch(e) {}
+    try {
+      if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+      window.__LIVE_BC__.postMessage(payload);
+    } catch(e) {}
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    try {
+      var saved = parseInt(localStorage.getItem('portfolio_live_interval') || '0', 10);
+      if (saved > 0) {
+        setGlobalLiveInterval(saved);
+      }
+    } catch (e) {}
+  });
+
+  try {
+    if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+    window.__LIVE_BC__.onmessage = function(ev) {
+      if (ev.data && ev.data.timeStr) {
+        globalLastSyncTime = ev.data.timeStr;
+        updateGlobalStatusUI();
+      }
+    };
+  } catch(e) {}
+})();
+</script>
+<style>
+@media (max-width: 640px) {
+  .rc-wrap { overflow: visible !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+  table.rc-cards { display: block; width: 100% !important; min-width: 0 !important; border: none !important; background: transparent !important; }
+  table.rc-cards thead { display: none; }
+  table.rc-cards tbody, table.rc-cards tfoot { display: block; }
+  table.rc-cards tr { display: block; margin: 0 0 10px 0; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px; background: rgba(15,23,42,0.75); }
+  table.rc-cards td { display: flow-root; padding: 7px 0 !important; border: none !important;
+    border-bottom: 1px dashed rgba(255,255,255,0.06) !important; text-align: right !important; white-space: normal !important;
+    min-width: 0 !important; max-width: none !important; width: auto !important; position: static !important;
+    box-shadow: none !important; background: transparent !important; }
+  table.rc-cards td:last-child { border-bottom: none !important; }
+  table.rc-cards td[data-label]::before { content: attr(data-label); float: left; width: 40%; margin-right: 10px; text-align: left;
+    color: #94a3b8; font-size: 0.74rem; font-weight: 600; line-height: 1.5; }
+  table.rc-cards td.rc-head { font-size: 1.02rem; padding-bottom: 8px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.10) !important; text-align: left !important; }
+  table.rc-cards td.rc-head::before { display: none; }
+  table.rc-cards td.rc-empty { display: none; }
+}
+</style>
+<script>
+(function () {
+  var PHONE = 640, timer = null;
+  function headers(table) {
+    var row = table.tHead && table.tHead.rows[table.tHead.rows.length - 1];
+    if (!row) return [];
+    var out = [];
+    for (var i = 0; i < row.cells.length; i++) {
+      var c = row.cells[i], tmp = document.createElement('div');
+      tmp.innerHTML = c.innerHTML.replace(/<br\s*\/?>/gi, ' ');
+      var text = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+      for (var k = 0; k < (c.colSpan || 1); k++) out.push(text);
+    }
+    return out;
+  }
+  function label(table) {
+    var hs = headers(table);
+    for (var b = 0; b < table.tBodies.length; b++) {
+      var rows = table.tBodies[b].rows;
+      for (var r = 0; r < rows.length; r++) {
+        var col = 0, cells = rows[r].cells;
+        for (var i = 0; i < cells.length; i++) {
+          var td = cells[i], h = hs[col] || '';
+          col += td.colSpan || 1;
+          if (i === 0 && cells.length > 1) { td.classList.add('rc-head'); continue; }
+          if (cells.length === 1) continue;
+          if (h) td.setAttribute('data-label', h);
+          var txt = (td.textContent || '').trim();
+          td.classList.toggle('rc-empty', !txt || txt === '-');
+        }
+      }
+    }
+  }
+  function apply() {
+    var phone = window.innerWidth <= PHONE;
+    var tables = document.querySelectorAll('table:not(.no-cards):not(.fin-table)');
+    for (var t = 0; t < tables.length; t++) {
+      var table = tables[t], wrap = table.parentElement;
+      if (!phone) {
+        if (table.classList.contains('rc-cards')) { table.classList.remove('rc-cards'); if (wrap) wrap.classList.remove('rc-wrap'); }
+        continue;
+      }
+      if (!table.tHead || table.closest('.rc-skip')) continue;
+      if (!table.classList.contains('rc-cards')) {
+        var avail = wrap ? wrap.clientWidth : window.innerWidth;
+        if (table.scrollWidth <= avail + 4) continue;
+        table.classList.add('rc-cards');
+        if (wrap) wrap.classList.add('rc-wrap');
+      }
+      label(table);
+    }
+  }
+  function schedule() { clearTimeout(timer); timer = setTimeout(apply, 120); }
+  document.addEventListener('DOMContentLoaded', function () {
+    apply();
+    window.addEventListener('resize', schedule);
+    // Live price refreshes rewrite rows; relabel them.
+    try { new MutationObserver(function (ms) {
+      for (var i = 0; i < ms.length; i++) { if (ms[i].target.closest && ms[i].target.closest('table')) { schedule(); return; } }
+      schedule();
+    }).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+  });
+})();
+</script>
+
+<section class="hero">
+  <span class="hero-date">🗓️ ปรึกษาเมื่อ 30 ต.ค. 2569</span>
+  <h1>คำแนะนำพอร์ต</h1>
+  <p class="sub" style="margin:0">สรุปจากการคุยกันว่าถ้าเป็นเจ้าของพอร์ตนี้จะทำอะไรต่อ. ตารางจุดซื้อขายด้านล่างอัปเดตราคาสดได้.</p>
+  <div class="hls"><div class="hl"><div class="hl-ico">⚖️</div><div><div class="hl-t">ลด LLY จาก 78% ให้เหลือราว 50%</div><div class="hl-s">แบ่งขาย 3 ไม้ แล้วเอาเงินไปทำพอร์ตแกน VOO</div></div></div><div class="hl"><div class="hl-ico">🧹</div><div><div class="hl-t">ขาย NOK กับ BAC ที่ได้เกรด F</div><div class="hl-s">รอวันที่ราคาเด้งก่อน ไม่ขายวันที่ร่วงแรง</div></div></div><div class="hl"><div class="hl-ico">🔌</div><div><div class="hl-t">อยากได้หุ้นชิป เลือก SMH ไม่ใช่ CHPY</div><div class="hl-s">รอแท่งกลับตัวเหนือ EMA200 แล้วค่อยซื้อไม้แรก</div></div></div></div>
+  <div class="prog"><div class="prog-head"><span>สัดส่วน LLY ตอนนี้ <b>77.9%</b></span><span class="muted">เป้าแรก 50% · ระยะยาว 30 ถึง 35%</span></div><div class="prog-bar"><div class="prog-fill" style="width:77.9%"></div><div class="prog-mark" style="left:50%" title="เป้าแรก 50%"></div><div class="prog-mark prog-mark2" style="left:35%" title="เพดานระยะยาว 35%"></div></div></div>
+</section>
+
+<h2>🧭 แผนจัดพอร์ต</h2>
+<div class="grid"><div class="card tone-go"><div class="card-top"><div class="card-t">1. ลด LLY ลงทีละขั้น</div><span class="pill pill-go">ทำได้</span></div><ul><li>LLY คิดเป็น 78% ของพอร์ต ถ้าลง 25% พอร์ตจะหายราว 330,000 บาท.</li><li>ราคายืดเหนือ EMA200 ไป 29% และราคาเป้านักวิเคราะห์สูงกว่าแค่ 1.3%.</li><li>ขาย 3 ไม้ ไม้ละราว 3 หุ้น ห่างกัน 1 ถึง 2 สัปดาห์. ถ้าหลุด 1,364 ให้ขายไม้ที่เหลือเลย.</li></ul></div><div class="card tone-go"><div class="card-top"><div class="card-t">2. ขาย NOK และ BAC</div><span class="pill pill-go">ทำได้</span></div><ul><li>ทั้งสองตัวได้เกรด F. NOK กำไรหด 6.7% ส่วน BAC ยอดขายลด 1%.</li><li>รวมกันราว 3,177 USD. ย้ายไปหุ้นเกรด A ดีกว่ารอกลับมาเท่าทุน.</li></ul></div><div class="card tone-go"><div class="card-top"><div class="card-t">3. สร้างพอร์ตแกนด้วย VOO</div><span class="pill pill-go">ทำได้</span></div><ul><li>ตอนนี้ VOO มีแค่ 0.7% ของพอร์ต.</li><li>เป้าคือราว 18 ถึง 20%. ซื้อตามรอบที่ขาย LLY.</li></ul></div><div class="card tone-wait"><div class="card-top"><div class="card-t">4. เติม VRT เมื่อมีแท่งกลับตัว</div><span class="pill pill-wait">รอจังหวะ</span></div><ul><li>คะแนนพื้นฐานเต็ม 100% และราคาเป้าสูงกว่า 42.6%.</li><li>วันที่ปรึกษาเป็นวันร่วงแรง จึงรอแท่งกลับตัวก่อน. งบรอบหน้าอีก 117 วัน.</li></ul></div><div class="card tone-wait"><div class="card-top"><div class="card-t">5. MNST, ABNB, APP รอหลังงบ</div><span class="pill pill-wait">รอจังหวะ</span></div><ul><li>APP งบ 4 พ.ย. ABNB และ MNST งบ 5 พ.ย. ห้ามซื้อเพิ่มก่อนงบ.</li><li>MNST เกรด A+ ดีที่สุดในพอร์ต ถ้างบผ่านค่อยเติม.</li></ul></div><div class="card tone-wait"><div class="card-top"><div class="card-t">6. GOOGL ค่อยๆ ซื้อ</div><span class="pill pill-wait">รอจังหวะ</span></div><ul><li>พื้นฐานเต็ม 100% และ P/E 14.7 แต่ราคาต่ำกว่า EMA200 14.5%.</li><li>ซื้อไม้เล็กเมื่อ RSI กลับตัวขึ้น. หยุดซื้อถ้าหลุด 266.</li></ul></div></div>
+
+<h2>🎯 พอร์ตเป้าหมายหลังทำครบ</h2>
+<div class="box">
+  <div class="mix"><div class="mix-seg" style="width:50%;background:#a78bfa" title="LLY 50%"></div><div class="mix-seg" style="width:19%;background:#3b82f6" title="VOO 19%"></div><div class="mix-seg" style="width:10%;background:#22d3ee" title="GOOGL 10%"></div><div class="mix-seg" style="width:7%;background:#10b981" title="VRT 7%"></div><div class="mix-seg" style="width:5%;background:#f59e0b" title="MNST 5%"></div><div class="mix-seg" style="width:6%;background:#f472b6" title="ABNB + APP 6%"></div><div class="mix-seg" style="width:3%;background:#64748b" title="เงินสด 3%"></div></div>
+  <div class="mix-legend"><span class="mix-key"><i style="background:#a78bfa"></i>LLY <b>50%</b></span><span class="mix-key"><i style="background:#3b82f6"></i>VOO <b>19%</b></span><span class="mix-key"><i style="background:#22d3ee"></i>GOOGL <b>10%</b></span><span class="mix-key"><i style="background:#10b981"></i>VRT <b>7%</b></span><span class="mix-key"><i style="background:#f59e0b"></i>MNST <b>5%</b></span><span class="mix-key"><i style="background:#f472b6"></i>ABNB + APP <b>6%</b></span><span class="mix-key"><i style="background:#64748b"></i>เงินสด <b>3%</b></span></div>
+  <div class="note">ถ้า LLY ลงแรง ความเสียหายจะเหลือประมาณครึ่งหนึ่งของตอนนี้.</div>
+</div>
+
+<h2>💬 หุ้นและกองทุนที่ถามมา</h2>
+<div class="grid"><div class="card tone-go"><div class="card-top"><div><div class="tk">SMH</div><div class="muted small">VanEck Semiconductor ETF</div></div><span class="pill pill-go">น่าซื้อที่สุดในกลุ่มชิป</span></div><div class="live-line">ราคาตอนนี้ <b data-price="SMH">523.84</b> USD</div><ul><li>ปีนี้ได้ +45.5% ใกล้ CHPY แต่ร่วงน้อยกว่าและไม่ต้องเสียภาษีปันผลบ่อย.</li><li>ราคาแตะ EMA200 พอดี แต่วันที่ปรึกษาลง 6.7% จึงรอแท่งกลับตัว.</li><li>ขนาด 5 ถึง 8% ของพอร์ต แบ่ง 3 ไม้ตามตารางจุดซื้อด้านล่าง.</li></ul></div><div class="card tone-go"><div class="card-top"><div><div class="tk">GPIQ</div><div class="muted small">Goldman Sachs Nasdaq-100 Premium Income</div></div><span class="pill pill-go">ซื้อได้ถ้าอยากได้ปันผล</span></div><div class="live-line">ราคาตอนนี้ <b data-price="GPIQ">54.48</b> USD</div><ul><li>ปันผลรายเดือนราว 10% ต่อปี ค่าธรรมเนียม 0.35%.</li><li>ปีนี้ได้ +12.4% ใกล้ QQQ แต่ร่วงน้อยกว่า.</li><li>ถ้าเน้นให้พอร์ตโต VOO หรือ QQQ ดีกว่า.</li></ul></div><div class="card tone-wait"><div class="card-top"><div><div class="tk">AEHR</div><div class="muted small">Aehr Test Systems</div></div><span class="pill pill-wait">หุ้นเก็งกำไร รอหลังงบ 2 พ.ย.</span></div><div class="live-line">ราคาตอนนี้ <b data-price="AEHR">53.88</b> USD</div><ul><li>เกรด F (8.6). ยอดขายลด 15% กำไรลด 82% และกระแสเงินสดติดลบ.</li><li>จุดแข็งคือไม่มีหนี้ และนักวิเคราะห์ 5 คนให้ซื้อ ราคาเป้า 141.75.</li><li>ถ้าซื้อ ไม่เกิน 2% ของพอร์ต และเตรียมใจว่าอาจหายครึ่ง.</li></ul></div><div class="card tone-stop"><div class="card-top"><div><div class="tk">CHPY</div><div class="muted small">YieldMax Semiconductor Option Income</div></div><span class="pill pill-stop">ไม่แนะนำสำหรับพอร์ตนี้</span></div><div class="live-line">ราคาตอนนี้ <b data-price="CHPY">56.62</b> USD</div><ul><li>ปันผลราว 43% ต่อปี แต่ราคาแทบไม่โต เพราะจ่ายกำไรออกมาหมด.</li><li>ร่วงหนักสุด 27.6% มากกว่า SMH ที่ได้ผลตอบแทนพอๆ กัน.</li><li>ถ้าหุ้นชิปไม่ขึ้น ปันผลจะมาจากเงินต้นของเราเอง.</li></ul></div></div>
+
+<h2>📊 ผลตอบแทนปีนี้ (รวมปันผล)</h2>
+<div class="tbl-wrap"><table class="no-cards">
+<thead><tr><th>กองทุน</th><th>ราคา</th><th>ปันผล</th><th>รวม</th><th>ร่วงหนักสุด</th></tr></thead>
+<tbody><tr><td class="tk-cell">CHPY</td><td>+1.8%</td><td>42.8%</td><td class="tot">+44.8%<div class="bar"><div style="width:98%"></div></div></td><td class="neg">-27.6%</td></tr><tr><td class="tk-cell">SMH</td><td>+45.5%</td><td>0.0%</td><td class="tot">+45.5%<div class="bar"><div style="width:100%"></div></div></td><td class="neg">-24.6%</td></tr><tr><td class="tk-cell">QQQ</td><td>+12.8%</td><td>0.4%</td><td class="tot">+13.2%<div class="bar"><div style="width:29%"></div></div></td><td class="neg">-11.7%</td></tr><tr><td class="tk-cell">GPIQ</td><td>+3.0%</td><td>9.1%</td><td class="tot">+12.4%<div class="bar"><div style="width:27%"></div></div></td><td class="neg">-9.5%</td></tr><tr><td class="tk-cell">VOO</td><td>+11.0%</td><td>0.9%</td><td class="tot">+12.0%<div class="bar"><div style="width:26%"></div></div></td><td class="neg">-8.9%</td></tr></tbody></table></div>
+<div class="note">ช่วง 31 ธ.ค. 68 ถึง 30 ต.ค. 69. ข้อมูลรายวันจาก Yahoo Finance และคิดว่าเอาปันผลไปซื้อเพิ่มทันที.
+CHPY ได้ผลตอบแทนพอๆ กับ SMH แต่ราคาแทบไม่โต และร่วงลึกกว่า.</div>
+
+<h2>🚦 จุดซื้อขายที่รอดู</h2>
+<div class="tbl-wrap"><table id="trig-table">
+<thead><tr><th>หุ้น</th><th>ทำอะไร</th><th>เงื่อนไข</th><th>ราคาตอนนี้</th><th>สถานะ</th></tr></thead>
+<tbody><tr data-kind="above" data-level="519.0" data-ticker="SMH"><td class="tk-cell">SMH</td><td><b>ซื้อไม้ 1</b><div class="muted small">ปิดเหนือ EMA200 และมีแท่งกลับตัว</div></td><td>≥ 519.00</td><td data-price="SMH">523.84</td><td class="st-cell"><span class="st st-hit">✅ ถึงแล้ว</span></td></tr><tr data-kind="below" data-level="505.0" data-ticker="SMH"><td class="tk-cell">SMH</td><td><b>ซื้อไม้ 2</b><div class="muted small">ย่อถึงขอบล่าง Bollinger แถว 500</div></td><td>≤ 505.00</td><td data-price="SMH">523.84</td><td class="st-cell"><span class="st st-wait">⏳ อีก -3.6%</span></td></tr><tr data-kind="above" data-level="570.6" data-ticker="SMH"><td class="tk-cell">SMH</td><td><b>ซื้อไม้ 3</b><div class="muted small">ยืนเหนือ EMA50 ได้ แปลว่าขาลงจบ</div></td><td>≥ 570.60</td><td data-price="SMH">523.84</td><td class="st-cell"><span class="st st-wait">⏳ อีก +8.9%</span></td></tr><tr data-kind="below" data-level="467.0" data-ticker="SMH"><td class="tk-cell">SMH</td><td><b>หยุดซื้อ</b><div class="muted small">ต่ำกว่า EMA200 เกิน 10%</div></td><td>≤ 467.00</td><td data-price="SMH">523.84</td><td class="st-cell"><span class="st st-wait">⏳ อีก -10.9%</span></td></tr><tr data-kind="below" data-level="55.5" data-ticker="GPIQ"><td class="tk-cell">GPIQ</td><td><b>ซื้อไม้ 1</b><div class="muted small">ราคาแถว EMA200</div></td><td>≤ 55.50</td><td data-price="GPIQ">54.48</td><td class="st-cell"><span class="st st-hit">✅ ถึงแล้ว</span></td></tr><tr data-kind="above" data-level="56.8" data-ticker="GPIQ"><td class="tk-cell">GPIQ</td><td><b>ซื้อไม้ 2</b><div class="muted small">ยืนเหนือ EMA50</div></td><td>≥ 56.80</td><td data-price="GPIQ">54.48</td><td class="st-cell"><span class="st st-wait">⏳ อีก +4.3%</span></td></tr><tr data-kind="above" data-level="57.0" data-ticker="AEHR"><td class="tk-cell">AEHR</td><td><b>ซื้อครึ่งแรก</b><div class="muted small">หลังงบ 2 พ.ย. และยืนเหนือแนวรับ Fibo</div></td><td>≥ 57.00</td><td data-price="AEHR">53.88</td><td class="st-cell"><span class="st st-wait">⏳ อีก +5.8%</span></td></tr><tr data-kind="below" data-level="43.0" data-ticker="AEHR"><td class="tk-cell">AEHR</td><td><b>รอดูแท่งกลับตัว</b><div class="muted small">ขอบล่าง Bollinger ถ้างบแย่</div></td><td>≤ 43.00</td><td data-price="AEHR">53.88</td><td class="st-cell"><span class="st st-wait">⏳ อีก -20.2%</span></td></tr><tr data-kind="below" data-level="1364.0" data-ticker="LLY"><td class="tk-cell">LLY</td><td><b>ขายไม้ที่เหลือ</b><div class="muted small">หลุด stop ของระบบ (ATR)</div></td><td>≤ 1,364.00</td><td data-price="LLY">1,425.37</td><td class="st-cell"><span class="st st-wait">⏳ อีก -4.3%</span></td></tr></tbody></table></div>
+<div class="note">"ถึงแล้ว" แปลว่าราคาแตะระดับแล้ว. ยังต้องดูแท่งเทียนกลับตัวและวันงบก่อนกดซื้อจริง.</div>
+
+<h2>📏 กฎประจำพอร์ต</h2>
+<div class="box"><ol><li>หุ้นตัวเดียวห้ามเกิน 35% ของพอร์ต. ส่วนที่เกินให้ขายออก.</li><li>ถือไม่เกิน 8 ถึง 10 ตัว. ตัวที่ได้เกรด F ติดกันเกิน 1 ไตรมาสให้ขาย.</li><li>เงินฝากใหม่แบ่ง 50% เข้า VOO และ 50% ให้หุ้นเกรด A ที่อยู่ในโซนเหนือ EMA200 0 ถึง 10%.</li><li>ไม่ซื้อเพิ่มภายใน 14 วันก่อนงบ และไม่ซื้อวันที่ราคาร่วงแรง.</li></ol></div>
+
+<h2>⚠️ ข้อจำกัด</h2>
+<div class="box"><ul><li>โซน EMA200 มาจาก backtest ที่มี survivorship bias, ทดสอบช่วงตลาดขาขึ้น และไม่มีงบย้อนหลัง.</li><li>ผลตอบแทนปี 2569 ยาวแค่ 10 เดือน ยังไม่หักภาษีปันผลและค่าธรรมเนียม.</li><li>ภาษีปันผลกองทุนสหรัฐและภาษีเงินนำเข้าไทย ยังไม่ได้ยืนยันกับผู้เชี่ยวชาญ.</li><li>นี่เป็นความเห็นจากข้อมูลในระบบ ไม่ใช่คำแนะนำการลงทุนที่รับรองผล.</li></ul></div>
+<p class="note" style="text-align:center;margin:24px 0">สร้างหน้าเมื่อ 2026-10-30 22:56</p>
+</div>
+<script>
+(function () {
+  var SYMBOLS = {"LLY": "NYSE:LLY", "SMH": "NASDAQ:SMH", "GPIQ": "NASDAQ:GPIQ", "AEHR": "NASDAQ:AEHR", "CHPY": "AMEX:CHPY"};
+  function fmt(p) { return p == null ? '-' : p.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+  function status(kind, level, price) {
+    if (price == null || price <= 0) return '<span class="st st-na">ไม่มีราคา</span>';
+    var hit = kind === 'above' ? price >= level : price <= level;
+    if (hit) return '<span class="st st-hit">✅ ถึงแล้ว</span>';
+    var gap = (level / price - 1) * 100;
+    return '<span class="st st-wait">⏳ อีก ' + (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%</span>';
+  }
+  function apply(prices) {
+    document.querySelectorAll('[data-price]').forEach(function (el) {
+      var p = prices[el.getAttribute('data-price')];
+      if (p != null) el.textContent = fmt(p);
+    });
+    document.querySelectorAll('#trig-table tr[data-kind]').forEach(function (tr) {
+      var p = prices[tr.getAttribute('data-ticker')];
+      if (p != null) tr.querySelector('.st-cell').innerHTML = status(tr.getAttribute('data-kind'), parseFloat(tr.getAttribute('data-level')), p);
+    });
+  }
+  window.refreshLiveQuotes = async function () {
+    var res = await fetch('https://scanner.tradingview.com/america/scan', {
+      method: 'POST', mode: 'cors',
+      body: JSON.stringify({ symbols: { tickers: Object.values(SYMBOLS) }, columns: ['close'] })
+    });
+    if (!res.ok) return;
+    var data = await res.json(), prices = {};
+    (data.data || []).forEach(function (it) { prices[(it.s || '').split(':').pop()] = it.d[0]; });
+    apply(prices);
+  };
+})();
+</script>
+</body>
+</html>

@@ -204,7 +204,7 @@ for m in ['fwd60','fwd20','mdd60']:
    ```bash
    /usr/bin/python3 -m unittest discover -s tests
    ```
-2. สร้างรายงานทั้ง 7 หน้า. ต้องจบด้วย exit 0 และขึ้นข้อความ "อัปเดตรายงานทั้งหมด 7 รายการเรียบร้อยสมบูรณ์".
+2. สร้างรายงานทั้ง 8 หน้า. ต้องจบด้วย exit 0 และขึ้นข้อความ "อัปเดตรายงานทั้งหมด 8 รายการเรียบร้อยสมบูรณ์".
    ```bash
    /usr/bin/python3 portfolio.py --all
    ```
@@ -215,7 +215,7 @@ for m in ['fwd60','fwd20','mdd60']:
 4. เปิดทุกหน้าด้วย Chrome แบบ headless เพื่อถ่าย screenshot และเก็บ console log.
    ```bash
    C="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-   for f in portfolio_master portfolio_review portfolio_recovery portfolio_dip_sim trades_ledger stock_chart watchlist; do
+   for f in portfolio_master portfolio_review portfolio_recovery portfolio_dip_sim trades_ledger stock_chart watchlist advisor; do
      "$C" --headless=new --disable-gpu --enable-logging=stderr --v=0 --virtual-time-budget=8000 \
        --window-size=1440,2400 --screenshot=/tmp/$f.png "file://$PWD/reports/$f.html" 2>/tmp/$f.console.log >/dev/null
      echo "$f js_errors=$(grep -c 'Uncaught' /tmp/$f.console.log)"
