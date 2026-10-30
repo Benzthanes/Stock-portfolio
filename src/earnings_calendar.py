@@ -119,6 +119,13 @@ CONFIRMED_EARNINGS_DATES: Dict[str, List[str]] = {
         # 2026-10-20: https://teslanorth.com/2026/10/16/spacex-q3-2026-results-webcast/
         "2026-08-04", "2026-10-20",
     ],
+    "AEHR": [
+        # 2024-01-09: https://www.aehr.com/2024/01/aehr-reports-strong-revenue-and-earnings-growth-for-the-second-quarter-and-first-six-months-of-fiscal-2024/
+        "2024-01-09", "2024-04-09", "2024-07-16", "2024-10-10",
+        "2025-01-13", "2025-04-08", "2025-07-08", "2025-10-06",
+        # 2026-11-02: https://www.aehr.com/2026/10/aehr-test-systems-to-announce-first-quarter-fiscal-2027-financial-results-on-november-2-2026/
+        "2026-01-08", "2026-04-07", "2026-07-14", "2026-11-02",
+    ],
 }
 
 # Timing of quarterly earnings announcements:
@@ -143,6 +150,7 @@ CONFIRMED_EARNINGS_TIMING: Dict[str, Any] = {
     "AMZN": "amc",    # ยืนยัน IR (Amazon ประกาศหลังปิดตลาด ~16:00 ET, Call 17:30 ET - Q3 2024: https://ir.aboutamazon.com/news-release/news-release-details/2024/Amazon.com-Announces-Third-Quarter-Results/default.aspx)
     "JPM": "bmo",     # ยืนยัน IR (JPMorgan Chase ประกาศก่อนเปิดตลาด ~07:00 ET, Call 08:30 ET - Q3 2024: https://www.jpmorganchase.com/ir/news/2024/3q24-earnings)
     "SPCX": "amc",    # แหล่งรอง ยังไม่มี IR ทางการ (SpaceX ประกาศหลังปิดตลาด webcast 15:30 CT - Q3 2026: https://teslanorth.com/2026/10/16/spacex-q3-2026-results-webcast/)
+    "AEHR": "amc",    # ยืนยัน IR (Aehr ประกาศหลังปิดตลาด 17:00 ET - Q1 FY27: https://www.aehr.com/2026/10/aehr-test-systems-to-announce-first-quarter-fiscal-2027-financial-results-on-november-2-2026/)
 }
 
 _LOGGED_UNKNOWN_TIMING = set()

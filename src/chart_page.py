@@ -20,9 +20,27 @@ from src.chart_data import (
 )
 from src.scoring import EARNINGS_GUARD_DAYS, ETF_TICKERS
 from src.nav import nav_bar_html
+from src.trades import data_path
+from src.watchlist import WATCHLIST_STOCKS
 
 TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 REPORTS_DIR = Path(__file__).resolve().parent.parent / "reports"
+
+
+def _data_dir() -> Path:
+    return data_path("")
+
+
+# Charted without a holding or trade. The Fibo support comes from the
+# watchlist table in src/watchlist.py so the number lives in one place.
+WATCHED_STOCKS: Dict[str, Dict[str, Any]] = {
+    "AEHR": {
+        "name": "Aehr Test Systems",
+        "sector": "Semiconductor Equipment",
+        "exchange": "NASDAQ",
+        "fibo_support": next(s["support"] for s in WATCHLIST_STOCKS if s["ticker"] == "AEHR"),
+    },
+}
 
 
 def render_chart_template(values: Dict[str, str]) -> str:
@@ -76,10 +94,11 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
         "APP": ("AppLovin Corporation", "Application Software", "NASDAQ"),
         "VST": ("Vistra Corp.", "Independent Power Producers", "NYSE"),
         "SKHY": ("SK hynix Inc. American Depositary Shares", "Memory Semiconductors", "NASDAQ"),
+        "AEHR": ("Aehr Test Systems", "Semiconductor Equipment", "NASDAQ"),
     }
 
     # 1. From portfolio.json
-    p_path = Path("data/portfolio.json")
+    p_path = _data_dir() / "portfolio.json"
     if p_path.exists():
         try:
             p_data = json.loads(p_path.read_text(encoding="utf-8"))
@@ -95,6 +114,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                     "total_cost": (h.get("total_cost_usd") or 0.0),
                     "cost_thb": (h.get("cost_thb") or 0.0),
                     "is_holding": True,
+                    "is_watched": False,
                     "price": (h.get("close_price") or 0.0),
                     "support": (h.get("key_support") or 0.0),
                     "resistance": (h.get("key_resistance") or 0.0),
@@ -110,7 +130,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
             pass
 
     # 2. From portfolio_dip_sim.json
-    d_path = Path("data/portfolio_dip_sim.json")
+    d_path = _data_dir() / "portfolio_dip_sim.json"
     if d_path.exists():
         try:
             d_data = json.loads(d_path.read_text(encoding="utf-8"))
@@ -127,6 +147,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                         "total_cost": (h.get("total_cost_usd") or 0.0),
                         "cost_thb": 0.0,
                         "is_holding": False,
+                        "is_watched": False,
                         "price": (h.get("close_price") or 0.0),
                         "support": (h.get("key_support") or 0.0),
                         "resistance": (h.get("key_resistance") or 0.0),
@@ -142,7 +163,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
             pass
 
     # 3. From trades.json
-    t_path = Path("data/trades.json")
+    t_path = _data_dir() / "trades.json"
     if t_path.exists():
         try:
             t_data = json.loads(t_path.read_text(encoding="utf-8"))
@@ -159,6 +180,7 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
                         "total_cost": 0.0,
                         "cost_thb": 0.0,
                         "is_holding": False,
+                        "is_watched": False,
                         "price": tr.get("sell_price_usd", 0.0),
                         "support": 0.0,
                         "resistance": 0.0,
@@ -173,8 +195,34 @@ def get_all_stocks_metadata() -> Dict[str, Dict[str, Any]]:
         except Exception:
             pass
 
+    # 3.5 From WATCHED_STOCKS (watched for technical analysis without portfolio holding or trade history)
+    for t, info in WATCHED_STOCKS.items():
+        if t not in meta:
+            meta[t] = {
+                "ticker": t,
+                "name": info.get("name", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[0]),
+                "sector": info.get("sector", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[1]),
+                "exchange": info.get("exchange", KNOWN_NAMES.get(t, (t, "", "NASDAQ"))[2]),
+                "cost": 0.0,
+                "shares": 0.0,
+                "total_cost": 0.0,
+                "cost_thb": 0.0,
+                "is_holding": False,
+                "is_watched": True,
+                "price": 0.0,
+                "support": info.get("fibo_support", 0.0),
+                "resistance": 0.0,
+                "sl": 0.0,
+                "tp": 0.0,
+                "target": 0.0,
+                "days_to_earnings": None,
+                "earnings_date": "-",
+                "is_earnings_near": False,
+                "earnings_guard_days": EARNINGS_GUARD_DAYS,
+            }
+
     # 4. Enrich with technical levels & earnings calendar from analysis JSON files
-    for an_file in [Path("data/.port_analysis.json"), Path("data/account_summary.json")]:
+    for an_file in [_data_dir() / ".port_analysis.json", _data_dir() / "account_summary.json"]:
         if an_file.exists():
             try:
                 an_data = json.loads(an_file.read_text(encoding="utf-8"))
@@ -277,6 +325,15 @@ def generate_stock_chart_page_html() -> str:
     """
     meta = get_all_stocks_metadata()
     raw_cache = load_candles_cache()
+
+    missing = [t for t in meta if t not in raw_cache]
+    if missing:
+        try:
+            from src.chart_data import get_all_charts_payload
+            new_payloads = get_all_charts_payload(missing)
+            raw_cache.update(new_payloads)
+        except Exception as exc:
+            print(f"[chart_page] score/candles fetch for missing tickers {missing} failed: {exc}", file=sys.stderr)
 
     # Pre-attach unified screener scores and fundamentals so recomputation has complete context
     all_tickers_to_score = sorted(list(set(list(raw_cache.keys()) + list(meta.keys()))))
@@ -401,8 +458,11 @@ def generate_stock_chart_page_html() -> str:
         res_str = _format_sr_levels(ress_chosen)
 
         is_holding = m.get("is_holding", False)
+        is_watched = m.get("is_watched", False)
         if is_holding:
             badge_html = '<span class="sc-badge sc-badge-holding">ถืออยู่</span><span class="sc-live-dot" title="มีในพอร์ตจริง">●</span>'
+        elif is_watched:
+            badge_html = '<span class="sc-badge sc-badge-watch">จับตา</span>'
         else:
             badge_html = '<span class="sc-badge sc-badge-closed">ขายแล้ว</span>'
 
@@ -434,6 +494,7 @@ def generate_stock_chart_page_html() -> str:
         "__PILLS_HTML__": pills_html_str,
         "__DEFAULT_TICKER__": sorted_tickers[0] if sorted_tickers else "LLY",
         "__SORTED_TICKERS_JSON__": sorted_tickers_json,
+        "__STOCK_COUNT__": str(len(sorted_tickers)),
         "__INIT_TICKER__": sorted_tickers[0] if sorted_tickers else "LLY",
     })
     (reports_dir / "stock_chart.html").write_text(html_content, encoding="utf-8")

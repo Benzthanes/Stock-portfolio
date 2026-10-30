@@ -28,6 +28,7 @@ def _report_failure(failures, step, exc):
 
 def _refresh_charts():
     from src.chart_data import get_all_charts_payload
+    from src.chart_page import WATCHED_STOCKS
     p_path = Path("data/portfolio.json")
     t_path = Path("data/trades.json")
     d_path = Path("data/portfolio_dip_sim.json")
@@ -38,6 +39,7 @@ def _refresh_charts():
         [h["ticker"] for h in p_data.get("holdings", [])]
         + [t["ticker"] for t in t_data.get("trades", [])]
         + [h["ticker"] for h in d_data.get("holdings", [])]
+        + list(WATCHED_STOCKS.keys())
     )
     get_all_charts_payload(list(all_t))
 
