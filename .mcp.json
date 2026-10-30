@@ -1,8 +1,14 @@
 {
   "mcpServers": {
     "tavily": {
-      "type": "http",
-      "url": "https://mcp.tavily.com/mcp"
+      "command": "/opt/homebrew/bin/npx",
+      "args": [
+        "-y",
+        "tavily-mcp@latest"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      }
     }
   }
 }
