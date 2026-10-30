@@ -59,9 +59,14 @@ jobs:
         id: reports
         run: python3 -m portfolio --all
 
+      - name: Check report data
+        id: check
+        if: steps.reports.outcome == 'success'
+        run: python3 scripts/check_reports.py
+
       - name: Commit and push updated reports
-        # Push whatever was generated even if one report step failed. The job still fails afterwards.
-        if: success() || steps.reports.outcome == 'failure'
+        # Push whatever was generated even if a report step or the data check failed. The job still fails afterwards.
+        if: success() || steps.reports.outcome == 'failure' || steps.check.outcome == 'failure'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

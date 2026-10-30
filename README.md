@@ -15,13 +15,14 @@
 เพียงพิมพ์คำสั่งสั้นๆ เหล่านี้ในช่องแชท:
 
 ### 🌟 `/all` อัปเดตทุกรายงานพร้อมกันในคลิกเดียว (All-in-One Refresh)
-- รันอัปเดตข้อมูลสดของทั้ง 6 รายงานให้พร้อมกันในรอบเดียว:
+- รันอัปเดตข้อมูลสดของทั้ง 7 รายงานให้พร้อมกันในรอบเดียว:
   1. แดชบอร์ดภาพรวมพอร์ต ([portfolio_master.html](reports/portfolio_master.html))
   2. รายงานตรวจสุขภาพพอร์ต ([portfolio_review.html](reports/portfolio_review.html))
   3. กลยุทธ์ฟื้นฟูแก้ดอย ([portfolio_recovery.html](reports/portfolio_recovery.html))
   4. พอร์ตจำลองช้อนซื้อ Dip ([portfolio_dip_sim.html](reports/portfolio_dip_sim.html))
   5. บัญชีประวัติปิดการขาย ([trades_ledger.html](reports/trades_ledger.html))
   6. หน้ากราฟและ AI เต็มจอ ([stock_chart.html](reports/stock_chart.html))
+  7. หุ้นที่สนใจตามแนวรับ Fibo ([watchlist.html](reports/watchlist.html))
 - ทุกรายงานมีแถบเมนูด้านบนสำหรับสลับหน้า และแสดงเวลาอัปเดตล่าสุด.
 - หรือรันผ่าน Terminal ด้วยคำสั่ง: `python3 portfolio.py --all`
 

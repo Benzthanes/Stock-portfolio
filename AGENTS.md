@@ -17,10 +17,11 @@ AI agent ทุกตัว (Gemini, Claude, Codex และตัวอื่�
 | งาน | คำสั่ง |
 | :--- | :--- |
 | เทสต์ทั้งหมด | `/usr/bin/python3 -m unittest discover -s tests` |
-| สร้างรายงานทั้ง 6 หน้า | `/usr/bin/python3 portfolio.py --all` |
+| สร้างรายงานทั้ง 7 หน้า | `/usr/bin/python3 portfolio.py --all` |
 | Backtest ตัวชี้วัด | `/usr/bin/python3 -m scripts.backtest_scoring` (ใช้เวลาราว 6 นาที ให้รันแบบ background) |
 | ปรับต้นทุนบาทตาม slip | `/usr/bin/python3 -m scripts.reconcile_cost_thb` (dry-run). ใส่ `--apply` เมื่อผู้ใช้อนุมัติแล้ว |
 | ข่าวที่รอวิเคราะห์ | `/usr/bin/python3 -m src.ai_news --pending` |
+| ตรวจข้อมูลในรายงาน | `/usr/bin/python3 scripts/check_reports.py` (stop กลับด้าน, guard วันงบ, วันแท่งเทียน) |
 
 * ใช้ `/usr/bin/python3` และห้ามใช้ `uv run` เพราะจะสร้างไฟล์ `uv.lock` ที่ไม่ต้องการ. โค้ดใช้แค่ standard library.
 * ห้ามเรียก `--help` กับสคริปต์ที่ไม่มี argparse เช่น `scripts/generate_master_report.py` (หรือ `python3 -m scripts.generate_master_report`). สคริปต์แบบนี้จะรันจริงและเขียนทับ `data/account_summary.json` กับ `reports/`.
@@ -52,8 +53,9 @@ AI agent ทุกตัว (Gemini, Claude, Codex และตัวอื่�
 
 1. เทสต์ผ่านครบ. เทสต์ใหม่ต้อง assert ค่าตัวเลขจริง ไม่ใช่แค่เช็กว่าไม่ crash.
 2. เช็กว่าเทสต์ไม่แตะ data จริง ด้วยการเทียบ `md5 -q data/ledger.json data/portfolio.json data/trades.json` ก่อนและหลังรัน.
-3. `portfolio.py --all` จบด้วย exit 0 และขึ้นข้อความ "อัปเดตรายงานทั้งหมด 6 รายการเรียบร้อยสมบูรณ์".
-4. เปิดทั้ง 6 หน้าด้วย Chrome แบบ headless ตามคำสั่งใน `docs/METHODOLOGY.md` หัวข้อ 5. จำนวน `Uncaught` ต้องเป็น 0. ให้เปิดดู screenshot เองด้วย.
+3. `portfolio.py --all` จบด้วย exit 0 และขึ้นข้อความ "อัปเดตรายงานทั้งหมด 7 รายการเรียบร้อยสมบูรณ์".
+   ต่อด้วย `scripts/check_reports.py` ที่ต้องจบด้วย exit 0.
+4. เปิดทั้ง 7 หน้าด้วย Chrome แบบ headless ตามคำสั่งใน `docs/METHODOLOGY.md` หัวข้อ 5. จำนวน `Uncaught` ต้องเป็น 0. ให้เปิดดู screenshot เองด้วย.
 5. บั๊กที่รายงานต้องทำให้เกิดซ้ำได้ก่อนแก้. ถ้าทำซ้ำไม่ได้ให้บอกว่ายังไม่ยืนยัน ห้ามแก้ตามการเดา.
 
 กับดักที่เคยเจอ:

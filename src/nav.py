@@ -10,6 +10,7 @@ PAGES = (
     ("dip_sim", "portfolio_dip_sim.html", "Dip จำลอง"),
     ("ledger", "trades_ledger.html", "รายการซื้อขายทั้งหมด"),
     ("chart", "stock_chart.html", "กราฟ"),
+    ("watchlist", "watchlist.html", "หุ้นที่สนใจ"),
 )
 
 ALIASES = {

@@ -1,11 +1,11 @@
 ---
 name: all
-description: Refreshes all 6 HTML reports in one run (Master Dashboard, Health Review, Recovery, Dip Simulation, Trades Ledger, Stock Chart), including AI Thai news translation and analysis, then verifies every page renders. Trigger on "/all", "all", "อัปเดตทั้งหมด", "ทำทุกอย่าง", "รันทั้งหมด", "อัปเดตทุกตัว", or requests to refresh all portfolio dashboards.
+description: Refreshes all 7 HTML reports in one run (Master Dashboard, Health Review, Recovery, Dip Simulation, Trades Ledger, Stock Chart, Watchlist), including AI Thai news translation and analysis, then verifies every page renders. Trigger on "/all", "all", "อัปเดตทั้งหมด", "ทำทุกอย่าง", "รันทั้งหมด", "อัปเดตทุกตัว", or requests to refresh all portfolio dashboards.
 ---
 
 # All-in-One Refresh (`/all`)
 
-อัปเดตรายงานทั้ง 6 หน้าในรอบเดียว พร้อมวิเคราะห์ข่าวใหม่ด้วย AI.
+อัปเดตรายงานทั้ง 7 หน้าในรอบเดียว พร้อมวิเคราะห์ข่าวใหม่ด้วย AI.
 รายละเอียดทุกขั้นอยู่ใน `docs/METHODOLOGY.md` หัวข้อ 4 และ 5.
 
 ## ก่อนเริ่ม
@@ -37,18 +37,24 @@ description: Refreshes all 6 HTML reports in one run (Master Dashboard, Health R
    cp data/ai_news_cache.json /tmp/ai_news_cache.before.json
    python3 -m src.ai_news --save /tmp/ai_news_analysis.json
    ```
-6. **สร้างรายงานทั้งหมด.** ต้องจบด้วย exit 0 และขึ้นข้อความ "อัปเดตรายงานทั้งหมด 6 รายการเรียบร้อยสมบูรณ์".
+6. **สร้างรายงานทั้งหมด.** ต้องจบด้วย exit 0 และขึ้นข้อความ "อัปเดตรายงานทั้งหมด 7 รายการเรียบร้อยสมบูรณ์".
    ```bash
    python3 portfolio.py --all
    ```
-7. **ตรวจทุกหน้าด้วย Chrome แบบ headless** ตามคำสั่งใน `docs/METHODOLOGY.md` หัวข้อ 5. จำนวน `Uncaught` error ต้องเป็น 0 ทุกหน้า. ให้เปิดดู screenshot ของหน้า Review และหน้า Chart เองด้วย.
-8. **สรุปให้ผู้ใช้.** บอก NAV, กำไรสะสม, จำนวนข่าวที่วิเคราะห์ใหม่, หุ้นที่เกรดเปลี่ยน และหุ้นที่งบออกภายใน 14 วัน.
+7. **ตรวจข้อมูลในรายงานด้วยสคริปต์.** ต้องจบด้วย exit 0 และขึ้น `0 problems`. ถ้ามีปัญหาให้หยุด รายงานผู้ใช้ และห้าม commit.
+   ```bash
+   python3 scripts/check_reports.py
+   ```
+   สคริปต์เช็กบั๊กที่หน้าเว็บไม่แสดงเป็น error. ได้แก่ stop หรือ target กลับด้าน, earnings guard ที่ไม่มีจำนวนวัน, guard บนกราฟที่ไม่ตรงกับ `days_to_earnings` ใน `data/account_summary.json` และแท่งสุดท้ายที่ตกวันเสาร์อาทิตย์หรือเลยวันปัจจุบันของตลาดสหรัฐฯ.
+8. **ตรวจทุกหน้าด้วย Chrome แบบ headless** ตามคำสั่งใน `docs/METHODOLOGY.md` หัวข้อ 5. จำนวน `Uncaught` error ต้องเป็น 0 ทุกหน้า. ให้เปิดดู screenshot ของหน้า Review และหน้า Chart เองด้วย.
+9. **สรุปให้ผู้ใช้.** บอก NAV, กำไรสะสม, จำนวนข่าวที่วิเคราะห์ใหม่, หุ้นที่เกรดเปลี่ยน และหุ้นที่งบออกภายใน 14 วัน.
 
 ## เมื่อรันใน GitHub Actions
 
 * Workflow `.github/workflows/update_portfolio.yml` รัน `python3 portfolio.py --all`.
 * ระบบใช้บทวิเคราะห์จาก `data/ai_news_cache.json` ก่อนเสมอ และไม่เขียนทับของเดิม.
 * ข่าวที่ AI ยังไม่ได้วิเคราะห์จะใช้ heuristic แทนชั่วคราว.
+* หลังสร้างรายงาน workflow รัน `python3 scripts/check_reports.py`. ถ้าเจอปัญหา workflow ยัง push รายงานใหม่ แต่ job จะ fail และเปิด issue.
 
 ## รายงานที่ได้
 
@@ -58,3 +64,4 @@ description: Refreshes all 6 HTML reports in one run (Master Dashboard, Health R
 4. `reports/portfolio_dip_sim.html` คือพอร์ตจำลองช้อนซื้อ.
 5. `reports/trades_ledger.html` คือรายการซื้อขายทั้งหมด.
 6. `reports/stock_chart.html` คือกราฟ, การ์ดคะแนนรวม และข่าว.
+7. `reports/watchlist.html` คือแนวรับ Fibo และหุ้นที่สนใจ.
