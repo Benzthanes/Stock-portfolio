@@ -2145,8 +2145,13 @@
 
 
 
-        /* Quarterly statement table on phones: quarter picker + metric list,
-           with the full table one tap away. */
+        /* Sub-rows (QoQ, YoY, margins) set a see-through cell background that
+           also hit the frozen metric column, so numbers scrolled underneath it. */
+        .fin-table td.fin-row-header,
+        .fin-table .fin-row-sub td.fin-row-header { background: #0c1427; }
+
+        /* Quarterly statements on phones: no sideways table. A trend view (one
+           card per metric with an 8-quarter bar strip) and a per-quarter list. */
         .finm-wrap { display: none; }
         .fin-table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         @media (max-width: 640px) {
@@ -2154,14 +2159,33 @@
             .fin-table-title { font-size: 0.84rem; }
             .fin-table-responsive { border: none; background: transparent; overflow: visible; }
             .finm-wrap { display: block; }
-            .fin-table-scroll { display: none; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; background: #090e1a; margin-top: 10px; }
-            .fin-show-full .fin-table-scroll { display: block; }
-            .fin-show-full .finm-list, .fin-show-full .finm-chips { display: none; }
-            .fin-table { min-width: 0; font-size: 0.72rem; }
-            .fin-table th, .fin-table td { padding: 8px 8px; }
-            .fin-table th.th-metric { min-width: 112px; max-width: 112px; white-space: normal; }
-            .fin-row-header { white-space: normal; min-width: 112px; max-width: 112px; font-size: 0.70rem; line-height: 1.3; }
-            .fin-table th.th-quarter { min-width: 84px; }
+            .fin-table-scroll { display: none; }
+            .finm-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 12px;
+                border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.08); }
+            .finm-seg-btn { white-space: nowrap; padding: 9px 6px; border-radius: 9px; border: none; background: transparent; color: #94a3b8;
+                font-size: 0.80rem; font-weight: 700; font-family: inherit; cursor: pointer; }
+            .finm-seg-btn.active { background: rgba(59, 130, 246, 0.25); color: #bfdbfe; }
+            .finc-hint { font-size: 0.70rem; color: #64748b; margin: 0 2px 8px; }
+            .finc-card { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; background: #090e1a;
+                padding: 12px 12px 8px; margin-bottom: 10px; }
+            .finc-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+            .finc-title { font-size: 0.80rem; font-weight: 700; color: #cbd5e1; }
+            .finc-q { font-size: 0.70rem; font-weight: 700; color: #60a5fa; white-space: nowrap; }
+            .finc-valrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
+            .finc-val { font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 800; color: #f8fafc; }
+            .finc-bars { display: grid; gap: 4px; align-items: end; }
+            .finc-bar { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px;
+                height: 92px; padding: 0; border: none; background: none; cursor: pointer; font-family: inherit;
+                -webkit-tap-highlight-color: transparent; }
+            .finc-bar b { font-weight: 700; font-size: 0.58rem; color: #94a3b8; white-space: nowrap; line-height: 1; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.3px; }
+            .finc-bar.sel b { color: #f8fafc; }
+            .finc-bar span { width: 100%; max-width: 30px; min-height: 0; flex: 0 1 auto; border-radius: 4px 4px 1px 1px; background: rgba(148, 163, 184, 0.35); }
+            .finc-bar.latest span { background: rgba(96, 165, 250, 0.75); }
+            .finc-bar.neg span { background: rgba(251, 113, 133, 0.7); }
+            .finc-bar.na span { background: rgba(255, 255, 255, 0.06); }
+            .finc-bar.sel span { outline: 2px solid #f8fafc; outline-offset: 1px; }
+            .finc-bar em { font-style: normal; font-size: 0.56rem; color: #64748b; white-space: nowrap; line-height: 1; }
+            .finc-bar.sel em { color: #e2e8f0; font-weight: 700; }
             .finm-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
             .finm-chips::-webkit-scrollbar { display: none; }
             .finm-chip { flex: 0 0 auto; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12);
@@ -2175,8 +2199,6 @@
             .finm-val { font-family: 'JetBrains Mono', monospace; color: #f1f5f9; text-align: right; white-space: nowrap; }
             .finm-sub { background: rgba(255, 255, 255, 0.015); padding-left: 22px; }
             .finm-sub .finm-label { color: #94a3b8; font-weight: 500; font-size: 0.74rem; }
-            .finm-full-btn { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.4);
-                background: rgba(59, 130, 246, 0.12); color: #93c5fd; font-weight: 700; font-size: 0.80rem; font-family: inherit; cursor: pointer; }
         }
 
         /* Phones: the stock-menu button shrinks to a round thumb-reach button on
@@ -2256,7 +2278,7 @@
   .rnav-int-btn { padding: 3px 6px; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️<span class="rnav-int-word"> อัปเดตสด:</span></span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 19:07</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link active" aria-current="page">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️<span class="rnav-int-word"> อัปเดตสด:</span></span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 20:03</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -8185,14 +8207,77 @@
             });
             lists += `<div class="finm-list" data-q="${idx}"${idx === last ? '' : ' hidden'}><div class="finm-date">งวด ${q.quarter_label} · ${q.date}</div>${items}</div>`;
         });
+        // Phone trend view: one card per metric with an 8-quarter bar strip.
+        const money = k => q => q[k + '_fmt'] || '-';
+        const pct = k => q => q[k] != null ? `${q[k].toFixed(1)}%` : '-';
+        const trendDefs = [
+            ['💰 รายได้รวม', 'revenue', money('revenue')],
+            ['📈 กำไรขั้นต้น', 'gross_profit', money('gross_profit')],
+            ['⚙️ อัตรากำไรขั้นต้น', 'gross_margin', pct('gross_margin')],
+            ['🏢 กำไรจากการดำเนินงาน', 'operating_income', money('operating_income')],
+            ['🎯 กำไรสุทธิ', 'net_income', money('net_income')],
+            ['📊 อัตรากำไรสุทธิ', 'net_margin', pct('net_margin')],
+            ['💵 กำไรต่อหุ้น (EPS)', 'eps', q => q.eps != null ? `$${q.eps.toFixed(2)}` : '-'],
+            ['🌊 กระแสเงินสดอิสระ (FCF)', 'fcf', money('fcf')],
+            ['💳 หนี้สินรวม', 'total_debt', money('total_debt')],
+            ['🏛️ ส่วนของผู้ถือหุ้น', 'stockholders_equity', money('stockholders_equity')],
+            ['⚖️ หนี้สินต่อทุน (D/E)', 'debt_to_equity', q => q.debt_to_equity != null ? `${q.debt_to_equity.toFixed(2)}x` : '-'],
+            ['🏷️ P/E อ้างอิงไตรมาส', 'pe_quarterly', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-'],
+        ];
+        // Short label above each bar so the trend reads without tapping.
+        const short = (key, v) => {
+            if (v == null) return '–';
+            if (['gross_margin', 'net_margin', 'pe_quarterly'].includes(key)) return v.toFixed(1);
+            if (['eps', 'debt_to_equity'].includes(key)) return v.toFixed(2);
+            const a = Math.abs(v), sign = v < 0 ? '-' : '';
+            if (a >= 1e9) return sign + (a / 1e9).toFixed(a >= 1e11 ? 0 : 1) + 'B';
+            if (a >= 1e6) return sign + (a / 1e6).toFixed(0) + 'M';
+            return sign + (a / 1e3).toFixed(0) + 'K';
+        };
+        const yoy = (key, idx) => {
+            if (idx < 4) return null;
+            const v = quarters[idx][key], p = quarters[idx - 4][key];
+            return (v == null || p == null || p === 0) ? null : ((v - p) / Math.abs(p)) * 100;
+        };
+        let trendCards = '';
+        trendDefs.forEach(([title, key, fmt]) => {
+            const vals = quarters.map(q => q[key]);
+            if (vals.every(v => v == null)) return;
+            const maxAbs = Math.max(...vals.map(v => Math.abs(v || 0))) || 1;
+            let bars = '';
+            quarters.forEach((q, idx) => {
+                const v = q[key];
+                const h = v == null ? 3 : Math.max(4, Math.round(Math.abs(v) / maxAbs * 56));
+                const cls = v == null ? 'na' : (v < 0 ? 'neg' : (idx === last ? 'latest' : ''));
+                bars += `<button type="button" class="finc-bar ${cls}${idx === last ? ' sel' : ''}" data-q="${idx}" data-v="${fmt(q)}" data-l="${q.quarter_label}" data-y="${yoy(key, idx) ?? ''}" onclick="finTrendPick(this)"><b>${short(key, v)}</b><span style="height:${h}px"></span><em>${q.quarter_label.replace("'", "’")}</em></button>`;
+            });
+            trendCards += `
+                <div class="finc-card">
+                    <div class="finc-head">
+                        <span class="finc-title">${title}</span>
+                        <span class="finc-q">${quarters[last].quarter_label}</span>
+                    </div>
+                    <div class="finc-valrow"><span class="finc-val">${fmt(quarters[last])}</span><span class="finc-yoy">${yoy(key, last) != null ? _renderGrowthBadge(yoy(key, last), 'YoY') : ''}</span></div>
+                    <div class="finc-bars" style="grid-template-columns: repeat(${quarters.length}, 1fr);">${bars}</div>
+                </div>`;
+        });
+
         const mobileHtml = `
             <div class="finm-wrap">
-                <div class="finm-chips">${chips}</div>
-                ${lists}
-                <button type="button" class="finm-full-btn" onclick="finToggleFullTable()">📋 ดูตารางเต็ม 8 ไตรมาส (เลื่อนซ้ายขวา)</button>
+                <div class="finm-seg" role="tablist">
+                    <button type="button" class="finm-seg-btn active" data-view="trend" onclick="finMobileView('trend')">📈 แนวโน้ม ${quarters.length} ไตรมาส</button>
+                    <button type="button" class="finm-seg-btn" data-view="quarter" onclick="finMobileView('quarter')">📋 ทีละไตรมาส</button>
+                </div>
+                <div class="finm-view" data-view="trend">
+                    <div class="finc-hint">แตะแท่งกราฟเพื่อดูตัวเลขของไตรมาสนั้น</div>
+                    ${trendCards}
+                </div>
+                <div class="finm-view" data-view="quarter" hidden>
+                    <div class="finm-chips">${chips}</div>
+                    ${lists}
+                </div>
             </div>`;
 
-        container.classList.remove('fin-show-full');
         container.innerHTML = `
             ${mobileHtml}
             <div class="fin-table-scroll">
@@ -8211,13 +8296,23 @@
         container.querySelectorAll('.finm-list').forEach(l => { l.hidden = +l.dataset.q !== idx; });
     }
 
-    function finToggleFullTable() {
+    function finMobileView(view) {
         const container = document.getElementById('fin_table_container');
         if (!container) return;
-        const full = container.classList.toggle('fin-show-full');
-        const btn = container.querySelector('.finm-full-btn');
-        if (btn) btn.textContent = full ? '📱 กลับไปดูทีละไตรมาส' : '📋 ดูตารางเต็ม 8 ไตรมาส (เลื่อนซ้ายขวา)';
+        container.querySelectorAll('.finm-seg-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+        container.querySelectorAll('.finm-view').forEach(v => { v.hidden = v.dataset.view !== view; });
     }
+
+    function finTrendPick(bar) {
+        const card = bar.closest('.finc-card');
+        if (!card) return;
+        card.querySelectorAll('.finc-bar').forEach(b => b.classList.toggle('sel', b === bar));
+        card.querySelector('.finc-val').textContent = bar.dataset.v;
+        card.querySelector('.finc-q').textContent = bar.dataset.l;
+        const y = bar.dataset.y;
+        card.querySelector('.finc-yoy').innerHTML = y === '' ? '' : _renderGrowthBadge(Number(y), 'YoY');
+    }
+
 
     // Switch Tabs (Lightweight Chart vs TradingView Full Embed)
     function switchChartTab(mode) {

@@ -4896,14 +4896,77 @@
             });
             lists += `<div class="finm-list" data-q="${idx}"${idx === last ? '' : ' hidden'}><div class="finm-date">งวด ${q.quarter_label} · ${q.date}</div>${items}</div>`;
         });
+        // Phone trend view: one card per metric with an 8-quarter bar strip.
+        const money = k => q => q[k + '_fmt'] || '-';
+        const pct = k => q => q[k] != null ? `${q[k].toFixed(1)}%` : '-';
+        const trendDefs = [
+            ['💰 รายได้รวม', 'revenue', money('revenue')],
+            ['📈 กำไรขั้นต้น', 'gross_profit', money('gross_profit')],
+            ['⚙️ อัตรากำไรขั้นต้น', 'gross_margin', pct('gross_margin')],
+            ['🏢 กำไรจากการดำเนินงาน', 'operating_income', money('operating_income')],
+            ['🎯 กำไรสุทธิ', 'net_income', money('net_income')],
+            ['📊 อัตรากำไรสุทธิ', 'net_margin', pct('net_margin')],
+            ['💵 กำไรต่อหุ้น (EPS)', 'eps', q => q.eps != null ? `$${q.eps.toFixed(2)}` : '-'],
+            ['🌊 กระแสเงินสดอิสระ (FCF)', 'fcf', money('fcf')],
+            ['💳 หนี้สินรวม', 'total_debt', money('total_debt')],
+            ['🏛️ ส่วนของผู้ถือหุ้น', 'stockholders_equity', money('stockholders_equity')],
+            ['⚖️ หนี้สินต่อทุน (D/E)', 'debt_to_equity', q => q.debt_to_equity != null ? `${q.debt_to_equity.toFixed(2)}x` : '-'],
+            ['🏷️ P/E อ้างอิงไตรมาส', 'pe_quarterly', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-'],
+        ];
+        // Short label above each bar so the trend reads without tapping.
+        const short = (key, v) => {
+            if (v == null) return '–';
+            if (['gross_margin', 'net_margin', 'pe_quarterly'].includes(key)) return v.toFixed(1);
+            if (['eps', 'debt_to_equity'].includes(key)) return v.toFixed(2);
+            const a = Math.abs(v), sign = v < 0 ? '-' : '';
+            if (a >= 1e9) return sign + (a / 1e9).toFixed(a >= 1e11 ? 0 : 1) + 'B';
+            if (a >= 1e6) return sign + (a / 1e6).toFixed(0) + 'M';
+            return sign + (a / 1e3).toFixed(0) + 'K';
+        };
+        const yoy = (key, idx) => {
+            if (idx < 4) return null;
+            const v = quarters[idx][key], p = quarters[idx - 4][key];
+            return (v == null || p == null || p === 0) ? null : ((v - p) / Math.abs(p)) * 100;
+        };
+        let trendCards = '';
+        trendDefs.forEach(([title, key, fmt]) => {
+            const vals = quarters.map(q => q[key]);
+            if (vals.every(v => v == null)) return;
+            const maxAbs = Math.max(...vals.map(v => Math.abs(v || 0))) || 1;
+            let bars = '';
+            quarters.forEach((q, idx) => {
+                const v = q[key];
+                const h = v == null ? 3 : Math.max(4, Math.round(Math.abs(v) / maxAbs * 56));
+                const cls = v == null ? 'na' : (v < 0 ? 'neg' : (idx === last ? 'latest' : ''));
+                bars += `<button type="button" class="finc-bar ${cls}${idx === last ? ' sel' : ''}" data-q="${idx}" data-v="${fmt(q)}" data-l="${q.quarter_label}" data-y="${yoy(key, idx) ?? ''}" onclick="finTrendPick(this)"><b>${short(key, v)}</b><span style="height:${h}px"></span><em>${q.quarter_label.replace("'", "’")}</em></button>`;
+            });
+            trendCards += `
+                <div class="finc-card">
+                    <div class="finc-head">
+                        <span class="finc-title">${title}</span>
+                        <span class="finc-q">${quarters[last].quarter_label}</span>
+                    </div>
+                    <div class="finc-valrow"><span class="finc-val">${fmt(quarters[last])}</span><span class="finc-yoy">${yoy(key, last) != null ? _renderGrowthBadge(yoy(key, last), 'YoY') : ''}</span></div>
+                    <div class="finc-bars" style="grid-template-columns: repeat(${quarters.length}, 1fr);">${bars}</div>
+                </div>`;
+        });
+
         const mobileHtml = `
             <div class="finm-wrap">
-                <div class="finm-chips">${chips}</div>
-                ${lists}
-                <button type="button" class="finm-full-btn" onclick="finToggleFullTable()">📋 ดูตารางเต็ม 8 ไตรมาส (เลื่อนซ้ายขวา)</button>
+                <div class="finm-seg" role="tablist">
+                    <button type="button" class="finm-seg-btn active" data-view="trend" onclick="finMobileView('trend')">📈 แนวโน้ม ${quarters.length} ไตรมาส</button>
+                    <button type="button" class="finm-seg-btn" data-view="quarter" onclick="finMobileView('quarter')">📋 ทีละไตรมาส</button>
+                </div>
+                <div class="finm-view" data-view="trend">
+                    <div class="finc-hint">แตะแท่งกราฟเพื่อดูตัวเลขของไตรมาสนั้น</div>
+                    ${trendCards}
+                </div>
+                <div class="finm-view" data-view="quarter" hidden>
+                    <div class="finm-chips">${chips}</div>
+                    ${lists}
+                </div>
             </div>`;
 
-        container.classList.remove('fin-show-full');
         container.innerHTML = `
             ${mobileHtml}
             <div class="fin-table-scroll">
@@ -4922,13 +4985,23 @@
         container.querySelectorAll('.finm-list').forEach(l => { l.hidden = +l.dataset.q !== idx; });
     }
 
-    function finToggleFullTable() {
+    function finMobileView(view) {
         const container = document.getElementById('fin_table_container');
         if (!container) return;
-        const full = container.classList.toggle('fin-show-full');
-        const btn = container.querySelector('.finm-full-btn');
-        if (btn) btn.textContent = full ? '📱 กลับไปดูทีละไตรมาส' : '📋 ดูตารางเต็ม 8 ไตรมาส (เลื่อนซ้ายขวา)';
+        container.querySelectorAll('.finm-seg-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+        container.querySelectorAll('.finm-view').forEach(v => { v.hidden = v.dataset.view !== view; });
     }
+
+    function finTrendPick(bar) {
+        const card = bar.closest('.finc-card');
+        if (!card) return;
+        card.querySelectorAll('.finc-bar').forEach(b => b.classList.toggle('sel', b === bar));
+        card.querySelector('.finc-val').textContent = bar.dataset.v;
+        card.querySelector('.finc-q').textContent = bar.dataset.l;
+        const y = bar.dataset.y;
+        card.querySelector('.finc-yoy').innerHTML = y === '' ? '' : _renderGrowthBadge(Number(y), 'YoY');
+    }
+
 
     // Switch Tabs (Lightweight Chart vs TradingView Full Embed)
     function switchChartTab(mode) {
