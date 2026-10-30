@@ -4559,6 +4559,18 @@
         return `<span class="${cls}">${sign}${Math.abs(num).toFixed(1)}% ${arrow}${lbl}</span>`;
     }
 
+    // invert: for debt and D/E a fall is the good direction, so green means down.
+    // neutral: a higher or lower P/E is neither good nor bad, so it stays grey.
+    function _renderYoYBadge(val, isPoints, invert, neutral) {
+        if (neutral) return _renderGrowthBadge(val, 'YoY').replace(/fin-badge-(pos|neg)/, 'fin-badge-neutral');
+        if (!isPoints && !invert) return _renderGrowthBadge(val, 'YoY');
+        const good = invert ? val < 0 : val > 0, bad = invert ? val > 0 : val < 0;
+        const cls = good ? 'fin-badge-pos' : (bad ? 'fin-badge-neg' : 'fin-badge-neutral');
+        const unit = isPoints ? ' จุด' : '%';
+        const arrow = val > 0 ? '▲' : (val < 0 ? '▼' : '');
+        return `<span class="${cls}">${val > 0 ? '+' : (val < 0 ? '-' : '')}${Math.abs(val).toFixed(1)}${unit} ${arrow} YoY</span>`;
+    }
+
     function updateFinancialsSection(ticker) {
         const card = document.getElementById('financials_card');
         if (!card) return;
@@ -4923,11 +4935,18 @@
             if (a >= 1e6) return sign + (a / 1e6).toFixed(0) + 'M';
             return sign + (a / 1e3).toFixed(0) + 'K';
         };
+        // Margins change in percentage points: 36.4% -> 30.9% is "-5.5 จุด",
+        // not "-15.1%", which reads as if profit itself fell or went negative.
+        const PP_KEYS = ['gross_margin', 'net_margin'];
         const yoy = (key, idx) => {
             if (idx < 4) return null;
             const v = quarters[idx][key], p = quarters[idx - 4][key];
-            return (v == null || p == null || p === 0) ? null : ((v - p) / Math.abs(p)) * 100;
+            if (v == null || p == null) return null;
+            if (PP_KEYS.includes(key)) return v - p;
+            return p === 0 ? null : ((v - p) / Math.abs(p)) * 100;
         };
+        const LOWER_IS_BETTER = ['total_debt', 'debt_to_equity'];
+        const yoyBadge = (key, val) => val == null ? '' : _renderYoYBadge(val, PP_KEYS.includes(key), LOWER_IS_BETTER.includes(key), key === 'pe_quarterly');
         let trendCards = '';
         trendDefs.forEach(([title, key, fmt]) => {
             const vals = quarters.map(q => q[key]);
@@ -4938,7 +4957,7 @@
                 const v = q[key];
                 const h = v == null ? 3 : Math.max(4, Math.round(Math.abs(v) / maxAbs * 56));
                 const cls = v == null ? 'na' : (v < 0 ? 'neg' : (idx === last ? 'latest' : ''));
-                bars += `<button type="button" class="finc-bar ${cls}${idx === last ? ' sel' : ''}" data-q="${idx}" data-v="${fmt(q)}" data-l="${q.quarter_label}" data-y="${yoy(key, idx) ?? ''}" onclick="finTrendPick(this)"><b>${short(key, v)}</b><span style="height:${h}px"></span><em>${q.quarter_label.replace("'", "’")}</em></button>`;
+                bars += `<button type="button" class="finc-bar ${cls}${idx === last ? ' sel' : ''}" data-q="${idx}" data-v="${fmt(q)}" data-l="${q.quarter_label}" data-y="${yoy(key, idx) ?? ''}" data-pp="${PP_KEYS.includes(key) ? 1 : ''}" data-inv="${LOWER_IS_BETTER.includes(key) ? 1 : ''}" data-neu="${key === 'pe_quarterly' ? 1 : ''}" onclick="finTrendPick(this)"><b>${short(key, v)}</b><span style="height:${h}px"></span><em>${q.quarter_label.replace("'", "’")}</em></button>`;
             });
             trendCards += `
                 <div class="finc-card">
@@ -4946,7 +4965,7 @@
                         <span class="finc-title">${title}</span>
                         <span class="finc-q">${quarters[last].quarter_label}</span>
                     </div>
-                    <div class="finc-valrow"><span class="finc-val">${fmt(quarters[last])}</span><span class="finc-yoy">${yoy(key, last) != null ? _renderGrowthBadge(yoy(key, last), 'YoY') : ''}</span></div>
+                    <div class="finc-valrow"><span class="finc-val">${fmt(quarters[last])}</span><span class="finc-yoy">${yoyBadge(key, yoy(key, last))}</span></div>
                     <div class="finc-bars" style="grid-template-columns: repeat(${quarters.length}, 1fr);">${bars}</div>
                 </div>`;
         });
@@ -4999,7 +5018,7 @@
         card.querySelector('.finc-val').textContent = bar.dataset.v;
         card.querySelector('.finc-q').textContent = bar.dataset.l;
         const y = bar.dataset.y;
-        card.querySelector('.finc-yoy').innerHTML = y === '' ? '' : _renderGrowthBadge(Number(y), 'YoY');
+        card.querySelector('.finc-yoy').innerHTML = y === '' ? '' : _renderYoYBadge(Number(y), bar.dataset.pp === '1', bar.dataset.inv === '1', bar.dataset.neu === '1');
     }
 
 
