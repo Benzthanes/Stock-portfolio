@@ -282,7 +282,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link active" aria-current="page">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 11:04</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link active" aria-current="page">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 18:12</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -445,7 +445,7 @@
                 <div class="text-muted">พอร์ต: <strong>ไม่รวยก็ซวยอ่ะค้าบ</strong></div>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.70 THB/USD</span>
+                <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.68 THB/USD</span>
             </div>
         </header>
 
@@ -462,8 +462,8 @@
             </div>
             <div class="card">
                 <div class="kpi-label">฿ ยอดขาดทุนรวม (THB)</div>
-                <div class="kpi-value text-rose">-฿36,476.64</div>
-                <div class="kpi-subtext">คำนวณที่อัตราแลกเปลี่ยน 33.70 THB/USD</div>
+                <div class="kpi-value text-rose">-฿36,658.62</div>
+                <div class="kpi-subtext">คำนวณที่อัตราแลกเปลี่ยน 33.68 THB/USD</div>
             </div>
         </div>
 
@@ -487,7 +487,7 @@
                 <tbody>
                     
         <tr>
-            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 405.31)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span></td>
+            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 403.54)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span></td>
             <td><div class="fw-bold">Alphabet Inc. Class A</div><div class="text-muted small">ผู้นำเสิร์ชเอนจิน Google, แพลตฟอร์ม YouTube, Android และคลาวด์ Google Cloud</div></td>
             <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $341.72<br><span class="text-muted small">ตลาด:</span> $283.82</td>
             <td style="text-align: right;" class="text-rose fw-bold">-16.9%<br><span class="small">(-$647.84)</span></td>
@@ -496,8 +496,8 @@
                 <div class="text-amber small">ต้าน $340.29</div>
             </td>
             <td style="text-align: right;" class="text-emerald fw-bold">+20.4%</td>
-            <td style="text-align: right;"><strong>$405.31</strong> <span class='text-emerald small'>(+43%)</span></td>
-            <td style="text-align: center;"><span class='badge badge-amber' title="Rev Growth +22% 🚀 • Net Income +90% 🚀 • Elite ROE (44%) 🏆 • Attractive PEG 0.19 💎 • Safe Debt (D/E 0.21) 🛡️ • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-14.1%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 60/100</span><br><span class="badge badge-neutral">Rev +22.2% | Net +89.7%</span></td>
+            <td style="text-align: right;"><strong>$403.54</strong> <span class='text-emerald small'>(+42%)</span></td>
+            <td style="text-align: center;"><span class='badge badge-amber' title="Rev Growth +22% 🚀 • Net Income +90% 🚀 • Elite ROE (44%) 🏆 • Attractive PEG 0.19 💎 • Safe Debt (D/E 0.22) 🛡️ • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-14.1%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 60/100</span><br><span class="badge badge-neutral">Rev +22.2% | Net +89.7%</span></td>
             <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 95 วัน</span></td>
             <td><span class="badge badge-amber">🛡️ ถือติดตามแนวรับ $267.81 (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)</span></td>
         </tr>
@@ -560,7 +560,7 @@
             <!-- Card Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 405.31)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 403.54)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
                     <strong style="font-size: 1.25rem;">Alphabet Inc. Class A</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Technology Services • Internet Software/Services</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟢 High Quality Growth (ธุรกิจเติบโตสูง)</span>
@@ -568,7 +568,7 @@
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                     <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -16.9% (-$647.84 USD)</span>
                     <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🛡️ ถือติดตามแนวรับ $267.81 (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)</span>
-                    <button onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 405.31)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <button onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 403.54)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -676,7 +676,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$405.31 <span class="small">(+43%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$403.54 <span class="small">(+42%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -684,7 +684,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 66 แห่ง (Buy 59 / Hold 7 / Sell 0) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $405.31 (Upside +42.8%)
+                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 66 แห่ง (Buy 59 / Hold 7 / Sell 0) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $403.54 (Upside +42.2%)
                 </div>
             </div>
 
@@ -696,7 +696,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>AI กำลังทำลายห่านทองคำของ Google หรือไม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMihAFBVV95cUxQbERmeGFScWJVREM0S1dtT2JUTzF6TVA0cjRhQWQ1MmUwWmozdFdkWDF1Y3VCeUs1N1RRY2c0aXdjem45Qk41LS1xNF92WHNvZzFOUG42UzZ5aXY0UC1vTUZLdE1YTE9aV051a0ZjVVhubmhEbWRwcDlWNktoNFo4a0h2MUY?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Is AI Killing Google&#x27;s Golden Goose? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>AI กำลังทำลายห่านทองคำของ Google หรือไม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMinAFBVV95cUxPWEVRSXhpZHNadnJjczFKZDQ3M3c3bTZJV1JUdTFrbGZ2SENEaUlrSkRCYVNCQzlGWVZQME1HcXlteTBPLS1WaDAyM0V1dUl6ZExYRklIQURaODlrb3NBczFLd3hhVDVKeG9reEZaekp3N0hTX05xSDJtNjRQX01KOS11bDVVaXJMbzBwNjI3bWN2N1VOemkwdmZhdno?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Is AI Killing Google&#x27;s Golden Goose? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[NBC News]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Google ร่วงหนักเป็นประวัติการณ์ จุดความกลัวฟองสบู่ AI แตก</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPMjg1ckNTT3R0aUxzR05RZEN2LUZYempyTkl6UW5aVUJZbjdxODAtb19za0NCdnd0ZnNVRHJMSV8yUmdDWkkwUTAtc2hmdjVPZjAyTzQ3cEhaQUFyNmJ1YkhDNG04Wl9LdWI1TVZwa3l1T0pQMmtUbXNzSnhxOWlCQmRPNGFnaFBDLTlrbzFkVTBNdFJzQWFlSjhOR1g5WUlJUi1JWFRyNlpFekNTZjMxVjln?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google stock&#x27;s historically bad day raises fears of AI bubble popping ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Trefis]</strong> <span style='font-weight: 600; color: #f1f5f9;'>อะไรทำให้หุ้น Alphabet ร่วงลง</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxNdnM2dkRueE1tNnBVQkg5ZF9JQW5YMVFELUwxUUpqR0VRU2JlMldsSVQ4R295MGd3U0JRTGs5dHpyUXowb2NUb3pwVkZfZXdqTG40QTlLT1g0UjR1c0dlSDFfYS05c3MyNHg2MVBpVVJOMmlSVW52eXlQVThfNndDQ2hrS1RiM0dhX3JhTEdVZ3pybDJueXpv?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>What Sent Alphabet Stock Lower? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Amazon, Alphabet, SpaceX และ Meta ถูกมองเป็นต้นเหตุของการเทขายหุ้นเทครอบใหม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMi1wFBVV95cUxQREdoUGl3MFdxbTlBczk2OXRndWF6aVAtY3BFeU5raF9mODcwVVNvc0F0d3ViU2RpcDBIWUFRYUlVS0o4bVY0TDFMSDZuUFJGc2t6U0czUTNYVXBzeHZoXzNVNmJWVzZfaGVhZW1ZU3EwaVJWRlpwbnV5cUhuQklyV21MQ1duclVsZ1JyWnpHajA3OXE0UTlzMVJoMDdIT3JUY1lRanRycmtsaXZJcVJ3UTh1UnNKOERaa05pMGF6REFQUFdxOWZib3dTTjBVekVydGxFOEZWbw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Amazon, Alphabet, SpaceX and Meta are all to blame for the new tech stock rout ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>สรุป AI จาก Stocktwits งบ Intel, Amazon และ Alphabet จุดชนวนเทขาย เมื่อรายจ่ายมหาศาลกลับมาเป็นประเด็น</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMioAFBVV95cUxPMThQRlY5ekM4R3I3ZzFwcXRNblFjbVI0MUFaX1phN2Y4THAxeXJSZi1PWjU1eUVtM0l3bUtCZDVxTDB1bU55ejJPMW03M3kxdTVsZ1B3aF9wcWcwTzdjdi0yUWZkeDE2MWJJdkdMQ0lmM1VDdzVoUjRpSUs3ZFM3YjByMVNMZjhwMDdLWUpqdmlSQ0dhQURsamRSWXVRUXp3?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Stocktwits AI Roundup: Intel, Amazon, Alphabet Results Trigger Meltdown As Big Tech’s Record Spending Returns To Focus ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -888,7 +888,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวเชิงบวกเด่นชัดในสัปดาห์นี้.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[ad-hoc-news.de]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Nokia บวกจากความร่วมมือด้าน R&amp;D ในอินเดียกับ LTTS</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPdXNpb0I2MnFDQUYtaU1uRVFubFZWR1ZVOUdpRExPUllxemR0OEU1bGxQRmJaeHdtcnQ2Yk4yZnhpZ01pa1VPX1JYQ19wS3dxREluZ2lRcnozQThEUlNZY3NCcGxBb3poSms1MHp5UWRSMmxRc0RFY25DdGlVOEdJbnpMSGd6dVhxdkhGSmxQdll2a2xhRjd0OTAzRUNqTTA5SE0zSHozU0wxSTdEa0M1UkVB?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Nokia stock gains India R&amp;D partnership with LTTS ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -1088,7 +1088,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[ad-hoc-news.de]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น AppLovin ทำจุดต่ำสุดรอบปี หลัง RBC และ UBS ลดราคาเป้าหมายก่อนประกาศงบ</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizgFBVV95cUxPajlUY2RldC1CcFpBYVdYWjBOSXZlRmNMLUk0ZUpycnNQdmdfSk12ZzJpT25GUGMxcHk1UlpZQWJOd090cDhqQ0c4ZHh1X0Z5MWpmeU1jcmRhSk9USkozTXVYUndVMll1am0zTWZIUEY1VzZHdDJIbmRYRHpZaFRseGc2eVVqb3JkMTB1ZlVQeGdsY2RnU3VscnhlWGVjbVMyVnhPaTQ4NEVBQUdvaXl6Sy05YlgzTEdsYU9ZVlc5bk9HeVgzRERMRXdsNHoxQQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>AppLovin stock hits annual low as RBC, UBS cut targets ahead of results ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[TradingView]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ทำไม NFLX, MBLY และ APP จึงร่วงลงทำจุดต่ำสุดรอบ 52 สัปดาห์</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPV0kxZ3Zub2tNeVFkekxabjV0czVSZWd0OWQ4ZHI5YVlUSW1URFNvWEhkXzhFQzJYS3k0RTJiUDUxR09Zck93SjFodnNEYVVtelliMGlxUlFhZ0MzQmY4UTlrUlY0dnBfVDF4MEtxWFFOTjNhS2hGR0hnZDJRTzBYU3ZsUGNMUnJqdjgwMmlvelRTeUxKaW9ydXliWVQxZ2J3dG5uZHJBVEd0RkwwVGNHdUtn?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Why Did NFLX, MBLY, APP Stocks Tumble To 52-Week Lows? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 

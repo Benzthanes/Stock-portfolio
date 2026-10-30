@@ -590,7 +590,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 11:04</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link active" aria-current="page">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 18:12</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -754,7 +754,7 @@
             </div>
             <div class="header-meta">
                 <span class="meta-pill">🏦 <strong>Broker:</strong> Dime! (KKP Securities)</span>
-                <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.70 THB/USD</span>
+                <span class="meta-pill">💱 <strong>FX Rate:</strong> 33.68 THB/USD</span>
             </div>
         </header>
 
@@ -774,20 +774,20 @@
             <div class="card kpi-card">
                 <div class="kpi-label">💰 มูลค่าพอร์ตปัจจุบัน</div>
                 <div class="kpi-value">$49,460.80</div>
-                <div class="kpi-subtext">≈ ฿1,666,878.41 THB (ต้นทุน $40,397.78)</div>
+                <div class="kpi-subtext">≈ ฿1,665,641.89 THB (ต้นทุน $40,397.78)</div>
                 
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">📈 กำไร/ขาดทุนสุทธิ (Unrealized)</div>
                 <div class="kpi-value" style="color: var(--emerald);">+$9,063.02 (+22.43%)</div>
-                <div class="kpi-subtext">≈ +฿308,468.25 THB</div>
+                <div class="kpi-subtext">≈ +฿307,231.73 THB</div>
             </div>
 
             <div class="card kpi-card">
                 <div class="kpi-label">⚡ กำไร/ขาดทุนวันนี้ (1D Change)</div>
                 <div class="kpi-value" style="color: var(--emerald);">+$1,945.01 (+4.09%)</div>
-                <div class="kpi-subtext">≈ +฿65,548.94 THB</div>
+                <div class="kpi-subtext">≈ +฿65,500.32 THB</div>
             </div>
 
             <div class="card kpi-card">
@@ -935,23 +935,23 @@
                     
         <tr>
             <td style="white-space: nowrap;">
-                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1373.7, 1107.6, 1412.64, 1309.91, 1483.6, 1412.64)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LLY 📈</span>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1373.7, 1107.6, 1443.28, 1309.91, 1483.6, 1443.28)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LLY 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Eli Lilly and Company</div>
                 <div class="text-muted small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 180px; line-height: 1.3;">บริษัทยาชีวเวชภัณฑ์ระดับโลก ผู้นำยารักษาเบาหวานและยาลดความอ้วน (Mounjaro/Zepbound)</div>
             </td>
-            <td style="white-space: nowrap;">⭐⭐⭐⭐<br><span class='badge badge-emerald' title="Rev Growth +50% 🚀 • Net Income +94% 🚀 • Elite ROE (102%) 🏆 • Attractive PEG 0.46 💎 • Elevated Debt (D/E 1.62) • FCF Cash Cow 💵 • ยืดเหนือ EMA200 (+24.5%) รอย่อ" style='cursor:help;'>เกรด A · 75/100</span></td>
+            <td style="white-space: nowrap;">⭐⭐⭐⭐<br><span class='badge badge-emerald' title="Rev Growth +46% 🚀 • Net Income +50% 🚀 • Elite ROE (86%) 🏆 • Attractive PEG 0.84 💎 • Moderate Debt (D/E 1.23) • FCF Cash Cow 💵 • ยืดเหนือ EMA200 (+24.5%) รอย่อ" style='cursor:help;'>เกรด A · 78/100</span></td>
             <td style="text-align: right; font-weight: 700; white-space: nowrap;">76.8%</td>
             <td style="text-align: right; white-space: nowrap;">$1,021.11</td>
             <td style="text-align: right; font-weight: 600; white-space: nowrap;">$1,373.70</td>
             <td style="text-align: right; white-space: nowrap;">
                 <div class="text-emerald small fw-bold">รับ $1,107.60</div>
-                <div class="text-amber small">ต้าน $1,412.64</div>
+                <div class="text-amber small">ต้าน $1,443.28</div>
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$37,979.73</div>
-                <div class="text-muted small">≈ ฿1,279,955</div>
+                <div class="text-muted small">≈ ฿1,279,005</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-emerald">
                 <div class="fw-bold">+34.53%</div>
@@ -967,13 +967,13 @@
         
         <tr>
             <td style="white-space: nowrap;">
-                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 283.82, 267.81, 340.29, 267.81, 340.29, 405.31)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
+                <span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 283.82, 267.81, 340.29, 267.81, 340.29, 403.54)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
             </td>
             <td>
                 <div class="fw-bold">Alphabet Inc. Class A</div>
                 <div class="text-muted small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 180px; line-height: 1.3;">ผู้นำเสิร์ชเอนจิน Google, แพลตฟอร์ม YouTube, Android และคลาวด์ Google Cloud</div>
             </td>
-            <td style="white-space: nowrap;">⭐⭐⭐<br><span class='badge badge-amber' title="Rev Growth +22% 🚀 • Net Income +90% 🚀 • Elite ROE (44%) 🏆 • Attractive PEG 0.19 💎 • Safe Debt (D/E 0.21) 🛡️ • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-14.1%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 60/100</span></td>
+            <td style="white-space: nowrap;">⭐⭐⭐<br><span class='badge badge-amber' title="Rev Growth +22% 🚀 • Net Income +90% 🚀 • Elite ROE (44%) 🏆 • Attractive PEG 0.19 💎 • Safe Debt (D/E 0.22) 🛡️ • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-14.1%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 60/100</span></td>
             <td style="text-align: right; font-weight: 700; white-space: nowrap;">6.4%</td>
             <td style="text-align: right; white-space: nowrap;">$341.72</td>
             <td style="text-align: right; font-weight: 600; white-space: nowrap;">$283.82</td>
@@ -983,7 +983,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$3,175.86</div>
-                <div class="text-muted small">≈ ฿107,030</div>
+                <div class="text-muted small">≈ ฿106,950</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-rose">
                 <div class="fw-bold">-16.94%</div>
@@ -1015,7 +1015,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$1,944.55</div>
-                <div class="text-muted small">≈ ฿65,533</div>
+                <div class="text-muted small">≈ ฿65,485</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-rose">
                 <div class="fw-bold">-12.34%</div>
@@ -1047,7 +1047,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$1,635.35</div>
-                <div class="text-muted small">≈ ฿55,113</div>
+                <div class="text-muted small">≈ ฿55,072</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-emerald">
                 <div class="fw-bold">+9.66%</div>
@@ -1079,7 +1079,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$1,412.50</div>
-                <div class="text-muted small">≈ ฿47,603</div>
+                <div class="text-muted small">≈ ฿47,567</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-emerald">
                 <div class="fw-bold">+14.35%</div>
@@ -1111,7 +1111,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$1,399.76</div>
-                <div class="text-muted small">≈ ฿47,173</div>
+                <div class="text-muted small">≈ ฿47,138</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-rose">
                 <div class="fw-bold">-5.84%</div>
@@ -1143,7 +1143,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$803.91</div>
-                <div class="text-muted small">≈ ฿27,093</div>
+                <div class="text-muted small">≈ ฿27,073</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-emerald">
                 <div class="fw-bold">+7.95%</div>
@@ -1175,7 +1175,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$758.89</div>
-                <div class="text-muted small">≈ ฿25,575</div>
+                <div class="text-muted small">≈ ฿25,556</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-rose">
                 <div class="fw-bold">-10.66%</div>
@@ -1207,7 +1207,7 @@
             </td>
             <td style="text-align: right; white-space: nowrap;">
                 <div>$350.25</div>
-                <div class="text-muted small">≈ ฿11,804</div>
+                <div class="text-muted small">≈ ฿11,795</div>
             </td>
             <td style="text-align: right; white-space: nowrap;" class="text-emerald">
                 <div class="fw-bold">+10.44%</div>
@@ -1252,18 +1252,18 @@
         <tr>
             <td><a href="https://www.tradingview.com/chart/?symbol=NYSE:LLY" target="_blank" class="ticker-pill">LLY</a></td>
             <td><div class="fw-bold">Eli Lilly and Company</div></td>
-            <td><span class='badge badge-emerald'>🟢 ยอดเยี่ยม</span> <span class='text-muted' style='font-size:0.72rem;'>92/100 · ข้อมูล 100%</span></td>
-            <td style="text-align: right; font-weight: 600;">+49.6%</td>
-            <td style="text-align: right; font-weight: 600;">+93.5%</td>
-            <td style="text-align: right; font-weight: 600;"><span class='text-emerald fw-bold'>+102.4% 🏆</span></td>
-            <td style="text-align: right; font-weight: 600;"><span class='text-amber'>1.62</span></td>
+            <td><span class='badge badge-emerald'>🟢 ยอดเยี่ยม</span> <span class='text-muted' style='font-size:0.72rem;'>96/100 · ข้อมูล 100%</span></td>
+            <td style="text-align: right; font-weight: 600;">+45.5%</td>
+            <td style="text-align: right; font-weight: 600;">+49.8%</td>
+            <td style="text-align: right; font-weight: 600;"><span class='text-emerald fw-bold'>+86.1% 🏆</span></td>
+            <td style="text-align: right; font-weight: 600;"><span>1.23</span></td>
             <td style="text-align: right;">
-                <div class="fw-bold">0.46</div>
-                <div class="text-muted small">ถูกมาก (0.46 💎)</div>
+                <div class="fw-bold">0.84</div>
+                <div class="text-muted small">คุ้มค่ามาก (0.84 💎)</div>
             </td>
-            <td style="text-align: right;">46.7x</td>
-            <td style="text-align: right; font-weight: 600;">$18.2B</td>
-            <td style="text-align: right;"><strong>$1,412.64</strong> <span class='text-emerald small'>(+2.8%)</span></td>
+            <td style="text-align: right;">45.1x</td>
+            <td style="text-align: right; font-weight: 600;">$19.7B</td>
+            <td style="text-align: right;"><strong>$1,443.28</strong> <span class='text-emerald small'>(+5.1%)</span></td>
             <td style="text-align: center;">$930 - $1,680</td>
             <td><span class='badge badge-emerald'>Buy 25</span> <span class='badge badge-amber'>Hold 3</span> <span class='badge badge-rose'>Sell 1</span></td>
             <td><span class='text-muted'>10 Feb 2027 (งบออกใน 103 วัน)</span></td>
@@ -1276,14 +1276,14 @@
             <td style="text-align: right; font-weight: 600;">+22.2%</td>
             <td style="text-align: right; font-weight: 600;">+89.7%</td>
             <td style="text-align: right; font-weight: 600;"><span class='text-emerald fw-bold'>+44.3% 🏆</span></td>
-            <td style="text-align: right; font-weight: 600;"><span class='text-emerald fw-bold'>0.21 🛡️</span></td>
+            <td style="text-align: right; font-weight: 600;"><span class='text-emerald fw-bold'>0.22 🛡️</span></td>
             <td style="text-align: right;">
                 <div class="fw-bold">0.19</div>
                 <div class="text-muted small">ถูกมาก (0.19 💎)</div>
             </td>
             <td style="text-align: right;">14.8x</td>
             <td style="text-align: right; font-weight: 600;">$19.7B</td>
-            <td style="text-align: right;"><strong>$405.31</strong> <span class='text-emerald small'>(+42.8%)</span></td>
+            <td style="text-align: right;"><strong>$403.54</strong> <span class='text-emerald small'>(+42.2%)</span></td>
             <td style="text-align: center;">$300 - $500</td>
             <td><span class='badge badge-emerald'>Buy 59</span> <span class='badge badge-amber'>Hold 7</span> <span class='badge badge-rose'>Sell 0</span></td>
             <td><span class='text-muted'>02 Feb 2027 (งบออกใน 95 วัน)</span></td>
@@ -1558,7 +1558,7 @@
             <!-- Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1373.7, 1107.6, 1412.64, 1309.91, 1483.6, 1412.64)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LLY 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1373.7, 1107.6, 1443.28, 1309.91, 1483.6, 1443.28)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">LLY 📈</span>
                     <strong style="font-size: 1.25rem;">Eli Lilly and Company</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Health Technology • Pharmaceuticals: Major</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
@@ -1566,7 +1566,7 @@
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                     <span class="badge badge-emerald" style="font-size: 0.95rem; padding: 5px 12px;">+34.53%</span>
                     <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 76.8% (⭐⭐⭐)</span>
-                    <button onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1373.7, 1107.6, 1412.64, 1309.91, 1483.6, 1412.64)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <button onclick="openChartModal(&quot;LLY&quot;, &quot;NYSE&quot;, &quot;Eli Lilly and Company&quot;, &quot;Health Technology&quot;, 1021.1077, 1373.7, 1107.6, 1443.28, 1309.91, 1483.6, 1443.28)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -1583,7 +1583,7 @@
             <div class="drivers-box">
                 <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">📈 4 เครื่องจักรขับเคลื่อนการเติบโตในอนาคต (Future Growth Drivers 1-12 เดือน):</div>
                 <ul class="drivers-list">
-                    <li>การขยายตัวของรายได้ระดับ +49.6% YoY และความสามารถในการทำกำไรสุทธิ +93.5% YoY</li><li>อัตราการประเมินมูลค่า P/E 46.7x และค่า PEG 0.46 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Pharmaceuticals: Major</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                    <li>การขยายตัวของรายได้ระดับ +45.5% YoY และความสามารถในการทำกำไรสุทธิ +49.8% YoY</li><li>อัตราการประเมินมูลค่า P/E 45.1x และค่า PEG 0.84 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Pharmaceuticals: Major</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
                 </ul>
             </div>
 
@@ -1625,7 +1625,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$1,412.64 <span class="small"> (+2.8%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$1,443.28 <span class="small"> (+5.1%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High)</div>
@@ -1633,7 +1633,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> โบรกเกอร์ 29 แห่ง (Buy 25 / Hold 3 / Sell 1) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $1,412.64 (Upside +2.8%)
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> โบรกเกอร์ 29 แห่ง (Buy 25 / Hold 3 / Sell 1) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $1,443.28 (Upside +5.1%)
                 </div>
             </div>
 
@@ -1641,7 +1641,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[24/7 Wall St.]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ServiceNow และ Fortinet ดิ่ง 24% ขณะที่ Eli Lilly นำกลุ่มหุ้นขาขึ้นช่วงเช้า</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizwFBVV95cUxNMnZoU3ZBS2diaHhsOVVIam9jekowM0hKTUdDeFdNUTlWVG50Zno0bms0UHMzNy1ST21FeUZpUlE1QS1TUy11VVU3QW5DWG10ZjI0b2pURnc3ZDl0ZHpYWXVCM3Q0cDRMdkdIX3dkTWZ5ZGFYTkwwMlFLRFVabDBlQU5hNTlVS29EZVlXNG1VeG96MXFuUldfMFF1UUxQb1JPMTM3N2dsYXlLazM0UVFCUE5wakl6NDM4OFJEbmRucjlVMmRwNFVWR3d4d0N1dzQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>ServiceNow and Fortinet Sink 24% as Eli Lilly Leads Early Gainers ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Eli Lilly และ Fortinet ติดกลุ่มหุ้นเคลื่อนไหวแรงวันพฤหัสบดี</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMivwFBVV95cUxQdmhoVHdSeXFwdm5DMkdRVzFjZlBCaUlUM3hGODNLV0Z0MXhxWWo3X0UzVjRGUTJudWhqMWN4M3VIT0VIOHE0bXFpSldHUmVBeHJLcmdoQjB0MnhSRWRKYno4cHBvNGFyWXJ5aVBtNnBwREZuaGp6T1FnajZram5IWDlZR0ItRE9SQURSYWpoNTVhS1EzZDBqZThaRS10TWg1TXNxUXZpa0k0QXpZc2U3cjdvV19jbGRPVTRlcEZiNA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Eli Lilly, Fortinet among market cap stock movers on Thursday ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[재경일보]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Eli Lilly พุ่ง 6.6% จาก Mounjaro และ Zepbound หนุนงบ Q3 ดีกว่าคาด</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiYkFVX3lxTFBYRTZfM0R6cThpMWJ6LWVuLVk4VHFjU2N2RGRJU2dQSC1vZWZ4ZGVGOEFIUGlRaHZmZW8wbmJ4Q0h1VWF4Q1pMUmlGODNYOXg1M1dNZ0JiMFV2VlowZlFvWmNn?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Eli Lilly Shares Jump 6.6% as Mounjaro and Zepbound Fuel Third-Quarter Earnings Beat : Finance : JKN ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com Canada]</strong> <span style='font-weight: 600; color: #f1f5f9;'>BMO ปรับเพิ่มราคาเป้าหมายหุ้น Eli Lilly จากความแข็งแกร่งกลุ่มยาเมตาบอลิก</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMivwFBVV95cUxNYURtbDlVaS01MjBrT0FnakNtdGpxNTZPNFV0UHF3ajdZV2RvaFhNMGZEQWhDZnJMRmJMUGh0UFFRMURybFp6N3BlcF9FamlPb09Xc3B2eXY4OGVnaVg1ZTl5Z2xMUUJ1NmcwaUh0TjFYYVl5bXVTWjNPNnVvNUh0dEFyUWdTdlFFTVhfSzJNYkJ2eFo4YTNMWVphNjBDUmV3UTh2N3czUEdWbVk3WXg3Z29laWI3NTI0RXVUbDNFMA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>BMO raises Eli Lilly stock price target on metabolic strength By Investing.com ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com Canada]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ไฮไลต์ประชุมนักลงทุน Q3 2026 ของ Eli Lilly รายได้โต 39% จาก Mounjaro</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMi1AFBVV95cUxNM0NSeTZBdU5kNVZQbGhNZDRydEVwajlhdWpHRE0tWUdRenBsZXZOejlxRTl6c0tkdkdZU1Mybk50X281UVNjMFRseTZlV2Rvc3BiNHNZNFlIdWt3WWRrX0NUMnpJUkg4RW1LeGVQY3htNFVLU0ljNkU4RlJwWWNVZXBNdUVtcWVxX2NMcWgwS3lPMEp5YXVaZ1V1UFlwZkJMMVJQb281OUZXM0Z0VnVlcC1Nem5DdkwwU2tZekRHYWltTkh6RTVtd05ST05iMUpDejhJSA?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Eli Lilly and Co (LLY) (Q3 2026) Earnings Call Highlights: Revenue Jumps 39% as Mounjaro and ... By GuruFocus ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com]</strong> <span style='font-weight: 600; color: #f1f5f9;'>BofA ปรับเพิ่มราคาเป้าหมาย Eli Lilly หลังผลประกอบการแข็งแกร่ง</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiugFBVV95cUxPSHJnZG1ONnNhcDJ0WnBUX2lkMUt1amZQNFpqZExLaXA5M0RjODBxa2RNY25fdHVrMXNwUHJ6anNQOEdxN3BRNkMwWndoellHeEdqMmZSaHc2OG1uY2dVYndrdGVxWklxeXhSX3cyTGg4SnBadUNEN3dJWFpBd09TZW9DQW9oTS04OWIyQS1JWnEySVA2d3Z6WGJGbTN6andfbmZUV3l0TVVxSlExVXE3akE1cmRDTnBCelE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>BofA raises Eli Lilly stock price target on strong results ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Pluang]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Eli Lilly รายได้ Q3 โต 39% และปรับเพิ่มประมาณการทั้งปี</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiogFBVV95cUxPQUxOU2taUUl1aGg3OVhWZ0t4ZEM3ckpPTU1yMU9XamtueXhrakFWYWhGY3drcGNEcWUyeFdDbnlfWm1vcmJua1JkWVgwVkluQTNQSmRpNTh5WmZZZmR5YlNFWFJNY05UcUpSNW8zOFlYU2FvdXEwNlhhNWdieXVzZnBfdWZ4YUF5OWhFSl9HX3FJRW8tY053N1FWa1dHZkF6UFE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Eli Lilly posts 39% revenue growth in Q3 driven by key drug franchises, raises full-year guidance. ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -1667,7 +1667,7 @@
             <!-- Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 283.82, 267.81, 340.29, 267.81, 340.29, 405.31)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 283.82, 267.81, 340.29, 267.81, 340.29, 403.54)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
                     <strong style="font-size: 1.25rem;">Alphabet Inc. Class A</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Technology Services • Internet Software/Services</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Market Leader</span>
@@ -1675,7 +1675,7 @@
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                     <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">-16.94%</span>
                     <span class="badge badge-neutral" style="font-size: 0.85rem;">สัดส่วน 6.4% (⭐⭐⭐)</span>
-                    <button onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 283.82, 267.81, 340.29, 267.81, 340.29, 405.31)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <button onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 341.7162, 283.82, 267.81, 340.29, 267.81, 340.29, 403.54)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -1734,7 +1734,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$405.31 <span class="small"> (+42.8%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$403.54 <span class="small"> (+42.2%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High)</div>
@@ -1742,7 +1742,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> โบรกเกอร์ 66 แห่ง (Buy 59 / Hold 7 / Sell 0) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $405.31 (Upside +42.8%)
+                    📌 <strong>ข้อสรุปของวอลล์สตรีท:</strong> โบรกเกอร์ 66 แห่ง (Buy 59 / Hold 7 / Sell 0) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $403.54 (Upside +42.2%)
                 </div>
             </div>
 
@@ -1754,7 +1754,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>AI กำลังทำลายห่านทองคำของ Google หรือไม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMihAFBVV95cUxQbERmeGFScWJVREM0S1dtT2JUTzF6TVA0cjRhQWQ1MmUwWmozdFdkWDF1Y3VCeUs1N1RRY2c0aXdjem45Qk41LS1xNF92WHNvZzFOUG42UzZ5aXY0UC1vTUZLdE1YTE9aV051a0ZjVVhubmhEbWRwcDlWNktoNFo4a0h2MUY?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Is AI Killing Google&#x27;s Golden Goose? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>AI กำลังทำลายห่านทองคำของ Google หรือไม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMinAFBVV95cUxPWEVRSXhpZHNadnJjczFKZDQ3M3c3bTZJV1JUdTFrbGZ2SENEaUlrSkRCYVNCQzlGWVZQME1HcXlteTBPLS1WaDAyM0V1dUl6ZExYRklIQURaODlrb3NBczFLd3hhVDVKeG9reEZaekp3N0hTX05xSDJtNjRQX01KOS11bDVVaXJMbzBwNjI3bWN2N1VOemkwdmZhdno?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Is AI Killing Google&#x27;s Golden Goose? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[NBC News]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Google ร่วงหนักเป็นประวัติการณ์ จุดความกลัวฟองสบู่ AI แตก</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPMjg1ckNTT3R0aUxzR05RZEN2LUZYempyTkl6UW5aVUJZbjdxODAtb19za0NCdnd0ZnNVRHJMSV8yUmdDWkkwUTAtc2hmdjVPZjAyTzQ3cEhaQUFyNmJ1YkhDNG04Wl9LdWI1TVZwa3l1T0pQMmtUbXNzSnhxOWlCQmRPNGFnaFBDLTlrbzFkVTBNdFJzQWFlSjhOR1g5WUlJUi1JWFRyNlpFekNTZjMxVjln?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google stock&#x27;s historically bad day raises fears of AI bubble popping ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Trefis]</strong> <span style='font-weight: 600; color: #f1f5f9;'>อะไรทำให้หุ้น Alphabet ร่วงลง</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMilwFBVV95cUxNdnM2dkRueE1tNnBVQkg5ZF9JQW5YMVFELUwxUUpqR0VRU2JlMldsSVQ4R295MGd3U0JRTGs5dHpyUXowb2NUb3pwVkZfZXdqTG40QTlLT1g0UjR1c0dlSDFfYS05c3MyNHg2MVBpVVJOMmlSVW52eXlQVThfNndDQ2hrS1RiM0dhX3JhTEdVZ3pybDJueXpv?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>What Sent Alphabet Stock Lower? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Amazon, Alphabet, SpaceX และ Meta ถูกมองเป็นต้นเหตุของการเทขายหุ้นเทครอบใหม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMi1wFBVV95cUxQREdoUGl3MFdxbTlBczk2OXRndWF6aVAtY3BFeU5raF9mODcwVVNvc0F0d3ViU2RpcDBIWUFRYUlVS0o4bVY0TDFMSDZuUFJGc2t6U0czUTNYVXBzeHZoXzNVNmJWVzZfaGVhZW1ZU3EwaVJWRlpwbnV5cUhuQklyV21MQ1duclVsZ1JyWnpHajA3OXE0UTlzMVJoMDdIT3JUY1lRanRycmtsaXZJcVJ3UTh1UnNKOERaa05pMGF6REFQUFdxOWZib3dTTjBVekVydGxFOEZWbw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Amazon, Alphabet, SpaceX and Meta are all to blame for the new tech stock rout ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>สรุป AI จาก Stocktwits งบ Intel, Amazon และ Alphabet จุดชนวนเทขาย เมื่อรายจ่ายมหาศาลกลับมาเป็นประเด็น</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMioAFBVV95cUxPMThQRlY5ekM4R3I3ZzFwcXRNblFjbVI0MUFaX1phN2Y4THAxeXJSZi1PWjU1eUVtM0l3bUtCZDVxTDB1bU55ejJPMW03M3kxdTVsZ1B3aF9wcWcwTzdjdi0yUWZkeDE2MWJJdkdMQ0lmM1VDdzVoUjRpSUs3ZFM3YjByMVNMZjhwMDdLWUpqdmlSQ0dhQURsamRSWXVRUXp3?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Stocktwits AI Roundup: Intel, Amazon, Alphabet Results Trigger Meltdown As Big Tech’s Record Spending Returns To Focus ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -1859,7 +1859,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[ad-hoc-news.de]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Nokia บวกจากความร่วมมือด้าน R&amp;D ในอินเดียกับ LTTS</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPdXNpb0I2MnFDQUYtaU1uRVFubFZWR1ZVOUdpRExPUllxemR0OEU1bGxQRmJaeHdtcnQ2Yk4yZnhpZ01pa1VPX1JYQ19wS3dxREluZ2lRcnozQThEUlNZY3NCcGxBb3poSms1MHp5UWRSMmxRc0RFY25DdGlVOEdJbnpMSGd6dVhxdkhGSmxQdll2a2xhRjd0OTAzRUNqTTA5SE0zSHozU0wxSTdEa0M1UkVB?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Nokia stock gains India R&amp;D partnership with LTTS ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -2077,7 +2077,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[RTTNews]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Vertiv ประกาศผลประกอบการเบื้องต้นเป็นบวก</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMilgFBVV95cUxPdkVkRC10ZldPRFNxYlhHSmxodG1hYUFNM3hsZGJMREpTaGU3REsxbWFvSEM5ZmRsSmtFSmtWRFhiRUZmc0lWcnpMWExjOUxSdzFjTmpsVHVLUWdEVk9pcDAzbzIyMmxjYWlLYVFEZVNXWnV5cTViLURtMnBrNGZ3WXFzMDhxMUZ1dnYwVFJMX0U3QnpOMkE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>vertiv holdings co Positive Earnings Pre-Announcements ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[MarketBeat]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Vertiv (VRT) ขึ้น 1.3% หลังงบแข็งแกร่ง</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMiswFBVV95cUxQdDBUQ3ZxSHpSSnk1djlhQ3YweldqcXpEUllZRl9UQkRDaEZJTUJrSGx3RjF6WWpZay1UVVRtR1dyTzUyN1hQWElzSDBzNGhfYWNid2xPWTVjYUhjaXJuS3F2ZnRFSnNhM3dlajNMZWlScGFiaFBraHBKU3dZNVNfbzZ4R3ROV3BjOE1rNG5jVUhtOEtUNGJ6MlJyMGZzZU1kTVVaQlJsNnpMV0Zyc2J1T0FYbw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Vertiv (NYSE:VRT) Shares Climb 1.3% After Strong Earnings ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[RTTNews]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Vertiv ประกาศผลประกอบการเบื้องต้นเป็นบวก</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMilgFBVV95cUxPdkVkRC10ZldPRFNxYlhHSmxodG1hYUFNM3hsZGJMREpTaGU3REsxbWFvSEM5ZmRsSmtFSmtWRFhiRUZmc0lWcnpMWExjOUxSdzFjTmpsVHVLUWdEVk9pcDAzbzIyMmxjYWlLYVFEZVNXWnV5cTViLURtMnBrNGZ3WXFzMDhxMUZ1dnYwVFJMX0U3QnpOMkE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>vertiv holdings co Positive Earnings Pre-Announcements ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Investing.com Australia]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Bernstein ปรับขึ้นราคาเป้าหมายหุ้น Vertiv เป็น 376 ดอลลาร์ จากผลงานที่แข็งแกร่ง</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMixwFBVV95cUxPbXNfNF9FM2pHN2xSdDJwTUFtV3MwV01haGR2ZXdFVnY3aWcyN1J2Q0U5dmg3a29KUkR6cll3QkdBUXJaelA5Vk5yWThlWmh6dzVlcVRPQi1fd2lsczJSUnNQZVd2ZmZXWC04SzV5Szc5WEI4S1RxMjdlbnUybTlTd012MTBKaktNcmRhVFFqQmliQVZ0eVBmOG9ZQlpubXpyVld0djlENXBVVDA1TDFQakpMWnRENjNkSVBhY2o3Yk0xNnZVcmFR?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Bernstein raises Vertiv stock price target to $376 on strong results ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -2295,7 +2295,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ยังไม่มีข่าวด้านบวกโดดเด่นในสัปดาห์นี้.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[MarketBeat]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Monster Beverage Corporation $MNST หุ้น: Soltis Investment Advisors LLC Grows Holdings</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#94a3b8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.25); vertical-align:middle;'>heuristic</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMi3wFBVV95cUxNUTVRTC1nY0hxbFQ2TjNtWFVGNlFucm85SUxGc2NhZUpJazMyaGxtbjJYc2hBcW1LcWFoOVY0Zi1UYXdDR3hjY1RLUlFKWVVvSngzc05OYlpYZUZyR0o2cnQyTVlOWUxyWEMyd3Y2aW5USjQ2SFlLVGZyNkRDeDdLTXlQdEtrOEllSXA3RTJqalpDdlN3YzV6bGxjNWViVjB5azRrZFh5NW84UXFjVXJ1ZU5IRVpHMnlEbHE1QWVjUk9tcDM1QlhiMDVrMUc2MkxGWWtGODE1c3VjM2taRENV?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Monster Beverage Corporation $MNST Stock: Soltis Investment Advisors LLC Grows Holdings ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -2408,7 +2408,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[ad-hoc-news.de]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น AppLovin ทำจุดต่ำสุดรอบปี หลัง RBC และ UBS ลดราคาเป้าหมายก่อนประกาศงบ</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizgFBVV95cUxPajlUY2RldC1CcFpBYVdYWjBOSXZlRmNMLUk0ZUpycnNQdmdfSk12ZzJpT25GUGMxcHk1UlpZQWJOd090cDhqQ0c4ZHh1X0Z5MWpmeU1jcmRhSk9USkozTXVYUndVMll1am0zTWZIUEY1VzZHdDJIbmRYRHpZaFRseGc2eVVqb3JkMTB1ZlVQeGdsY2RnU3VscnhlWGVjbVMyVnhPaTQ4NEVBQUdvaXl6Sy05YlgzTEdsYU9ZVlc5bk9HeVgzRERMRXdsNHoxQQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>AppLovin stock hits annual low as RBC, UBS cut targets ahead of results ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[TradingView]</strong> <span style='font-weight: 600; color: #f1f5f9;'>ทำไม NFLX, MBLY และ APP จึงร่วงลงทำจุดต่ำสุดรอบ 52 สัปดาห์</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPV0kxZ3Zub2tNeVFkekxabjV0czVSZWd0OWQ4ZHI5YVlUSW1URFNvWEhkXzhFQzJYS3k0RTJiUDUxR09Zck93SjFodnNEYVVtelliMGlxUlFhZ0MzQmY4UTlrUlY0dnBfVDF4MEtxWFFOTjNhS2hGR0hnZDJRTzBYU3ZsUGNMUnJqdjgwMmlvelRTeUxKaW9ydXliWVQxZ2J3dG5uZHJBVEd0RkwwVGNHdUtn?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Why Did NFLX, MBLY, APP Stocks Tumble To 52-Week Lows? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 

@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หุ้นที่สนใจ (Watchlist Fibo Support) - Filter Stock</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #080d1a;
+            --bg-card: #0f172a;
+            --bg-card-hover: #1e293b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --emerald: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.15);
+            --rose: #f43f5e;
+            --rose-glow: rgba(244, 63, 94, 0.15);
+            --blue: #3b82f6;
+            --blue-glow: rgba(59, 130, 246, 0.15);
+            --amber: #f59e0b;
+            --amber-glow: rgba(245, 158, 11, 0.15);
+            --purple: #a855f7;
+            --gold: #fbbf24;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .meta-pill {
+            background: var(--bg-card);
+            padding: 5px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        /* Summary Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-card.active {
+            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 14px var(--blue-glow);
+        }
+
+        .stat-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Infographic section */
+        .infographic-card {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.6) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: var(--radius-md);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+        }
+
+        .thumb-wrap {
+            position: relative;
+            flex: 0 0 140px;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .thumb-wrap:hover {
+            transform: scale(1.03);
+            border-color: var(--blue);
+            box-shadow: 0 0 15px var(--blue-glow);
+        }
+
+        .thumb-img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            gap: 4px;
+            opacity: 0.9;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.84rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--blue);
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .search-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            width: 180px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus {
+            border-color: var(--blue);
+        }
+
+        .select-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--text-secondary);
+            padding: 12px 14px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .ticker-pill {
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+        }
+
+        .group-pill {
+            background: rgba(148, 163, 184, 0.08);
+            color: var(--text-secondary);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.76rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-rose {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .badge-amber {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-emerald {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-port {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fef08a;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            font-weight: 700;
+        }
+
+        .badge-neutral {
+            background: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .text-emerald { color: var(--emerald); }
+        .text-rose { color: var(--rose); }
+        .text-amber { color: var(--amber); }
+        .text-blue { color: var(--blue); }
+        .text-purple { color: var(--purple); }
+        .text-gold { color: var(--gold); }
+        .text-muted { color: var(--text-muted); }
+        .fw-bold { font-weight: 700; }
+        .small { font-size: 0.78rem; }
+
+        /* Modal / Lightbox for Image */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: auto;
+            padding: 10px;
+        }
+
+        .modal-img {
+            max-width: 100%;
+            max-height: 82vh;
+            display: block;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--rose);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .infographic-card { flex-direction: column; align-items: flex-start; }
+            .thumb-wrap { width: 100%; height: 120px; }
+            .thumb-img { height: 120px; }
+            .search-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <style>
+.rnav { display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; width: 100%; max-width: 100%;
+  padding: 10px 14px; margin: 0 0 16px 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  font-family: 'Prompt', 'Inter', -apple-system, sans-serif; font-size: 0.86rem; }
+.rnav-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; width: 100%; flex-wrap: wrap; }
+.rnav-links { display: flex; gap: 6px; min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.rnav-links::-webkit-scrollbar { display: none; }
+.rnav-link { flex: 0 0 auto; white-space: nowrap; padding: 6px 12px; border-radius: 8px; text-decoration: none; color: #94a3b8;
+  border: 1px solid transparent; transition: color 0.15s, background 0.15s; }
+.rnav-link:hover { color: #f8fafc; background: rgba(255,255,255,0.06); }
+.rnav-link.active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: #3b82f6; font-weight: 600; }
+.rnav-time { white-space: nowrap; color: #64748b; font-size: 0.78rem; }
+
+/* GLOBAL LIVE CONTROLS BAR */
+.rnav-live-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.82rem; }
+.rnav-live-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rnav-live-right { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+.rnav-refresh-btn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(37, 99, 235, 0.32) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.45); color: #93c5fd; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+.rnav-refresh-btn:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.45) 100%); border-color: #60a5fa; color: #ffffff; }
+.rnav-live-badge { font-size: 0.66rem; background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1px 5px; border-radius: 4px; color: #93c5fd; font-weight: 700; }
+.rnav-int-group { display: inline-flex; align-items: center; gap: 3px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 2px 4px; }
+.rnav-int-label { font-size: 0.76rem; color: #94a3b8; font-weight: 600; padding-left: 4px; }
+.rnav-int-btn { padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: #94a3b8; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; font-family: inherit; }
+.rnav-int-btn:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.08); }
+.rnav-int-btn.active { background: rgba(59, 130, 246, 0.3); border-color: #3b82f6; color: #60a5fa; font-weight: 700; }
+.rnav-status { font-size: 0.78rem; color: #94a3b8; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .rnav { padding: 8px 10px; gap: 8px; }
+  .rnav-top-row { gap: 6px; }
+  .rnav-live-bar { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 6px; }
+  .rnav-live-left { justify-content: space-between; width: 100%; }
+  .rnav-live-right { width: 100%; justify-content: space-between; margin-left: 0; }
+  .rnav-time { font-size: 0.72rem; }
+  .rnav-status { font-size: 0.74rem; }
+}
+</style>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link active" aria-current="page">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 18:12</span></div></div></nav>
+<script>
+(function() {
+  var activeLink = document.querySelector(".rnav-link.active");
+  if (activeLink && activeLink.parentNode) {
+    activeLink.parentNode.scrollLeft = activeLink.offsetLeft - activeLink.parentNode.offsetLeft - 16;
+  }
+
+  var globalIntervalSec = 0;
+  var globalCountdownSec = 0;
+  var globalCountdownTimer = null;
+  var globalLastSyncTime = '';
+
+  window.triggerGlobalRefresh = async function() {
+    var btn = document.getElementById('rnav-btn-refresh');
+    var icon = document.getElementById('rnav-refresh-icon');
+    var text = document.getElementById('rnav-refresh-text');
+    var statusEl = document.getElementById('rnav-live-status');
+
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+    if (icon) icon.style.transform = 'rotate(360deg)';
+    if (text) text.textContent = 'กำลังดึง...';
+
+    try {
+      if (typeof window.refreshLiveQuotes === 'function') {
+        await window.refreshLiveQuotes();
+      } else if (typeof window.fetchChartLiveQuotes === 'function') {
+        await window.fetchChartLiveQuotes();
+      } else {
+        await fetchGenericLiveQuotes();
+      }
+      var now = new Date();
+      globalLastSyncTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      updateGlobalStatusUI();
+    } catch (e) {
+      console.warn('Global refresh error:', e);
+      if (statusEl) statusEl.textContent = '⚠️ รีเฟรชไม่สำเร็จ';
+    } finally {
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+      if (icon) icon.style.transform = 'none';
+      if (text) text.textContent = 'รีเฟรชราคา';
+    }
+  };
+
+  window.setGlobalLiveInterval = function(sec) {
+    globalIntervalSec = parseInt(sec, 10) || 0;
+    try {
+      localStorage.setItem('portfolio_live_interval', globalIntervalSec);
+    } catch (e) {}
+
+    [0, 5, 15, 30, 60].forEach(function(s) {
+      var b = document.getElementById('rnav-live-' + s);
+      if (b) b.classList.toggle('active', s === globalIntervalSec);
+    });
+
+    if (globalCountdownTimer) {
+      clearInterval(globalCountdownTimer);
+      globalCountdownTimer = null;
+    }
+
+    if (typeof window.setLiveInterval === 'function') {
+      window.setLiveInterval(globalIntervalSec);
+    }
+    if (typeof window.setChartLiveInterval === 'function') {
+      window.setChartLiveInterval(globalIntervalSec);
+    }
+
+    if (globalIntervalSec <= 0) {
+      updateGlobalStatusUI();
+      return;
+    }
+
+    globalCountdownSec = globalIntervalSec;
+    updateGlobalStatusUI();
+
+    if (typeof window.setLiveInterval !== 'function' && typeof window.setChartLiveInterval !== 'function') {
+      window.triggerGlobalRefresh();
+      globalCountdownTimer = setInterval(function() {
+        if (document.hidden) return;
+        globalCountdownSec--;
+        if (globalCountdownSec <= 0) {
+          globalCountdownSec = globalIntervalSec;
+          window.triggerGlobalRefresh();
+        }
+        updateGlobalStatusUI();
+      }, 1000);
+    }
+  };
+
+  function updateGlobalStatusUI() {
+    var statusEl = document.getElementById('rnav-live-status');
+    if (!statusEl) return;
+    if (globalIntervalSec <= 0) {
+      statusEl.innerHTML = globalLastSyncTime 
+        ? '🟢 ซิงค์ล่าสุด: <strong style="color:#60a5fa;">' + globalLastSyncTime + ' น.</strong>'
+        : '⚪ อัปเดตด้วยตนเอง';
+    } else {
+      var dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;margin-right:4px;"></span>';
+      statusEl.innerHTML = dot + 'Live (' + globalIntervalSec + 's): <strong style="color:#10b981;">' + globalCountdownSec + 's</strong>' +
+        (globalLastSyncTime ? ' | <strong style="color:#60a5fa;">' + globalLastSyncTime + ' น.</strong>' : '');
+    }
+  }
+
+  async function fetchGenericLiveQuotes() {
+    var res = await fetch('https://scanner.tradingview.com/america/scan', {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        symbols: { tickers: ["NASDAQ:NVDA","NASDAQ:AAPL","NASDAQ:MSFT","NASDAQ:GOOGL","NASDAQ:AMZN","NYSE:LLY","NASDAQ:TSLA","NASDAQ:AVGO","AMEX:VOO","NASDAQ:QQQI"] },
+        columns: ['close', 'change', 'premarket_close', 'premarket_change', 'postmarket_close', 'postmarket_change']
+      })
+    });
+    if (!res.ok) return;
+    var data = await res.json();
+    var quotes = {};
+    (data.data || []).forEach(function(item) {
+      var parts = (item.s || '').split(':');
+      var tk = parts.length > 1 ? parts[1] : parts[0];
+      quotes[tk] = {
+        close: item.d[0],
+        change: item.d[1],
+        premarket_close: item.d[2],
+        premarket_change: item.d[3],
+        postmarket_close: item.d[4],
+        postmarket_change: item.d[5]
+      };
+    });
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    var payload = { quotes: quotes, timeStr: timeStr, timestamp: Date.now() };
+    try { localStorage.setItem('portfolio_live_bus', JSON.stringify(payload)); } catch(e) {}
+    try {
+      if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+      window.__LIVE_BC__.postMessage(payload);
+    } catch(e) {}
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    try {
+      var saved = parseInt(localStorage.getItem('portfolio_live_interval') || '0', 10);
+      if (saved > 0) {
+        setGlobalLiveInterval(saved);
+      }
+    } catch (e) {}
+  });
+
+  try {
+    if (!window.__LIVE_BC__) window.__LIVE_BC__ = new BroadcastChannel('stock_portfolio_live_channel');
+    window.__LIVE_BC__.onmessage = function(ev) {
+      if (ev.data && ev.data.timeStr) {
+        globalLastSyncTime = ev.data.timeStr;
+        updateGlobalStatusUI();
+      }
+    };
+  } catch(e) {}
+})();
+</script>
+
+    <div class="header">
+        <div class="header-title">
+            <h1>📋 หุ้นที่สนใจ (Watchlist Fibo Support)</h1>
+        </div>
+        <div class="header-meta">
+            <span class="meta-pill">🔍 อ้างอิง: <strong>Shay Boloor (2026-10-17)</strong></span>
+            <span class="meta-pill">⏱️ เวลาของราคา: <strong>2026-10-30 18:12:52</strong></span>
+            <span class="meta-pill">📊 ทั้งหมด: <strong>49 ตัว</strong></span>
+        </div>
+    </div>
+
+    
+
+    <!-- Disclaimer / Limitations Callout Box -->
+    <div class="card" style="border-left: 4px solid var(--amber); margin-bottom: 24px; padding: 16px 20px; background: rgba(245, 158, 11, 0.05); border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.25);">
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <span style="font-size: 1.5rem; line-height: 1;">⚠️</span>
+            <div>
+                <div style="font-weight: 700; color: #fbbf24; font-size: 0.98rem; margin-bottom: 4px;">
+                    ข้อจำกัดและคำเตือนสำคัญ (Risk Disclaimer)
+                </div>
+                <ul style="margin: 0; padding-left: 18px; color: var(--text-secondary); font-size: 0.86rem; line-height: 1.6;">
+                    <li><strong>แนวรับ Fibo จากภาพยังไม่ผ่าน backtest:</strong> เป็นการประเมินโซนราคาทางเทคนิคจากภายนอก ห้ามนำไปใช้เป็นคะแนนในระบบหลัก (Unified Score) และห้ามใช้บล็อกการซื้อขาย</li>
+                    <li><strong>สภาพคล่องช่วง Premarket ต่ำ:</strong> ราคาซื้อขายนอกเวลาทำการปกติมีความผันผวนสูงและมี Spread กว้าง โปรดใช้ความระมัดระวัง</li>
+                    <li><strong>ไม่ใช่คำแนะนำการลงทุน:</strong> ข้อมูลนี้จัดทำเพื่อการติดตามและศึกษา Risk/Reward เท่านั้น ผู้ลงทุนต้องวิเคราะห์ปัจจัยพื้นฐานและความเสี่ยงด้วยตนเอง</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infographic Preview & Source Attribution -->
+    <div class="infographic-card">
+        <div class="thumb-wrap" onclick="openImageModal()" title="คลิกเพื่อดูภาพต้นฉบับขนาดเต็ม">
+            <img src="assets/shay_fibo_support_2026-10-17.jpeg" alt="Shay Boloor Fibo Support" class="thumb-img">
+            <div class="thumb-overlay">
+                <span>🔍 คลิกขยายภาพ</span>
+            </div>
+        </div>
+        <div style="flex: 1; min-width: 260px;">
+            <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem; margin-bottom: 4px;">
+                ภาพต้นฉบับ: คีย์แนวรับ Fibonacci หุ้นเติบโต 12 ธีม
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px;">
+                รวบรวมโดย <strong>Shay Boloor</strong> (อัปเดต 17 ต.ค. 2026) ครอบคลุม 12 ธีมเทคโนโลยี เช่น Space, Quantum, Nuclear, Photonics, AI Silicon, AI Power และ AI Utilities
+            </div>
+            <button class="filter-btn" onclick="openImageModal()" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
+                🖼️ เปิดดูภาพแนวรับ Fibo ต้นฉบับเต็มจอ
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card" id="card-all" onclick="filterByStatus('all')">
+            <div>
+                <div class="stat-num text-blue">49</div>
+                <div class="stat-label">หุ้นทั้งหมดในตาราง</div>
+            </div>
+            <span style="font-size: 1.6rem;">📋</span>
+        </div>
+        <div class="stat-card" id="card-a" onclick="filterByStatus('A')">
+            <div>
+                <div class="stat-num text-rose">18</div>
+                <div class="stat-label">(ก) ต่ำกว่าแนวรับแล้ว</div>
+            </div>
+            <span style="font-size: 1.6rem;">🔻</span>
+        </div>
+        <div class="stat-card" id="card-b" onclick="filterByStatus('B')">
+            <div>
+                <div class="stat-num text-amber">6</div>
+                <div class="stat-label">(ข) 0-5% เหนือแนวรับ</div>
+            </div>
+            <span style="font-size: 1.6rem;">⚠️</span>
+        </div>
+        <div class="stat-card" id="card-c" onclick="filterByStatus('C')">
+            <div>
+                <div class="stat-num text-emerald">25</div>
+                <div class="stat-label">(ค) ยังห่างเกิน 5%</div>
+            </div>
+            <span style="font-size: 1.6rem;">🟢</span>
+        </div>
+        <div class="stat-card" id="card-port" onclick="filterByPortfolio()">
+            <div>
+                <div class="stat-num text-gold">2</div>
+                <div class="stat-label">ตัวที่มีในพอร์ตจริง</div>
+            </div>
+            <span style="font-size: 1.6rem;">⭐</span>
+        </div>
+    </div>
+
+    <!-- Filters & Controls Bar -->
+    <div class="filters-bar">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">ตัวกรองสถานะ:</span>
+            <button class="filter-btn active" id="btn-filter-all" onclick="filterByStatus('all')">ทั้งหมด (49)</button>
+            <button class="filter-btn" id="btn-filter-a" onclick="filterByStatus('A')">ต่ำกว่าแนวรับ (18)</button>
+            <button class="filter-btn" id="btn-filter-b" onclick="filterByStatus('B')">0-5% จ่อรับ (6)</button>
+            <button class="filter-btn" id="btn-filter-c" onclick="filterByStatus('C')">ห่างเกิน 5% (25)</button>
+            <button class="filter-btn" id="btn-filter-port" onclick="filterByPortfolio()">⭐ ในพอร์ตจริง (2)</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; align-items: center;">
+            <select class="select-box" id="group-select" onchange="filterByGroup(this.value)">
+                <option value="all">ทุกกลุ่มอุตสาหกรรม (12 กลุ่ม)</option>
+                <option value="AI Applications">AI Applications</option><option value="AI Connectivity">AI Connectivity</option><option value="AI Power">AI Power</option><option value="AI Silicon">AI Silicon</option><option value="AI Utilities">AI Utilities</option><option value="CPU Bottleneck">CPU Bottleneck</option><option value="Drones">Drones</option><option value="Nuclear">Nuclear</option><option value="Photonics">Photonics</option><option value="Physical AI">Physical AI</option><option value="Quantum">Quantum</option><option value="Space">Space</option>
+            </select>
+            <input type="text" class="search-box" id="search-input" placeholder="ค้นหา Ticker..." oninput="handleSearch(this.value)">
+        </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="table-wrap">
+        <table id="stocks-table">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>กลุ่มอุตสาหกรรม</th>
+                    <th style="text-align: right;">ราคาปิด ($)</th>
+                    <th style="text-align: right;">ราคา Pre/Post ($)</th>
+                    <th style="text-align: right;">ราคาที่ใช้วัด ($)</th>
+                    <th style="text-align: right;">แนวรับ Fibo ($)</th>
+                    <th style="text-align: right;">% ห่างจากแนวรับ</th>
+                    <th style="text-align: center;">สถานะแนวรับ</th>
+                    <th style="text-align: center;">พอร์ตจริง</th>
+                    <th style="text-align: left;">ประเภทราคา</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr class="stock-row status-a" data-group="AI Utilities" data-status="A" data-portfolio="false" data-ticker="CIFR">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">CIFR</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Utilities</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$8.10</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$7.58 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$7.58</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$9</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-15.83%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Applications" data-status="A" data-portfolio="false" data-ticker="NOW">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">NOW</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Applications</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$109.67</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$109.86 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$109.86</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$124</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-11.40%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="CPU Bottleneck" data-status="A" data-portfolio="false" data-ticker="INTC">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">INTC</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">CPU Bottleneck</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$92.07</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$68.38 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$68.38</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$75</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.83%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Connectivity" data-status="A" data-portfolio="false" data-ticker="CRDO">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">CRDO</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Connectivity</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$165.29</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$152.99 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$152.99</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$167</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.39%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="true" data-ticker="GOOGL">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">GOOGL</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Physical AI</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$283.82</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$282.33 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$282.33</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$307</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.04%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-port" title="มีหุ้นนี้ในพอร์ตจริง (data/portfolio.json)">⭐ มีในพอร์ต</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Connectivity" data-status="A" data-portfolio="false" data-ticker="MRVL">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">MRVL</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Connectivity</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$218.34</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$205.10 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$205.10</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$222</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-7.61%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="CPU Bottleneck" data-status="A" data-portfolio="false" data-ticker="ARM">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">ARM</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">CPU Bottleneck</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$228.77</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$208.15 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$208.15</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$225</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-7.49%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Nuclear" data-status="A" data-portfolio="false" data-ticker="OKLO">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">OKLO</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Nuclear</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$26.81</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$25.53 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$25.53</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$27</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-5.45%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Utilities" data-status="A" data-portfolio="false" data-ticker="IREN">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">IREN</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Utilities</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$26.25</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$24.61 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$24.61</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$26</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-5.33%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Photonics" data-status="A" data-portfolio="false" data-ticker="COHR">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">COHR</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Photonics</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$237.22</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$216.00 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$216.00</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$224</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-3.57%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Photonics" data-status="A" data-portfolio="false" data-ticker="AEHR">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AEHR</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Photonics</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$61.21</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$55.05 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$55.05</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$57</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-3.42%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Silicon" data-status="A" data-portfolio="false" data-ticker="ASML">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">ASML</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Silicon</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$1675.70</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$1594.76 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$1594.76</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$1637</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-2.58%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Nuclear" data-status="A" data-portfolio="false" data-ticker="LEU">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">LEU</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Nuclear</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$110.55</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$105.26 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$105.26</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$107</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.63%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="false" data-ticker="VPG">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">VPG</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Physical AI</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$59.16</td>
+            <td style="text-align: right; white-space: nowrap;">-</td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$59.16</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$60</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.40%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">ราคาปิด (Close)</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="false" data-ticker="AMZN">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AMZN</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Physical AI</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$243.79</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$227.78 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$227.78</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$231</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.39%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Silicon" data-status="A" data-portfolio="false" data-ticker="NVDA">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">NVDA</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Silicon</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$213.66</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$207.36 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$207.36</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$210</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.26%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Nuclear" data-status="A" data-portfolio="false" data-ticker="UUUU">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">UUUU</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Nuclear</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$8.23</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$7.95 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$7.95</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$8</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-0.62%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Power" data-status="A" data-portfolio="false" data-ticker="ON">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">ON</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Power</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$75.24</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$71.64 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$71.64</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$72</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-0.50%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-b" data-group="Quantum" data-status="B" data-portfolio="false" data-ticker="IONQ">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">IONQ</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Quantum</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$31.72</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$30.13 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$30.13</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$30</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+0.43%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-b" data-group="CPU Bottleneck" data-status="B" data-portfolio="false" data-ticker="AMKR">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AMKR</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">CPU Bottleneck</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$41.21</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$38.53 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$38.53</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$38</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+1.39%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-b" data-group="AI Connectivity" data-status="B" data-portfolio="false" data-ticker="AVGO">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AVGO</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Connectivity</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$345.00</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$331.65 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$331.65</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$324</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+2.36%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-b" data-group="AI Silicon" data-status="B" data-portfolio="false" data-ticker="MU">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">MU</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Silicon</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$934.27</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$885.92 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$885.92</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$849</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.35%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-b" data-group="AI Silicon" data-status="B" data-portfolio="false" data-ticker="TSM">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">TSM</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Silicon</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$431.81</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$416.41 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$416.41</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$398</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.63%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-b" data-group="Quantum" data-status="B" data-portfolio="false" data-ticker="RGTI">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">RGTI</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Quantum</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$12.06</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$11.53 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$11.53</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$11</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.78%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Power" data-status="C" data-portfolio="false" data-ticker="BE">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">BE</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Power</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$222.30</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$203.98 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$203.98</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$192</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.24%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Utilities" data-status="C" data-portfolio="false" data-ticker="DOCN">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">DOCN</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Utilities</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$99.97</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$96.00 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$96.00</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$90</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.67%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Power" data-status="C" data-portfolio="false" data-ticker="NVTS">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">NVTS</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Power</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$9.20</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.59 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$8.59</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$8</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.37%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="ASTS">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">ASTS</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Space</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$43.07</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$40.89 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$40.89</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$38</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.61%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="ONDS">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">ONDS</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$6.88</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$6.48 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$6.48</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$6</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.00%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="CPU Bottleneck" data-status="C" data-portfolio="false" data-ticker="AMD">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AMD</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">CPU Bottleneck</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$566.42</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$517.75 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$517.75</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$479</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.09%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="KTOS">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">KTOS</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$43.59</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$42.31 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$42.31</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$39</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.49%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="MRCY">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">MRCY</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$81.80</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$80.40 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$80.40</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$74</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.65%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Connectivity" data-status="C" data-portfolio="false" data-ticker="ALAB">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">ALAB</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Connectivity</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$290.43</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$273.11 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$273.11</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$251</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.81%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Utilities" data-status="C" data-portfolio="false" data-ticker="NBIS">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">NBIS</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Utilities</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$171.99</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$159.85 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$159.85</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$146</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+9.49%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Quantum" data-status="C" data-portfolio="false" data-ticker="QBTS">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">QBTS</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Quantum</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$11.56</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$11.05 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$11.05</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$10</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+10.50%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="RKLB">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">RKLB</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Space</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$59.10</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$55.60 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$55.60</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$50</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.20%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Physical AI" data-status="C" data-portfolio="false" data-ticker="TSLA">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">TSLA</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Physical AI</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$403.30</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$394.00 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$394.00</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$353</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.61%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Photonics" data-status="C" data-portfolio="false" data-ticker="LITE">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">LITE</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Photonics</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$919.53</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$854.07 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$854.07</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$765</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.64%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Quantum" data-status="C" data-portfolio="false" data-ticker="INFQ">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">INFQ</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Quantum</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$9.43</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.97 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$8.97</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$8</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.13%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Applications" data-status="C" data-portfolio="false" data-ticker="SNOW">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">SNOW</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Applications</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$330.27</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$317.97 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$317.97</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$283</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.36%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Applications" data-status="C" data-portfolio="false" data-ticker="PLTR">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">PLTR</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Applications</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$196.42</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$193.79 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$193.79</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$172</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.67%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Power" data-status="C" data-portfolio="true" data-ticker="VRT">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">VRT</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Power</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$245.92</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$230.40 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$230.40</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$195</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+18.15%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-port" title="มีหุ้นนี้ในพอร์ตจริง (data/portfolio.json)">⭐ มีในพอร์ต</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Photonics" data-status="C" data-portfolio="false" data-ticker="AAOI">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AAOI</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Photonics</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$79.19</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$72.21 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$72.21</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$61</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+18.38%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="SPCX">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">SPCX</span> <span class="text-muted" style="font-size:0.72rem;" title="แนวรับไม่ได้มาจากภาพ Shay Boloor">✎ ผู้ใช้กำหนดเอง 2026-10-30</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Space</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$143.89</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$138.96 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$138.96</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$115</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+20.83%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="RDW">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">RDW</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Space</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$9.16</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.63 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$8.63</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$7</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+23.29%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="AI Applications" data-status="C" data-portfolio="false" data-ticker="CRWD">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">CRWD</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">AI Applications</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$261.15</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$261.25 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$261.25</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$210</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+24.40%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Nuclear" data-status="C" data-portfolio="false" data-ticker="GEV">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">GEV</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Nuclear</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$887.85</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$861.00 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$861.00</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$678</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+26.99%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="AVAV">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">AVAV</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$134.88</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$132.00 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$132.00</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$102</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+29.41%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="PL">
+            <td style="white-space: nowrap;">
+                <span class="ticker-pill">PL</span>
+            </td>
+            <td style="white-space: nowrap;">
+                <span class="group-pill">Space</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;" class="text-muted">$14.31</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$13.65 <small>(Pre)</small></span></td>
+            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$13.65</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$10</td>
+            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+36.55%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+        </tr>
+        
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 10px;">
+        <div>
+            💡 เรียงลำดับจาก % ห่างต่ำสุดไปสูงสุด (ราคาต่ำกว่าแนวรับขึ้นก่อน) | สูตร: <code>((ราคา - แนวรับ) / แนวรับ) * 100</code>
+        </div>
+        <div id="row-count-display">
+            แสดง 49 จาก 49 ตัว
+        </div>
+    </div>
+</div>
+
+<!-- Modal Overlay for Image Zoom -->
+<div class="modal-overlay" id="image-modal" onclick="closeImageModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeImageModal()">&times;</button>
+        <div style="padding: 10px 10px 14px 10px; color: var(--text-secondary); font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff;">🖼️ ภาพต้นฉบับแนวรับ Fibonacci หุ้นเติบโต (Shay Boloor, 17/10/2026)</strong>
+            <span>กด ESC หรือคลิกด้านนอกเพื่อปิด</span>
+        </div>
+        <img src="assets/shay_fibo_support_2026-10-17.jpeg" alt="Fibo Support Large" class="modal-img">
+    </div>
+</div>
+
+<script>
+let currentStatus = 'all';
+let currentGroup = 'all';
+let currentSearch = '';
+let currentPortOnly = false;
+
+function applyFilters() {
+    const rows = document.querySelectorAll('.stock-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        const rowGroup = row.getAttribute('data-group');
+        const rowPort = row.getAttribute('data-portfolio') === 'true';
+        const rowTicker = row.getAttribute('data-ticker').toLowerCase();
+
+        let matchStatus = (currentStatus === 'all') || (rowStatus === currentStatus);
+        if (currentPortOnly) {
+            matchStatus = matchStatus && rowPort;
+        }
+        const matchGroup = (currentGroup === 'all') || (rowGroup === currentGroup);
+        const matchSearch = (!currentSearch) || (rowTicker.includes(currentSearch));
+
+        if (matchStatus && matchGroup && matchSearch) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    const countDisplay = document.getElementById('row-count-display');
+    if (countDisplay) {
+        countDisplay.textContent = `แสดง ${visibleCount} จาก ${rows.length} ตัว`;
+    }
+}
+
+function filterByStatus(status) {
+    currentStatus = status;
+    currentPortOnly = false;
+
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
+
+    if (status === 'all') {
+        document.getElementById('btn-filter-all')?.classList.add('active');
+        document.getElementById('card-all')?.classList.add('active');
+    } else if (status === 'A') {
+        document.getElementById('btn-filter-a')?.classList.add('active');
+        document.getElementById('card-a')?.classList.add('active');
+    } else if (status === 'B') {
+        document.getElementById('btn-filter-b')?.classList.add('active');
+        document.getElementById('card-b')?.classList.add('active');
+    } else if (status === 'C') {
+        document.getElementById('btn-filter-c')?.classList.add('active');
+        document.getElementById('card-c')?.classList.add('active');
+    }
+
+    applyFilters();
+}
+
+function filterByPortfolio() {
+    currentPortOnly = !currentPortOnly;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
+
+    const btn = document.getElementById('btn-filter-port');
+    const card = document.getElementById('card-port');
+    if (currentPortOnly) {
+        btn?.classList.add('active');
+        card?.classList.add('active');
+    } else {
+        currentStatus = 'all';
+        document.getElementById('btn-filter-all')?.classList.add('active');
+        document.getElementById('card-all')?.classList.add('active');
+    }
+    applyFilters();
+}
+
+function filterByGroup(group) {
+    currentGroup = group;
+    applyFilters();
+}
+
+function handleSearch(query) {
+    currentSearch = (query || '').trim().toLowerCase();
+    applyFilters();
+}
+
+function openImageModal() {
+    const modal = document.getElementById('image-modal');
+    if (modal) modal.classList.add('open');
+}
+
+function closeImageModal(e) {
+    const modal = document.getElementById('image-modal');
+    if (modal) modal.classList.remove('open');
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeImageModal();
+});
+</script>
+</body>
+</html>
