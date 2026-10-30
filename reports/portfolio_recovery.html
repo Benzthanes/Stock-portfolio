@@ -282,7 +282,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link active" aria-current="page">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-29 22:18</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link active" aria-current="page">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 11:04</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -457,12 +457,12 @@
             </div>
             <div class="card">
                 <div class="kpi-label">💸 ยอดขาดทุนรวม (USD)</div>
-                <div class="kpi-value text-rose">-$1,075.18</div>
+                <div class="kpi-value text-rose">-$1,098.99</div>
                 <div class="kpi-subtext">เงินลงทุนที่จมอยู่ ณ ราคาตลาดปัจจุบัน</div>
             </div>
             <div class="card">
                 <div class="kpi-label">฿ ยอดขาดทุนรวม (THB)</div>
-                <div class="kpi-value text-rose">-฿35,718.05</div>
+                <div class="kpi-value text-rose">-฿36,476.64</div>
                 <div class="kpi-subtext">คำนวณที่อัตราแลกเปลี่ยน 33.70 THB/USD</div>
             </div>
         </div>
@@ -487,66 +487,66 @@
                 <tbody>
                     
         <tr>
-            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 268.88, 340.31, 0.0, 0.0, 415.18)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span></td>
+            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 405.31)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span></td>
             <td><div class="fw-bold">Alphabet Inc. Class A</div><div class="text-muted small">ผู้นำเสิร์ชเอนจิน Google, แพลตฟอร์ม YouTube, Android และคลาวด์ Google Cloud</div></td>
-            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $341.72<br><span class="text-muted small">ตลาด:</span> $284.89</td>
-            <td style="text-align: right;" class="text-rose fw-bold">-16.6%<br><span class="small">(-$635.81)</span></td>
+            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $341.72<br><span class="text-muted small">ตลาด:</span> $283.82</td>
+            <td style="text-align: right;" class="text-rose fw-bold">-16.9%<br><span class="small">(-$647.84)</span></td>
             <td style="text-align: right;">
-                <div class="text-emerald fw-bold">รับ $268.88</div>
-                <div class="text-amber small">ต้าน $340.31</div>
+                <div class="text-emerald fw-bold">รับ $267.81</div>
+                <div class="text-amber small">ต้าน $340.29</div>
             </td>
-            <td style="text-align: right;" class="text-emerald fw-bold">+19.9%</td>
-            <td style="text-align: right;"><strong>$415.18</strong> <span class='text-emerald small'>(+46%)</span></td>
-            <td style="text-align: center;"><span class='badge badge-amber' title="Rev Growth +22% 🚀 • Net Income +90% 🚀 • Elite ROE (44%) 🏆 • Attractive PEG 0.19 💎 • Safe Debt (D/E 0.21) 🛡️ • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-13.7%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 60/100</span><br><span class="badge badge-neutral">Rev +22.2% | Net +89.7%</span></td>
-            <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 96 วัน</span></td>
-            <td><span class="badge badge-amber">🛡️ ถือติดตามแนวรับ $268.88 (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)</span></td>
+            <td style="text-align: right;" class="text-emerald fw-bold">+20.4%</td>
+            <td style="text-align: right;"><strong>$405.31</strong> <span class='text-emerald small'>(+43%)</span></td>
+            <td style="text-align: center;"><span class='badge badge-amber' title="Rev Growth +22% 🚀 • Net Income +90% 🚀 • Elite ROE (44%) 🏆 • Attractive PEG 0.19 💎 • Safe Debt (D/E 0.21) 🛡️ • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-14.1%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 60/100</span><br><span class="badge badge-neutral">Rev +22.2% | Net +89.7%</span></td>
+            <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 95 วัน</span></td>
+            <td><span class="badge badge-amber">🛡️ ถือติดตามแนวรับ $267.81 (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)</span></td>
         </tr>
         
         <tr>
-            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 0.0, 0.0, 7.9, 10.0, 0.0, 0.0, 12.7)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOK 📈</span></td>
+            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 0.0, 0.0, 7.91, 10.0, 0.0, 0.0, 12.7)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOK 📈</span></td>
             <td><div class="fw-bold">Nokia Oyj</div><div class="text-muted small">ผู้ให้บริการโครงสร้างพื้นฐานเครือข่ายโทรคมนาคม อุปกรณ์ส่งสัญญาณ 5G และไฟเบอร์</div></td>
-            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $10.62<br><span class="text-muted small">ตลาด:</span> $9.24</td>
-            <td style="text-align: right;" class="text-rose fw-bold">-13.0%<br><span class="small">(-$287.36)</span></td>
+            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $10.62<br><span class="text-muted small">ตลาด:</span> $9.31</td>
+            <td style="text-align: right;" class="text-rose fw-bold">-12.3%<br><span class="small">(-$273.78)</span></td>
             <td style="text-align: right;">
-                <div class="text-emerald fw-bold">รับ $7.90</div>
+                <div class="text-emerald fw-bold">รับ $7.91</div>
                 <div class="text-amber small">ต้าน $10.00</div>
             </td>
-            <td style="text-align: right;" class="text-emerald fw-bold">+14.9%</td>
-            <td style="text-align: right;"><strong>$12.70</strong> <span class='text-emerald small'>(+37%)</span></td>
-            <td style="text-align: center;"><span class='badge badge-amber' title="Slow Rev Growth +9.7% • ⚠️ Net Income Shrinking (-6.7%) • Low ROE (4.0%) • Safe Debt (D/E 0.16) 🛡️ • FCF Cash Cow 💵 • ต่ำกว่า EMA200 (-5.9%)" style='cursor:help;'>เกรด C · 42/100</span><br><span class="badge badge-neutral">Rev +9.7% | Net -6.7%</span></td>
-            <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 91 วัน</span></td>
+            <td style="text-align: right;" class="text-emerald fw-bold">+14.1%</td>
+            <td style="text-align: right;"><strong>$12.70</strong> <span class='text-emerald small'>(+36%)</span></td>
+            <td style="text-align: center;"><span class='badge badge-amber' title="Slow Rev Growth +9.7% • ⚠️ Net Income Shrinking (-6.7%) • Low ROE (4.0%) • Safe Debt (D/E 0.16) 🛡️ • FCF Cash Cow 💵 • ต่ำกว่า EMA200 (-5.3%)" style='cursor:help;'>เกรด C · 42/100</span><br><span class="badge badge-neutral">Rev +9.7% | Net -6.7%</span></td>
+            <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 90 วัน</span></td>
             <td><span class="badge badge-amber">🔄 Capital Rotation (⚠️ Net Income Shrinking (-6.7%) โยกเงินไปหุ้นผู้นำขาขึ้น)</span></td>
         </tr>
         
         <tr>
-            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 253.93, 295.84, 0.0, 0.0, 454.15)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">APP 📈</span></td>
+            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 253.59, 295.8, 0.0, 0.0, 454.15)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">APP 📈</span></td>
             <td><div class="fw-bold">AppLovin Corp</div><div class="text-muted small">แพลตฟอร์มเทคโนโลยีการตลาดและเครือข่ายโฆษณา AI สำหรับเกมและแอปมือถือ</div></td>
-            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $285.32<br><span class="text-muted small">ตลาด:</span> $256.44</td>
-            <td style="text-align: right;" class="text-rose fw-bold">-10.1%<br><span class="small">(-$85.98)</span></td>
+            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $285.32<br><span class="text-muted small">ตลาด:</span> $254.91</td>
+            <td style="text-align: right;" class="text-rose fw-bold">-10.7%<br><span class="small">(-$90.54)</span></td>
             <td style="text-align: right;">
-                <div class="text-emerald fw-bold">รับ $253.93</div>
-                <div class="text-amber small">ต้าน $295.84</div>
+                <div class="text-emerald fw-bold">รับ $253.59</div>
+                <div class="text-amber small">ต้าน $295.80</div>
             </td>
-            <td style="text-align: right;" class="text-emerald fw-bold">+11.3%</td>
-            <td style="text-align: right;"><strong>$454.15</strong> <span class='text-emerald small'>(+77%)</span></td>
-            <td style="text-align: center;"><span class='badge badge-amber' title="Rev Growth +29% 🚀 • Net Income +90% 🚀 • Elite ROE (204%) 🏆 • Attractive PEG 0.22 💎 • Moderate Debt (D/E 1.11) • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-35.3%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 58/100</span><br><span class="badge badge-neutral">Rev +28.5% | Net +89.9%</span></td>
-            <td style="text-align: center;"><span class='badge badge-rose'>⚠️ งบออกใน 6 วัน</span></td>
-            <td><span class="badge badge-amber">🟠 Freeze DCA (งบออกใน 6 วัน ห้ามถัวเด็ดขาด)</span></td>
+            <td style="text-align: right;" class="text-emerald fw-bold">+11.9%</td>
+            <td style="text-align: right;"><strong>$454.15</strong> <span class='text-emerald small'>(+78%)</span></td>
+            <td style="text-align: center;"><span class='badge badge-amber' title="Rev Growth +29% 🚀 • Net Income +90% 🚀 • Elite ROE (204%) 🏆 • Attractive PEG 0.21 💎 • Moderate Debt (D/E 1.11) • FCF Cash Cow 💵 • ⚠️ หลุด EMA200 เกิน 10% (-35.7%) เสี่ยง Drawdown ลึก" style='cursor:help;'>เกรด B · 58/100</span><br><span class="badge badge-neutral">Rev +28.5% | Net +89.9%</span></td>
+            <td style="text-align: center;"><span class='badge badge-rose'>⚠️ งบออกใน 5 วัน</span></td>
+            <td><span class="badge badge-amber">🟠 Freeze DCA (งบออกใน 5 วัน ห้ามถัวเด็ดขาด)</span></td>
         </tr>
         
         <tr>
-            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 0.0, 0.0, 49.12, 56.69, 0.0, 0.0, 62.74)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span></td>
+            <td><span class="ticker-pill clickable-ticker" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 0.0, 0.0, 49.05, 56.67, 0.0, 0.0, 62.74)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span></td>
             <td><div class="fw-bold">Bank of America Corp</div><div class="text-muted small">หนึ่งในธนาคารพาณิชย์และสถาบันสินเชื่อที่ใหญ่ที่สุดในสหรัฐอเมริกา</div></td>
-            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $54.31<br><span class="text-muted small">ตลาด:</span> $51.90</td>
-            <td style="text-align: right;" class="text-rose fw-bold">-4.4%<br><span class="small">(-$66.03)</span></td>
+            <td style="text-align: right;"><span class="text-muted small">ทุน:</span> $54.31<br><span class="text-muted small">ตลาด:</span> $51.14</td>
+            <td style="text-align: right;" class="text-rose fw-bold">-5.8%<br><span class="small">(-$86.83)</span></td>
             <td style="text-align: right;">
-                <div class="text-emerald fw-bold">รับ $49.12</div>
-                <div class="text-amber small">ต้าน $56.69</div>
+                <div class="text-emerald fw-bold">รับ $49.05</div>
+                <div class="text-amber small">ต้าน $56.67</div>
             </td>
-            <td style="text-align: right;" class="text-emerald fw-bold">+4.6%</td>
-            <td style="text-align: right;"><strong>$62.74</strong> <span class='text-emerald small'>(+21%)</span></td>
-            <td style="text-align: center;"><span class='badge badge-rose' title="⚠️ Neg Rev Trap (-1.0%) • Slow Net Income +8.7% • Low ROE (10.7%) • Attractive PEG 0.84 💎 • ต่ำกว่า EMA200 (-6.0%) • RSI Hook ยกหัวจากต่ำกว่า 40 ⤴" style='cursor:help;'>เกรด F · 39/100 ⤴</span><br><span class="badge badge-neutral">Rev -1.0% | Net +8.7%</span></td>
-            <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 78 วัน</span></td>
+            <td style="text-align: right;" class="text-emerald fw-bold">+6.2%</td>
+            <td style="text-align: right;"><strong>$62.74</strong> <span class='text-emerald small'>(+23%)</span></td>
+            <td style="text-align: center;"><span class='badge badge-rose' title="⚠️ Neg Rev Trap (-1.0%) • Slow Net Income +8.7% • Low ROE (10.7%) • Attractive PEG 0.85 💎 • ต่ำกว่า EMA200 (-7.4%) • RSI Hook ยกหัวจากต่ำกว่า 40 ⤴" style='cursor:help;'>เกรด F · 39/100 ⤴</span><br><span class="badge badge-neutral">Rev -1.0% | Net +8.7%</span></td>
+            <td style="text-align: center;"><span class='badge badge-neutral'>งบออกใน 77 วัน</span></td>
             <td><span class="badge badge-amber">🔄 Capital Rotation (⚠️ Neg Rev Trap (-1.0%) โยกเงินไปหุ้นผู้นำขาขึ้น)</span></td>
         </tr>
         
@@ -560,15 +560,15 @@
             <!-- Card Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 268.88, 340.31, 0.0, 0.0, 415.18)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 405.31)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">GOOGL 📈</span>
                     <strong style="font-size: 1.25rem;">Alphabet Inc. Class A</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Technology Services • Internet Software/Services</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟢 High Quality Growth (ธุรกิจเติบโตสูง)</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -16.6% (-$635.81 USD)</span>
-                    <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🛡️ ถือติดตามแนวรับ $268.88 (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)</span>
-                    <button onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 268.88, 340.31, 0.0, 0.0, 415.18)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -16.9% (-$647.84 USD)</span>
+                    <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🛡️ ถือติดตามแนวรับ $267.81 (เกาะเส้น Stop-Loss ไม่หลุดทรงหลัก)</span>
+                    <button onclick="openChartModal(&quot;GOOGL&quot;, &quot;NASDAQ&quot;, &quot;Alphabet Inc. Class A&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 267.81, 340.29, 0.0, 0.0, 405.31)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -590,27 +590,27 @@
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ราคาตลาด (Market Price)</div>
-                    <div class="fw-bold" style="font-size: 1.15rem;">$284.89</div>
-                    <div class="text-rose small">ห่างจากทุน: -16.6%</div>
+                    <div class="fw-bold" style="font-size: 1.15rem;">$283.82</div>
+                    <div class="text-rose small">ห่างจากทุน: -16.9%</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ระยะทางดีดคืนทุน (Gap)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+19.9%</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+20.4%</div>
                     <div class="text-muted small">ต้องการราคาแตะ $341.72</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวรับดักช้อน (Key Support)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$268.88</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$267.81</div>
                     <div class="text-muted small">แนวรับความผันผวน 1.5 ATR</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวต้านรีบาวด์ (Key Resistance)</div>
-                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">$340.31</div>
+                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">$340.29</div>
                     <div class="text-muted small">เส้น 50 วัน (Mean Reversion)</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">จุดตัดขาดทุน (SL Guard)</div>
-                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$268.88</div>
+                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$267.81</div>
                     <div class="text-muted small">หลุดต้องลดพอร์ต</div>
                 </div>
             </div>
@@ -622,7 +622,7 @@
                         <span>📈 4 ปัจจัยขับเคลื่อนการเติบโตในอนาคต (1-12 เดือนข้างหน้า)</span>
                     </div>
                     <ul class="outlook-list drivers">
-                        <li>การขยายตัวของรายได้ระดับ +22.2% YoY และความสามารถในการทำกำไรสุทธิ +89.7% YoY</li><li>อัตราการประเมินมูลค่า P/E 14.9x และค่า PEG 0.19 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Internet Software/Services</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
+                        <li>การขยายตัวของรายได้ระดับ +22.2% YoY และความสามารถในการทำกำไรสุทธิ +89.7% YoY</li><li>อัตราการประเมินมูลค่า P/E 14.8x และค่า PEG 0.19 เท่า สะท้อนระดับราคาต่อการเติบโต</li><li>ส่วนแบ่งการตลาดและความแข็งแกร่งของตราสินค้าในกลุ่มอุตสาหกรรม Internet Software/Services</li><li>การเพิ่มประสิทธิภาพการดำเนินงานและการบริหารจัดการต้นทุนเพื่อผลักดันกระแสเงินสดอิสระ</li>
                     </ul>
                 </div>
                 <div class="outlook-subcard" style="border-top: 3px solid var(--rose);">
@@ -643,7 +643,7 @@
                 </div>
                 <div class="timeline-grid">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ปฏิทินงบ (96 วัน)</span>
+                <span class="timeline-step-badge">ปฏิทินงบ (95 วัน)</span>
                 <div class="timeline-step-desc">การแถลงงบการเงินและทิศทางคำสั่งซื้อในอนาคต</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -668,7 +668,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">ราคาปัจจุบัน</div>
-                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$284.89</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$283.82</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าต่ำสุด (Low Target)</div>
@@ -676,7 +676,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$415.18 <span class="small">(+46%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$405.31 <span class="small">(+43%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -684,7 +684,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 66 แห่ง (Buy 59 / Hold 7 / Sell 0) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $415.18 (Upside +45.7%)
+                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 66 แห่ง (Buy 59 / Hold 7 / Sell 0) ราคาเป้าหมายเฉลี่ยสถาบันอยู่ที่ $405.31 (Upside +42.8%)
                 </div>
             </div>
 
@@ -696,7 +696,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[Forbes]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Google’s Larry Page, Sergey Brin Lose Combined $60 Billion As Alphabet Stock Drops</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#94a3b8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.25); vertical-align:middle;'>heuristic</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMizgFBVV95cUxNTWt0SFhta2VwZmlVYy1GaG5fbDRuQnRlUWhOSDYxS29FTURfbHdtaGEtWkNCT1g5YWhoMDhNN2VkWlR4TzFMbEhPNm5BVWd4V09SUG5jUWc2eDloQzBmMUNnSFdHUFMtV3dEeDZsREowVFNOOWlwQWNmNHBObXVJTHMyS1VickVsd3ZWM094MEFsLUVacmN4OTVYbVN4WDltWUduY2M5dUxJVk1uVXR0NHV1eGZ4blRXMGJmdWVkOEpleUwzOU93blZIaWpZZw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google’s Larry Page, Sergey Brin Lose Combined $60 Billion As Alphabet Stock Drops ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[NBC News]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Google-parent Alphabet’s stock price plunges, erasing more than $500 billion in value</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#94a3b8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.25); vertical-align:middle;'>heuristic</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMikgFBVV95cUxNMndTLS04T1FTZGdERGZVOVpOcThYTkNlT0FHUnp4TF9lVU52SDlfYlY3VzZubGxkcDdwWDQxbUlpcDUzUjN1RF9qRXBfbzlTaEsydXlNMnpIRjJldVpOdWdVdVBUZ2c5aVRZS094c01NZk9aZGVUcl9WZlhzdG4yNHRCVEpfajlTX3NYVmlpdzRPQQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google-parent Alphabet’s stock price plunges, erasing more than $500 billion in value ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[TradingView]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Google Stock Selloff Exposes Hidden ETF Risk</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#94a3b8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.25); vertical-align:middle;'>heuristic</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMipwFBVV95cUxPdHVBM2tEeHJXTEllbjdBQk9YTUxsc3licG1NLUplYm5IOHR1VFFzT1lKTGxvUTRJZmFGMGVKb2ZpTWNHMDZWalkzVUdDZ1pHMUFXVFdQSDVGWnIxNGdaYUtTTnpadWlOeU9UVEUzMVMzY1J5NEtSUWpUYTZhZ2VrTmJVV3I1YnE3MmNseUJjb1J5cmJZQTlKUGRMWGZITDFFa2VjM2pFaw?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google Stock Selloff Exposes Hidden ETF Risk ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[The Motley Fool]</strong> <span style='font-weight: 600; color: #f1f5f9;'>AI กำลังทำลายห่านทองคำของ Google หรือไม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMihAFBVV95cUxQbERmeGFScWJVREM0S1dtT2JUTzF6TVA0cjRhQWQ1MmUwWmozdFdkWDF1Y3VCeUs1N1RRY2c0aXdjem45Qk41LS1xNF92WHNvZzFOUG42UzZ5aXY0UC1vTUZLdE1YTE9aV051a0ZjVVhubmhEbWRwcDlWNktoNFo4a0h2MUY?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Is AI Killing Google&#x27;s Golden Goose? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>AI กำลังทำลายห่านทองคำของ Google หรือไม่</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMinAFBVV95cUxPWEVRSXhpZHNadnJjczFKZDQ3M3c3bTZJV1JUdTFrbGZ2SENEaUlrSkRCYVNCQzlGWVZQME1HcXlteTBPLS1WaDAyM0V1dUl6ZExYRklIQURaODlrb3NBczFLd3hhVDVKeG9reEZaekp3N0hTX05xSDJtNjRQX01KOS11bDVVaXJMbzBwNjI3bWN2N1VOemkwdmZhdno?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Is AI Killing Google&#x27;s Golden Goose? ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[NBC News]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น Google ร่วงหนักเป็นประวัติการณ์ จุดความกลัวฟองสบู่ AI แตก</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMisgFBVV95cUxPMjg1ckNTT3R0aUxzR05RZEN2LUZYempyTkl6UW5aVUJZbjdxODAtb19za0NCdnd0ZnNVRHJMSV8yUmdDWkkwUTAtc2hmdjVPZjAyTzQ3cEhaQUFyNmJ1YkhDNG04Wl9LdWI1TVZwa3l1T0pQMmtUbXNzSnhxOWlCQmRPNGFnaFBDLTlrbzFkVTBNdFJzQWFlSjhOR1g5WUlJUi1JWFRyNlpFekNTZjMxVjln?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Google stock&#x27;s historically bad day raises fears of AI bubble popping ↗</a> <span class='text-muted small'>(30 Oct 2026)</span></div></li></ul>
                 </div>
             </div>
 
@@ -706,7 +706,7 @@
                     🧭 แผนยุทธศาสตร์สำหรับ GOOGL (แนะนำตามกฎ ไม่ใช่คำสั่ง):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    วันงบถัดไปอยู่ห่างอีก 96 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
+                    วันงบถัดไปอยู่ห่างอีก 95 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. ติดตามกรอบแนวรับแนวต้านสำคัญทางเทคนิค และปฏิบัติตามวินัย Stop-Loss อย่างเคร่งครัด
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดยอมแพ้ (Invalidation Risk):</strong> การปิดหลุดแนวรับโครงสร้างหลัก หรือตัวเลขอัตรากำไรสุทธิชะลอตัวลงเกิน 20%
@@ -730,21 +730,21 @@
                             <td><strong>1. ถือรอเฉยๆ (Hold)</strong></td>
                             <td>ไม่เติมเงิน รอราคาฟื้นตัวกลับหาทุนเดิมตามปัจจัยพื้นฐาน</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;"><strong>$341.72</strong> (+19.9%)</td>
+                            <td style="text-align: right;"><strong>$341.72</strong> (+20.4%)</td>
                             <td><span class="text-muted">ความเสี่ยงต่ำสุด แต่เงินจมและเสียโอกาสทำกำไร</span></td>
                         </tr>
                         <tr>
                             <td><strong>2. Smart DCA</strong></td>
-                            <td>ซื้อเพิ่ม 5.5949 หุ้น ที่แนวรับ <strong>$268.88</strong> (แนวรับความผันผวน 1.5 ATR)</td>
-                            <td style="text-align: right;" class="text-amber"><strong>$1,593.95</strong></td>
-                            <td style="text-align: right;" class="text-emerald"><strong>$322.78</strong> (+13.3%)</td>
+                            <td>ซื้อเพิ่ม 5.5949 หุ้น ที่แนวรับ <strong>$267.81</strong> (แนวรับความผันผวน 1.5 ATR)</td>
+                            <td style="text-align: right;" class="text-amber"><strong>$1,587.93</strong></td>
+                            <td style="text-align: right;" class="text-emerald"><strong>$322.42</strong> (+13.6%)</td>
                             <td><span class="text-emerald">ดึงทุนต่ำลง คืนทุนเร็วขึ้น (ห้ามถัวหากใกล้วันงบออก)</span></td>
                         </tr>
                         <tr>
                             <td><strong>3. สลับตัว (Rotation)</strong></td>
-                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $3,187.89 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
+                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $3,175.86 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +19.9%</strong></td>
+                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +20.4%</strong></td>
                             <td><span class="text-muted">เหมาะเฉพาะเมื่อพื้นฐานหุ้นเดิมพัง หรือกำไรหดตัวยาวนาน</span></td>
                         </tr>
                     </tbody>
@@ -756,15 +756,15 @@
             <!-- Card Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 0.0, 0.0, 7.9, 10.0, 0.0, 0.0, 12.7)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOK 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 0.0, 0.0, 7.91, 10.0, 0.0, 0.0, 12.7)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">NOK 📈</span>
                     <strong style="font-size: 1.25rem;">Nokia Oyj</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Electronic Technology • Telecommunications Equipment</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟡 Value Recovery & Optical Transition</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -13.0% (-$287.36 USD)</span>
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -12.3% (-$273.78 USD)</span>
                     <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🔄 Capital Rotation (⚠️ Net Income Shrinking (-6.7%) โยกเงินไปหุ้นผู้นำขาขึ้น)</span>
-                    <button onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 0.0, 0.0, 7.9, 10.0, 0.0, 0.0, 12.7)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <button onclick="openChartModal(&quot;NOK&quot;, &quot;NYSE&quot;, &quot;Nokia Oyj&quot;, &quot;Electronic Technology&quot;, 0.0, 0.0, 7.91, 10.0, 0.0, 0.0, 12.7)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -786,17 +786,17 @@
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ราคาตลาด (Market Price)</div>
-                    <div class="fw-bold" style="font-size: 1.15rem;">$9.24</div>
-                    <div class="text-rose small">ห่างจากทุน: -13.0%</div>
+                    <div class="fw-bold" style="font-size: 1.15rem;">$9.31</div>
+                    <div class="text-rose small">ห่างจากทุน: -12.3%</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ระยะทางดีดคืนทุน (Gap)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+14.9%</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+14.1%</div>
                     <div class="text-muted small">ต้องการราคาแตะ $10.62</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวรับดักช้อน (Key Support)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$7.90</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$7.91</div>
                     <div class="text-muted small">ขอบล่าง Bollinger Band</div>
                 </div>
                 <div class="kpi-box">
@@ -806,7 +806,7 @@
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">จุดตัดขาดทุน (SL Guard)</div>
-                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$8.53</div>
+                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$8.58</div>
                     <div class="text-muted small">หลุดต้องลดพอร์ต</div>
                 </div>
             </div>
@@ -839,7 +839,7 @@
                 </div>
                 <div class="timeline-grid">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">รอบประกาศงบถัดไป (91 วัน)</span>
+                <span class="timeline-step-badge">รอบประกาศงบถัดไป (90 วัน)</span>
                 <div class="timeline-step-desc">ประกาศผลประกอบการไตรมาส 3: ตัวชี้ขาด Gross Margin และคำสั่งซื้อ Network Infrastructure</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะกลาง (1-3 เดือน)</span>
@@ -864,7 +864,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">ราคาปัจจุบัน</div>
-                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$9.24</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$9.31</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าต่ำสุด (Low Target)</div>
@@ -872,7 +872,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$12.70 <span class="small">(+37%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$12.70 <span class="small">(+36%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -880,7 +880,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 30 แห่ง (Buy 22 / Hold 6 / Sell 2) เป้าหมายเฉลี่ย $12.70 (Upside +37.4%) โดยเป้าหมายต่ำสุดอยู่ที่ $7.28 และสูงสุดที่ $20.16
+                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 30 แห่ง (Buy 22 / Hold 6 / Sell 2) เป้าหมายเฉลี่ย $12.70 (Upside +36.4%) โดยเป้าหมายต่ำสุดอยู่ที่ $7.28 และสูงสุดที่ $20.16
                 </div>
             </div>
 
@@ -888,7 +888,7 @@
             <div class="grid-2-cols" style="gap: 14px; margin-bottom: 18px;">
                 <div class="bull-box" style="background: rgba(16, 185, 129, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div class="cat-label text-emerald fw-bold small" style="margin-bottom: 8px;">🟢 พาดหัวข่าวจริงเชิงบวกและปัจจัยหนุน (Positive News):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[StocksToTrade]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น NOK พุ่งจาก Starlink และแนวโน้ม Q4 ที่ปลุกฝั่งกระทิง</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMihgFBVV95cUxQTnNSbFBzMDl1OTZsc2tveVdEci1Xb0g4SnVjT3VCR0FYOS1PQlVWM0FpekVYVGZpWmVOeXdVSWJpZDFmdTZsakVIWC1tbHBOM0NfUnBVZWlfVEY4NmZCVGtvQ3dobkduVkF3UWFKcWU2MW9MMHlkOUY1LUU5dllVeWsxV0g1QQ?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>NOK Stock Jumps As Starlink And Q4 Guidance Energize Bulls ↗</a> <span class='text-muted small'>(28 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวเชิงบวกเด่นชัดในสัปดาห์นี้.</span></li></ul>
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
@@ -902,7 +902,7 @@
                     🧭 แผนยุทธศาสตร์สำหรับ NOK (แนะนำตามกฎ ไม่ใช่คำสั่ง):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    กำไรสุทธิ YoY -6.7%. วันงบถัดไปอยู่ห่างอีก 91 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.30) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $10.62
+                    กำไรสุทธิ YoY -6.7%. วันงบถัดไปอยู่ห่างอีก 90 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. ให้ถือรอประเมินตัวเลขจริง หากกราฟยืนเหนือแนวรับเส้น 200 วัน ($10.30) ได้ จึงรอจังหวะ Rebound Exit ปิดความเสี่ยงที่จุดคุ้มทุน $10.62
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดยอมแพ้ (Invalidation Risk):</strong> หากงบ Q3 ชะลอตัวลงเกินคาดและราคาหลุดจุดตัดขาดทุน (หลุดแนวรับโครงสร้างหลัก) ต้องพิจารณา Cut Loss เพื่อปกป้องเงินต้นส่วนใหญ่
@@ -926,21 +926,21 @@
                             <td><strong>1. ถือรอเฉยๆ (Hold)</strong></td>
                             <td>ไม่เติมเงิน รอราคาฟื้นตัวกลับหาทุนเดิมตามปัจจัยพื้นฐาน</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;"><strong>$10.62</strong> (+14.9%)</td>
+                            <td style="text-align: right;"><strong>$10.62</strong> (+14.1%)</td>
                             <td><span class="text-muted">ความเสี่ยงต่ำสุด แต่เงินจมและเสียโอกาสทำกำไร</span></td>
                         </tr>
                         <tr>
                             <td><strong>2. Smart DCA</strong></td>
-                            <td>ซื้อเพิ่ม 104.4335 หุ้น ที่แนวรับ <strong>$7.90</strong> (ขอบล่าง Bollinger Band)</td>
-                            <td style="text-align: right;" class="text-amber"><strong>$965.49</strong></td>
-                            <td style="text-align: right;" class="text-emerald"><strong>$10.16</strong> (+9.9%)</td>
+                            <td>ซื้อเพิ่ม 104.4335 หุ้น ที่แนวรับ <strong>$7.91</strong> (ขอบล่าง Bollinger Band)</td>
+                            <td style="text-align: right;" class="text-amber"><strong>$972.28</strong></td>
+                            <td style="text-align: right;" class="text-emerald"><strong>$10.18</strong> (+9.4%)</td>
                             <td><span class="text-emerald">ดึงทุนต่ำลง คืนทุนเร็วขึ้น (ห้ามถัวหากใกล้วันงบออก)</span></td>
                         </tr>
                         <tr>
                             <td><strong>3. สลับตัว (Rotation)</strong></td>
-                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $1,930.98 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
+                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $1,944.55 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +14.9%</strong></td>
+                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +14.1%</strong></td>
                             <td><span class="text-muted">เหมาะเฉพาะเมื่อพื้นฐานหุ้นเดิมพัง หรือกำไรหดตัวยาวนาน</span></td>
                         </tr>
                     </tbody>
@@ -952,15 +952,15 @@
             <!-- Card Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 253.93, 295.84, 0.0, 0.0, 454.15)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">APP 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 253.59, 295.8, 0.0, 0.0, 454.15)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">APP 📈</span>
                     <strong style="font-size: 1.25rem;">AppLovin Corp</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Technology Services • Packaged Software</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟢 Super Growth AI Monopolist (Top Conviction)</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -10.1% (-$85.98 USD)</span>
-                    <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🟠 Freeze DCA (งบออกใน 6 วัน ห้ามถัวเด็ดขาด)</span>
-                    <button onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 253.93, 295.84, 0.0, 0.0, 454.15)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -10.7% (-$90.54 USD)</span>
+                    <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🟠 Freeze DCA (งบออกใน 5 วัน ห้ามถัวเด็ดขาด)</span>
+                    <button onclick="openChartModal(&quot;APP&quot;, &quot;NASDAQ&quot;, &quot;AppLovin Corp&quot;, &quot;Technology Services&quot;, 0.0, 0.0, 253.59, 295.8, 0.0, 0.0, 454.15)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -982,27 +982,27 @@
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ราคาตลาด (Market Price)</div>
-                    <div class="fw-bold" style="font-size: 1.15rem;">$256.44</div>
-                    <div class="text-rose small">ห่างจากทุน: -10.1%</div>
+                    <div class="fw-bold" style="font-size: 1.15rem;">$254.91</div>
+                    <div class="text-rose small">ห่างจากทุน: -10.7%</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ระยะทางดีดคืนทุน (Gap)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+11.3%</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+11.9%</div>
                     <div class="text-muted small">ต้องการราคาแตะ $285.32</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวรับดักช้อน (Key Support)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$253.93</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$253.59</div>
                     <div class="text-muted small">ขอบล่าง Bollinger Band</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวต้านรีบาวด์ (Key Resistance)</div>
-                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">$295.84</div>
+                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">$295.80</div>
                     <div class="text-muted small">เส้น 50 วัน (Mean Reversion)</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">จุดตัดขาดทุน (SL Guard)</div>
-                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$239.75</div>
+                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$238.22</div>
                     <div class="text-muted small">หลุดต้องลดพอร์ต</div>
                 </div>
             </div>
@@ -1035,7 +1035,7 @@
                 </div>
                 <div class="timeline-grid">
                     <div class="timeline-step">
-                <span class="timeline-step-badge">ระยะประชิด (6 วัน)</span>
+                <span class="timeline-step-badge">ระยะประชิด (5 วัน)</span>
                 <div class="timeline-step-desc">รายงานงบการเงิน Q3: จับตาการเติบโตของรายได้จากลูกค้า Web Advertising และการเติบโตของซอฟต์แวร์ AXON 2.0</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
@@ -1060,7 +1060,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">ราคาปัจจุบัน</div>
-                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$256.44</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$254.91</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าต่ำสุด (Low Target)</div>
@@ -1068,7 +1068,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$454.15 <span class="small">(+77%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$454.15 <span class="small">(+78%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -1076,7 +1076,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 35 แห่ง (Buy 28 / Hold 7 / Sell 0) เป้าหมายเฉลี่ย $454.15 (Upside +77.1%) และเป้าหมายต่ำสุดอยู่ที่ $325.00 ซึ่งสูงกว่าต้นทุนของคุณ ($285.32) อยู่ $39.68
+                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 35 แห่ง (Buy 28 / Hold 7 / Sell 0) เป้าหมายเฉลี่ย $454.15 (Upside +78.2%) และเป้าหมายต่ำสุดอยู่ที่ $325.00 ซึ่งสูงกว่าต้นทุนของคุณ ($285.32) อยู่ $39.68
                 </div>
             </div>
 
@@ -1088,7 +1088,7 @@
                 </div>
                 <div class="bear-box" style="background: rgba(244, 63, 94, 0.04); padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(244, 63, 94, 0.2);">
                     <div class="cat-label text-rose fw-bold small" style="margin-bottom: 8px;">🔴 พาดหัวข่าวจริงที่ต้องระวังและความเสี่ยง (Risk Factors):</div>
-                    <ul class="cat-list"><li style='margin-bottom: 8px;'><strong class='source-tag'>[PR Newswire]</strong> <span style='font-weight: 600; color: #f1f5f9;'>Pomerantz ยื่นฟ้องคดีกลุ่มต่อ AppLovin และผู้บริหาร</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMi_AFBVV95cUxPWXJ4X09LOUJ0cW9wb3dhTnNocWJSSTJ3V1oyMkMtLVowRzExMEVKeXNZMFQ0djhRQmpGd0psQ2NPcVdUZE5jUzZFNFROS0ZOZHEwY1dsTENCS3JIcHgwSFRDM0pLXzE3YXowZ0JZc0dXTzhUcE1NbFNhSmU2cTZiUlJfbkFuWVZKRm12czhYSHN0ZXRwVll2RkctVUl6SFpYVW1VR3d5TUE4WU1PcmlwQVd5WG1rcTB4bUt4bV9WM2pYMUxQYzdGSE1oejRpT1R6enJVV2lxMjA4TDZXVVlManRJY3pkN0xXcGdjbkJQZWpMOHY2dHpUejBNYUE?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>Pomerantz Law Firm Announces the Filing of a Class Action Against AppLovin Corporation and Certain Officers - APP ↗</a> <span class='text-muted small'>(29 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[Yahoo Finance]</strong> <span style='font-weight: 600; color: #f1f5f9;'>หุ้น AppLovin (APP) ลดลงขณะที่ตลาดปรับขึ้น</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMinwFBVV95cUxQRVN3Q0Z5LXJ5YWFoMm90UjNscmM4aEdQSDgtd3kxaGdQZ2N6Y0cxeUlONVNPS2syZUlHODBJWjZvUDVqZ1FfT2FoNlpoNVQ0NDV0OGhQTzdzeG9fWlJ5cGtJTVliZmlwRHNYeFpPZ3gwdlg2Ti1IZlpUdmUwYTNZRFJuWlBUMHk3b3pwcnRjQlV4NHVzQUZRMFJoWjJrU1E?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>AppLovin (APP) Stock Declines While Market Improves: Some Information for Investors ↗</a> <span class='text-muted small'>(28 Oct 2026)</span></div></li><li style='margin-bottom: 8px;'><strong class='source-tag'>[PR Newswire]</strong> <span style='font-weight: 600; color: #f1f5f9;'>แจ้งเตือนผู้ถือหุ้น APP: คดีฟ้องร้องแบบกลุ่มต่อ AppLovin</span> <span class='badge badge-neutral' style='font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25); vertical-align:middle;'>สรุปโดย LLM ตรวจซ้ำก่อนใช้</span><div class='small' style='color: #94a3b8; margin-top: 2px; padding-left: 2px;'>↳ <a href='https://news.google.com/rss/articles/CBMijwJBVV95cUxNSUUtWmVBaHpoclRwWUFEa1FQYnNCYXlidTZZalVCcDBxU1p3OEc0LXZyUHFucGpiMWlBSENrZkE0ZnZueEo5Yk5rVWhwREQ1VkZZd2dSaGZZa0pwUUM1bGt5dTdDMHFFSG1vdUZNUzIzVGRFWjc1WUZGcVpLRU96TDg2RTczMHBPTGNGNTREb3NDY3dFc0VzcHR0OTd3bWpNTG13VDI1SnYyUF9YZHNaOVRORE5wVHVNWS0tU2JhclJqZnBfbmJ0eTdaMXQ0THJ1MXl1SU1uRnl3M1kxS2lpTHBnWGtXUi1seHVyU0F0SnY0QW9taHZvQlBQLWVTSkQxblZyU3V0aWFES0p0QS00?oc=5' target='_blank' rel='noopener noreferrer' class='news-headline-link' title='คลิกเพื่ออ่านข่าวต้นฉบับ'>APP Shareholder Alert: AppLovin Corporation Securities Class Action Lawsuit - Investors With Losses May Contact Levi &amp; Korsinsky ↗</a> <span class='text-muted small'>(28 Oct 2026)</span></div></li></ul>
+                    <ul class="cat-list"><li><span class='text-muted'>ไม่มีข่าวร้ายรุนแรงในระยะสั้น.</span></li></ul>
                 </div>
             </div>
 
@@ -1098,7 +1098,7 @@
                     🧭 แผนยุทธศาสตร์สำหรับ APP (แนะนำตามกฎ ไม่ใช่คำสั่ง):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    มีวันงบออกในอีก 6 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับสำคัญแล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่
+                    มีวันงบออกในอีก 5 วัน จึง 'ห้ามถัวเด็ดขาดก่อนงบออก' เพราะอาจเกิด Gap งบ. หุ้นมีพื้นฐานระดับ AAA และ PEG ถูกสุดในกลุ่ม AI. คำแนะนำคือ 'ถือรออย่างสบายใจ' หรือรอสัญญาณแท่งเทียนเขียว Daily Confirmation ที่แนวรับสำคัญแล้วทำ Smart DCA ซื้อเพิ่ม 50% ดึงทุนลงมารอรับ Upside ก้อนใหญ่
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดยอมแพ้ (Invalidation Risk):</strong> จุดยอมจำนนคือการหลุดเส้น Stop-Loss หรือหากตัวเลขอัตรากำไร AXON ชะลอตัวลงต่ำกว่า 20% อย่างมีนัยสำคัญ
@@ -1122,21 +1122,21 @@
                             <td><strong>1. ถือรอเฉยๆ (Hold)</strong></td>
                             <td>ไม่เติมเงิน รอราคาฟื้นตัวกลับหาทุนเดิมตามปัจจัยพื้นฐาน</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;"><strong>$285.32</strong> (+11.3%)</td>
+                            <td style="text-align: right;"><strong>$285.32</strong> (+11.9%)</td>
                             <td><span class="text-muted">ความเสี่ยงต่ำสุด แต่เงินจมและเสียโอกาสทำกำไร</span></td>
                         </tr>
                         <tr>
                             <td><strong>2. Smart DCA</strong></td>
-                            <td>ซื้อเพิ่ม 1.4885 หุ้น ที่แนวรับ <strong>$253.93</strong> (ขอบล่าง Bollinger Band)</td>
-                            <td style="text-align: right;" class="text-amber"><strong>$381.72</strong></td>
-                            <td style="text-align: right;" class="text-emerald"><strong>$275.69</strong> (+7.5%)</td>
+                            <td>ซื้อเพิ่ม 1.4885 หุ้น ที่แนวรับ <strong>$253.59</strong> (ขอบล่าง Bollinger Band)</td>
+                            <td style="text-align: right;" class="text-amber"><strong>$379.45</strong></td>
+                            <td style="text-align: right;" class="text-emerald"><strong>$275.18</strong> (+8.0%)</td>
                             <td><span class="text-emerald">ดึงทุนต่ำลง คืนทุนเร็วขึ้น (ห้ามถัวหากใกล้วันงบออก)</span></td>
                         </tr>
                         <tr>
                             <td><strong>3. สลับตัว (Rotation)</strong></td>
-                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $763.45 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
+                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $758.89 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +11.3%</strong></td>
+                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +11.9%</strong></td>
                             <td><span class="text-muted">เหมาะเฉพาะเมื่อพื้นฐานหุ้นเดิมพัง หรือกำไรหดตัวยาวนาน</span></td>
                         </tr>
                     </tbody>
@@ -1148,15 +1148,15 @@
             <!-- Card Header -->
             <div class="outlook-card-header">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 0.0, 0.0, 49.12, 56.69, 0.0, 0.0, 62.74)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
+                    <span class="ticker-pill clickable-ticker" style="font-size: 1.15rem; padding: 4px 12px;" onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 0.0, 0.0, 49.05, 56.67, 0.0, 0.0, 62.74)" title="คลิกเปิดดูกราฟเทคนิคัลอัจฉริยะ">BAC 📈</span>
                     <strong style="font-size: 1.25rem;">Bank of America Corp</strong>
                     <span class="badge badge-neutral" style="font-size: 0.8rem;">Finance • Major Banks</span>
                     <span class="badge badge-neutral" style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25);">🟢 Resilient Major Bank (Value Deep Dip)</span>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -4.4% (-$66.03 USD)</span>
+                    <span class="badge badge-rose" style="font-size: 0.95rem; padding: 5px 12px;">ติดลบ -5.8% (-$86.83 USD)</span>
                     <span class="badge badge-amber" style="font-size: 0.95rem; padding: 5px 12px;">🔄 Capital Rotation (⚠️ Neg Rev Trap (-1.0%) โยกเงินไปหุ้นผู้นำขาขึ้น)</span>
-                    <button onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 0.0, 0.0, 49.12, 56.69, 0.0, 0.0, 62.74)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
+                    <button onclick="openChartModal(&quot;BAC&quot;, &quot;NYSE&quot;, &quot;Bank of America Corp&quot;, &quot;Finance&quot;, 0.0, 0.0, 49.05, 56.67, 0.0, 0.0, 62.74)" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60a5fa; border-radius: 6px; padding: 5px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">📈 ดูกราฟสด & แนวรับแนวต้าน</button>
                 </div>
             </div>
 
@@ -1178,27 +1178,27 @@
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ราคาตลาด (Market Price)</div>
-                    <div class="fw-bold" style="font-size: 1.15rem;">$51.90</div>
-                    <div class="text-rose small">ห่างจากทุน: -4.4%</div>
+                    <div class="fw-bold" style="font-size: 1.15rem;">$51.14</div>
+                    <div class="text-rose small">ห่างจากทุน: -5.8%</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">ระยะทางดีดคืนทุน (Gap)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+4.6%</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">+6.2%</div>
                     <div class="text-muted small">ต้องการราคาแตะ $54.31</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวรับดักช้อน (Key Support)</div>
-                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$49.12</div>
+                    <div class="text-emerald fw-bold" style="font-size: 1.15rem;">$49.05</div>
                     <div class="text-muted small">ขอบล่าง Bollinger Band</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">แนวต้านรีบาวด์ (Key Resistance)</div>
-                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">$56.69</div>
+                    <div class="text-amber fw-bold" style="font-size: 1.15rem;">$56.67</div>
                     <div class="text-muted small">เส้น 50 วัน (Mean Reversion)</div>
                 </div>
                 <div class="kpi-box">
                     <div class="text-muted small">จุดตัดขาดทุน (SL Guard)</div>
-                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$50.21</div>
+                    <div class="text-rose fw-bold" style="font-size: 1.15rem;">$49.45</div>
                     <div class="text-muted small">หลุดต้องลดพอร์ต</div>
                 </div>
             </div>
@@ -1219,7 +1219,7 @@
                         <span class='text-muted small' style='font-size:0.72rem; font-weight:normal; color:#94a3b8;'>บันทึกเขียนเอง อัปเดต 2026-10-17</span>
                     </div>
                     <ul class="outlook-list drawdown" style="color: var(--text-secondary);">
-                        <li>ผลการดำเนินงาน Q3 รายได้และกำไรสุทธิปรับลดลงชั่วคราวจากการชะลอตัวของรายได้ค่าธรรมเนียม Fixed Income Trading และดีล M&A</li><li>ประเด็นค่าปรับด้านการกำกับดูแล (Regulatory Penalty) ส่งผลให้นักลงทุนเทขายฉับพลันจนราคาดิ่งหลุดกรอบ</li><li>ดัชนี RSI รายวันอยู่ที่ระดับ 40.07</li>
+                        <li>ผลการดำเนินงาน Q3 รายได้และกำไรสุทธิปรับลดลงชั่วคราวจากการชะลอตัวของรายได้ค่าธรรมเนียม Fixed Income Trading และดีล M&A</li><li>ประเด็นค่าปรับด้านการกำกับดูแล (Regulatory Penalty) ส่งผลให้นักลงทุนเทขายฉับพลันจนราคาดิ่งหลุดกรอบ</li><li>ดัชนี RSI รายวันอยู่ที่ระดับ 32.94</li>
                     </ul>
                 </div>
             </div>
@@ -1232,7 +1232,7 @@
                 <div class="timeline-grid">
                     <div class="timeline-step">
                 <span class="timeline-step-badge">ระยะประชิด (0-14 วัน)</span>
-                <div class="timeline-step-desc">แรงซื้อดักเด้งทางเทคนิค (Mean Reversion) เพื่อกลับไปทดสอบเส้น SMA 20 ที่ $52.18</div>
+                <div class="timeline-step-desc">แรงซื้อดักเด้งทางเทคนิค (Mean Reversion) เพื่อกลับไปทดสอบเส้น SMA 20 ที่ $52.14</div>
             </div><div class="timeline-step">
                 <span class="timeline-step-badge">ระยะ 1-3 เดือน</span>
                 <div class="timeline-step-desc">การประชุม Fed FOMC รอบใหม่ และการส่งสัญญาณการฟื้นตัวของสินเชื่อเชิงพาณิชย์</div>
@@ -1256,7 +1256,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">ราคาปัจจุบัน</div>
-                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$51.90</div>
+                        <div class="fw-bold text-rose" style="font-size: 1.1rem;">$51.14</div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าต่ำสุด (Low Target)</div>
@@ -1264,7 +1264,7 @@
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าเฉลี่ย (Average Target)</div>
-                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$62.74 <span class="small">(+21%)</span></div>
+                        <div class="fw-bold text-emerald" style="font-size: 1.1rem;">$62.74 <span class="small">(+23%)</span></div>
                     </div>
                     <div class="ws-target-cell">
                         <div class="text-muted small">เป้าสูงสุด (High Target)</div>
@@ -1272,7 +1272,7 @@
                     </div>
                 </div>
                 <div class="small" style="color: #cbd5e1; background: rgba(0, 0, 0, 0.2); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--emerald); margin-top: 6px;">
-                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 24 แห่ง (Buy 19 / Hold 5 / Sell 0) เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ $55.00 ซึ่งสูงกว่าต้นทุนของคุณ ($54.31) อยู่ $0.69 เป้าหมายเฉลี่ย $62.74 (Upside +20.9%)
+                    📌 <strong>มุมมองเปรียบเทียบ:</strong> โบรกเกอร์ 24 แห่ง (Buy 19 / Hold 5 / Sell 0) เป้าหมายต่ำสุดของวอลล์สตรีทอยู่ที่ $55.00 ซึ่งสูงกว่าต้นทุนของคุณ ($54.31) อยู่ $0.69 เป้าหมายเฉลี่ย $62.74 (Upside +22.7%)
                 </div>
             </div>
 
@@ -1294,7 +1294,7 @@
                     🧭 แผนยุทธศาสตร์สำหรับ BAC (แนะนำตามกฎ ไม่ใช่คำสั่ง):
                 </div>
                 <div style="font-size: 0.95rem; color: #ffffff; line-height: 1.5; margin-bottom: 10px;">
-                    วันงบถัดไปอยู่ห่างอีก 78 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาซื้อขายต่ำกว่าเป้าหมายต่ำสุดของสถาบัน จึงติดตามจังหวะดีดตัวทางเทคนิคหรือพิจารณาตามแผนแนวรับสำคัญ
+                    วันงบถัดไปอยู่ห่างอีก 77 วัน ไม่มีความเสี่ยงเรื่องงบตกใจในระยะสั้น. เนื่องจากราคาซื้อขายต่ำกว่าเป้าหมายต่ำสุดของสถาบัน จึงติดตามจังหวะดีดตัวทางเทคนิคหรือพิจารณาตามแผนแนวรับสำคัญ
                 </div>
                 <div style="font-size: 0.85rem; color: #fca5a5; background: rgba(244, 63, 94, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--rose);">
                     🛑 <strong>สัญญาณเตือนภัย / จุดยอมแพ้ (Invalidation Risk):</strong> หากราคาปิดหลุดแนวรับ Stop-Loss และมีปัจจัยเสี่ยงเศรษฐกิจถดถอยรุนแรง (Hard Landing) จนหนี้เสียพุ่ง ให้ลดขนาดสถานะลงครึ่งหนึ่ง
@@ -1318,21 +1318,21 @@
                             <td><strong>1. ถือรอเฉยๆ (Hold)</strong></td>
                             <td>ไม่เติมเงิน รอราคาฟื้นตัวกลับหาทุนเดิมตามปัจจัยพื้นฐาน</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;"><strong>$54.31</strong> (+4.6%)</td>
+                            <td style="text-align: right;"><strong>$54.31</strong> (+6.2%)</td>
                             <td><span class="text-muted">ความเสี่ยงต่ำสุด แต่เงินจมและเสียโอกาสทำกำไร</span></td>
                         </tr>
                         <tr>
                             <td><strong>2. Smart DCA</strong></td>
-                            <td>ซื้อเพิ่ม 13.6856 หุ้น ที่แนวรับ <strong>$49.12</strong> (ขอบล่าง Bollinger Band)</td>
-                            <td style="text-align: right;" class="text-amber"><strong>$710.28</strong></td>
-                            <td style="text-align: right;" class="text-emerald"><strong>$53.51</strong> (+3.1%)</td>
+                            <td>ซื้อเพิ่ม 13.6856 หุ้น ที่แนวรับ <strong>$49.05</strong> (ขอบล่าง Bollinger Band)</td>
+                            <td style="text-align: right;" class="text-amber"><strong>$699.88</strong></td>
+                            <td style="text-align: right;" class="text-emerald"><strong>$53.25</strong> (+4.1%)</td>
                             <td><span class="text-emerald">ดึงทุนต่ำลง คืนทุนเร็วขึ้น (ห้ามถัวหากใกล้วันงบออก)</span></td>
                         </tr>
                         <tr>
                             <td><strong>3. สลับตัว (Rotation)</strong></td>
-                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $1,420.56 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
+                            <td>ตัดขายแล้วย้ายเงินที่เหลือ $1,399.76 ไปเข้าหุ้น Dip ตัวแกร่ง</td>
                             <td style="text-align: right;">$0.00</td>
-                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +4.6%</strong></td>
+                            <td style="text-align: right;" class="text-blue"><strong>หุ้นใหม่กำไร +6.2%</strong></td>
                             <td><span class="text-muted">เหมาะเฉพาะเมื่อพื้นฐานหุ้นเดิมพัง หรือกำไรหดตัวยาวนาน</span></td>
                         </tr>
                     </tbody>
