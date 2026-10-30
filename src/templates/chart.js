@@ -403,6 +403,7 @@
     let activeSubpaneOscs = ['rsi'];
     let activeCandleSeries = null;
     let activeRsiSeries = null;
+    let activeUpdateHoverBar = null;
     let currentStockTicker = '__DEFAULT_TICKER__';
     let currentStockExchange = 'NYSE';
     let currentCandles = [];
@@ -459,12 +460,25 @@
     let currentAggTimeframe = 'D';
     let currentFiboMode = 'cycle';
 
-    function getWeekIdentifier(dateStr) {
+    function normalizeDateString(t) {
+        if (!t) return '';
+        if (typeof t === 'string') return t;
+        if (typeof t === 'object') {
+            if (t.year && t.month && t.day) {
+                return `${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}`;
+            }
+        }
+        return String(t);
+    }
+
+    function getWeekIdentifier(dateInput) {
+        const dateStr = normalizeDateString(dateInput);
         const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
         const day = d.getUTCDay();
         const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
         const monday = new Date(d.setUTCDate(diff));
-        return monday.toISOString().split('T')[0];
+        return isNaN(monday.getTime()) ? dateStr : monday.toISOString().split('T')[0];
     }
 
     function escapeHtml(value) {
@@ -480,7 +494,8 @@
         const groups = new Map();
         for (let i = 0; i < candles.length; i++) {
             const c = candles[i];
-            let key = (tf === 'W') ? getWeekIdentifier(c.time) : c.time.substring(0, 7);
+            const tStr = normalizeDateString(c.time);
+            let key = (tf === 'W') ? getWeekIdentifier(tStr) : tStr.substring(0, 7);
             if (!groups.has(key)) groups.set(key, []);
             groups.get(key).push(c);
         }
@@ -494,12 +509,13 @@
                 if (list[j].low < low) low = list[j].low;
                 volume += (list[j].volume || 0);
             }
+            const lastC = list[list.length - 1];
             aggregated.push({
-                time: list[list.length - 1].time,
+                time: normalizeDateString(lastC.time),
                 open: list[0].open,
                 high: Number(high.toFixed(2)),
                 low: Number(low.toFixed(2)),
-                close: list[list.length - 1].close,
+                close: lastC.close,
                 volume: volume
             });
         }
@@ -3120,10 +3136,18 @@
             });
         });
 
-        const candleByTime = new Map((currentCandles || []).map(c => [c.time, c]));
-        const candleIndexByTime = new Map((currentCandles || []).map((c, i) => [c.time, i]));
+        const normalizeTimeStr = t => (typeof t === 'object' && t !== null) ? `${t.year}-${String(t.month).padStart(2, '0')}-${String(t.day).padStart(2, '0')}` : String(t || '');
+        const candleByTime = new Map((currentCandles || []).map(c => [normalizeTimeStr(c.time), c]));
+        const candleIndexByTime = new Map((currentCandles || []).map((c, i) => [normalizeTimeStr(c.time), i]));
 
         const updateHoverBar = (tStr, bar) => {
+            if (typeof tStr === 'object' && tStr !== null) {
+                tStr = `${tStr.year}-${String(tStr.month).padStart(2, '0')}-${String(tStr.day).padStart(2, '0')}`;
+            } else if (!tStr && bar && typeof bar.time === 'object' && bar.time !== null) {
+                tStr = `${bar.time.year}-${String(bar.time.month).padStart(2, '0')}-${String(bar.time.day).padStart(2, '0')}`;
+            } else if (!tStr && bar && bar.time) {
+                tStr = String(bar.time);
+            }
             const dateEl = document.getElementById('chb_date');
             const ohlcEl = document.getElementById('chb_ohlc');
             if (dateEl && tStr) {
@@ -3152,6 +3176,7 @@
                 ohlcEl.innerHTML = `O: <b>$${Number(bar.open).toFixed(2)}</b> &nbsp;H: <b>$${Number(bar.high).toFixed(2)}</b> &nbsp;L: <b>$${Number(bar.low).toFixed(2)}</b> &nbsp;C: <b style="color:${cColor};">$${Number(bar.close).toFixed(2)}</b> ${dayChangeHtml} ${intraHtml}`;
             }
         };
+        activeUpdateHoverBar = updateHoverBar;
 
         if (currentCandles && currentCandles.length > 0) {
             const lastBar = currentCandles[currentCandles.length - 1];
@@ -5162,7 +5187,8 @@
                     columns: [
                         'close', 'change', 'high', 'low', 'open', 'volume',
                         'premarket_close', 'premarket_change',
-                        'postmarket_close', 'postmarket_change'
+                        'postmarket_close', 'postmarket_change',
+                        'time'
                     ]
                 })
             });
@@ -5184,7 +5210,8 @@
                     premarket_close: item.d[6],
                     premarket_change: item.d[7],
                     postmarket_close: item.d[8],
-                    postmarket_change: item.d[9]
+                    postmarket_change: item.d[9],
+                    time: item.d[10]
                 };
             });
 
@@ -5351,17 +5378,73 @@
                 updateExtPriceLine(activeCandleSeries, currentStockTicker);
             }
 
-            // 3. Tick active candle bar
+            // 3. Tick active candle bar (preserving historical date integrity)
             if (activeCandleSeries && CHARTS_DATA[currentStockTicker] && CHARTS_DATA[currentStockTicker].candles) {
                 const candles = CHARTS_DATA[currentStockTicker].candles;
-                if (candles.length > 0) {
-                    const lastBar = Object.assign({}, candles[candles.length - 1]);
-                    lastBar.close = q.close;
-                    if (q.close > lastBar.high) lastBar.high = q.close;
-                    if (q.close < lastBar.low) lastBar.low = q.close;
-                    try {
-                        activeCandleSeries.update(lastBar);
-                    } catch (e) {}
+                if (candles.length > 0 && typeof q.close === 'number') {
+                    // Determine quote date in US Eastern Time (America/New_York)
+                    // Rule: Never create or update candle if q.time is missing/null/invalid.
+                    let quoteDate = null;
+                    if (typeof q.time === 'number' && q.time > 0) {
+                        try {
+                            const d = new Date(q.time * 1000);
+                            quoteDate = d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+                        } catch (e) {}
+                    }
+
+                    if (quoteDate) {
+                        const lastHist = candles[candles.length - 1];
+                        const lastHistTime = typeof lastHist.time === 'string'
+                            ? lastHist.time
+                            : (lastHist.time && lastHist.time.year
+                                ? `${lastHist.time.year}-${String(lastHist.time.month).padStart(2,'0')}-${String(lastHist.time.day).padStart(2,'0')}`
+                                : '');
+
+                        if (quoteDate > lastHistTime) {
+                            // Live quote belongs to a NEW trading session (e.g. intraday / pre-market today).
+                            // Do NOT overwrite yesterday's historical candle! Create a new bar for quoteDate.
+                            const newBar = {
+                                time: quoteDate,
+                                open: (typeof q.open === 'number' && q.open > 0) ? q.open : q.close,
+                                high: (typeof q.high === 'number' && q.high > 0) ? Math.max(q.high, q.close) : q.close,
+                                low: (typeof q.low === 'number' && q.low > 0) ? Math.min(q.low, q.close) : q.close,
+                                close: q.close,
+                                volume: (typeof q.volume === 'number' && q.volume > 0) ? q.volume : 0
+                            };
+                            candles.push(newBar);
+
+                            if (currentAggTimeframe === 'D') {
+                                currentCandles = candles;
+                                try { activeCandleSeries.update(newBar); } catch (e) {}
+                                if (activeUpdateHoverBar) activeUpdateHoverBar(newBar.time, newBar);
+                            } else {
+                                currentCandles = aggregateCandles(candles, currentAggTimeframe);
+                                const aggLast = currentCandles[currentCandles.length - 1];
+                                try { activeCandleSeries.update(aggLast); } catch (e) {}
+                                if (activeUpdateHoverBar) activeUpdateHoverBar(aggLast.time, aggLast);
+                            }
+                        } else if (quoteDate === lastHistTime) {
+                            // Live quote belongs to the existing last candle of the current session
+                            const updatedBar = Object.assign({}, lastHist);
+                            updatedBar.close = q.close;
+                            if (q.close > updatedBar.high) updatedBar.high = q.close;
+                            if (q.close < updatedBar.low) updatedBar.low = q.close;
+                            if (typeof q.volume === 'number' && q.volume > 0) updatedBar.volume = q.volume;
+                            candles[candles.length - 1] = updatedBar;
+
+                            if (currentAggTimeframe === 'D') {
+                                currentCandles = candles;
+                                try { activeCandleSeries.update(updatedBar); } catch (e) {}
+                                if (activeUpdateHoverBar) activeUpdateHoverBar(updatedBar.time, updatedBar);
+                            } else {
+                                currentCandles = aggregateCandles(candles, currentAggTimeframe);
+                                const aggLast = currentCandles[currentCandles.length - 1];
+                                try { activeCandleSeries.update(aggLast); } catch (e) {}
+                                if (activeUpdateHoverBar) activeUpdateHoverBar(aggLast.time, aggLast);
+                            }
+                        }
+                        // If quoteDate < lastHistTime, skip candle update completely to prevent corruption.
+                    }
                 }
             }
         }

@@ -12,8 +12,9 @@ import sys
 import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.http import http_get
@@ -42,7 +43,7 @@ CACHE_PATH = Path(__file__).resolve().parent.parent / "data" / "candles_cache.js
 CACHE_TTL_SECONDS = 6 * 3600  # 6 hours
 PATTERN_WIN_RATE_NOTE = "ไม่มีสถิติยืนยัน (heuristic)"
 ANCHOR_BARS = 504
-INDICATOR_SCHEMA_VERSION = 19
+INDICATOR_SCHEMA_VERSION = 20
 EARNINGS_CALENDAR_HASH = get_earnings_calendar_hash()
 
 # Heuristic constants for swing signals (heuristic ไม่ผ่าน backtest)
@@ -103,7 +104,7 @@ def fetch_ticker_candles(ticker: str) -> List[Dict[str, Any]]:
         if None in (o, h, l, c):
             continue
         v = volumes[i] if (i < len(volumes) and volumes[i] is not None) else 0
-        t_str = datetime.fromtimestamp(timestamps[i]).strftime("%Y-%m-%d")
+        t_str = datetime.fromtimestamp(timestamps[i], tz=timezone.utc).strftime("%Y-%m-%d")
         # Clamp high and low to enforce OHLC invariant integrity: high >= max(o, c), low <= min(o, c)
         clamped_h = max(float(h), float(o), float(c))
         clamped_l = min(float(l), float(o), float(c))
@@ -3815,6 +3816,11 @@ def save_candles_cache(cache: Dict[str, Any]):
         raise
 
 
+def _market_today() -> str:
+    """Today's US market date. Indicators such as the earnings guard depend on it, so the cache is per market day."""
+    return datetime.now(ZoneInfo("America/New_York")).date().isoformat()
+
+
 def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> Dict[str, Any]:
     """
     Load or fetch chart payloads for all given tickers.
@@ -3822,6 +3828,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
     """
     cache = load_candles_cache()
     now_ts = time.time()
+    market_today = _market_today()
 
     tickers_to_fetch = []
     for t in set(tickers):
@@ -3834,6 +3841,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
             or not entry.get("full_history")
             or entry.get("schema_version") != INDICATOR_SCHEMA_VERSION
             or entry.get("earnings_hash") != EARNINGS_CALENDAR_HASH
+            or entry.get("market_date") != market_today
         ):
             tickers_to_fetch.append(t)
 
@@ -3860,6 +3868,7 @@ def get_all_charts_payload(tickers: List[str], force_refresh: bool = False) -> D
                 chart_data["full_history"] = True
                 chart_data["schema_version"] = INDICATOR_SCHEMA_VERSION
                 chart_data["earnings_hash"] = EARNINGS_CALENDAR_HASH
+                chart_data["market_date"] = market_today
                 return t, chart_data
             except Exception as e:
                 print(f"[chart_data] {t}: refresh failed, keeping cached data: {type(e).__name__}: {e}", file=sys.stderr)

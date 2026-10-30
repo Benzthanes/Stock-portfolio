@@ -2,6 +2,7 @@ import datetime
 import json
 import math
 import tempfile
+import time
 import unittest
 import urllib.error
 from pathlib import Path
@@ -93,6 +94,29 @@ class CandleCacheTest(unittest.TestCase):
             self.assertEqual(out["AAA"]["candles"], [{"close": 1}])
             self.assertTrue(json.loads(path.read_text())["AAA"]["stale"])
             self.assertIn("AAA", "".join(c.args[0] for c in err.write.call_args_list))
+
+    def test_fresh_entry_is_recomputed_when_market_day_changes(self):
+        """Earnings guard depends on the day, so a 6-hour-fresh entry from yesterday must be recomputed."""
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "candles_cache.json"
+            candles = [{"time": f"2026-01-{i % 28 + 1:02d}", "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.0, "volume": 10} for i in range(40)]
+            entry = {"candles": candles, "timestamp": time.time(), "full_history": True,
+                     "schema_version": chart_data.INDICATOR_SCHEMA_VERSION, "earnings_hash": chart_data.EARNINGS_CALENDAR_HASH,
+                     "market_date": "2026-10-29", "marker": "old"}
+            path.write_text(json.dumps({"AAA": entry}))
+            with mock.patch.object(chart_data, "CACHE_PATH", path), \
+                    mock.patch.object(chart_data, "_market_today", return_value="2026-10-29"), \
+                    mock.patch.object(chart_data, "fetch_ticker_candles") as fetch:
+                same_day = chart_data.get_all_charts_payload(["AAA"])
+            self.assertEqual(same_day["AAA"].get("marker"), "old")
+            with mock.patch.object(chart_data, "CACHE_PATH", path), \
+                    mock.patch.object(chart_data, "_market_today", return_value="2026-10-30"), \
+                    mock.patch.object(chart_data, "fetch_ticker_candles") as fetch:
+                next_day = chart_data.get_all_charts_payload(["AAA"])
+            fetch.assert_not_called()
+            self.assertNotIn("marker", next_day["AAA"])
+            self.assertEqual(next_day["AAA"]["market_date"], "2026-10-30")
+            self.assertEqual(len(next_day["AAA"]["candles"]), 40)
 
 
 class HttpRetryTest(unittest.TestCase):

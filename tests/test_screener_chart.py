@@ -763,6 +763,52 @@ class ChandelierExitTest(unittest.TestCase):
         self.assertTrue(len(res["series"]) > 0)
 
 
+class CandleDateIntegrityTest(unittest.TestCase):
+    def test_candle_timestamp_utc_determinism(self):
+        import json
+        from unittest.mock import patch
+        from src.chart_data import fetch_ticker_candles
+
+        fake_yahoo_response = {
+            "chart": {
+                "result": [{
+                    "timestamp": [1793280600],
+                    "indicators": {
+                        "quote": [{
+                            "open": [1332.73],
+                            "high": [1408.38],
+                            "low": [1330.00],
+                            "close": [1381.14],
+                            "volume": [1778906]
+                        }]
+                    }
+                }]
+            }
+        }
+        with patch("src.chart_data.http_get") as mock_get:
+            mock_get.return_value = json.dumps(fake_yahoo_response).encode("utf-8")
+            candles = fetch_ticker_candles("LLY")
+            self.assertEqual(len(candles), 1)
+            self.assertEqual(candles[0]["time"], "2026-10-29")
+            self.assertEqual(candles[0]["close"], 1381.14)
+
+    def test_confirmed_earnings_reaction_lly_exact_date(self):
+        from src.earnings_calendar import calculate_confirmed_earnings_reaction, get_confirmed_earnings_dates
+        dates = get_confirmed_earnings_dates("LLY")
+        self.assertIn("2026-10-29", dates)
+        mock_candles = [
+            {"time": "2026-10-28", "open": 1268.55, "high": 1299.43, "low": 1260.34, "close": 1288.30, "volume": 2052000},
+            {"time": "2026-10-29", "open": 1332.73, "high": 1408.38, "low": 1330.00, "close": 1381.14, "volume": 1778906},
+        ]
+        events = calculate_confirmed_earnings_reaction(mock_candles, dates, ticker="LLY")
+        self.assertEqual(len(events), 1)
+        ev = events[0]
+        self.assertEqual(ev["time"], "2026-10-29")
+        self.assertEqual(ev["reaction_pct"], 7.2)
+        self.assertEqual(ev["text"], "🗓️ +7.2%")
+        self.assertEqual(ev["position"], "belowBar")
+
+
 if __name__ == "__main__":
     unittest.main()
 
