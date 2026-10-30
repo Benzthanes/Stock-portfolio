@@ -168,7 +168,7 @@
   .rnav-int-btn { padding: 3px 6px; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link active" aria-current="page">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️<span class="rnav-int-word"> อัปเดตสด:</span></span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 20:32</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link active" aria-current="page">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️<span class="rnav-int-word"> อัปเดตสด:</span></span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 22:25</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -425,8 +425,8 @@
                 <button onclick="toggleAllTranches()" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #c084fc; padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <span>🔍</span> <span id="toggleAllBtnText">คลี่ดูรายละเอียดทุกไม้ (Expand All)</span>
                 </button>
-                <span class="meta-pill">⚡ 1 USD = 33.72 THB</span>
-                <span class="meta-pill">🕒 ข้อมูล ณ: 2026-10-30 20:32:31</span>
+                <span class="meta-pill">⚡ 1 USD = 33.74 THB</span>
+                <span class="meta-pill">🕒 ข้อมูล ณ: 2026-10-30 22:25:58</span>
             </div>
         </div>
 
@@ -449,7 +449,7 @@
             </div>
             <div class="card">
                 <div class="kpi-label" title="Dividends">เงินปันผลรับสะสม</div>
-                <div class="kpi-value" style="color: #10b981; white-space: nowrap;">+฿4,779.61</div>
+                <div class="kpi-value" style="color: #10b981; white-space: nowrap;">+฿4,782.17</div>
                 <div class="kpi-subtext">+$141.74 USD (13 ครั้ง)</div>
             </div>
         </div>
@@ -1846,7 +1846,7 @@
         <div id="section-divs" class="sub-section" style="margin-bottom: 36px;">
             <div class="section-title">
                 <span>💵</span> 3. ประวัติเงินปันผลรับสะสม (Dividends Received: 13 ครั้ง)
-                <span class="badge badge-success">รวม +$141.74 (~฿4,779.61)</span>
+                <span class="badge badge-success">รวม +$141.74 (~฿4,782.17)</span>
             </div>
             <div class="card" style="padding: 0; overflow-x: auto;">
                 <table>
@@ -1866,7 +1866,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">VOO</td>
             <td>1.8226/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$0.90</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿30.35</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿30.37</td>
         </tr>
         
         <tr>
@@ -1874,7 +1874,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">GOOGL</td>
             <td>0.22/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$1.95</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿65.76</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿65.79</td>
         </tr>
         
         <tr>
@@ -1882,7 +1882,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">LLY</td>
             <td>1.73/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$47.83</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿1,612.88</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿1,613.74</td>
         </tr>
         
         <tr>
@@ -1890,7 +1890,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">NOK</td>
             <td>0.0285/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$2.69</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿90.71</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿90.76</td>
         </tr>
         
         <tr>
@@ -1898,7 +1898,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">VOO</td>
             <td>1.9622/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$0.97</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿32.71</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿32.73</td>
         </tr>
         
         <tr>
@@ -1906,7 +1906,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">QQQI</td>
             <td>0.6572/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$3.84</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿129.49</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿129.56</td>
         </tr>
         
         <tr>
@@ -1914,7 +1914,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">LLY</td>
             <td>1.73/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$46.24</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿1,559.26</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿1,560.09</td>
         </tr>
         
         <tr>
@@ -1922,7 +1922,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">QQQI</td>
             <td>0.6589/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$3.85</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿129.83</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿129.90</td>
         </tr>
         
         <tr>
@@ -1930,7 +1930,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">QQQI</td>
             <td>0.6297/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$3.68</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿124.09</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿124.16</td>
         </tr>
         
         <tr>
@@ -1938,7 +1938,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">VOO</td>
             <td>1.8724/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$0.93</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿31.36</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿31.38</td>
         </tr>
         
         <tr>
@@ -1946,7 +1946,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">QQQI</td>
             <td>0.6089/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$3.55</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿119.71</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿119.77</td>
         </tr>
         
         <tr>
@@ -1954,7 +1954,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">LLY</td>
             <td>1.73/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$21.73</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿732.76</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿733.15</td>
         </tr>
         
         <tr>
@@ -1962,7 +1962,7 @@
             <td style="font-weight: 700; font-family: 'Inter', sans-serif; white-space: nowrap;">QQQI</td>
             <td>0.6140/หุ้น</td>
             <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 700; color: #10b981; white-space: nowrap;">+$3.58</td>
-            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿120.72</td>
+            <td style="text-align: right; font-family: 'Inter', sans-serif; font-weight: 600; color: #10b981; white-space: nowrap;">+฿120.79</td>
         </tr>
         
                     </tbody>
