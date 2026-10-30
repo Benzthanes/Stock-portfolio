@@ -366,26 +366,26 @@ def generate_watchlist_html(
             port_attr = "false"
 
         source_tag = (
-            f' <span class="text-muted" style="font-size:0.72rem;" title="แนวรับไม่ได้มาจากภาพ {SOURCE_AUTHOR}">✎ {escape(it["source"])}</span>'
+            f'<div class="text-muted" style="font-size:0.72rem; margin-top:3px;" title="แนวรับไม่ได้มาจากภาพ {SOURCE_AUTHOR}">✎ {escape(it["source"])}</div>'
             if it.get("source") else ""
         )
 
         table_rows.append(f"""
         <tr class="stock-row {row_class}" data-group="{escape(grp)}" data-status="{code}" data-portfolio="{port_attr}" data-ticker="{escape(tk)}">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">{tk}</span>{source_tag}
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">{escape(grp)}</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">{close_disp}</td>
-            <td style="text-align: right; white-space: nowrap;">{pre_post_disp}</td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">{eff_px_disp}</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">{supp_disp}</td>
-            <td style="text-align: right; white-space: nowrap;">{pct_disp}</td>
-            <td style="text-align: center; white-space: nowrap;">{status_badge}</td>
-            <td style="text-align: center; white-space: nowrap;">{port_tag}</td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">{px_type}</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">{close_disp}</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;">{pre_post_disp}</td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">{eff_px_disp}</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">{supp_disp}</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;">{pct_disp}</td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;">{status_badge}</td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;">{port_tag}</td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">{px_type}</td>
         </tr>
         """)
 
@@ -811,6 +811,56 @@ def generate_watchlist_html(
 
         .modal-close:hover {{
             background: var(--rose);
+        }}
+
+
+        /* Row tint by support status, so the status reads without scrolling sideways */
+        tr.status-a td {{ background: rgba(244, 63, 94, 0.09); }}
+        tr.status-b td {{ background: rgba(245, 158, 11, 0.08); }}
+        tr.status-c td {{ background: rgba(16, 185, 129, 0.04); }}
+        tr.status-a td:first-child {{ box-shadow: inset 4px 0 0 var(--rose); }}
+        tr.status-b td:first-child {{ box-shadow: inset 4px 0 0 var(--amber); }}
+        tr.status-c td:first-child {{ box-shadow: inset 4px 0 0 rgba(16, 185, 129, 0.55); }}
+        tr.status-a:hover td {{ background: rgba(244, 63, 94, 0.14); }}
+        tr.status-b:hover td {{ background: rgba(245, 158, 11, 0.13); }}
+        tr.status-c:hover td {{ background: rgba(16, 185, 129, 0.08); }}
+
+        /* Phone: each stock becomes a card, no sideways scrolling */
+        @media (max-width: 768px) {{
+            .table-wrap {{ overflow: visible; border: none; background: transparent; }}
+            #stocks-table thead {{ display: none; }}
+            #stocks-table, #stocks-table tbody {{ display: block; }}
+            #stocks-table tr.stock-row {{
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-areas: "ticker pct" "group status" "eff supp" "pp close" "port port";
+                gap: 6px 10px;
+                padding: 12px 14px;
+                margin-bottom: 10px;
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+                background: var(--bg-card);
+            }}
+            #stocks-table tr.stock-row td {{
+                display: block; padding: 0; border: none; background: transparent !important;
+                box-shadow: none !important; text-align: left !important;
+            }}
+            #stocks-table tr.status-a {{ border-left: 5px solid var(--rose); background: rgba(244, 63, 94, 0.10); }}
+            #stocks-table tr.status-b {{ border-left: 5px solid var(--amber); background: rgba(245, 158, 11, 0.09); }}
+            #stocks-table tr.status-c {{ border-left: 5px solid rgba(16, 185, 129, 0.6); }}
+            .c-ticker {{ grid-area: ticker; }}
+            .c-pct {{ grid-area: pct; text-align: right !important; font-size: 1.15rem; }}
+            .c-group {{ grid-area: group; }}
+            .c-status {{ grid-area: status; text-align: right !important; }}
+            .c-eff {{ grid-area: eff; }}
+            .c-supp {{ grid-area: supp; text-align: right !important; }}
+            .c-pp {{ grid-area: pp; font-size: 0.8rem; }}
+            .c-close {{ grid-area: close; text-align: right !important; font-size: 0.8rem; }}
+            .c-eff::before, .c-supp::before, .c-pp::before, .c-close::before {{
+                content: attr(data-label) " "; color: var(--text-muted); font-weight: 400; font-size: 0.75rem;
+            }}
+            .c-port {{ grid-area: port; }}
+            tr.stock-row[data-portfolio="false"] .c-port, .c-type {{ display: none !important; }}
         }}
 
         @media (max-width: 768px) {{

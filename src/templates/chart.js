@@ -4835,73 +4835,99 @@
             thCols += `<th class="th-quarter ${isLatest ? 'th-latest' : ''}"><div>${q.quarter_label}${latestBadge}</div><div style="font-size:0.65rem; color:#64748b; font-weight:normal; margin-top:2px;">${q.date}</div></th>`;
         });
 
-        // Helper to build a table row
-        function buildRow(title, getter, isSub = false) {
-            let rowHtml = `<tr class="${isSub ? 'fin-row-sub' : ''}"><td class="fin-row-header">${title}</td>`;
-            quarters.forEach((q, idx) => {
-                const isLatest = idx === quarters.length - 1;
-                const cellVal = getter(q, idx);
-                rowHtml += `<td class="fin-cell ${isLatest ? 'td-latest' : ''}">${cellVal}</td>`;
-            });
-            rowHtml += `</tr>`;
-            return rowHtml;
-        }
+        // One metric list feeds both the desktop table and the phone view.
+        const metrics = [
+            ['💰 รายได้รวม (Total Revenue)', q => `<strong>${q.revenue_fmt || '-'}</strong>`],
+            ['⚡ เติบโต QoQ (%)', q => _renderGrowthBadge(q.rev_growth_qoq), true],
+            ['📈 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true],
+            ['📈 กำไรขั้นต้น (Gross Profit)', q => q.gross_profit_fmt || '-'],
+            ['⚙️ อัตรากำไรขั้นต้น (Gross Margin)', q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-', true],
+            ['🏢 กำไรจากการดำเนินงาน (Operating Income)', q => q.operating_income_fmt || '-'],
+            ['🎯 กำไรสุทธิ (Net Income)', q => {
+                const ni = q.net_income;
+                const col = (ni != null && ni >= 0) ? '#34d399' : '#fb7185';
+                return `<strong style="color:${col}">${q.net_income_fmt || '-'}</strong>`;
+            }],
+            ['📊 อัตรากำไรสุทธิ (Net Margin)', q => {
+                const m = q.net_margin;
+                if (m == null) return '-';
+                const col = m >= 15 ? '#34d399' : (m >= 0 ? '#38bdf8' : '#fb7185');
+                return `<span style="color:${col}; font-weight:700;">${m.toFixed(1)}%</span>`;
+            }, true],
+            ['💵 กำไรต่อหุ้น (Diluted EPS)', q => {
+                const eps = q.eps;
+                if (eps == null) return '-';
+                const epsBadge = q.eps_growth_yoy != null ? ` ${_renderGrowthBadge(q.eps_growth_yoy)}` : '';
+                return `$${eps.toFixed(2)}${epsBadge}`;
+            }],
+            ['🌊 กระแสเงินสดอิสระ (FCF)', q => `<span style="color:#c084fc;">${q.fcf_fmt || '-'}</span>`],
+            ['💳 หนี้สินรวม (Total Debt)', q => q.total_debt_fmt || '-'],
+            ['🏛️ ส่วนของผู้ถือหุ้น (Stockholders Equity)', q => q.stockholders_equity_fmt || '-'],
+            ['⚖️ หนี้สินต่อทุน (D/E Ratio)', q => {
+                const de = q.debt_to_equity;
+                if (de == null) return '-';
+                const col = de > 2.5 ? '#fb7185' : (de <= 1.0 ? '#34d399' : '#f8fafc');
+                return `<span style="color:${col}; font-weight:700;">${de.toFixed(2)}x</span>`;
+            }, true],
+            ['🏷️ P/E อ้างอิงไตรมาส', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-', true],
+        ];
 
         let rowsHtml = '';
-        // 1. Revenue
-        rowsHtml += buildRow('💰 รายได้รวม (Total Revenue)', q => `<strong>${q.revenue_fmt || '-'}</strong>`);
-        // 2. QoQ Revenue Growth
-        rowsHtml += buildRow('⚡ เติบโต QoQ (%)', q => _renderGrowthBadge(q.rev_growth_qoq), true);
-        // 3. YoY Revenue Growth
-        rowsHtml += buildRow('📈 เติบโต YoY (%)', q => _renderGrowthBadge(q.rev_growth_yoy), true);
-        // 4. Gross Profit
-        rowsHtml += buildRow('📈 กำไรขั้นต้น (Gross Profit)', q => q.gross_profit_fmt || '-');
-        // 5. Gross Margin
-        rowsHtml += buildRow('⚙️ อัตรากำไรขั้นต้น (Gross Margin)', q => q.gross_margin != null ? `${q.gross_margin.toFixed(1)}%` : '-', true);
-        // 6. Operating Income
-        rowsHtml += buildRow('🏢 กำไรจากการดำเนินงาน (Operating Income)', q => q.operating_income_fmt || '-');
-        // 7. Net Income
-        rowsHtml += buildRow('🎯 กำไรสุทธิ (Net Income)', q => {
-            const ni = q.net_income;
-            const col = (ni != null && ni >= 0) ? '#34d399' : '#fb7185';
-            return `<strong style="color:${col}">${q.net_income_fmt || '-'}</strong>`;
+        metrics.forEach(([title, getter, isSub]) => {
+            rowsHtml += `<tr class="${isSub ? 'fin-row-sub' : ''}"><td class="fin-row-header">${title}</td>`;
+            quarters.forEach((q, idx) => {
+                const isLatest = idx === quarters.length - 1;
+                rowsHtml += `<td class="fin-cell ${isLatest ? 'td-latest' : ''}">${getter(q, idx)}</td>`;
+            });
+            rowsHtml += `</tr>`;
         });
-        // 8. Net Margin
-        rowsHtml += buildRow('📊 อัตรากำไรสุทธิ (Net Margin)', q => {
-            const m = q.net_margin;
-            if (m == null) return '-';
-            const col = m >= 15 ? '#34d399' : (m >= 0 ? '#38bdf8' : '#fb7185');
-            return `<span style="color:${col}; font-weight:700;">${m.toFixed(1)}%</span>`;
-        }, true);
-        // 9. Diluted EPS
-        rowsHtml += buildRow('💵 กำไรต่อหุ้น (Diluted EPS)', q => {
-            const eps = q.eps;
-            if (eps == null) return '-';
-            const epsBadge = q.eps_growth_yoy != null ? ` ${_renderGrowthBadge(q.eps_growth_yoy)}` : '';
-            return `$${eps.toFixed(2)}${epsBadge}`;
-        });
-        // 10. Free Cash Flow
-        rowsHtml += buildRow('🌊 กระแสเงินสดอิสระ (FCF)', q => `<span style="color:#c084fc;">${q.fcf_fmt || '-'}</span>`);
-        // 11. Total Debt
-        rowsHtml += buildRow('💳 หนี้สินรวม (Total Debt)', q => q.total_debt_fmt || '-');
-        // 12. Stockholders Equity
-        rowsHtml += buildRow('🏛️ ส่วนของผู้ถือหุ้น (Stockholders Equity)', q => q.stockholders_equity_fmt || '-');
-        // 13. Debt to Equity
-        rowsHtml += buildRow('⚖️ หนี้สินต่อทุน (D/E Ratio)', q => {
-            const de = q.debt_to_equity;
-            if (de == null) return '-';
-            const col = de > 2.5 ? '#fb7185' : (de <= 1.0 ? '#34d399' : '#f8fafc');
-            return `<span style="color:${col}; font-weight:700;">${de.toFixed(2)}x</span>`;
-        }, true);
-        // 14. Quarterly P/E
-        rowsHtml += buildRow('🏷️ P/E อ้างอิงไตรมาส', q => q.pe_quarterly != null ? `${q.pe_quarterly.toFixed(1)}x` : '-', true);
 
+        // Phone view: pick a quarter, then read its metrics top to bottom.
+        const last = quarters.length - 1;
+        let chips = '';
+        let lists = '';
+        quarters.forEach((q, idx) => {
+            const on = idx === last ? ' active' : '';
+            // Newest quarter first so the selected chip is visible without scrolling.
+            chips = `<button type="button" class="finm-chip${on}" data-q="${idx}" onclick="finMobileSelectQuarter(${idx})">${q.quarter_label}</button>` + chips;
+            let items = '';
+            metrics.forEach(([title, getter, isSub]) => {
+                items += `<div class="finm-row${isSub ? ' finm-sub' : ''}"><span class="finm-label">${title}</span><span class="finm-val">${getter(q, idx)}</span></div>`;
+            });
+            lists += `<div class="finm-list" data-q="${idx}"${idx === last ? '' : ' hidden'}><div class="finm-date">งวด ${q.quarter_label} · ${q.date}</div>${items}</div>`;
+        });
+        const mobileHtml = `
+            <div class="finm-wrap">
+                <div class="finm-chips">${chips}</div>
+                ${lists}
+                <button type="button" class="finm-full-btn" onclick="finToggleFullTable()">📋 ดูตารางเต็ม 8 ไตรมาส (เลื่อนซ้ายขวา)</button>
+            </div>`;
+
+        container.classList.remove('fin-show-full');
         container.innerHTML = `
-            <table class="fin-table">
-                <thead><tr>${thCols}</tr></thead>
-                <tbody>${rowsHtml}</tbody>
-            </table>
+            ${mobileHtml}
+            <div class="fin-table-scroll">
+                <table class="fin-table">
+                    <thead><tr>${thCols}</tr></thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
         `;
+    }
+
+    function finMobileSelectQuarter(idx) {
+        const container = document.getElementById('fin_table_container');
+        if (!container) return;
+        container.querySelectorAll('.finm-chip').forEach(b => b.classList.toggle('active', +b.dataset.q === idx));
+        container.querySelectorAll('.finm-list').forEach(l => { l.hidden = +l.dataset.q !== idx; });
+    }
+
+    function finToggleFullTable() {
+        const container = document.getElementById('fin_table_container');
+        if (!container) return;
+        const full = container.classList.toggle('fin-show-full');
+        const btn = container.querySelector('.finm-full-btn');
+        if (btn) btn.textContent = full ? '📱 กลับไปดูทีละไตรมาส' : '📋 ดูตารางเต็ม 8 ไตรมาส (เลื่อนซ้ายขวา)';
     }
 
     // Switch Tabs (Lightweight Chart vs TradingView Full Embed)

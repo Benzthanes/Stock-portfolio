@@ -420,6 +420,56 @@
             background: var(--rose);
         }
 
+
+        /* Row tint by support status, so the status reads without scrolling sideways */
+        tr.status-a td { background: rgba(244, 63, 94, 0.09); }
+        tr.status-b td { background: rgba(245, 158, 11, 0.08); }
+        tr.status-c td { background: rgba(16, 185, 129, 0.04); }
+        tr.status-a td:first-child { box-shadow: inset 4px 0 0 var(--rose); }
+        tr.status-b td:first-child { box-shadow: inset 4px 0 0 var(--amber); }
+        tr.status-c td:first-child { box-shadow: inset 4px 0 0 rgba(16, 185, 129, 0.55); }
+        tr.status-a:hover td { background: rgba(244, 63, 94, 0.14); }
+        tr.status-b:hover td { background: rgba(245, 158, 11, 0.13); }
+        tr.status-c:hover td { background: rgba(16, 185, 129, 0.08); }
+
+        /* Phone: each stock becomes a card, no sideways scrolling */
+        @media (max-width: 768px) {
+            .table-wrap { overflow: visible; border: none; background: transparent; }
+            #stocks-table thead { display: none; }
+            #stocks-table, #stocks-table tbody { display: block; }
+            #stocks-table tr.stock-row {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-areas: "ticker pct" "group status" "eff supp" "pp close" "port port";
+                gap: 6px 10px;
+                padding: 12px 14px;
+                margin-bottom: 10px;
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+                background: var(--bg-card);
+            }
+            #stocks-table tr.stock-row td {
+                display: block; padding: 0; border: none; background: transparent !important;
+                box-shadow: none !important; text-align: left !important;
+            }
+            #stocks-table tr.status-a { border-left: 5px solid var(--rose); background: rgba(244, 63, 94, 0.10); }
+            #stocks-table tr.status-b { border-left: 5px solid var(--amber); background: rgba(245, 158, 11, 0.09); }
+            #stocks-table tr.status-c { border-left: 5px solid rgba(16, 185, 129, 0.6); }
+            .c-ticker { grid-area: ticker; }
+            .c-pct { grid-area: pct; text-align: right !important; font-size: 1.15rem; }
+            .c-group { grid-area: group; }
+            .c-status { grid-area: status; text-align: right !important; }
+            .c-eff { grid-area: eff; }
+            .c-supp { grid-area: supp; text-align: right !important; }
+            .c-pp { grid-area: pp; font-size: 0.8rem; }
+            .c-close { grid-area: close; text-align: right !important; font-size: 0.8rem; }
+            .c-eff::before, .c-supp::before, .c-pp::before, .c-close::before {
+                content: attr(data-label) " "; color: var(--text-muted); font-weight: 400; font-size: 0.75rem;
+            }
+            .c-port { grid-area: port; }
+            tr.stock-row[data-portfolio="false"] .c-port, .c-type { display: none !important; }
+        }
+
         @media (max-width: 768px) {
             body { padding: 12px; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -472,7 +522,7 @@
   .rnav-status { font-size: 0.74rem; }
 }
 </style>
-<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link active" aria-current="page">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 18:12</span></div></div></nav>
+<nav class="rnav" aria-label="รายงาน"><div class="rnav-top-row"><div class="rnav-links"><a href="portfolio_master.html" class="rnav-link">ภาพรวม</a><a href="portfolio_review.html" class="rnav-link">สุขภาพพอร์ต</a><a href="portfolio_recovery.html" class="rnav-link">แก้ดอย</a><a href="portfolio_dip_sim.html" class="rnav-link">Dip จำลอง</a><a href="trades_ledger.html" class="rnav-link">รายการซื้อขายทั้งหมด</a><a href="stock_chart.html" class="rnav-link">กราฟ</a><a href="watchlist.html" class="rnav-link active" aria-current="page">หุ้นที่สนใจ</a></div></div><div class="rnav-live-bar"><div class="rnav-live-left"><button id="rnav-btn-refresh" class="rnav-refresh-btn" onclick="triggerGlobalRefresh()" title="กดเพื่อดึงราคาตลาดสดทันที"><span id="rnav-refresh-icon" style="display:inline-block; transition:transform 0.6s ease;">🔄</span> <span id="rnav-refresh-text">รีเฟรชราคา</span> <span class="rnav-live-badge">Live</span></button><div class="rnav-int-group" title="อัปเดตราคาหุ้นอัตโนมัติ (5วิ - 60วิ)"><span class="rnav-int-label">⏱️ อัปเดตสด:</span><button id="rnav-live-0" class="rnav-int-btn active" onclick="setGlobalLiveInterval(0)">ปิด</button><button id="rnav-live-5" class="rnav-int-btn" onclick="setGlobalLiveInterval(5)">5s</button><button id="rnav-live-15" class="rnav-int-btn" onclick="setGlobalLiveInterval(15)">15s</button><button id="rnav-live-30" class="rnav-int-btn" onclick="setGlobalLiveInterval(30)">30s</button><button id="rnav-live-60" class="rnav-int-btn" onclick="setGlobalLiveInterval(60)">60s</button></div></div><div class="rnav-live-right"><span id="rnav-live-status" class="rnav-status">⚪ อัปเดตด้วยตนเอง</span><span class="rnav-time">อัปเดต: 2026-10-30 18:23</span></div></div></nav>
 <script>
 (function() {
   var activeLink = document.querySelector(".rnav-link.active");
@@ -636,7 +686,7 @@
         </div>
         <div class="header-meta">
             <span class="meta-pill">🔍 อ้างอิง: <strong>Shay Boloor (2026-10-17)</strong></span>
-            <span class="meta-pill">⏱️ เวลาของราคา: <strong>2026-10-30 18:12:52</strong></span>
+            <span class="meta-pill">⏱️ เวลาของราคา: <strong>2026-10-30 18:23:57</strong></span>
             <span class="meta-pill">📊 ทั้งหมด: <strong>49 ตัว</strong></span>
         </div>
     </div>
@@ -760,884 +810,884 @@
             <tbody>
                 
         <tr class="stock-row status-a" data-group="AI Utilities" data-status="A" data-portfolio="false" data-ticker="CIFR">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">CIFR</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Utilities</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$8.10</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$7.58 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$7.58</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$9</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-15.83%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$8.10</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$7.51 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$7.51</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$9</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-16.56%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="AI Applications" data-status="A" data-portfolio="false" data-ticker="NOW">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">NOW</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Applications</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$109.67</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$109.86 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$109.86</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$124</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-11.40%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-a" data-group="CPU Bottleneck" data-status="A" data-portfolio="false" data-ticker="INTC">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">INTC</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">CPU Bottleneck</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$92.07</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$68.38 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$68.38</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$75</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.83%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$109.67</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$109.41 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$109.41</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$124</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-11.77%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="AI Connectivity" data-status="A" data-portfolio="false" data-ticker="CRDO">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">CRDO</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Connectivity</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$165.29</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$152.99 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$152.99</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$167</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.39%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$165.29</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$151.89 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$151.89</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$167</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-9.05%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="true" data-ticker="GOOGL">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">GOOGL</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Physical AI</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$283.82</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$282.33 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$282.33</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$307</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.04%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-port" title="มีหุ้นนี้ในพอร์ตจริง (data/portfolio.json)">⭐ มีในพอร์ต</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$283.82</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$281.71 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$281.71</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$307</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.24%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="badge badge-port" title="มีหุ้นนี้ในพอร์ตจริง (data/portfolio.json)">⭐ มีในพอร์ต</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
-        <tr class="stock-row status-a" data-group="AI Connectivity" data-status="A" data-portfolio="false" data-ticker="MRVL">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">MRVL</span>
+        <tr class="stock-row status-a" data-group="CPU Bottleneck" data-status="A" data-portfolio="false" data-ticker="INTC">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">INTC</span>
             </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">AI Connectivity</span>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">CPU Bottleneck</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$218.34</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$205.10 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$205.10</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$222</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-7.61%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$92.07</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$68.94 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$68.94</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$75</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-8.08%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="CPU Bottleneck" data-status="A" data-portfolio="false" data-ticker="ARM">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">ARM</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">CPU Bottleneck</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$228.77</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$208.15 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$208.15</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$225</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-7.49%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$228.77</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$207.81 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$207.81</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$225</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-7.64%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Connectivity" data-status="A" data-portfolio="false" data-ticker="MRVL">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">MRVL</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">AI Connectivity</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$218.34</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$205.24 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$205.24</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$222</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-7.55%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="Nuclear" data-status="A" data-portfolio="false" data-ticker="OKLO">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">OKLO</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Nuclear</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$26.81</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$25.53 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$25.53</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$27</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-5.45%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$26.81</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$25.40 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$25.40</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$27</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-5.93%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="AI Utilities" data-status="A" data-portfolio="false" data-ticker="IREN">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">IREN</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Utilities</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$26.25</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$24.61 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$24.61</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$26</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-5.33%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-a" data-group="Photonics" data-status="A" data-portfolio="false" data-ticker="COHR">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">COHR</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Photonics</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$237.22</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$216.00 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$216.00</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$224</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-3.57%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$26.25</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$24.46 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$24.46</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$26</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-5.92%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="Photonics" data-status="A" data-portfolio="false" data-ticker="AEHR">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">AEHR</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Photonics</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$61.21</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$55.05 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$55.05</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$57</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-3.42%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$61.21</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$54.90 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$54.90</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$57</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-3.68%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Photonics" data-status="A" data-portfolio="false" data-ticker="COHR">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">COHR</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Photonics</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$237.22</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$216.89 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$216.89</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$224</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-3.17%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="AI Silicon" data-status="A" data-portfolio="false" data-ticker="ASML">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">ASML</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Silicon</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$1675.70</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$1594.76 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$1594.76</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$1637</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-2.58%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$1675.70</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$1596.66 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$1596.66</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$1637</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-2.46%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="Nuclear" data-status="A" data-portfolio="false" data-ticker="LEU">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">LEU</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Nuclear</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$110.55</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$105.26 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$105.26</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$107</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.63%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="false" data-ticker="VPG">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">VPG</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Physical AI</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$59.16</td>
-            <td style="text-align: right; white-space: nowrap;">-</td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$59.16</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$60</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.40%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">ราคาปิด (Close)</td>
-        </tr>
-        
-
-        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="false" data-ticker="AMZN">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">AMZN</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Physical AI</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$243.79</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$227.78 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$227.78</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$231</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.39%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-a" data-group="AI Silicon" data-status="A" data-portfolio="false" data-ticker="NVDA">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">NVDA</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">AI Silicon</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$213.66</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$207.36 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$207.36</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$210</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.26%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$110.55</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$105.01 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$105.01</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$107</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.86%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="Nuclear" data-status="A" data-portfolio="false" data-ticker="UUUU">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">UUUU</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Nuclear</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$8.23</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$7.95 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$7.95</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$8</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-0.62%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$8.23</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$7.88 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$7.88</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$8</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.56%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="false" data-ticker="VPG">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">VPG</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Physical AI</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$59.16</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;">-</td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$59.16</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$60</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.40%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">ราคาปิด (Close)</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="AI Silicon" data-status="A" data-portfolio="false" data-ticker="NVDA">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">NVDA</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">AI Silicon</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$213.66</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$207.27 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$207.27</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$210</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.30%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-a" data-group="Physical AI" data-status="A" data-portfolio="false" data-ticker="AMZN">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">AMZN</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Physical AI</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$243.79</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$228.37 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$228.37</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$231</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-1.14%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-a" data-group="AI Power" data-status="A" data-portfolio="false" data-ticker="ON">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">ON</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Power</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$75.24</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$71.64 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$71.64</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$72</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-0.50%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$75.24</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$71.51 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$71.51</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$72</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-rose fw-bold">-0.68%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-rose">🔻 (ก) ต่ำกว่าแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-b" data-group="Quantum" data-status="B" data-portfolio="false" data-ticker="IONQ">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">IONQ</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Quantum</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$31.72</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$30.13 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$30.13</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$30</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+0.43%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$31.72</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$30.03 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$30.03</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$30</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+0.09%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-b" data-group="CPU Bottleneck" data-status="B" data-portfolio="false" data-ticker="AMKR">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">AMKR</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">CPU Bottleneck</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$41.21</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$38.53 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$38.53</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$38</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+1.39%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$41.21</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$38.51 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$38.51</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$38</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+1.34%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-b" data-group="AI Connectivity" data-status="B" data-portfolio="false" data-ticker="AVGO">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">AVGO</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Connectivity</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$345.00</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$331.65 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$331.65</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$324</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+2.36%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$345.00</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$331.16 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$331.16</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$324</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+2.21%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-b" data-group="AI Silicon" data-status="B" data-portfolio="false" data-ticker="MU">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">MU</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Silicon</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$934.27</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$885.92 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$885.92</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$849</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.35%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$934.27</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$880.77 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$880.77</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$849</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+3.74%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-b" data-group="AI Silicon" data-status="B" data-portfolio="false" data-ticker="TSM">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">TSM</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Silicon</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$431.81</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$416.41 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$416.41</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$398</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.63%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$431.81</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$416.00 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$416.00</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$398</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.52%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-b" data-group="Quantum" data-status="B" data-portfolio="false" data-ticker="RGTI">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">RGTI</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Quantum</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$12.06</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$11.53 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$11.53</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$11</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.78%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$12.06</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$11.51 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$11.51</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$11</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-amber fw-bold">+4.65%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-amber">⚠️ (ข) 0-5% เหนือแนวรับ</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Power" data-status="C" data-portfolio="false" data-ticker="BE">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">BE</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Power</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$222.30</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$203.98 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$203.98</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$192</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.24%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$222.30</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$204.15 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$204.15</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$192</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.33%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Utilities" data-status="C" data-portfolio="false" data-ticker="DOCN">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">DOCN</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Utilities</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$99.97</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$96.00 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$96.00</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$90</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.67%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$99.97</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$96.00 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$96.00</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$90</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.67%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Power" data-status="C" data-portfolio="false" data-ticker="NVTS">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">NVTS</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Power</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$9.20</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.59 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$8.59</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$8</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.37%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$9.20</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.54 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$8.54</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$8</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+6.75%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="ASTS">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">ASTS</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Space</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$43.07</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$40.89 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$40.89</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$38</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.61%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="ONDS">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">ONDS</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Drones</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$6.88</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$6.48 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$6.48</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$6</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.00%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-c" data-group="CPU Bottleneck" data-status="C" data-portfolio="false" data-ticker="AMD">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">AMD</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">CPU Bottleneck</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$566.42</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$517.75 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$517.75</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$479</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.09%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="KTOS">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">KTOS</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Drones</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$43.59</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$42.31 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$42.31</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$39</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.49%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="MRCY">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">MRCY</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Drones</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$81.80</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$80.40 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$80.40</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$74</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.65%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$43.07</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$40.76 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$40.76</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$38</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.26%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Connectivity" data-status="C" data-portfolio="false" data-ticker="ALAB">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">ALAB</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Connectivity</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$290.43</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$273.11 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$273.11</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$251</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.81%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$290.43</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$269.60 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$269.60</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$251</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.41%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="ONDS">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">ONDS</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$6.88</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$6.45 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$6.45</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$6</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.50%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="CPU Bottleneck" data-status="C" data-portfolio="false" data-ticker="AMD">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">AMD</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">CPU Bottleneck</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$566.42</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$516.20 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$516.20</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$479</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+7.77%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="KTOS">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">KTOS</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$43.59</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$42.15 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$42.15</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$39</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.08%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="MRCY">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">MRCY</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Drones</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$81.80</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$80.40 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$80.40</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$74</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.65%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Utilities" data-status="C" data-portfolio="false" data-ticker="NBIS">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">NBIS</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Utilities</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$171.99</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$159.85 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$159.85</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$146</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+9.49%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$171.99</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$159.10 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$159.10</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$146</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+8.97%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Quantum" data-status="C" data-portfolio="false" data-ticker="QBTS">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">QBTS</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Quantum</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$11.56</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$11.05 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$11.05</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$10</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+10.50%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$11.56</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$11.00 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$11.00</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$10</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+10.00%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="RKLB">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">RKLB</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Space</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$59.10</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$55.60 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$55.60</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$50</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.20%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$59.10</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$55.39 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$55.39</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$50</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+10.78%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Physical AI" data-status="C" data-portfolio="false" data-ticker="TSLA">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">TSLA</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Physical AI</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$403.30</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$394.00 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$394.00</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$353</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.61%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$403.30</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$393.17 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$393.17</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$353</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.38%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Photonics" data-status="C" data-portfolio="false" data-ticker="LITE">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">LITE</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Photonics</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$919.53</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$854.07 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$854.07</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$765</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.64%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
-        </tr>
-        
-
-        <tr class="stock-row status-c" data-group="Quantum" data-status="C" data-portfolio="false" data-ticker="INFQ">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">INFQ</span>
-            </td>
-            <td style="white-space: nowrap;">
-                <span class="group-pill">Quantum</span>
-            </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$9.43</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.97 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$8.97</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$8</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.13%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$919.53</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$853.00 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$853.00</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$765</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.50%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Applications" data-status="C" data-portfolio="false" data-ticker="SNOW">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">SNOW</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Applications</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$330.27</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$317.97 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$317.97</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$283</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.36%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$330.27</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$316.06 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$316.06</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$283</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+11.68%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
+        </tr>
+        
+
+        <tr class="stock-row status-c" data-group="Quantum" data-status="C" data-portfolio="false" data-ticker="INFQ">
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">INFQ</span>
+            </td>
+            <td class="c-group" style="white-space: nowrap;">
+                <span class="group-pill">Quantum</span>
+            </td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$9.43</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.96 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$8.96</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$8</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.00%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Applications" data-status="C" data-portfolio="false" data-ticker="PLTR">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">PLTR</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Applications</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$196.42</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$193.79 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$193.79</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$172</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.67%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$196.42</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$193.10 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$193.10</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$172</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+12.27%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Power" data-status="C" data-portfolio="true" data-ticker="VRT">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">VRT</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Power</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$245.92</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$230.40 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$230.40</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$195</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+18.15%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-port" title="มีหุ้นนี้ในพอร์ตจริง (data/portfolio.json)">⭐ มีในพอร์ต</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$245.92</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$229.60 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$229.60</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$195</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+17.74%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="badge badge-port" title="มีหุ้นนี้ในพอร์ตจริง (data/portfolio.json)">⭐ มีในพอร์ต</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Photonics" data-status="C" data-portfolio="false" data-ticker="AAOI">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">AAOI</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Photonics</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$79.19</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$72.21 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$72.21</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$61</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+18.38%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$79.19</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$71.96 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$71.96</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$61</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+17.97%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="SPCX">
-            <td style="white-space: nowrap;">
-                <span class="ticker-pill">SPCX</span> <span class="text-muted" style="font-size:0.72rem;" title="แนวรับไม่ได้มาจากภาพ Shay Boloor">✎ ผู้ใช้กำหนดเอง 2026-10-30</span>
+            <td class="c-ticker" style="white-space: nowrap;">
+                <span class="ticker-pill">SPCX</span><div class="text-muted" style="font-size:0.72rem; margin-top:3px;" title="แนวรับไม่ได้มาจากภาพ Shay Boloor">✎ ผู้ใช้กำหนดเอง 2026-10-30</div>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Space</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$143.89</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$138.96 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$138.96</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$115</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+20.83%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$143.89</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$138.48 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$138.48</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$115</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+20.42%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="RDW">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">RDW</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Space</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$9.16</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.63 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$8.63</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$7</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+23.29%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$9.16</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$8.62 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$8.62</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$7</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+23.14%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="AI Applications" data-status="C" data-portfolio="false" data-ticker="CRWD">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">CRWD</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">AI Applications</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$261.15</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$261.25 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$261.25</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$210</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+24.40%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$261.15</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$259.00 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$259.00</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$210</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+23.33%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Nuclear" data-status="C" data-portfolio="false" data-ticker="GEV">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">GEV</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Nuclear</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$887.85</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$861.00 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$861.00</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$678</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+26.99%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$887.85</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$856.01 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$856.01</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$678</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+26.26%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Drones" data-status="C" data-portfolio="false" data-ticker="AVAV">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">AVAV</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Drones</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$134.88</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$132.00 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$132.00</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$102</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+29.41%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$134.88</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$131.10 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$131.10</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$102</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+28.53%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
 
         <tr class="stock-row status-c" data-group="Space" data-status="C" data-portfolio="false" data-ticker="PL">
-            <td style="white-space: nowrap;">
+            <td class="c-ticker" style="white-space: nowrap;">
                 <span class="ticker-pill">PL</span>
             </td>
-            <td style="white-space: nowrap;">
+            <td class="c-group" style="white-space: nowrap;">
                 <span class="group-pill">Space</span>
             </td>
-            <td style="text-align: right; white-space: nowrap;" class="text-muted">$14.31</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$13.65 <small>(Pre)</small></span></td>
-            <td style="text-align: right; white-space: nowrap; font-weight: 600;">$13.65</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-gold fw-bold">$10</td>
-            <td style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+36.55%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
-            <td style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
-            <td style="text-align: left; white-space: nowrap;" class="text-muted small">Premarket</td>
+            <td class="c-close text-muted" data-label="ปิด" style="text-align: right; white-space: nowrap;">$14.31</td>
+            <td class="c-pp" data-label="Pre/Post" style="text-align: right; white-space: nowrap;"><span class="text-blue" title="Premarket">$13.66 <small>(Pre)</small></span></td>
+            <td class="c-eff" data-label="ราคาที่ใช้" style="text-align: right; white-space: nowrap; font-weight: 600;">$13.66</td>
+            <td class="c-supp text-gold fw-bold" data-label="แนวรับ" style="text-align: right; white-space: nowrap;">$10</td>
+            <td class="c-pct" style="text-align: right; white-space: nowrap;"><span class="text-emerald fw-bold">+36.55%</span></td>
+            <td class="c-status" style="text-align: center; white-space: nowrap;"><span class="badge badge-emerald">🟢 (ค) เกิน 5%</span></td>
+            <td class="c-port" style="text-align: center; white-space: nowrap;"><span class="text-muted">-</span></td>
+            <td class="c-type text-muted small" style="text-align: left; white-space: nowrap;">Premarket</td>
         </tr>
         
             </tbody>
