@@ -130,7 +130,7 @@ python3 recovery.py -f data/portfolio_set.json
 - รัน test: `python3 -m unittest discover -s tests -t .`.
   test ถูกบล็อกไม่ให้ต่อเน็ตจริง ตั้ง `ALLOW_NETWORK=1` ถ้าต้องการปิดการบล็อก.
 - Lint (ไม่บังคับ): `uvx ruff check .` ใช้ค่าจาก `pyproject.toml`.
-- CI: `.github/workflows/update_portfolio.yml` รันจันทร์ถึงศุกร์ 13:39 และ 21:12 UTC.
+- CI: `.github/workflows/update_portfolio.yml` รันจันทร์ถึงศุกร์ 11:56 และ 19:13 UTC (18:56 และ 02:13 ICT).
   GitHub มักรันช้ากว่าเวลาที่ตั้งไว้ 2 ถึง 4 ชั่วโมง.
   ถ้ารันพัง จะเปิดหรือคอมเมนต์ใน issue ที่มี label `portfolio-update-failure`.
 - Claude skills อยู่ที่ `.agents/skills/` และเข้าถึงผ่าน symlink `.claude/skills`.
