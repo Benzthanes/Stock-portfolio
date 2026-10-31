@@ -12,6 +12,21 @@ COMMAND = re.compile(r"python3 (?!-m )([\w/]+\.py)([^`\n|]*)")
 FLAG = re.compile(r"(?<![\w-])(--?[a-zA-Z][\w-]*)")
 
 
+def is_gitignored(path: str) -> bool:
+    try:
+        if subprocess.run(["git", "check-ignore", "-q", path], cwd=ROOT, capture_output=True).returncode == 0:
+            return True
+    except Exception:
+        pass
+    return path in {
+        "data/candles_cache.json",
+        "data/financials_cache.json",
+        "data/.news_cache.json",
+        "data/.backtest_candles.json",
+        "data/.port_analysis.json",
+    }
+
+
 def help_text(script: str, subcommand: str = "") -> str:
     cmd = [sys.executable, script] + ([subcommand] if subcommand else []) + ["--help"]
     return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=60).stdout
@@ -59,9 +74,29 @@ class AgentDocsTest(unittest.TestCase):
             for path in re.findall(r"`((?:\.?[\w-]+/)+[\w.-]+\.(?:py|json|md|yml|js|html))`", doc.read_text(encoding="utf-8")):
                 if "<" in path or "TICKER" in path or path.startswith(("/tmp", "reports/xxx", "data/.")):
                     continue
+                if is_gitignored(path):
+                    continue
                 if not (ROOT / path).exists():
                     missing.append(f"{doc.name}: {path}")
         self.assertEqual(missing, [])
+
+    def test_gitignored_cache_files_are_detected(self):
+        self.assertTrue(is_gitignored("data/candles_cache.json"))
+        self.assertTrue(is_gitignored("data/financials_cache.json"))
+        self.assertFalse(is_gitignored("data/portfolio.json"))
+        self.assertFalse(is_gitignored("src/trades.py"))
+
+    def test_paths_named_in_agent_docs_pass_when_cache_missing_from_disk(self):
+        original_exists = Path.exists
+
+        def fake_exists(path_obj):
+            if "candles_cache.json" in str(path_obj):
+                return False
+            return original_exists(path_obj)
+
+        from unittest.mock import patch
+        with patch.object(Path, "exists", fake_exists):
+            self.test_paths_named_in_agent_docs_exist()
 
 
 if __name__ == "__main__":
